@@ -1,0 +1,62 @@
+diff --git a/node_modules/react-native-web/dist/exports/useWindowDimensions/index.js b/node_modules/react-native-web/dist/exports/useWindowDimensions/index.js
+new file mode 100644
+index 0000000..35a0169
+--- /dev/null
++++ b/node_modules/react-native-web/dist/exports/useWindowDimensions/index.js
+@@ -0,0 +1,37 @@
++/**
++ * Copyright (c) Facebook, Inc. and its affiliates.
++ *
++ * This source code is licensed under the MIT license found in the
++ * LICENSE file in the root directory of this source tree.
++ *
++ * @format
++ * 
++ */
++'use strict';
++
++import Dimensions from '../Dimensions';
++import { useEffect, useState } from 'react';
++export default function useWindowDimensions() {
++  var _useState = useState(function () {
++    return Dimensions.get('window');
++  }),
++      dims = _useState[0],
++      setDims = _useState[1];
++
++  useEffect(function () {
++    function handleChange(_ref) {
++      var window = _ref.window;
++      setDims(window);
++    }
++
++    Dimensions.addEventListener('change', handleChange); // We might have missed an update between calling `get` in render and
++    // `addEventListener` in this handler, so we set it here. If there was
++    // no change, React will filter out this update as a no-op.
++
++    setDims(Dimensions.get('window'));
++    return function () {
++      Dimensions.removeEventListener('change', handleChange);
++    };
++  }, []);
++  return dims;
++}
+diff --git a/node_modules/react-native-web/dist/index.js b/node_modules/react-native-web/dist/index.js
+index e31af10..20e1a11 100644
+--- a/node_modules/react-native-web/dist/index.js
++++ b/node_modules/react-native-web/dist/index.js
+@@ -99,6 +99,7 @@ import Systrace from './exports/Systrace';
+ import TimePickerAndroid from './exports/TimePickerAndroid';
+ import TVEventHandler from './exports/TVEventHandler';
+ import VibrationIOS from './exports/VibrationIOS'; // plugins
++import useWindowDimensions from './exports/useWindowDimensions'; // plugins
+ 
+ import DeviceEventEmitter from './exports/DeviceEventEmitter';
+ export { // top-level API
+@@ -109,4 +110,4 @@ ActivityIndicator, Button, CheckBox, FlatList, Image, ImageBackground, KeyboardA
+ ColorPropType, EdgeInsetsPropType, PointPropType, // compat (components)
+ DatePickerIOS, DrawerLayoutAndroid, ImageEditor, ImageStore, InputAccessoryView, MaskedViewIOS, NavigatorIOS, PickerIOS, ProgressBarAndroid, ProgressViewIOS, SegmentedControlIOS, SnapshotViewIOS, TabBarIOS, ToastAndroid, ToolbarAndroid, ViewPagerAndroid, WebView, // compat (apis)
+ ActionSheetIOS, AlertIOS, CameraRoll, DatePickerAndroid, ImagePickerIOS, PermissionsAndroid, PushNotificationIOS, Settings, StatusBarIOS, Systrace, TimePickerAndroid, TVEventHandler, VibrationIOS, // plugins
+-DeviceEventEmitter };
+\ No newline at end of file
++DeviceEventEmitter, useWindowDimensions };

@@ -1,0 +1,55 @@
+{
+  "name": "LifeTime",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "ruby:bundle": "which bundle && bundle install",
+    "cocoapods:install": "(which bundle && cd ios && bundle exec pod install --repo-update) || echo \"iOS Pods not installed due to missing 'bundle' command - or an error during pod install\"",
+    "prepare": "patch-package && yarn ruby:bundle && yarn cocoapods:install",
+    "start": "react-native start",
+    "start:android": "react-native run-android",
+    "start:ios": "react-native run-ios --simulator=\"iPhone 11\"",
+    "start:web": "react-scripts start",
+    "build:web": "react-scripts build",
+    "test:native": "jest",
+    "test:web": "react-scripts test",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "flow-bin": "0.105.1",
+    "react": "16.11.0",
+    "react-dom": "^16.11.0",
+    "react-native": "0.61.2",
+    "react-native-web": "^0.11.7",
+    "react-scripts": "3.2.0",
+    "reason-react": "^0.7.0",
+    "reason-react-native": "^0.61.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.3",
+    "@babel/runtime": "^7.6.3",
+    "@react-native-community/eslint-config": "^0.0.5",
+    "babel-jest": "^24.9.0",
+    "bs-platform": "^5.2.1",
+    "eslint": "^6.6.0",
+    "jest": "^24.9.0",
+    "metro-react-native-babel-preset": "^0.56.0",
+    "patch-package": "^6.2.0",
+    "react-test-renderer": "16.9.0"
+  },
+  "jest": {
+    "preset": "react-native"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
