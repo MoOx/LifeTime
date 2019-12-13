@@ -19,6 +19,8 @@
 		2DCD954D1E0B4F2C00145EB5 /* LifeTimeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* LifeTimeTests.m */; };
 		3E553368A17D8B5C9CED4ED7 /* libPods-LifeTime-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A8B711944F2FBF952527E3F4 /* libPods-LifeTime-tvOS.a */; };
 		64AA001D65274E86C70727D4 /* libPods-LifeTime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CF9C661A53A1D74910D3874 /* libPods-LifeTime.a */; };
+		7EF095F423A2D5CE0030AFF6 /* Icon-transparent.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EF095F323A2D5CE0030AFF6 /* Icon-transparent.png */; };
+		7EF095F623A2D5E60030AFF6 /* Gradient.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EF095F523A2D5E60030AFF6 /* Gradient.png */; };
 		BA650D32FA69B0915F6202A9 /* libPods-LifeTimeTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CE7CE8EFAC1CF73F18A21B5A /* libPods-LifeTimeTests.a */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +61,8 @@
 		33CDF874EBE9F033F81121DD /* Pods-LifeTime.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime.release.xcconfig"; path = "Target Support Files/Pods-LifeTime/Pods-LifeTime.release.xcconfig"; sourceTree = "<group>"; };
 		408021321C30B4A98AE24CE4 /* Pods-LifeTime.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime.debug.xcconfig"; path = "Target Support Files/Pods-LifeTime/Pods-LifeTime.debug.xcconfig"; sourceTree = "<group>"; };
 		459F4DC83EFF62E731BB0B1B /* Pods-LifeTime-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-LifeTime-tvOSTests/Pods-LifeTime-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
+		7EF095F323A2D5CE0030AFF6 /* Icon-transparent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-transparent.png"; path = "../public/Icon-transparent.png"; sourceTree = "<group>"; };
+		7EF095F523A2D5E60030AFF6 /* Gradient.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Gradient.png; path = ../public/Gradient.png; sourceTree = "<group>"; };
 		9A9B67576FA914BBC7BC494A /* Pods-LifeTime-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-LifeTime-tvOSTests/Pods-LifeTime-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9CF9C661A53A1D74910D3874 /* libPods-LifeTime.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LifeTime.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8B711944F2FBF952527E3F4 /* libPods-LifeTime-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LifeTime-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -125,12 +129,14 @@
 		13B07FAE1A68108700A75B9A /* LifeTime */ = {
 			isa = PBXGroup;
 			children = (
+				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
+				7EF095F323A2D5CE0030AFF6 /* Icon-transparent.png */,
+				7EF095F523A2D5E60030AFF6 /* Gradient.png */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
 			name = LifeTime;
@@ -194,7 +200,6 @@
 				126E990817DB00BCFC08F694 /* Pods-LifeTimeTests.debug.xcconfig */,
 				EB59170ED3FE0F9FBE0CBAFE /* Pods-LifeTimeTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -308,6 +313,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -337,6 +343,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				7EF095F623A2D5E60030AFF6 /* Gradient.png in Resources */,
+				7EF095F423A2D5CE0030AFF6 /* Icon-transparent.png in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -637,6 +645,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = LifeTime;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -656,6 +665,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = LifeTime;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
