@@ -1,8 +1,12 @@
 // ReasonML bindings for react-native-calendar v1.7.0
 
 type isoDateString = string;
-type authorizationStatus =
-  [@bs.string] [ | `denied | `restricted | `authorized | `undetermined];
+
+type authorizationStatus = string;
+// [@bs.string] [ | `denied | `restricted | `authorized | `undetermined];
+
+type rawRecurrenceFrequency = string;
+// [@bs.string] [ | `daily | `weekly | `monthly | `yearly];
 
 type recurrenceFrequency =
   [@bs.string] [ | `daily | `weekly | `monthly | `yearly];
@@ -88,7 +92,7 @@ type calendarEventReadable = {
   /** Indicates whether the event is an all-day event. */
   allDay: option(bool),
   /** The simple recurrence frequency of the calendar event. */
-  recurrence: option(recurrenceFrequency),
+  recurrence: option(rawRecurrenceFrequency),
   /** The location associated with the calendar event. */
   location: option(string),
   /** iOS ONLY - Indicates whether an event is a detached instance of a repeating event. */
@@ -186,24 +190,24 @@ type calendarOptions = {
 };
 
 /** Get calendar authorization status. */
-[@bs.module "react-native-calendar-events"]
+[@bs.module "react-native-calendar-events"] [@bs.scope "default"]
 external authorizationStatus: unit => Js.Promise.t(authorizationStatus) =
   "authorizationStatus";
 
 /** Request calendar authorization. Authorization must be granted before accessing calendar events. */
-[@bs.module "react-native-calendar-events"]
+[@bs.module "react-native-calendar-events"] [@bs.scope "default"]
 external authorizeEventStore: unit => Js.Promise.t(authorizationStatus) =
   "authorizeEventStore";
 
 /** Finds all the calendars on the device. */
-[@bs.module "react-native-calendar-events"]
+[@bs.module "react-native-calendar-events"] [@bs.scope "default"]
 external findCalendars: unit => Js.Promise.t(array(calendar)) =
   "findCalendars";
 
 /** Create a calendar.
  * @param calendar - Calendar to create
  */
-[@bs.module "react-native-calendar-events"]
+[@bs.module "react-native-calendar-events"] [@bs.scope "default"]
 external saveCalendar: calendarOptions => Js.Promise.t(string) =
   "saveCalendar";
 
@@ -211,7 +215,7 @@ external saveCalendar: calendarOptions => Js.Promise.t(string) =
  * Find calendar event by id.
  * @param id - Event ID
  */
-[@bs.module "react-native-calendar-events"]
+[@bs.module "react-native-calendar-events"] [@bs.scope "default"]
 external findEventById:
   string => Js.Promise.t(Js.Nullable.t(calendarEventReadable)) =
   "findEventById";
@@ -222,7 +226,7 @@ external findEventById:
  * @param endDate - Date string in ISO format
  * @param [calendarIds] - List of calendar id strings to specify calendar events. Defaults to all calendars if empty.
  */
-[@bs.module "react-native-calendar-events"]
+[@bs.module "react-native-calendar-events"] [@bs.scope "default"]
 external fetchAllEvents:
   (isoDateString, isoDateString, option(array(string))) =>
   Js.Promise.t(array(calendarEventReadable)) =
@@ -235,7 +239,7 @@ external fetchAllEvents:
  * @param [options] - Options specific to the saved event.
  * @returns - Promise resolving to saved event's ID.
  */
-[@bs.module "react-native-calendar-events"]
+[@bs.module "react-native-calendar-events"] [@bs.scope "default"]
 external saveEvent:
   (string, calendarEventWritable, option(options)) => Js.Promise.t(string) =
   "saveEvent";
@@ -246,6 +250,6 @@ external saveEvent:
  * @param [options] - Options specific to the saved event.
  * @returns - Promise resolving to bool to indicate if removal succeeded.
  */
-[@bs.module "react-native-calendar-events"]
+[@bs.module "react-native-calendar-events"] [@bs.scope "default"]
 external removeEvent: (string, option(options)) => Js.Promise.t(bool) =
   "removeEvent";
