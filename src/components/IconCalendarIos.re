@@ -15,14 +15,16 @@ let styles =
         ),
       "text":
         textStyle(
-          ~fontSize=9.,
-          ~lineHeight=9.,
+          ~fontSize=6.,
+          ~lineHeight=8.,
           ~fontWeight=`_400,
+          ~textAlign=`center,
           ~color=Theme.Colors.Ios.light.red,
           (),
         ),
       "number":
         textStyle(
+          ~textAlign=`center,
           ~fontSize=30.,
           ~lineHeight=30.,
           ~fontWeight=`_300,
