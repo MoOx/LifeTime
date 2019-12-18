@@ -1,7 +1,7 @@
 {
-  "name": "LifeTime",
-  "version": "0.0.1",
   "private": true,
+  "name": "lifetime-app",
+  "version": "0.0.1",
   "scripts": {
     "ruby:bundle": "which bundle && bundle install",
     "cocoapods:install": "(which bundle && cd ios && bundle exec pod install --repo-update) || echo \"iOS Pods not installed due to missing 'bundle' command - or an error during pod install\"",
@@ -16,17 +16,27 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-community/blur": "^3.4.1",
+    "@react-native-community/masked-view": "^0.1.5",
+    "@react-navigation/bottom-tabs": "^5.0.0-alpha.22",
+    "@react-navigation/core": "^5.0.0-alpha.28",
+    "@react-navigation/native": "^5.0.0-alpha.20",
+    "@react-navigation/stack": "^5.0.0-alpha.45",
     "react": "16.11.0",
     "react-dom": "^16.11.0",
-    "react-multiversal": "https://github.com/MoOx/react-multiversal",
+    "react-multiversal": "https://github.com/MoOx/react-multiversal#36e8721",
     "react-native": "0.61.2",
     "react-native-bootsplash": "^1.0.3",
     "react-native-calendar-events": "^1.7.3",
     "react-native-dark-mode": "^0.2.1",
+    "react-native-gesture-handler": "^1.5.2",
+    "react-native-reanimated": "^1.4.0",
+    "react-native-safe-area-context": "^0.6.1",
     "react-native-svg": "^9.13.6",
     "react-native-web": "^0.11.7",
     "reason-react": "^0.7.0",
-    "reason-react-native": "^0.61.0"
+    "reason-react-native": "^0.61.0",
+    "reason-react-navigation": "https://github.com/reason-react-native/reason-react-navigation#101ff84"
   },
   "devDependencies": {
     "@babel/core": "^7.6.3",

@@ -18,6 +18,7 @@
   "bs-dependencies": [
     "reason-react",
     "reason-react-native",
+    "reason-react-navigation",
     "react-multiversal"
   ]
 }

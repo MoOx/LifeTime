@@ -4,6 +4,7 @@ open ReactMultiversal;
 let styles =
   Style.(
     StyleSheet.create({
+      "wrapper": viewStyle(~flexGrow=1., ()),
       "container": viewStyle(~flexGrow=1., ()),
       "content": viewStyle(~flexGrow=1., ~justifyContent=`center, ()),
       "pitch":
@@ -73,7 +74,7 @@ let themedStyles =
 let icon = Packager.require("../../public/Icon.png");
 
 [@react.component]
-let make = () => {
+let make = (~onAboutPrivacyPress, ~onContinuePress) => {
   let dynamicStyles = Hooks.useStyles(themedStyles);
   let windowDimensions = Dimensions.useWindowDimensions();
   let animatedPitchOpacity = React.useRef(Animated.Value.create(0.));
@@ -133,7 +134,9 @@ let make = () => {
     None;
   });
 
-  <ScrollView horizontal=true pagingEnabled=true style=dynamicStyles##wrapper>
+  <ScrollView
+    style={Style.array([|dynamicStyles##wrapper|])}
+    contentContainerStyle=styles##wrapper>
     <SafeAreaView style=styles##container>
       <SpacedView
         horizontal=XL
@@ -214,7 +217,7 @@ let make = () => {
                 ->React.string
               </Text>
               <Spacer size=S />
-              <TouchableOpacity onPress={_ => ()}>
+              <TouchableOpacity onPress=onAboutPrivacyPress>
                 <Text
                   style=Style.(
                     array([|
@@ -228,7 +231,7 @@ let make = () => {
             </View>
           </Row>
           <Spacer size=L />
-          <TouchableButton text="Continue" onPress={_ => ()} />
+          <TouchableButton text="Continue" onPress=onContinuePress />
         </Animated.View>
       </SpacedView>
     </SafeAreaView>
