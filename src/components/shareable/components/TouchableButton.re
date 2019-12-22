@@ -33,7 +33,7 @@ let themedStyles =
 
 [@react.component]
 let make = (~onPress, ~text, ~styles as s=?) => {
-  let dynamicStyles = Hooks.useStyles(themedStyles);
+  let dynamicStyles = Theme.useYourStyles(themedStyles);
   <TouchableOpacity onPress>
     <SpacedView
       vertical=S

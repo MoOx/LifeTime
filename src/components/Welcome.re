@@ -75,7 +75,7 @@ let icon = Packager.require("../../public/Icon.png");
 
 [@react.component]
 let make = (~onAboutPrivacyPress, ~onContinuePress) => {
-  let dynamicStyles = Hooks.useStyles(themedStyles);
+  let dynamicStyles = Theme.useYourStyles(themedStyles);
   let windowDimensions = Dimensions.useWindowDimensions();
   let animatedPitchOpacity = React.useRef(Animated.Value.create(0.));
   let animatedPitchScale = React.useRef(Animated.Value.create(0.75));
@@ -137,7 +137,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
   <ScrollView
     style={Style.array([|dynamicStyles##wrapper|])}
     contentContainerStyle=styles##wrapper>
-    <SafeAreaView style=styles##container>
+    <ReactNativeSafeAreaContext.SafeAreaView style=styles##container>
       <SpacedView
         horizontal=XL
         style=Style.(
@@ -234,6 +234,6 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
           <TouchableButton text="Continue" onPress=onContinuePress />
         </Animated.View>
       </SpacedView>
-    </SafeAreaView>
+    </ReactNativeSafeAreaContext.SafeAreaView>
   </ScrollView>;
 };

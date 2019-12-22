@@ -2,6 +2,9 @@
   package="com.lifetime">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- https://github.com/react-native-community/react-native-permissions -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
     <application
       android:name=".MainApplication"

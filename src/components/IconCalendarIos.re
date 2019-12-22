@@ -9,7 +9,7 @@ let styles =
           //   ~justifyContent=`center,
           ~alignItems=`center,
           ~borderWidth=StyleSheet.hairlineWidth,
-          ~borderColor=Theme.Colors.Ios.light.gray,
+          ~borderColor=Predefined.Colors.Ios.light.gray,
           ~borderRadius=Theme.Radius.button,
           (),
         ),
@@ -19,7 +19,7 @@ let styles =
           ~lineHeight=8.,
           ~fontWeight=`_400,
           ~textAlign=`center,
-          ~color=Theme.Colors.Ios.light.red,
+          ~color=Predefined.Colors.Ios.light.red,
           (),
         ),
       "number":
@@ -36,25 +36,12 @@ let styles =
 
 [@react.component]
 let make = (~style as s=?) => {
-  let today = Js.Date.(fromFloat(now()));
+  let today = Date.now();
   <SpacedView
     horizontal=XXS
     vertical=XXS
     style=Style.(arrayOption([|Some(styles##container), s|]))>
-    <Text style=styles##text>
-      {switch (today->Js.Date.getDay) {
-       | 1. => "Monday"
-       | 2. => "Tuesday"
-       | 3. => "Wednesday"
-       | 4. => "Thursday"
-       | 5. => "Friday"
-       | 6. => "Saturday"
-       | _ => "Sunday"
-       }}
-      ->React.string
-    </Text>
-    <Text style=styles##number>
-      {today->Js.Date.getDate->Js.Float.toString->React.string}
-    </Text>
+    <Text style=styles##text> {today->Date.dayLongString->React.string} </Text>
+    <Text style=styles##number> {today->Date.dateString->React.string} </Text>
   </SpacedView>;
 };

@@ -13,8 +13,8 @@ module MainStackScreen = {
 
   [@react.component]
   let make = (~navigation, ~route) =>
-    <MainStack.Navigator headerMode=`none>
-      <MainStack.Screen name="WelcomeScreen" component=WelcomeScreen.make />
+    <MainStack.Navigator headerMode=`none mode=`modal>
+      <MainStack.Screen name="HomeScreen" component=HomeScreen.make />
     </MainStack.Navigator>;
 };
 
@@ -22,8 +22,9 @@ module RootNavigator = {
   open Navigators;
 
   [@react.component]
-  let make = () =>
+  let make = () => {
     <RootStackNavigator.Navigator
+      initialRouteName="MainStack"
       mode=`modal
       headerMode=`none
       screenOptions={_ =>
@@ -39,10 +40,17 @@ module RootNavigator = {
         component=MainStackScreen.make
       />
       <RootStackNavigator.Screen
+        name="WelcomeModalScreen"
+        component=WelcomeScreen.make
+        // disable gesture cause we don't allow people to bypass this screen
+        options={_ => RootStackNavigator.options(~gestureEnabled=false, ())}
+      />
+      <RootStackNavigator.Screen
         name="PrivacyModalScreen"
         component=PrivacyModalScreen.make
       />
     </RootStackNavigator.Navigator>;
+  };
 };
 
 [@react.component]

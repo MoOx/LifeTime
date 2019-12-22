@@ -19,6 +19,8 @@
     "reason-react",
     "reason-react-native",
     "reason-react-navigation",
-    "react-multiversal"
+    "react-multiversal",
+    "reason-future",
+    "@reason-react-native/safe-area-context",
   ]
 }

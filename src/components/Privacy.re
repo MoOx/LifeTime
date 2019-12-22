@@ -34,7 +34,7 @@ let title = "LifeTime & Privacy";
 
 [@react.component]
 let make = () => {
-  let dynamicStyles = Hooks.useStyles(themedStyles);
+  let dynamicStyles = Theme.useYourStyles(themedStyles);
 
   <SpacedView horizontal=L vertical=XL style=styles##container>
     <Center>

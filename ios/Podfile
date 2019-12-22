@@ -33,6 +33,10 @@ target 'LifeTime' do
   pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
+  
+  # https://github.com/react-native-community/react-native-permissions
+  permissions_path = '../node_modules/react-native-permissions/ios'
+  pod 'Permission-Calendars', :path => "#{permissions_path}/Calendars.podspec"
 
   target 'LifeTimeTests' do
     inherit! :search_paths
