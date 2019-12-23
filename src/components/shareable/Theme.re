@@ -72,6 +72,7 @@ let dynamicStyles =
             textStyle(~color=Predefined.Colors.Ios.light.gray5, ()),
           "textGray6":
             textStyle(~color=Predefined.Colors.Ios.light.gray6, ()),
+          "textBlue": textStyle(~color=Predefined.Colors.Ios.light.blue, ()),
           "textOnBackground":
             textStyle(~color=Colors.light.textOnBackground, ()),
           "textLightOnBackground":
@@ -109,6 +110,7 @@ let dynamicStyles =
           "textGray4": textStyle(~color=Predefined.Colors.Ios.dark.gray4, ()),
           "textGray5": textStyle(~color=Predefined.Colors.Ios.dark.gray5, ()),
           "textGray6": textStyle(~color=Predefined.Colors.Ios.dark.gray6, ()),
+          "textBlue": textStyle(~color=Predefined.Colors.Ios.dark.blue, ()),
           "textOnBackground":
             textStyle(~color=Colors.dark.textOnBackground, ()),
           "textLightOnBackground":

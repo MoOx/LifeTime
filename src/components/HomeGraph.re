@@ -30,6 +30,8 @@ let availableCalendars = (calendars, settings: AppSettings.settings) =>
     )
   ->Array.map(c => c##id);
 
+let numberOfEventsToShow = 8;
+
 [@react.component]
 let make = (~onFiltersPress) => {
   let dynamicStyles = Theme.useStyles();
@@ -43,6 +45,8 @@ let make = (~onFiltersPress) => {
 
   let calendars = Calendars.useCalendars(isFocus);
   let (events, setEvents) = React.useState(() => None);
+  let (eventsToShow, setEventsToShow) =
+    React.useState(() => numberOfEventsToShow);
 
   React.useEffect3(
     () => {
@@ -171,69 +175,91 @@ let make = (~onFiltersPress) => {
        ->Option.getWithDefault(React.null)}
       {durationPerTitle
        ->Option.map(durationPerTitle =>
-           durationPerTitle
-           ->Array.map(((title, totalDurationInMin)) => {
-               let durationInH = totalDurationInMin /. 60.;
-               let durationH = durationInH->int_of_float;
-               let durationM = (durationInH -. durationH->float_of_int) *. 60.;
-               let durationString =
-                 durationH->string_of_int
-                 ++ "h"
-                 ++ " "
-                 ++ (durationM >= 1. ? durationM->Js.Float.toFixed ++ "m" : "");
-               <TouchableOpacity onPress={_ => ()} key=title>
-                 <Separator style=dynamicStyles##separatorOnBackground />
-                 <SpacedView vertical=XS>
-                   <View style=Predefined.styles##rowSpaceBetween>
-                     <View>
-                       <Text> title->React.string </Text>
-                       <Spacer size=XXS />
-                       <Row style=Style.(viewStyle(~alignItems=`center, ()))>
-                         <View
-                           style=Style.(
-                             array([|
-                               dynamicStyles##backgroundGray3,
-                               viewStyle(
-                                 ~width=
-                                   (
-                                     totalDurationInMin
-                                     /. maxDurationInMin
-                                     *. availableWidthForBar
-                                   )
-                                   ->dp,
-                                 ~height=6.->dp,
-                                 ~borderRadius=6.,
-                                 ~overflow=`hidden,
-                                 (),
-                               ),
-                             |])
-                           )
-                         />
-                         <Spacer size=XXS />
-                         <Text
-                           style=Style.(
-                             array([|
-                               styles##durationText,
-                               dynamicStyles##textLightOnBackground,
-                             |])
-                           )>
-                           durationString->React.string
-                         </Text>
-                       </Row>
-                     </View>
-                     <SVGChevronRight
-                       width={14.->ReactFromSvg.Size.dp}
-                       height={14.->ReactFromSvg.Size.dp}
-                       fill={Predefined.Colors.Ios.light.gray4}
-                     />
-                   </View>
-                 </SpacedView>
-               </TouchableOpacity>;
-             })
-           ->React.array
+           <>
+             {durationPerTitle
+              ->Array.slice(~offset=0, ~len=eventsToShow)
+              ->Array.map(((title, totalDurationInMin)) => {
+                  let durationInH = totalDurationInMin /. 60.;
+                  let durationH = durationInH->int_of_float;
+                  let durationM =
+                    (durationInH -. durationH->float_of_int) *. 60.;
+                  let durationString =
+                    durationH->string_of_int
+                    ++ "h"
+                    ++ " "
+                    ++ (
+                      durationM >= 1. ? durationM->Js.Float.toFixed ++ "m" : ""
+                    );
+                  <TouchableOpacity onPress={_ => ()} key=title>
+                    <Separator style=dynamicStyles##separatorOnBackground />
+                    <SpacedView vertical=XS>
+                      <View style=Predefined.styles##rowSpaceBetween>
+                        <View>
+                          <Text> title->React.string </Text>
+                          <Spacer size=XXS />
+                          <Row
+                            style=Style.(viewStyle(~alignItems=`center, ()))>
+                            <View
+                              style=Style.(
+                                array([|
+                                  dynamicStyles##backgroundGray3,
+                                  viewStyle(
+                                    ~width=
+                                      (
+                                        totalDurationInMin
+                                        /. maxDurationInMin
+                                        *. availableWidthForBar
+                                      )
+                                      ->dp,
+                                    ~height=6.->dp,
+                                    ~borderRadius=6.,
+                                    ~overflow=`hidden,
+                                    (),
+                                  ),
+                                |])
+                              )
+                            />
+                            <Spacer size=XXS />
+                            <Text
+                              style=Style.(
+                                array([|
+                                  styles##durationText,
+                                  dynamicStyles##textLightOnBackground,
+                                |])
+                              )>
+                              durationString->React.string
+                            </Text>
+                          </Row>
+                        </View>
+                        <SVGChevronRight
+                          width={14.->ReactFromSvg.Size.dp}
+                          height={14.->ReactFromSvg.Size.dp}
+                          fill={Predefined.Colors.Ios.light.gray4}
+                        />
+                      </View>
+                    </SpacedView>
+                  </TouchableOpacity>;
+                })
+              ->React.array}
+             {durationPerTitle->Array.length > eventsToShow
+                ? <TouchableOpacity
+                    onPress={_ =>
+                      setEventsToShow(eventsToShow =>
+                        eventsToShow + numberOfEventsToShow
+                      )
+                    }>
+                    <Separator style=dynamicStyles##separatorOnBackground />
+                    <SpacedView vertical=XS>
+                      <Text style=dynamicStyles##textBlue>
+                        "Show More"->React.string
+                      </Text>
+                    </SpacedView>
+                  </TouchableOpacity>
+                : React.null}
+           </>
          )
        ->Option.getWithDefault(React.null)}
-      <Separator />
+      <Separator style=dynamicStyles##separatorOnBackground />
     </View>
   </>;
 };
