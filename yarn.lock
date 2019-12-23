@@ -1513,6 +1513,11 @@
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.3.tgz#2b5a3ab3f918cca48a8c754c08168e3f03eba61b"
   integrity sha512-shAmDyaQC4H92APFoIaVDHCx5bStIocgvbwQyxPRrbUY20V1EYTbSDchWbuwlMG3V17cprZhA6+78JfB+3DTPw==
 
+"@react-native-community/async-storage@^1.7.1":
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/@react-native-community/async-storage/-/async-storage-1.7.1.tgz#ef2104d865de61ad91bba66613e57e689ff4e6a1"
+  integrity sha512-/oX/x+EU4xNaqIaC/epVKzO8XghzImPA7l8cLz3USEFmtFiXFjBbTeeIFjjEm/u4/cv38Wi1xMEa10PHIWygRg==
+
 "@react-native-community/blur@^3.4.1":
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/@react-native-community/blur/-/blur-3.4.1.tgz#dec04c7d60dd6a4fa7e3af3506feefec804728d0"
@@ -1659,6 +1664,16 @@
   dependencies:
     "@react-navigation/routers" "^5.0.0-alpha.17"
     color "^3.1.2"
+
+"@reason-react-native/async-storage@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@reason-react-native/async-storage/-/async-storage-1.6.0.tgz#3c1a2c67cbbf26f23c5b8faca3af9c7d0f6b22cf"
+  integrity sha512-vJbzW8nZh1q30YaBhKtX+x6JrAGhpdA+FJu/wP3HIO5c/LK1l+/gPmTCz+7DZnn7zu2dhhckpVVAm7fNYTnzgQ==
+
+"@reason-react-native/safe-area-context@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@reason-react-native/safe-area-context/-/safe-area-context-0.6.0.tgz#11174e4cbab13a6032bc25e002d9647b1fec3654"
+  integrity sha512-v8Jz86jaBd2AgXt50HZ0Srp9uHGUTRJvDgRrIrRzB11PninmrJ8ai7v8pAEADQhVT31UEWXw1R3hWPq9oVnb9g==
 
 "@svgr/babel-plugin-add-jsx-attribute@^4.2.0":
   version "4.2.0"
@@ -3024,7 +3039,7 @@ browserslist@^4.0.0, browserslist@^4.1.1, browserslist@^4.6.0, browserslist@^4.6
     electron-to-chromium "^1.3.295"
     node-releases "^1.1.38"
 
-bs-platform@^5.2.1:
+bs-platform@^5.0.1, bs-platform@^5.2.1:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-5.2.1.tgz#3f76f6d4f4c7255296375a8104c8be332770b691"
   integrity sha512-3ISP+RBC/NYILiJnphCY0W3RTYpQ11JGa2dBBLVug5fpFZ0qtSaL3ZplD8MyjNeXX2bC7xgrWfgBSn8Tc9om7Q==
@@ -5630,7 +5645,7 @@ glob-to-regexp@^0.3.0:
   resolved "https://registry.yarnpkg.com/glob-to-regexp/-/glob-to-regexp-0.3.0.tgz#8c5a1494d2066c570cc3bfe4496175acc4d502ab"
   integrity sha1-jFoUlNIGbFcMw7/kSWF1rMTVAqs=
 
-glob@^7.0.3, glob@^7.1.4:
+glob@^7.0.3, glob@^7.1.3, glob@^7.1.4:
   version "7.1.6"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.6.tgz#141f33b81a7c2492e125594307480c46679278a6"
   integrity sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==
@@ -5642,7 +5657,7 @@ glob@^7.0.3, glob@^7.1.4:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@^7.1.1, glob@^7.1.2, glob@^7.1.3:
+glob@^7.1.1, glob@^7.1.2:
   version "7.1.4"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.4.tgz#aa608a2f6c577ad357e1ae5a5c26d9a8d1969255"
   integrity sha512-hkLPepehmnKk41pUGm3sYxoFs/umurYfYJCerbXEyFIWcAzvpipAgVkBqqT9RBKMGjnq6kMuyYwha6csxbiM1A==
@@ -10063,14 +10078,25 @@ react-error-overlay@^6.0.3:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.3.tgz#c378c4b0a21e88b2e159a3e62b2f531fd63bf60d"
   integrity sha512-bOUvMWFQVk5oz8Ded9Xb7WVdEi3QGLC8tH7HmYP0Fdp4Bn3qw0tRFmr5TW6mvahzvmrK4a6bqWGfCevBflP+Xw==
 
+react-from-svg@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-from-svg/-/react-from-svg-1.2.0.tgz#13af3f75ed980d7bf8b426c176c9f82c3bbf0a4a"
+  integrity sha512-h9NFEMvD/XqMDjZM4EEXGui5ka7ax3ZRDhL07yfiRzR+JeD6j/Jskc+E4VoaGOMn54XqzFIKp/P+RymYsMmhkw==
+  dependencies:
+    bs-platform "^5.0.1"
+    glob "^7.1.3"
+    mkdirp "^0.5.1"
+    reason-future "^2.4.0"
+    reason-react "^0.7.0"
+
 react-is@^16.8.1, react-is@^16.8.4, react-is@^16.9.0:
   version "16.10.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.10.2.tgz#984120fd4d16800e9a738208ab1fba422d23b5ab"
   integrity sha512-INBT1QEgtcCCgvccr5/86CfD71fw9EPmDxgiJX4I2Ddr6ZsV6iFXsuby+qWJPtmNuMY0zByTsG4468P7nHuNWA==
 
-"react-multiversal@https://github.com/MoOx/react-multiversal#36e8721":
+"react-multiversal@https://github.com/MoOx/react-multiversal#d094233":
   version "0.0.0"
-  resolved "https://github.com/MoOx/react-multiversal#36e87213702e484c123bfc0c03725bd32e43de85"
+  resolved "https://github.com/MoOx/react-multiversal#d0942336d0ec6ccfbaf0e9259babfa81471de7cd"
   dependencies:
     "@react-native-community/blur" "^3.4.1"
     react-native-safe-area-context "^0.6.1"
@@ -10105,6 +10131,11 @@ react-native-gesture-handler@^1.5.2:
     hoist-non-react-statics "^2.3.1"
     invariant "^2.2.4"
     prop-types "^15.7.2"
+
+react-native-permissions@^2.0.8:
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-2.0.8.tgz#e6d20a7b6e3df5333a3d80cc83024686fa2f49e3"
+  integrity sha512-qK8Thp+9PTl/YjhKkRr8LPHfX5Evv5Zj/3CmAiqE45qCTB5UbWTKBWUfg3iqfMrjv9nE2rcS1PrIjZCDh6s/gQ==
 
 react-native-reanimated@^1.4.0:
   version "1.4.0"
@@ -10344,14 +10375,19 @@ realpath-native@^1.1.0:
   dependencies:
     util.promisify "^1.0.0"
 
+reason-future@^2.4.0, reason-future@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/reason-future/-/reason-future-2.5.0.tgz#52d91a343f65c6d527cd1cca4685bbc097971c68"
+  integrity sha512-rzrMQlRfQYlyiryQQJfgj04IEUN1Eau4JLnorlEVSm6Yxp2Kq6no3p+dWCocz5BLR9wIFPnSFMloLNP4ErK6ag==
+
 reason-react-native@^0.61.0:
   version "0.61.0"
   resolved "https://registry.yarnpkg.com/reason-react-native/-/reason-react-native-0.61.0.tgz#61579b309305b03c4cc7f44e9b6f2be3603474b4"
   integrity sha512-HBkbeNFpIsyMZw0jj0YutX1RsujRfwhAtcxxN5tK9W8lClUedaUxzi5pIqmf6XsE02/23TOWh9tNXS0ltM8S2A==
 
-"reason-react-navigation@https://github.com/reason-react-native/reason-react-navigation#101ff84":
+"reason-react-navigation@https://github.com/reason-react-native/reason-react-navigation#2d3efd3":
   version "4.0.0-alpha.0"
-  resolved "https://github.com/reason-react-native/reason-react-navigation#101ff847195217c656b2e6736bae5edf2316219e"
+  resolved "https://github.com/reason-react-native/reason-react-navigation#2d3efd3b6c35b40976e0aa4d2672cdb6ad8288f8"
 
 reason-react@^0.7.0:
   version "0.7.0"

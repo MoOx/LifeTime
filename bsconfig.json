@@ -22,5 +22,7 @@
     "react-multiversal",
     "reason-future",
     "@reason-react-native/safe-area-context",
+    "react-from-svg",
+    "@reason-react-native/async-storage"
   ]
 }

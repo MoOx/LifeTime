@@ -49,6 +49,10 @@ module RootNavigator = {
         name="PrivacyModalScreen"
         component=PrivacyModalScreen.make
       />
+      <RootStackNavigator.Screen
+        name="FiltersModalScreen"
+        component=FiltersModalScreen.make
+      />
     </RootStackNavigator.Navigator>;
   };
 };

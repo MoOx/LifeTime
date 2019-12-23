@@ -27,92 +27,104 @@ let msToMin = duration => duration /. 1000. /. 60.;
 let make = (~onFiltersPress) => {
   let dynamicStyles = Theme.useStyles();
 
+  let isFocus = ReactNavigation.Native.useIsFocused();
+  let (settings, _setSettings) = AppSettings.useSettings(isFocus);
+
   let today = Date.now();
   let before = Date.now();
   before->Js.Date.setDate(before->Js.Date.getDate -. 7.)->ignore;
 
-  let (events, setEvents) = React.useState(() => [||]);
-  React.useEffect1(
+  let calendars = Calendars.useCalendars(isFocus);
+  let (events, setEvents) = React.useState(() => None);
+
+  React.useEffect3(
     () => {
-      ReactNativeCalendarEvents.fetchAllEvents(
-        before->Js.Date.toISOString,
-        today->Js.Date.toISOString,
-        None,
-      )
-      ->FutureJs.fromPromise(error => {
-          // @todo ?
-          Js.log(error);
-          error;
-        })
-      ->Future.tapOk(evts => setEvents(_ => evts))
+      calendars
+      ->Option.map(calendars =>
+          ReactNativeCalendarEvents.fetchAllEvents(
+            before->Js.Date.toISOString,
+            today->Js.Date.toISOString,
+            Some(
+              calendars
+              ->Array.keep(c =>
+                  settings.filters.calendarsIdsSkipped
+                  ->Array.some(cs => cs != c##id)
+                )
+              ->Array.map(c => c##id),
+            ),
+          )
+          ->FutureJs.fromPromise(error => {
+              // @todo ?
+              Js.log(error);
+              error;
+            })
+          ->Future.tapOk(res => setEvents(_ => Some(res)))
+          ->ignore
+        )
       ->ignore;
       None;
     },
-    [|setEvents|],
+    (setEvents, calendars, settings),
   );
-
-  let (filters, setFilters) =
-    React.useState(() =>
-      {allDay: true, calendars: [||], minimumDurationInMin: 120.}
-    );
-
-  let filteredEvents =
-    events->Array.keep(e =>
-      if (filters.allDay && e##allDay->Option.getWithDefault(false)) {
-        false;
-      } else if (filters.calendars
-                 ->Array.some(cal =>
-                     cal##id
-                     != e##calendar
-                        ->Option.map(c => c##id)
-                        ->Option.getWithDefault("")
-                   )) {
-        false;
-      } else {
-        true;
-      }
-    );
-
-  let eventsByName =
-    filteredEvents
-    ->Array.reduce(
-        Map.String.empty,
-        (map, e) => {
-          let key = e##title->Js.String.toLowerCase;
-          map->Map.String.set(
-            key,
-            map
-            ->Map.String.get(key)
-            ->Option.getWithDefault([||])
-            ->Array.concat([|e|]),
-          );
-        },
-      )
-    ->Map.String.toArray;
 
   let durationPerTitle =
-    eventsByName->Array.map(((_key, evts)) => {
-      let totalDurationInMin =
-        evts->Array.reduce(
-          0.,
-          (totalDurationInMin, e) => {
-            let durationInMs = e->eventDurationInMs;
-            totalDurationInMin
-            +. durationInMs->Js.Date.fromFloat->Js.Date.valueOf->msToMin;
+    events->Option.map(events =>
+      events
+      ->Array.keep(e
+          // filters out all day events
+          =>
+            if (e##allDay->Option.getWithDefault(false)) {
+              false;
+            } else if (settings.filters.calendarsIdsSkipped
+                       ->Array.some(cid =>
+                           cid
+                           == e##calendar
+                              ->Option.map(c => c##id)
+                              ->Option.getWithDefault("")
+                         )) {
+              false;
+            } else {
+              true;
+            }
+          )
+      ->Array.reduce(
+          Map.String.empty,
+          (map, e) => {
+            let key = e##title->Js.String.toLowerCase;
+            map->Map.String.set(
+              key,
+              map
+              ->Map.String.get(key)
+              ->Option.getWithDefault([||])
+              ->Array.concat([|e|]),
+            );
           },
-        );
-      (
-        evts[0]->Option.map(e => e##title)->Option.getWithDefault(""),
-        totalDurationInMin,
-      );
-    });
-
-  durationPerTitle->SortArray.stableSortInPlaceBy(((_, minA), (_, minB)) =>
-    minA > minB ? (-1) : minA < minB ? 1 : 0
-  );
+        )
+      ->Map.String.toArray
+      ->Array.map(((_key, evts)) => {
+          let totalDurationInMin =
+            evts->Array.reduce(
+              0.,
+              (totalDurationInMin, e) => {
+                let durationInMs = e->eventDurationInMs;
+                totalDurationInMin
+                +. durationInMs->Js.Date.fromFloat->Js.Date.valueOf->msToMin;
+              },
+            );
+          (
+            evts[0]->Option.map(e => e##title)->Option.getWithDefault(""),
+            totalDurationInMin,
+          );
+        })
+      ->SortArray.stableSortBy(((_, minA), (_, minB)) =>
+          minA > minB ? (-1) : minA < minB ? 1 : 0
+        )
+    );
 
   let (_, maxDurationInMin) =
-    durationPerTitle[0]->Option.getWithDefault(("", 50.));
+    durationPerTitle
+    ->Option.flatMap(dpt => dpt[0])
+    ->Option.getWithDefault(("", 50.));
 
   let (width, setWidth) = React.useState(() => 0.);
   let onLayout =
@@ -120,9 +132,8 @@ let make = (~onFiltersPress) => {
       let width = layoutEvent##nativeEvent##layout##width;
       setWidth(_ => width);
     });
-
-  let availableWidthForBar = width -. 85. -. SpacedView.space *. 2.;
   // keep some place for duration string
+  let availableWidthForBar = width -. 85. -. SpacedView.space *. 2.;
 
   <>
     <View style=Predefined.styles##rowSpaceBetween>
@@ -137,10 +148,9 @@ let make = (~onFiltersPress) => {
     </View>
     <View onLayout style=dynamicStyles##background>
       {durationPerTitle
-       ->Array.map(((title, totalDurationInMin)) =>
-           totalDurationInMin < filters.minimumDurationInMin
-             ? React.null
-             : {
+       ->Option.map(durationPerTitle =>
+           durationPerTitle
+           ->Array.map(((title, totalDurationInMin)) => {
                let durationInH = totalDurationInMin /. 60.;
                let durationH = durationInH->int_of_float;
                let durationM = (durationInH -. durationH->float_of_int) *. 60.;
@@ -189,12 +199,18 @@ let make = (~onFiltersPress) => {
                          </Text>
                        </Row>
                      </View>
+                     <SVGChevronRight
+                       width={14.->ReactFromSvg.Size.dp}
+                       height={14.->ReactFromSvg.Size.dp}
+                       fill={Predefined.Colors.Ios.light.gray4}
+                     />
                    </View>
                  </SpacedView>
                </TouchableOpacity>;
-             }
+             })
+           ->React.array
          )
-       ->React.array}
+       ->Option.getWithDefault(React.null)}
       <Separator />
     </View>
   </>;

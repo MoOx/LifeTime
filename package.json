@@ -5,7 +5,11 @@
   "scripts": {
     "ruby:bundle": "which bundle && bundle install",
     "cocoapods:install": "(which bundle && cd ios && bundle exec pod install --repo-update) || echo \"iOS Pods not installed due to missing 'bundle' command - or an error during pod install\"",
-    "prepare": "patch-package && yarn ruby:bundle && yarn cocoapods:install",
+    "svg:cleanup": "trash src/SVGs/components",
+    "svg:convert": "react-from-svg src/SVGs src/SVGs/components --with-reason --remove-fill",
+    "svg:format": "find src/SVGs/components -name \"*.re\" | grep -v \"node_modules\" | xargs bsrefmt --in-place",
+    "svg": "yarn svg:cleanup && yarn svg:convert && yarn svg:format",
+    "prepare": "patch-package && yarn ruby:bundle && yarn cocoapods:install && yarn svg",
     "start": "react-native start",
     "start:android": "react-native run-android",
     "start:ios": "react-native run-ios --simulator=\"iPhone 11\"",
@@ -27,7 +31,7 @@
     "@reason-react-native/safe-area-context": "^0.6.0",
     "react": "16.11.0",
     "react-dom": "^16.11.0",
-    "react-multiversal": "https://github.com/MoOx/react-multiversal#4e3ceb1",
+    "react-multiversal": "https://github.com/MoOx/react-multiversal#d094233",
     "react-native": "0.61.2",
     "react-native-bootsplash": "^1.0.3",
     "react-native-calendar-events": "^1.7.3",
@@ -42,7 +46,7 @@
     "reason-future": "^2.5.0",
     "reason-react": "^0.7.0",
     "reason-react-native": "^0.61.0",
-    "reason-react-navigation": "https://github.com/reason-react-native/reason-react-navigation#101ff84"
+    "reason-react-navigation": "https://github.com/reason-react-native/reason-react-navigation#2d3efd3"
   },
   "devDependencies": {
     "@babel/core": "^7.6.3",
@@ -55,7 +59,7 @@
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.56.0",
     "patch-package": "^6.2.0",
-    "react-from-svg": "^1.1.0",
+    "react-from-svg": "^1.2.0",
     "react-scripts": "3.2.0",
     "react-test-renderer": "16.9.0"
   },

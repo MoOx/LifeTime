@@ -72,20 +72,23 @@ let make = (~navigation, ~route) => {
           eventOptions(~useNativeDriver=true, ()),
         )
       )>
-      // <StickyHeader
-      //   scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
-      //   scrollOffsetY=120.
-      //   safeArea=false
-      //   animateBackgroundOpacity=`yes
-      //   backgroundElement
-      //   color={Predefined.Colors.Ios.light.blue}
-      //   color2={Predefined.Colors.Ios.light.blue}
-      //   title=Home.title
-      // />
-
-        <Home
-          onFiltersPress={() => ()}
-        />
-      </Animated.ScrollView>
+      <StickyHeader
+        scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
+        scrollOffsetY=120.
+        safeArea=true
+        animateBackgroundOpacity=`yes
+        backgroundElement
+        color={Predefined.Colors.Ios.light.blue}
+        color2={Predefined.Colors.Ios.light.blue}
+        title=Home.title
+      />
+      <Home
+        onFiltersPress={() =>
+          navigation->Navigators.RootStackNavigator.Navigation.navigate(
+            "FiltersModalScreen",
+          )
+        }
+      />
+    </Animated.ScrollView>
   </>;
 };
