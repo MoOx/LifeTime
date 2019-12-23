@@ -23,6 +23,13 @@ let eventDurationInMs = e =>
 
 let msToMin = duration => duration /. 1000. /. 60.;
 
+let availableCalendars = (calendars, settings: AppSettings.settings) =>
+  calendars
+  ->Array.keep(c =>
+      !settings.filters.calendarsIdsSkipped->Array.some(cs => cs == c##id)
+    )
+  ->Array.map(c => c##id);
+
 [@react.component]
 let make = (~onFiltersPress) => {
   let dynamicStyles = Theme.useStyles();
@@ -39,28 +46,19 @@ let make = (~onFiltersPress) => {
 
   React.useEffect3(
     () => {
-      calendars
-      ->Option.map(calendars =>
-          ReactNativeCalendarEvents.fetchAllEvents(
-            before->Js.Date.toISOString,
-            today->Js.Date.toISOString,
-            Some(
-              calendars
-              ->Array.keep(c =>
-                  settings.filters.calendarsIdsSkipped
-                  ->Array.some(cs => cs != c##id)
-                )
-              ->Array.map(c => c##id),
-            ),
-          )
-          ->FutureJs.fromPromise(error => {
-              // @todo ?
-              Js.log(error);
-              error;
-            })
-          ->Future.tapOk(res => setEvents(_ => Some(res)))
-          ->ignore
-        )
+      ReactNativeCalendarEvents.fetchAllEvents(
+        before->Js.Date.toISOString,
+        today->Js.Date.toISOString,
+        // we filter calendar later cause if you UNSELECT ALL
+        // this `fetchAllEvents` DEFAULT TO ALL
+        None,
+      )
+      ->FutureJs.fromPromise(error => {
+          // @todo ?
+          Js.log(error);
+          error;
+        })
+      ->Future.tapOk(res => setEvents(_ => Some(res)))
       ->ignore;
       None;
     },
@@ -75,6 +73,7 @@ let make = (~onFiltersPress) => {
           =>
             if (e##allDay->Option.getWithDefault(false)) {
               false;
+                   // filters selected calendars
             } else if (settings.filters.calendarsIdsSkipped
                        ->Array.some(cid =>
                            cid
@@ -147,6 +146,29 @@ let make = (~onFiltersPress) => {
       </Row>
     </View>
     <View onLayout style=dynamicStyles##background>
+      {calendars
+       ->Option.map(calendars => availableCalendars(calendars, settings))
+       ->Option.map(c =>
+           if (c->Array.length === 0) {
+             <>
+               <Separator style=dynamicStyles##separatorOnBackground />
+               <SpacedView>
+                 <Center>
+                   <Spacer size=XXL />
+                   <Title> "No Events"->React.string </Title>
+                   <Spacer />
+                   <Text>
+                     "You should select at least a calendar"->React.string
+                   </Text>
+                   <Spacer size=XXL />
+                 </Center>
+               </SpacedView>
+             </>;
+           } else {
+             React.null;
+           }
+         )
+       ->Option.getWithDefault(React.null)}
       {durationPerTitle
        ->Option.map(durationPerTitle =>
            durationPerTitle
