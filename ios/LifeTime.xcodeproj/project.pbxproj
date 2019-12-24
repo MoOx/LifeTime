@@ -643,7 +643,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.moox.$(PRODUCT_NAME:rfc1034identifier);
+				PRODUCT_BUNDLE_IDENTIFIER = io.moox.LifeTime;
 				PRODUCT_NAME = LifeTime;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -663,7 +663,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.moox.$(PRODUCT_NAME:rfc1034identifier);
+				PRODUCT_BUNDLE_IDENTIFIER = io.moox.LifeTime;
 				PRODUCT_NAME = LifeTime;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -690,7 +690,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.LifeTime-tvOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.moox.LifeTime-tvOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
@@ -718,7 +718,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.LifeTime-tvOS";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.moox.LifeTime-tvOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
@@ -745,7 +745,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.LifeTime-tvOSTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.moox.LifeTime-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LifeTime-tvOS.app/LifeTime-tvOS";
@@ -772,7 +772,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.LifeTime-tvOSTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.moox.LifeTime-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LifeTime-tvOS.app/LifeTime-tvOS";
