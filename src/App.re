@@ -59,10 +59,12 @@ module RootNavigator = {
 
 [@react.component]
 let app = () => {
-  <>
+  let (settings, setSettings) = AppSettings.useSettings();
+  <AppSettings.ContextProvider value=(settings, setSettings)>
     <Native.NavigationNativeContainer>
       <RootNavigator />
     </Native.NavigationNativeContainer>
     <Bootsplash />
-  </>;
+    <Dev />
+  </AppSettings.ContextProvider>;
 };

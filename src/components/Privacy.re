@@ -9,39 +9,19 @@ let styles =
     })
   );
 
-open Theme;
-let themedStyles =
-  Style.{
-    light:
-      StyleSheet.create({
-        "wrapper":
-          viewStyle(~backgroundColor=Theme.Colors.light.background, ()),
-
-        "titleText":
-          textStyle(~color=Theme.Colors.light.textOnBackground, ()),
-        "text": textStyle(~color=Theme.Colors.light.textOnBackground, ()),
-      }),
-    dark:
-      StyleSheet.create({
-        "wrapper":
-          viewStyle(~backgroundColor=Theme.Colors.dark.background, ()),
-        "titleText": textStyle(~color=Theme.Colors.dark.textOnBackground, ()),
-        "text": textStyle(~color=Theme.Colors.dark.textOnBackground, ()),
-      }),
-  };
-
 let title = "LifeTime & Privacy";
 
 [@react.component]
 let make = () => {
-  let dynamicStyles = Theme.useYourStyles(themedStyles);
+  let themeStyles = Theme.useStyles();
 
   <SpacedView horizontal=L vertical=XL style=styles##container>
     <Center>
-      <Title style=dynamicStyles##titleText> title->React.string </Title>
+      <Title style=themeStyles##textOnBackground> title->React.string </Title>
     </Center>
     <Spacer size=L />
-    <Text style=Style.(array([|styles##text, dynamicStyles##text|]))>
+    <Text
+      style=Style.(array([|styles##text, themeStyles##textOnBackground|]))>
       {j|LifeTime is designed to protect your information.
 
 LifeTime only run computation on your device and does not share your information anywhere.

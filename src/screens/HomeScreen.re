@@ -1,21 +1,32 @@
 open ReactNative;
 open ReactMultiversal;
 
-let backgroundElement =
-  <>
-    <View
-      style=Style.(
-        array([|
-          StyleSheet.absoluteFill,
-          style(~backgroundColor="rgba(255,255,255,0.8)", ()),
-        |])
-      )
-    />
-    <BlurView nativeBlurType=`light style=StyleSheet.absoluteFill />
-  </>;
-
 [@react.component]
 let make = (~navigation, ~route) => {
+  let theme = Theme.useTheme();
+  let themeStyles = Theme.useStyles();
+  // let themeColors = Theme.useColors();
+  let backgroundElement =
+    <>
+      <View
+        style=Style.(
+          list([
+            StyleSheet.absoluteFill,
+            themeStyles##background,
+            style(~opacity=0.8, ()),
+          ])
+        )
+      />
+      <BlurView
+        nativeBlurType={
+          switch (theme) {
+          | `dark => `dark
+          | `light => `light
+          }
+        }
+        style=StyleSheet.absoluteFill
+      />
+    </>;
   React.useEffect1(
     () => {
       open ReactNativePermissions;
@@ -54,7 +65,10 @@ let make = (~navigation, ~route) => {
   <>
     <StatusBar barStyle=`darkContent />
     <Animated.ScrollView
-      style=Predefined.styles##flexGrow
+      style={Style.list([
+        Predefined.styles##flexGrow,
+        themeStyles##backgroundDark,
+      ])}
       showsHorizontalScrollIndicator=false
       showsVerticalScrollIndicator=false
       scrollEventThrottle=16
@@ -78,8 +92,7 @@ let make = (~navigation, ~route) => {
         safeArea=true
         animateBackgroundOpacity=`yes
         backgroundElement
-        color={Predefined.Colors.Ios.light.blue}
-        color2={Predefined.Colors.Ios.light.blue}
+        textStyle=themeStyles##textOnBackground
         title=Home.title
       />
       <Home

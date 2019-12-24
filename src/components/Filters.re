@@ -18,11 +18,10 @@ let title = "Filters";
 
 [@react.component]
 let make = () => {
-  let dynamicStyles = Theme.useStyles();
+  let (settings, setSettings) = React.useContext(AppSettings.context);
+  let themeStyles = Theme.useStyles();
   let calendars = Calendars.useCalendars();
-  let (settings, setSettings) = AppSettings.useSettings(None);
-  let isCalendarButtonHide =
-    settings.filters.calendarsIdsSkipped->Array.length === 0;
+  let isCalendarButtonHide = settings##calendarsIdsSkipped->Array.length === 0;
   <>
     <View style=Predefined.styles##rowSpaceBetween>
       <Row> <Spacer size=S /> <BlockHeading text="Calendars" /> </Row>
@@ -33,15 +32,12 @@ let make = () => {
                  setSettings(_settings =>
                    {
                      // ...settings,
-                     lastUpdated: Js.Date.now(),
-                     filters:
-                       // ...settings.filters,
-                       {
-                         calendarsIdsSkipped:
-                           calendars
-                           ->Option.map(cs => cs->Array.map(c => c##id))
-                           ->Option.getWithDefault([||]),
-                       },
+                     "theme": settings##theme,
+                     "lastUpdated": Js.Date.now(),
+                     "calendarsIdsSkipped":
+                       calendars
+                       ->Option.map(cs => cs->Array.map(c => c##id))
+                       ->Option.getWithDefault([||]),
                    }
                  )
                }
@@ -52,12 +48,9 @@ let make = () => {
                  setSettings(_settings =>
                    {
                      // ...settings,
-                     lastUpdated: Js.Date.now(),
-                     filters:
-                       // ...settings.filters,
-                       {
-                         calendarsIdsSkipped: [||],
-                       },
+                     "theme": settings##theme,
+                     "lastUpdated": Js.Date.now(),
+                     "calendarsIdsSkipped": [||],
                    }
                  )
                }
@@ -66,7 +59,7 @@ let make = () => {
         <Spacer size=S />
       </Row>
     </View>
-    <View style=dynamicStyles##background>
+    <View style=themeStyles##background>
       {calendars
        ->Option.map(calendars =>
            calendars
@@ -74,41 +67,43 @@ let make = () => {
                <TouchableOpacity
                  key=calendar##id
                  onPress={_ =>
-                   AppSettings.(
-                     setSettings(settings =>
-                       {
-                         lastUpdated: Js.Date.now(),
-                         filters: {
-                           calendarsIdsSkipped:
-                             {let ids = settings.filters.calendarsIdsSkipped
-                              if (ids->Array.some(id => id == calendar##id)) {
-                                ids->Array.keep(id => id != calendar##id);
-                              } else {
-                                ids->Array.concat([|calendar##id|]);
-                              }},
-                         },
-                       }
-                     )
+                   setSettings(settings =>
+                     {
+                       // ...settings,
+                       "theme": settings##theme,
+                       "lastUpdated": Js.Date.now(),
+                       "calendarsIdsSkipped":
+                         {let ids = settings##calendarsIdsSkipped
+                          if (ids->Array.some(id => id == calendar##id)) {
+                            ids->Array.keep(id => id != calendar##id);
+                          } else {
+                            ids->Array.concat([|calendar##id|]);
+                          }},
+                     }
                    )
                  }>
-                 <Separator style=dynamicStyles##separatorOnBackground />
+                 <Separator style=themeStyles##separatorOnBackground />
                  <SpacedView vertical=XS>
                    <View style=Predefined.styles##rowSpaceBetween>
                      <View>
-                       <Text style=styles##text>
+                       <Text
+                         style={Style.list([
+                           styles##text,
+                           themeStyles##textOnBackground,
+                         ])}>
                          {calendar##title->React.string}
                        </Text>
                        <Text
-                         style={S._2((
+                         style={Style.list([
                            styles##infoText,
-                           dynamicStyles##textGray2,
-                         ))}>
+                           themeStyles##textGray2,
+                         ])}>
                          {calendar##source->React.string}
                        </Text>
                      </View>
                      {
                        let skipped =
-                         settings.filters.calendarsIdsSkipped
+                         settings##calendarsIdsSkipped
                          ->Array.some(id => id == calendar##id);
                        if (skipped) {
                          <SVGCircle
@@ -131,7 +126,7 @@ let make = () => {
            ->React.array
          )
        ->Option.getWithDefault(React.null)}
-      <Separator />
+      <Separator style=themeStyles##separatorOnBackground />
     </View>
   </>;
 };

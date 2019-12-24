@@ -12,7 +12,7 @@ let title = "Your LifeTime";
 
 [@react.component]
 let make = (~onFiltersPress) => {
-  let dynamicStyles = Theme.useStyles();
+  let themeStyles = Theme.useStyles();
   let today = Date.now();
   <>
     <StatusBar barStyle=`darkContent />
@@ -23,7 +23,7 @@ let make = (~onFiltersPress) => {
       <ReactNativeSafeAreaContext.SafeAreaView
         style=Predefined.styles##flexGrow>
         <SpacedView>
-          <TitlePre style=dynamicStyles##textLightOnBackground>
+          <TitlePre style=themeStyles##textLightOnBackground>
             {Date.(
                today->dayLongString
                ++ " "
@@ -34,7 +34,7 @@ let make = (~onFiltersPress) => {
              ->Js.String.toUpperCase
              ->React.string}
           </TitlePre>
-          <Title style=dynamicStyles##textOnBackground>
+          <Title style=themeStyles##textOnBackground>
             title->React.string
           </Title>
         </SpacedView>

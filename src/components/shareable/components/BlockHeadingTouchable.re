@@ -2,9 +2,9 @@ open ReactNative;
 
 [@react.component]
 let make = (~onPress, ~text) => {
-  let dynamicStyles = Theme.useStyles();
+  let themeStyles = Theme.useStyles();
 
   <TouchableOpacity onPress>
-    <BlockHeading text style=dynamicStyles##textButton />
+    <BlockHeading text style=themeStyles##textButton />
   </TouchableOpacity>;
 };

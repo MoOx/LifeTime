@@ -1,108 +1,94 @@
 open Belt;
 
-type topActivities = {minimumDuration: float};
-
-type filters = {
-  calendarsIdsSkipped: array(string),
-  // allDay: bool,
-  // topActivities,
-};
-
+// Js.t for easy stringify for AsyncStorage
 type settings = {
-  lastUpdated: float,
-  filters,
+  .
+  "theme": string,
+  "lastUpdated": float,
+  "calendarsIdsSkipped": array(string),
 };
 
-// @todo bs7 remove this & use non "Json"
-type filtersJson = {
-  .
-  "calendarsIdsSkipped": array(string),
-  // allDay: bool,
-  // topActivities,
-};
-type settingsJson = {
-  .
-  "lastUpdated": float,
-  "filters": filtersJson,
-};
+let themeToThemeString =
+  fun
+  | `light => "light"
+  | `dark => "dark"
+  // | `auto => "auto"
+  | _ => "auto";
+
+let themeStringToTheme =
+  fun
+  | "light" => `light
+  | "dark" => `dark
+  // | "auto" =>`auto
+  | _ => `auto;
 
 let defaultSettings = {
-  lastUpdated: 0.,
-  filters: {
-    calendarsIdsSkipped: [||],
-  },
+  "theme": "auto",
+  "lastUpdated": 0.,
+  "calendarsIdsSkipped": [||],
 };
 
-let decodeFilteredCalendarsIds = json =>
+let decodeJsonSettings = (json: Js.Json.t): settings => {
   switch (Js.Json.classify(json)) {
-  | Js.Json.JSONArray(ids) =>
-    ids->Array.keepMap(jsonId =>
-      switch (Js.Json.classify(jsonId)) {
-      | Js.Json.JSONString(id) => Some(id)
-      | _ =>
-        failwith(
-          "LifeTime: decodeFilteredCalendarsIds: unable to decode string id",
-        )
-      }
-    )
-  | _ =>
-    failwith("LifeTime: decodeFilteredCalendarsIds: unable to decode array")
-  };
-
-let decodeJsonSettings = (json: Js.Json.t) => {
-  switch (Js.Json.classify(json)) {
-  | Js.Json.JSONObject(settings) =>
-    settings
-    ->Js.Dict.get("filters")
-    ->Option.map(jsonFilters =>
-        switch (Js.Json.classify(jsonFilters)) {
-        | Js.Json.JSONObject(filters) => {
-            lastUpdated:
-              settings
-              ->Js.Dict.get("lastUpdated")
-              ->Option.map(json =>
-                  switch (json->Js.Json.classify) {
-                  | Js.Json.JSONNumber(lastUpdated) => lastUpdated
-                  | _ =>
-                    Js.log(
-                      "LifeTime: decodeJsonSettings: unable to decode lastUpdated",
-                    );
-                    2.;
-                  }
-                )
-              ->Option.getWithDefault(1.),
-            filters: {
-              calendarsIdsSkipped:
-                filters
-                ->Js.Dict.get("calendarsIdsSkipped")
-                ->Option.map(json => json->decodeFilteredCalendarsIds)
-                ->Option.getWithDefault(
-                    defaultSettings.filters.calendarsIdsSkipped,
-                  ),
-            },
-          }
-        | _ =>
-          failwith("LifeTime: decodeJsonSettings: unable to decode filters")
-        }
-      )
-    ->Option.getWithDefault(defaultSettings)
+  | Js.Json.JSONObject(settings) => {
+      "theme":
+        settings
+        ->Js.Dict.get("theme")
+        ->Option.map(json =>
+            switch (json->Js.Json.classify) {
+            | Js.Json.JSONString(theme) =>
+              // force theme to be valid
+              theme->themeStringToTheme->themeToThemeString
+            | _ =>
+              Js.log("LifeTime: decodeJsonSettings: unable to decode theme");
+              "auto";
+            }
+          )
+        ->Option.getWithDefault("auto"),
+      "lastUpdated":
+        settings
+        ->Js.Dict.get("lastUpdated")
+        ->Option.map(json =>
+            switch (json->Js.Json.classify) {
+            | Js.Json.JSONNumber(lastUpdated) => lastUpdated
+            | _ =>
+              Js.log(
+                "LifeTime: decodeJsonSettings: unable to decode lastUpdated",
+              );
+              2.;
+            }
+          )
+        ->Option.getWithDefault(1.),
+      "calendarsIdsSkipped":
+        settings
+        ->Js.Dict.get("calendarsIdsSkipped")
+        ->Option.map(json =>
+            switch (Js.Json.classify(json)) {
+            | Js.Json.JSONArray(ids) =>
+              ids->Array.keepMap(jsonId =>
+                switch (Js.Json.classify(jsonId)) {
+                | Js.Json.JSONString(id) => Some(id)
+                | _ =>
+                  failwith(
+                    "LifeTime: decodeCalendarsIds: unable to decode string id",
+                  )
+                }
+              )
+            | _ =>
+              failwith("LifeTime: decodeCalendarsIds: unable to decode array")
+            }
+          )
+        ->Option.getWithDefault(defaultSettings##calendarsIdsSkipped),
+    }
   | _ => failwith("LifeTime: decodeJsonSettings: unable to decode settings")
   };
 };
 
-let decodeSettings: string => settings =
-  rawJson =>
-    try (rawJson->Js.Json.parseExn->decodeJsonSettings) {
-    | _ =>
-      Js.log2("LifeTime: useSettings: unable to decode valid json", rawJson);
-      defaultSettings;
-    };
-
 let storageKey = "settings";
 
-let useSettings = updater => {
+let useSettings = () => {
   let (settings, set) = React.useState(() => defaultSettings);
-  React.useEffect2(
+  React.useEffect1(
     () => {
       ReactNativeAsyncStorage.getItem(storageKey)
       ->FutureJs.fromPromise(error => {
@@ -116,27 +102,28 @@ let useSettings = updater => {
             =>
               res
               ->Js.Null.toOption
-              ->Option.map(decodeSettings)
+              ->Option.map(rawJson =>
+                  try (rawJson->Js.Json.parseExn->decodeJsonSettings) {
+                  | _ =>
+                    Js.log2(
+                      "LifeTime: useSettings: unable to decode valid json",
+                      rawJson,
+                    );
+                    defaultSettings;
+                  }
+                )
               ->Option.getWithDefault(defaultSettings)
             )
         )
       ->ignore;
       None;
     },
-    (set, updater),
+    [|set|],
   );
   React.useEffect1(
     () => {
       if (settings != defaultSettings) {
-        // @todo bs 7 remove the transfo
-        let settingsJson: settingsJson = {
-          "lastUpdated": settings.lastUpdated,
-          "filters": {
-            "calendarsIdsSkipped": settings.filters.calendarsIdsSkipped,
-          },
-        };
-        Js.log2("settingsJson", settingsJson);
-        settingsJson
+        settings
         ->Js.Json.stringifyAny
         ->Option.map(stringifiedSettings =>
             ReactNativeAsyncStorage.setItem(storageKey, stringifiedSettings)
@@ -148,4 +135,16 @@ let useSettings = updater => {
     [|settings|],
   );
   (settings, set);
+};
+
+type setSet = settings => settings;
+let defaultContext: (settings, setSet => unit) = (defaultSettings, _ => ());
+let context = React.createContext(defaultContext);
+
+module ContextProvider = {
+  let makeProps = (~value, ~children, ()) => {
+    "value": value,
+    "children": children,
+  };
+  let make = React.Context.provider(context);
 };

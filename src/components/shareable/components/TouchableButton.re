@@ -16,35 +16,21 @@ let styles =
     })
   );
 
-open Theme;
-let themedStyles =
-  Style.{
-    light:
-      StyleSheet.create({
-        "container": viewStyle(~backgroundColor=Theme.Colors.light.main, ()),
-        "text": textStyle(~color=Theme.Colors.light.textOnMain, ()),
-      }),
-    dark:
-      StyleSheet.create({
-        "container": viewStyle(~backgroundColor=Theme.Colors.dark.main, ()),
-        "text": textStyle(~color=Theme.Colors.dark.textOnMain, ()),
-      }),
-  };
-
 [@react.component]
 let make = (~onPress, ~text, ~styles as s=?) => {
-  let dynamicStyles = Theme.useYourStyles(themedStyles);
+  let themeStyles = Theme.useStyles();
+
   <TouchableOpacity onPress>
     <SpacedView
       vertical=S
       style=Style.(
         arrayOption([|
           Some(styles##container),
-          Some(dynamicStyles##container),
+          Some(themeStyles##backgroundMain),
           s,
         |])
       )>
-      <Text style=Style.(array([|styles##text, dynamicStyles##text|]))>
+      <Text style=Style.(array([|styles##text, themeStyles##textOnMain|]))>
         text->React.string
       </Text>
     </SpacedView>

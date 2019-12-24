@@ -26,7 +26,7 @@ let msToMin = duration => duration /. 1000. /. 60.;
 let availableCalendars = (calendars, settings: AppSettings.settings) =>
   calendars
   ->Array.keep(c =>
-      !settings.filters.calendarsIdsSkipped->Array.some(cs => cs == c##id)
+      !settings##calendarsIdsSkipped->Array.some(cs => cs == c##id)
     )
   ->Array.map(c => c##id);
 
@@ -34,10 +34,11 @@ let numberOfEventsToShow = 8;
 
 [@react.component]
 let make = (~onFiltersPress) => {
-  let dynamicStyles = Theme.useStyles();
+  let (settings, _setSettings) = React.useContext(AppSettings.context);
+
+  let themeStyles = Theme.useStyles();
 
   let isFocus = ReactNavigation.Native.useIsFocused();
-  let (settings, _setSettings) = AppSettings.useSettings(isFocus);
 
   let today = Date.now();
   let before = Date.now();
@@ -78,7 +79,7 @@ let make = (~onFiltersPress) => {
             if (e##allDay->Option.getWithDefault(false)) {
               false;
                    // filters selected calendars
-            } else if (settings.filters.calendarsIdsSkipped
+            } else if (settings##calendarsIdsSkipped
                        ->Array.some(cid =>
                            cid
                            == e##calendar
@@ -149,13 +150,13 @@ let make = (~onFiltersPress) => {
         <Spacer size=S />
       </Row>
     </View>
-    <View onLayout style=dynamicStyles##background>
+    <View onLayout style=themeStyles##background>
       {calendars
        ->Option.map(calendars => availableCalendars(calendars, settings))
        ->Option.map(c =>
            if (c->Array.length === 0) {
              <>
-               <Separator style=dynamicStyles##separatorOnBackground />
+               <Separator style=themeStyles##separatorOnBackground />
                <SpacedView>
                  <Center>
                    <Spacer size=XXL />
@@ -191,18 +192,20 @@ let make = (~onFiltersPress) => {
                       durationM >= 1. ? durationM->Js.Float.toFixed ++ "m" : ""
                     );
                   <TouchableOpacity onPress={_ => ()} key=title>
-                    <Separator style=dynamicStyles##separatorOnBackground />
+                    <Separator style=themeStyles##separatorOnBackground />
                     <SpacedView vertical=XS>
                       <View style=Predefined.styles##rowSpaceBetween>
                         <View>
-                          <Text> title->React.string </Text>
+                          <Text style=themeStyles##textOnBackground>
+                            title->React.string
+                          </Text>
                           <Spacer size=XXS />
                           <Row
                             style=Style.(viewStyle(~alignItems=`center, ()))>
                             <View
                               style=Style.(
                                 array([|
-                                  dynamicStyles##backgroundGray3,
+                                  themeStyles##backgroundGray3,
                                   viewStyle(
                                     ~width=
                                       (
@@ -224,7 +227,7 @@ let make = (~onFiltersPress) => {
                               style=Style.(
                                 array([|
                                   styles##durationText,
-                                  dynamicStyles##textLightOnBackground,
+                                  themeStyles##textLightOnBackground,
                                 |])
                               )>
                               durationString->React.string
@@ -248,9 +251,9 @@ let make = (~onFiltersPress) => {
                         eventsToShow + numberOfEventsToShow
                       )
                     }>
-                    <Separator style=dynamicStyles##separatorOnBackground />
+                    <Separator style=themeStyles##separatorOnBackground />
                     <SpacedView vertical=XS>
-                      <Text style=dynamicStyles##textBlue>
+                      <Text style=themeStyles##textBlue>
                         "Show More"->React.string
                       </Text>
                     </SpacedView>
@@ -259,7 +262,7 @@ let make = (~onFiltersPress) => {
            </>
          )
        ->Option.getWithDefault(React.null)}
-      <Separator style=dynamicStyles##separatorOnBackground />
+      <Separator style=themeStyles##separatorOnBackground />
     </View>
   </>;
 };

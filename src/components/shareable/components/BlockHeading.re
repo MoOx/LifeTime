@@ -10,13 +10,13 @@ let styles =
 
 [@react.component]
 let make = (~text, ~style as s=?) => {
-  let dynamicStyles = Theme.useStyles();
+  let themeStyles = Theme.useStyles();
 
   <SpacedView horizontal=XXS vertical=XXS>
     <Text
       style={Style.arrayOption([|
         Some(styles##text),
-        Some(dynamicStyles##textGray),
+        Some(themeStyles##textGray),
         s,
       |])}>
       {text->Js.String.toUpperCase->React.string}

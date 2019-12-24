@@ -4,8 +4,6 @@ open ReactMultiversal;
 let styles =
   Style.(
     StyleSheet.create({
-      "wrapper": viewStyle(~flexGrow=1., ()),
-      "container": viewStyle(~flexGrow=1., ()),
       "content": viewStyle(~flexGrow=1., ~justifyContent=`center, ()),
       "pitch":
         viewStyle(~flexGrow=1., ~flexShrink=1., ~justifyContent=`center, ()),
@@ -44,39 +42,11 @@ let styles =
     })
   );
 
-open Theme;
-let themedStyles =
-  Style.{
-    light:
-      StyleSheet.create({
-        "wrapper":
-          viewStyle(~backgroundColor=Theme.Colors.light.background, ()),
-        "title": textStyle(~color=Theme.Colors.light.textOnBackground, ()),
-        "appName": textStyle(~color=Theme.Colors.light.main, ()),
-        "baseline": textStyle(~color=Theme.Colors.light.textOnBackground, ()),
-        "permissions":
-          textStyle(~color=Theme.Colors.light.textLightOnBackground, ()),
-        "permissionsLink": textStyle(~color=Theme.Colors.light.main, ()),
-      }),
-    dark:
-      StyleSheet.create({
-        "wrapper":
-          viewStyle(~backgroundColor=Theme.Colors.dark.background, ()),
-        "title": textStyle(~color=Theme.Colors.dark.textOnBackground, ()),
-        "appName": textStyle(~color=Theme.Colors.dark.main, ()),
-        "baseline": textStyle(~color=Theme.Colors.dark.textOnBackground, ()),
-        "permissions":
-          textStyle(~color=Theme.Colors.dark.textLightOnBackground, ()),
-        "permissionsLink": textStyle(~color=Theme.Colors.dark.main, ()),
-      }),
-  };
-
 let icon = Packager.require("../../public/Icon.png");
 
 [@react.component]
 let make = (~onAboutPrivacyPress, ~onContinuePress) => {
-  let dynamicStyles = Theme.useYourStyles(themedStyles);
-  let windowDimensions = Dimensions.useWindowDimensions();
+  let themeStyles = Theme.useStyles();
   let animatedPitchOpacity = React.useRef(Animated.Value.create(0.));
   let animatedPitchScale = React.useRef(Animated.Value.create(0.75));
   let animatedBottomOpacity = React.useRef(Animated.Value.create(0.));
@@ -135,17 +105,10 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
   });
 
   <ScrollView
-    style={Style.array([|dynamicStyles##wrapper|])}
-    contentContainerStyle=styles##wrapper>
-    <ReactNativeSafeAreaContext.SafeAreaView style=styles##container>
-      <SpacedView
-        horizontal=XL
-        style=Style.(
-          array([|
-            styles##content,
-            style(~width=windowDimensions##width->dp, ()),
-          |])
-        )>
+    style={Style.array([|themeStyles##background|])}
+    contentContainerStyle=styles##content>
+    <ReactNativeSafeAreaContext.SafeAreaView style=Predefined.styles##flexGrow>
+      <SpacedView horizontal=XL vertical=S style=Predefined.styles##flexGrow>
         <Animated.View
           style=Style.(
             array([|
@@ -168,17 +131,26 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
             |])
           )>
           <Image style=styles##icon source={icon->Image.Source.fromRequired} />
-          <Spacer size=L />
-          <Text style=Style.(array([|styles##title, dynamicStyles##title|]))>
+          <Spacer />
+          <Text
+            style=Style.(
+              array([|styles##title, themeStyles##textOnBackground|])
+            )
+            numberOfLines=1
+            adjustsFontSizeToFit=true>
             "Welcome to"->React.string
           </Text>
           <Text
-            style=Style.(array([|styles##appName, dynamicStyles##appName|]))>
+            style=Style.(array([|styles##appName, themeStyles##textMain|]))
+            numberOfLines=1
+            adjustsFontSizeToFit=true>
             "LifeTime"->React.string
           </Text>
           <Spacer />
           <Text
-            style=Style.(array([|styles##baseline, dynamicStyles##baseline|]))>
+            style=Style.(
+              array([|styles##baseline, themeStyles##textOnBackground|])
+            )>
             "Your personal coach, helping you to reach your goals and spend your valuable time on things you love."
             ->React.string
           </Text>
@@ -211,7 +183,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
             <View style=styles##bottomText>
               <Text
                 style=Style.(
-                  array([|styles##permissions, dynamicStyles##permissions|])
+                  array([|styles##permissions, themeStyles##textGray|])
                 )>
                 "LifeTime needs access to your calendar to show activity reports & suggestions. Your data stay on your device."
                 ->React.string
@@ -220,10 +192,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
               <TouchableOpacity onPress=onAboutPrivacyPress>
                 <Text
                   style=Style.(
-                    array([|
-                      styles##permissionsLink,
-                      dynamicStyles##permissionsLink,
-                    |])
+                    array([|styles##permissionsLink, themeStyles##textMain|])
                   )>
                   "About LifeTime & Privacy..."->React.string
                 </Text>
@@ -232,6 +201,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
           </Row>
           <Spacer size=L />
           <TouchableButton text="Continue" onPress=onContinuePress />
+          <Spacer />
         </Animated.View>
       </SpacedView>
     </ReactNativeSafeAreaContext.SafeAreaView>

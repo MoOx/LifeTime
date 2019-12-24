@@ -1,9 +1,10 @@
 open ReactMultiversal;
 
+type acceptedMode = [ | `light | `dark | `auto];
 type t = [ | `light | `dark];
 
 type rnStyleSheet('a) = Js.t('a);
-type dynamicStyles('a) = {
+type themeStyles('a) = {
   light: rnStyleSheet('a),
   dark: rnStyleSheet('a),
 };
@@ -36,11 +37,12 @@ module Colors = {
   };
 };
 
-let dynamicStyles =
+let themeStyles =
   ReactNative.(
     Style.{
       light:
         StyleSheet.create({
+          "backgroundMain": viewStyle(~backgroundColor=Colors.light.main, ()),
           "background":
             viewStyle(~backgroundColor=Colors.light.background, ()),
           "separatorOnBackground":
@@ -77,13 +79,14 @@ let dynamicStyles =
             textStyle(~color=Colors.light.textOnBackground, ()),
           "textLightOnBackground":
             textStyle(~color=Colors.light.textLightOnBackground, ()),
-          "main": textStyle(~color=Colors.light.main, ()),
+          "textMain": textStyle(~color=Colors.light.main, ()),
           "textOnMain": textStyle(~color=Colors.light.textOnMain, ()),
           "textButton":
             textStyle(~color=Predefined.Colors.Ios.light.blue, ()),
         }),
       dark:
         StyleSheet.create({
+          "backgroundMain": viewStyle(~backgroundColor=Colors.dark.main, ()),
           "background":
             viewStyle(~backgroundColor=Colors.dark.background, ()),
           "separatorOnBackground":
@@ -115,7 +118,7 @@ let dynamicStyles =
             textStyle(~color=Colors.dark.textOnBackground, ()),
           "textLightOnBackground":
             textStyle(~color=Colors.dark.textLightOnBackground, ()),
-          "main": textStyle(~color=Colors.dark.main, ()),
+          "textMain": textStyle(~color=Colors.dark.main, ()),
           "textOnMain": textStyle(~color=Colors.dark.textOnMain, ()),
           "textButton": textStyle(~color=Predefined.Colors.Ios.dark.blue, ()),
         }),
@@ -123,25 +126,34 @@ let dynamicStyles =
   );
 
 let useTheme = (): t => {
-  switch (ReactNativeDarkMode.useDarkMode()) {
-  | true => `dark
-  | _ => `light
+  let (settings, _setSettings) = React.useContext(AppSettings.context);
+  // let mode = React.useContext(ContextProvider.context);
+  let mode = settings##theme->AppSettings.themeStringToTheme;
+  let autoMode = ReactNativeDarkMode.useDarkMode();
+  switch (mode) {
+  | `auto =>
+    switch (autoMode) {
+    | true => `dark
+    | _ => `light
+    }
+  | `light => `light
+  | `dark => `dark
   };
 };
 
 let useStyles = (): rnStyleSheet('a) => {
   let theme = useTheme();
   switch (theme) {
-  | `light => dynamicStyles.light
-  | `dark => dynamicStyles.dark
+  | `light => themeStyles.light
+  | `dark => themeStyles.dark
   };
 };
 
-let useYourStyles = (themedStyles: dynamicStyles('a)): rnStyleSheet('a) => {
+let useColors = () => {
   let theme = useTheme();
   switch (theme) {
-  | `light => themedStyles.light
-  | `dark => themedStyles.dark
+  | `light => Predefined.Colors.Ios.light
+  | `dark => Predefined.Colors.Ios.dark
   };
 };
 
