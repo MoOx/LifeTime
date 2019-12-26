@@ -188,51 +188,52 @@ let make = (~startDate, ~endDate, ~onFiltersPress) => {
                     <Separator style=themeStyles##separatorOnBackground />
                     <SpacedView vertical=XS>
                       <View style=Predefined.styles##rowSpaceBetween>
-                        <View>
-                          <Text style=themeStyles##textOnBackground>
-                            title->React.string
-                          </Text>
-                          <Spacer size=XXS />
-                          <Row
-                            style=Style.(viewStyle(~alignItems=`center, ()))>
-                            <View
-                              style=Style.(
-                                array([|
-                                  themeStyles##backgroundGray3,
-                                  viewStyle(
-                                    ~width=
-                                      (
-                                        totalDurationInMin
-                                        /. maxDurationInMin
-                                        *. availableWidthForBar
-                                      )
-                                      ->dp,
-                                    ~height=6.->dp,
-                                    ~borderRadius=6.,
-                                    ~overflow=`hidden,
-                                    (),
-                                  ),
-                                |])
-                              )
-                            />
-                            <Spacer size=XXS />
-                            <Text
-                              style=Style.(
-                                array([|
-                                  styles##durationText,
-                                  themeStyles##textLightOnBackground,
-                                |])
-                              )>
-                              durationString->React.string
+
+                          <View>
+                            <Text style=themeStyles##textOnBackground>
+                              title->React.string
                             </Text>
-                          </Row>
+                            <Spacer size=XXS />
+                            <Row
+                              style=Style.(viewStyle(~alignItems=`center, ()))>
+                              <View
+                                style=Style.(
+                                  array([|
+                                    themeStyles##backgroundGray3,
+                                    viewStyle(
+                                      ~width=
+                                        (
+                                          totalDurationInMin
+                                          /. maxDurationInMin
+                                          *. availableWidthForBar
+                                        )
+                                        ->dp,
+                                      ~height=6.->dp,
+                                      ~borderRadius=6.,
+                                      ~overflow=`hidden,
+                                      (),
+                                    ),
+                                  |])
+                                )
+                              />
+                              <Spacer size=XXS />
+                              <Text
+                                style=Style.(
+                                  array([|
+                                    styles##durationText,
+                                    themeStyles##textLightOnBackground,
+                                  |])
+                                )>
+                                durationString->React.string
+                              </Text>
+                            </Row>
+                          </View>
                         </View>
-                        <SVGChevronRight
-                          width={14.->ReactFromSvg.Size.dp}
-                          height={14.->ReactFromSvg.Size.dp}
-                          fill={Predefined.Colors.Ios.light.gray4}
-                        />
-                      </View>
+                        // <SVGChevronRight
+                        //   width={14.->ReactFromSvg.Size.dp}
+                        //   height={14.->ReactFromSvg.Size.dp}
+                        //   fill={Predefined.Colors.Ios.light.gray4}
+                        // />
                     </SpacedView>
                   </TouchableOpacity>;
                 })
