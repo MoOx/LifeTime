@@ -237,25 +237,50 @@ let make = (~startDate, ~endDate, ~onFiltersPress) => {
                   </TouchableOpacity>;
                 })
               ->React.array}
-             {durationPerTitle->Array.length > eventsToShow
-                ? <TouchableOpacity
-                    onPress={_ =>
-                      setEventsToShow(eventsToShow =>
-                        eventsToShow + numberOfEventsToShow
-                      )
-                    }>
-                    <Separator style=themeStyles##separatorOnBackground />
-                    <SpacedView vertical=XS>
-                      <Text style=themeStyles##textBlue>
-                        "Show More"->React.string
-                      </Text>
-                    </SpacedView>
-                  </TouchableOpacity>
-                : React.null}
+             <Separator style=themeStyles##separatorOnBackground />
+             {
+               let showMore = durationPerTitle->Array.length > eventsToShow;
+               let showLess = eventsToShow > numberOfEventsToShow;
+               showMore || showLess
+                 ? <>
+                     <View style=Predefined.styles##rowSpaceBetween>
+                       {durationPerTitle->Array.length > eventsToShow
+                          ? <TouchableOpacity
+                              onPress={_ =>
+                                setEventsToShow(eventsToShow =>
+                                  eventsToShow + numberOfEventsToShow
+                                )
+                              }>
+                              <SpacedView vertical=XS>
+                                <Text style=themeStyles##textBlue>
+                                  "Show More"->React.string
+                                </Text>
+                              </SpacedView>
+                            </TouchableOpacity>
+                          : React.null}
+                       <Spacer />
+                       {eventsToShow > numberOfEventsToShow
+                          ? <TouchableOpacity
+                              onPress={_ =>
+                                setEventsToShow(eventsToShow =>
+                                  eventsToShow - numberOfEventsToShow
+                                )
+                              }>
+                              <SpacedView vertical=XS>
+                                <Text style=themeStyles##textBlue>
+                                  "Show Less"->React.string
+                                </Text>
+                              </SpacedView>
+                            </TouchableOpacity>
+                          : React.null}
+                     </View>
+                     <Separator style=themeStyles##separatorOnBackground />
+                   </>
+                 : React.null;
+             }
            </>
          )
        ->Option.getWithDefault(React.null)}
-      <Separator style=themeStyles##separatorOnBackground />
     </View>
   </>;
 };
