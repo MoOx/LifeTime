@@ -2,7 +2,7 @@ open ReactNative;
 open ReactMultiversal;
 
 [@react.component]
-let make = (~navigation, ~route) => {
+let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   let themeColors = Theme.useColors();

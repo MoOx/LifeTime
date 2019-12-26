@@ -11,18 +11,6 @@ let styles =
     })
   );
 
-type filters = {
-  allDay: bool,
-  calendars: array(ReactNativeCalendarEvents.calendar),
-  minimumDurationInMin: float,
-};
-
-let eventDurationInMs = e =>
-  e##endDate->Js.Date.fromString->Js.Date.valueOf
-  -. e##startDate->Js.Date.fromString->Js.Date.valueOf;
-
-let msToMin = duration => duration /. 1000. /. 60.;
-
 let availableCalendars = (calendars, settings: AppSettings.settings) =>
   calendars
   ->Array.keep(c =>
@@ -33,27 +21,25 @@ let availableCalendars = (calendars, settings: AppSettings.settings) =>
 let numberOfEventsToShow = 8;
 
 [@react.component]
-let make = (~onFiltersPress) => {
+let make = (~startDate, ~endDate, ~onFiltersPress) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
 
   let themeStyles = Theme.useStyles();
 
   let isFocus = ReactNavigation.Native.useIsFocused();
 
-  let today = Date.now();
-  let before = Date.now();
-  before->Js.Date.setDate(before->Js.Date.getDate -. 7.)->ignore;
-
   let calendars = Calendars.useCalendars(isFocus);
+  let (loading, setLoading) = React.useState(() => false);
   let (events, setEvents) = React.useState(() => None);
   let (eventsToShow, setEventsToShow) =
     React.useState(() => numberOfEventsToShow);
 
-  React.useEffect3(
+  React.useEffect5(
     () => {
+      setLoading(_ => true);
       ReactNativeCalendarEvents.fetchAllEvents(
-        before->Js.Date.toISOString,
-        today->Js.Date.toISOString,
+        startDate->Js.Date.toISOString,
+        endDate->Js.Date.toISOString,
         // we filter calendar later cause if you UNSELECT ALL
         // this `fetchAllEvents` DEFAULT TO ALL
         None,
@@ -63,11 +49,14 @@ let make = (~onFiltersPress) => {
           Js.log(error);
           error;
         })
-      ->Future.tapOk(res => setEvents(_ => Some(res)))
+      ->Future.tapOk(res => {
+          setLoading(_ => false);
+          setEvents(_ => Some(res));
+        })
       ->ignore;
       None;
     },
-    (setEvents, calendars, settings),
+    (startDate, endDate, setEvents, calendars, settings),
   );
 
   let durationPerTitle =
@@ -110,9 +99,13 @@ let make = (~onFiltersPress) => {
             evts->Array.reduce(
               0.,
               (totalDurationInMin, e) => {
-                let durationInMs = e->eventDurationInMs;
+                let durationInMs =
+                  Date.eventDurationInMs(e##endDate, e##startDate);
                 totalDurationInMin
-                +. durationInMs->Js.Date.fromFloat->Js.Date.valueOf->msToMin;
+                +. durationInMs
+                   ->Js.Date.fromFloat
+                   ->Js.Date.valueOf
+                   ->Date.msToMin;
               },
             );
           (
@@ -141,7 +134,7 @@ let make = (~onFiltersPress) => {
 
   <>
     <View style=Predefined.styles##rowSpaceBetween>
-      <Spacer />
+      <Row> <Spacer size=S /> <BlockHeading text="Top Activities" /> </Row>
       <Row>
         <BlockHeadingTouchable
           onPress={_ => onFiltersPress()}

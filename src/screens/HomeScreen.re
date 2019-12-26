@@ -2,7 +2,7 @@ open ReactNative;
 open ReactMultiversal;
 
 [@react.component]
-let make = (~navigation, ~route) => {
+let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   // let themeColors = Theme.useColors();
@@ -95,13 +95,16 @@ let make = (~navigation, ~route) => {
         textStyle=themeStyles##textOnBackground
         title=Home.title
       />
-      <Home
-        onFiltersPress={() =>
-          navigation->Navigators.RootStackNavigator.Navigation.navigate(
-            "FiltersModalScreen",
-          )
-        }
-      />
+      <ReactNativeSafeAreaContext.SafeAreaView
+        style=Predefined.styles##flexGrow>
+        <Home
+          onFiltersPress={() =>
+            navigation->Navigators.RootStackNavigator.Navigation.navigate(
+              "FiltersModalScreen",
+            )
+          }
+        />
+      </ReactNativeSafeAreaContext.SafeAreaView>
     </Animated.ScrollView>
   </>;
 };

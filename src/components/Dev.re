@@ -1,17 +1,33 @@
 open ReactNative;
+open ReactMultiversal;
 
 [@react.component]
 let make = () => {
   let (settings, setSettings) = React.useContext(AppSettings.context);
   let theme = settings##theme->AppSettings.themeStringToTheme;
+  let themeStyles = Theme.useStyles();
 
   <View
     style=Style.(
-      style(~position=`absolute, ~bottom=20.->dp, ~right=20.->dp, ())
+      viewStyle(
+        ~position=`absolute,
+        ~bottom=10.->dp,
+        ~right=10.->dp,
+        ~flexDirection=`row,
+        (),
+      )
     )>
+    <TouchableOpacity
+      onPress={_ => ReactNativePermissions.openSettings()->ignore}>
+      <SpacedView horizontal=S>
+        <Text style=themeStyles##textOnBackground>
+          {j|⚙️|j}->React.string
+        </Text>
+      </SpacedView>
+    </TouchableOpacity>
     {switch (theme) {
      | `light =>
-       <Text
+       <TouchableOpacity
          onPress={_ =>
            setSettings(settings =>
              {
@@ -21,10 +37,12 @@ let make = () => {
              }
            )
          }>
-         {j|🌕|j}->React.string
-       </Text>
+         <SpacedView horizontal=S>
+           <Text> {j|🌕|j}->React.string </Text>
+         </SpacedView>
+       </TouchableOpacity>
      | `dark =>
-       <Text
+       <TouchableOpacity
          onPress={_ =>
            setSettings(settings =>
              {
@@ -34,10 +52,12 @@ let make = () => {
              }
            )
          }>
-         {j|🌑|j}->React.string
-       </Text>
+         <SpacedView horizontal=S>
+           <Text> {j|🌑|j}->React.string </Text>
+         </SpacedView>
+       </TouchableOpacity>
      | `auto =>
-       <Text
+       <TouchableOpacity
          onPress={_ =>
            setSettings(settings =>
              {
@@ -47,8 +67,10 @@ let make = () => {
              }
            )
          }>
-         {j|🌓|j}->React.string
-       </Text>
+         <SpacedView horizontal=S>
+           <Text> {j|🌓|j}->React.string </Text>
+         </SpacedView>
+       </TouchableOpacity>
      }}
   </View>;
 };

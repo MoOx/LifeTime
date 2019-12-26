@@ -1,7 +1,9 @@
-let now = () => Js.Date.(fromFloat(now()));
+open Js.Date;
+
+let now = () => fromFloat(now());
 
 let dayLongString = date => {
-  switch (date->Js.Date.getDay) {
+  switch (date->getDay) {
   | 1. => "Monday"
   | 2. => "Tuesday"
   | 3. => "Wednesday"
@@ -14,7 +16,7 @@ let dayLongString = date => {
 };
 
 let monthLongString = date => {
-  switch (date->Js.Date.getMonth +. 1.) {
+  switch (date->getMonth +. 1.) {
   | 1. => "January"
   | 2. => "February"
   | 3. => "March"
@@ -32,5 +34,67 @@ let monthLongString = date => {
 };
 
 let dateString = date => {
-  date->Js.Date.getDate->Js.Float.toString;
+  date->getDate->Js.Float.toString;
+};
+
+let eventDurationInMs = (endDate, startDate) =>
+  endDate->fromString->valueOf -. startDate->fromString->valueOf;
+
+let msToMin = duration => duration /. 1000. /. 60.;
+
+let copy = date => date->valueOf->fromFloat;
+
+let addDays = (~numberOfDays, date) => {
+  let d = date->copy;
+  d->setDate(d->getDate +. numberOfDays->float)->ignore;
+  d;
+};
+
+let firstDayOfWeek = (~firstDayOfWeekIndex: int=1, givenDate: t) => {
+  let dayOfWeek = givenDate->getDay->int_of_float;
+  let firstDayOfWeek = givenDate->copy;
+  let diff =
+    dayOfWeek >= firstDayOfWeekIndex
+      ? dayOfWeek - firstDayOfWeekIndex : 6 - dayOfWeek;
+
+  firstDayOfWeek->setDate(givenDate->getDate -. diff->float)->ignore;
+  firstDayOfWeek
+  ->setHoursMSMs(~hours=0., ~minutes=0., ~seconds=0., ~milliseconds=0., ())
+  ->ignore;
+
+  firstDayOfWeek;
+};
+
+let lastDayOfWeek = (~firstDayOfWeekIndex: int=1, givenDate: t) => {
+  firstDayOfWeek(~firstDayOfWeekIndex, givenDate)->addDays(~numberOfDays=7);
+};
+
+let firstDayOfMonth = date => {
+  makeWithYMD(~year=date->getFullYear, ~month=date->getMonth, ~date=1., ());
+};
+
+let lastDayOfMonth = date => {
+  makeWithYMDHMS(
+    ~year=date->getFullYear,
+    ~month=date->getMonth +. 1.,
+    ~date=0.,
+    ~hours=23.,
+    ~minutes=59.,
+    ~seconds=59.,
+    (),
+  );
+};
+
+let minDate = (d1, d2) =>
+  if (d1->getTime < d2->getTime) {
+    d1;
+  } else {
+    d2;
+  };
+
+let weekDates = (~firstDayOfWeekIndex: int=1, date) => {
+  (
+    firstDayOfWeek(~firstDayOfWeekIndex, date),
+    lastDayOfWeek(~firstDayOfWeekIndex, date),
+  );
 };

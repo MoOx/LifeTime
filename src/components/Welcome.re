@@ -104,106 +104,102 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
     None;
   });
 
-  <ScrollView
-    style={Style.array([|themeStyles##background|])}
-    contentContainerStyle=styles##content>
-    <ReactNativeSafeAreaContext.SafeAreaView style=Predefined.styles##flexGrow>
-      <SpacedView horizontal=XL vertical=S style=Predefined.styles##flexGrow>
-        <Animated.View
-          style=Style.(
-            array([|
-              styles##pitch,
-              style(
-                ~opacity=
-                  animatedPitchOpacity
-                  ->React.Ref.current
-                  ->Animated.StyleProp.float,
-                ~transform=[|
-                  scale(
-                    ~scale=
-                      animatedPitchScale
-                      ->React.Ref.current
-                      ->Animated.StyleProp.float,
-                  ),
-                |],
-                (),
-              ),
-            |])
-          )>
-          <Image style=styles##icon source={icon->Image.Source.fromRequired} />
-          <Spacer />
-          <Text
-            style=Style.(
-              array([|styles##title, themeStyles##textOnBackground|])
-            )
-            numberOfLines=1
-            adjustsFontSizeToFit=true>
-            "Welcome to"->React.string
-          </Text>
-          <Text
-            style=Style.(array([|styles##appName, themeStyles##textMain|]))
-            numberOfLines=1
-            adjustsFontSizeToFit=true>
-            "LifeTime"->React.string
-          </Text>
-          <Spacer />
-          <Text
-            style=Style.(
-              array([|styles##baseline, themeStyles##textOnBackground|])
-            )>
-            "Your personal coach, helping you to reach your goals and spend your valuable time on things you love."
-            ->React.string
-          </Text>
-        </Animated.View>
+  <View style=styles##content>
+    <SpacedView horizontal=XL vertical=S style=Predefined.styles##flexGrow>
+      <Animated.View
+        style=Style.(
+          array([|
+            styles##pitch,
+            style(
+              ~opacity=
+                animatedPitchOpacity
+                ->React.Ref.current
+                ->Animated.StyleProp.float,
+              ~transform=[|
+                scale(
+                  ~scale=
+                    animatedPitchScale
+                    ->React.Ref.current
+                    ->Animated.StyleProp.float,
+                ),
+              |],
+              (),
+            ),
+          |])
+        )>
+        <Image style=styles##icon source={icon->Image.Source.fromRequired} />
         <Spacer />
-        <Animated.View
+        <Text
           style=Style.(
-            array([|
-              styles##bottom,
-              style(
-                ~opacity=
-                  animatedBottomOpacity
-                  ->React.Ref.current
-                  ->Animated.StyleProp.float,
-                ~transform=[|
-                  translateY(
-                    ~translateY=
-                      animatedBottomTranslateY
-                      ->React.Ref.current
-                      ->Animated.StyleProp.float,
-                  ),
-                |],
-                (),
-              ),
-            |])
+            array([|styles##title, themeStyles##textOnBackground|])
+          )
+          numberOfLines=1
+          adjustsFontSizeToFit=true>
+          "Welcome to"->React.string
+        </Text>
+        <Text
+          style=Style.(array([|styles##appName, themeStyles##textMain|]))
+          numberOfLines=1
+          adjustsFontSizeToFit=true>
+          "LifeTime"->React.string
+        </Text>
+        <Spacer />
+        <Text
+          style=Style.(
+            array([|styles##baseline, themeStyles##textOnBackground|])
           )>
-          <Row>
-            <IconCalendar style=styles##iconCalendar />
+          "Your personal coach, helping you to reach your goals and spend your valuable time on things you love."
+          ->React.string
+        </Text>
+      </Animated.View>
+      <Spacer />
+      <Animated.View
+        style=Style.(
+          array([|
+            styles##bottom,
+            style(
+              ~opacity=
+                animatedBottomOpacity
+                ->React.Ref.current
+                ->Animated.StyleProp.float,
+              ~transform=[|
+                translateY(
+                  ~translateY=
+                    animatedBottomTranslateY
+                    ->React.Ref.current
+                    ->Animated.StyleProp.float,
+                ),
+              |],
+              (),
+            ),
+          |])
+        )>
+        <Row>
+          <IconCalendar style=styles##iconCalendar />
+          <Spacer size=S />
+          <View style=styles##bottomText>
+            <Text
+              style=Style.(
+                array([|styles##permissions, themeStyles##textGray|])
+              )>
+              "LifeTime needs access to your calendar to show activity reports & suggestions. Your data stay on your device."
+              ->React.string
+            </Text>
             <Spacer size=S />
-            <View style=styles##bottomText>
+            <TouchableOpacity onPress=onAboutPrivacyPress>
               <Text
                 style=Style.(
-                  array([|styles##permissions, themeStyles##textGray|])
+                  array([|styles##permissionsLink, themeStyles##textMain|])
                 )>
-                "LifeTime needs access to your calendar to show activity reports & suggestions. Your data stay on your device."
-                ->React.string
+                "About LifeTime & Privacy..."->React.string
               </Text>
-              <Spacer size=S />
-              <TouchableOpacity onPress=onAboutPrivacyPress>
-                <Text
-                  style=Style.(
-                    array([|styles##permissionsLink, themeStyles##textMain|])
-                  )>
-                  "About LifeTime & Privacy..."->React.string
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </Row>
-          <Spacer size=L />
-          <TouchableButton text="Continue" onPress=onContinuePress />
-          <Spacer />
-        </Animated.View>
-      </SpacedView>
-    </ReactNativeSafeAreaContext.SafeAreaView>
-  </ScrollView>;
+            </TouchableOpacity>
+          </View>
+        </Row>
+        <Spacer size=L />
+        <TouchableButton text="Continue" onPress=onContinuePress />
+        <Spacer />
+      </Animated.View>
+    </SpacedView>
+  </View>;
 };

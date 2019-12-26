@@ -12,7 +12,7 @@ module MainStackScreen = {
   open Navigators;
 
   [@react.component]
-  let make = (~navigation, ~route) =>
+  let make = (~navigation as _, ~route as _) =>
     <MainStack.Navigator headerMode=`none mode=`modal>
       <MainStack.Screen name="HomeScreen" component=HomeScreen.make />
     </MainStack.Navigator>;
@@ -65,6 +65,6 @@ let app = () => {
       <RootNavigator />
     </Native.NavigationNativeContainer>
     <Bootsplash />
-    <Dev />
+    {Global.__DEV__ ? <Dev /> : React.null}
   </AppSettings.ContextProvider>;
 };
