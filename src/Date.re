@@ -33,6 +33,24 @@ let monthLongString = date => {
   };
 };
 
+let monthShortString = date => {
+  switch (date->getMonth +. 1.) {
+  | 1. => "Jan"
+  | 2. => "Feb"
+  | 3. => "Mar"
+  | 4. => "Apr"
+  | 5. => "May"
+  | 6. => "Jun"
+  | 7. => "Jul"
+  | 8. => "Aug"
+  | 9. => "Sep"
+  | 10. => "Oct"
+  | 11. => "Nov"
+  | 12. => "Dec"
+  | _ => ""
+  };
+};
+
 let dateString = date => {
   date->getDate->Js.Float.toString;
 };

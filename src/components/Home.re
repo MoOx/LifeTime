@@ -22,6 +22,13 @@ let make = (~onFiltersPress) => {
     React.useRef(
       Date.weekDates(~firstDayOfWeekIndex=1, today->React.Ref.current),
     );
+  let previousDates =
+    React.useRef(
+      Date.weekDates(
+        ~firstDayOfWeekIndex=1,
+        today->React.Ref.current->Date.addDays(~numberOfDays=-7),
+      ),
+    );
 
   let data =
     React.useRef(
@@ -44,6 +51,9 @@ let make = (~onFiltersPress) => {
       ->Option.getWithDefault(todayDates->React.Ref.current)
     );
 
+  let (todayFirst, _) = todayDates->React.Ref.current;
+  let (previousFirst, _) = previousDates->React.Ref.current;
+
   let flatListRef = React.useRef(Js.Nullable.null);
 
   let getItemLayout =
@@ -62,15 +72,31 @@ let make = (~onFiltersPress) => {
       let (firstDay, lastDay) = renderItemProps##item;
       <View style=styleWidth>
         <SpacedView>
-          <Text> {firstDay->Js.Date.toString->React.string} </Text>
-          <Text>
-            {lastDay
-             ->Date.minDate(today->React.Ref.current)
-             ->Js.Date.toString
-             ->React.string}
+          <Text style=themeStyles##textLightOnBackground>
+            (
+              if (todayFirst == firstDay) {
+                "Daily Average";
+              } else if (previousFirst == firstDay) {
+                "Last Week's Average";
+              } else {
+                firstDay->Js.Date.getDate->Js.Float.toString
+                ++ " - "
+                ++ lastDay->Js.Date.getDate->Js.Float.toString
+                ++ " "
+                ++ lastDay->Date.monthShortString
+                ++ " Average";
+              }
+            )
+            ->React.string
           </Text>
         </SpacedView>
       </View>;
+      // <Text>
+      //   {lastDay
+      //    ->Date.minDate(today->React.Ref.current)
+      //    ->Js.Date.toString
+      //    ->React.string}
+      // </Text>
     });
 
   let onViewableItemsChanged =
@@ -117,15 +143,12 @@ let make = (~onFiltersPress) => {
     <View style=Predefined.styles##rowSpaceBetween>
       <Row> <Spacer size=S /> <BlockHeading text="Weekly Chart" /> </Row>
       <Row>
-        {
-          let (todayFirst, _) = todayDates->React.Ref.current;
-          todayFirst == startDate
-            ? React.null
-            : <BlockHeadingTouchable
-                onPress=onShowThisWeek
-                text="Show This Week"
-              />;
-        }
+        {todayFirst == startDate
+           ? React.null
+           : <BlockHeadingTouchable
+               onPress=onShowThisWeek
+               text="Show This Week"
+             />}
         <Spacer size=S />
       </Row>
     </View>
