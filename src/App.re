@@ -60,11 +60,13 @@ module RootNavigator = {
 [@react.component]
 let app = () => {
   let (settings, setSettings) = AppSettings.useSettings();
-  <AppSettings.ContextProvider value=(settings, setSettings)>
-    <Native.NavigationNativeContainer>
-      <RootNavigator />
-    </Native.NavigationNativeContainer>
-    <Bootsplash />
-    {Global.__DEV__ ? <Dev /> : React.null}
-  </AppSettings.ContextProvider>;
+  <ReactNativeDarkMode.DarkModeProvider>
+    <AppSettings.ContextProvider value=(settings, setSettings)>
+      <Native.NavigationNativeContainer>
+        <RootNavigator />
+      </Native.NavigationNativeContainer>
+      <Bootsplash />
+      {Global.__DEV__ ? <Dev /> : React.null}
+    </AppSettings.ContextProvider>
+  </ReactNativeDarkMode.DarkModeProvider>;
 };

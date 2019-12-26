@@ -127,7 +127,6 @@ let themeStyles =
 
 let useTheme = (): t => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
-  // let mode = React.useContext(ContextProvider.context);
   let mode = settings##theme->AppSettings.themeStringToTheme;
   let autoMode = ReactNativeDarkMode.useDarkMode();
   switch (mode) {
