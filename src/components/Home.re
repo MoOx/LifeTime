@@ -18,6 +18,11 @@ let make = (~onFiltersPress) => {
   let styleWidth = Style.(style(~width=windowDimensions##width->dp, ()));
 
   let today = React.useRef(Date.now());
+  let todayDates =
+    React.useRef(
+      Date.weekDates(~firstDayOfWeekIndex=1, today->React.Ref.current),
+    );
+
   let data =
     React.useRef(
       Array.range(0, 51)
@@ -31,14 +36,15 @@ let make = (~onFiltersPress) => {
           )
         ),
     );
+  let initialScrollIndex = data->React.Ref.current->Array.length - 1;
 
   let ((startDate, endDate), setCurrentDates) =
     React.useState(() =>
       data->React.Ref.current[data->React.Ref.current->Array.length - 1]
-      ->Option.getWithDefault(
-          Date.weekDates(~firstDayOfWeekIndex=1, today->React.Ref.current),
-        )
+      ->Option.getWithDefault(todayDates->React.Ref.current)
     );
+
+  let flatListRef = React.useRef(Js.Nullable.null);
 
   let getItemLayout =
     React.useMemo1(
@@ -76,6 +82,23 @@ let make = (~onFiltersPress) => {
       }
     );
 
+  let onShowThisWeek =
+    React.useCallback3(
+      _ =>
+        // scrollToIndexParams triggers the setCurrentDates
+        // setCurrentDates(_ => todayDates->React.Ref.current);
+        flatListRef
+        ->React.Ref.current
+        ->Js.Nullable.toOption
+        ->Option.map(flatList =>
+            flatList->FlatList.scrollToIndex(
+              FlatList.scrollToIndexParams(~index=initialScrollIndex, ()),
+            )
+          )
+        ->ignore,
+      (setCurrentDates, todayDates, flatListRef),
+    );
+
   <>
     <SpacedView>
       <TitlePre style=themeStyles##textLightOnBackground>
@@ -93,14 +116,26 @@ let make = (~onFiltersPress) => {
     </SpacedView>
     <View style=Predefined.styles##rowSpaceBetween>
       <Row> <Spacer size=S /> <BlockHeading text="Weekly Chart" /> </Row>
-      <Row> <Spacer size=S /> </Row>
+      <Row>
+        {
+          let (todayFirst, _) = todayDates->React.Ref.current;
+          todayFirst == startDate
+            ? React.null
+            : <BlockHeadingTouchable
+                onPress=onShowThisWeek
+                text="Show This Week"
+              />;
+        }
+        <Spacer size=S />
+      </Row>
     </View>
     <Separator style=themeStyles##separatorOnBackground />
     <FlatList
+      ref=flatListRef
       horizontal=true
       pagingEnabled=true
       showsHorizontalScrollIndicator=false
-      initialScrollIndex={data->React.Ref.current->Array.length - 1}
+      initialScrollIndex
       data={data->React.Ref.current}
       style={Style.list([themeStyles##background, styleWidth])}
       getItemLayout
