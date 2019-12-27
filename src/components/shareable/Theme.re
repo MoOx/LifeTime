@@ -14,6 +14,7 @@ type colors = {
   backgroundDark: string,
   textOnBackground: string,
   textLightOnBackground: string,
+  textLightOnBackgroundDark: string,
   main: string,
   textOnMain: string,
 };
@@ -24,14 +25,16 @@ module Colors = {
     backgroundDark: Predefined.Colors.Ios.light.gray6,
     textOnBackground: "#111",
     textLightOnBackground: Predefined.Colors.Ios.light.gray2,
+    textLightOnBackgroundDark: Predefined.Colors.Ios.light.gray,
     main: Predefined.Colors.Ios.light.indigo,
     textOnMain: "#fff",
   };
   let dark: colors = {
-    background: Predefined.Colors.Ios.dark.gray5,
-    backgroundDark: Predefined.Colors.Ios.dark.gray6,
+    background: Predefined.Colors.Ios.dark.gray6,
+    backgroundDark: "#111",
     textOnBackground: "rgba(255,255,255,0.9)",
-    textLightOnBackground: Predefined.Colors.Ios.light.gray3,
+    textLightOnBackground: Predefined.Colors.Ios.light.gray2,
+    textLightOnBackgroundDark: Predefined.Colors.Ios.light.gray,
     main: Predefined.Colors.Ios.dark.indigo,
     textOnMain: "rgba(255,255,255,0.9)",
   };
@@ -79,6 +82,8 @@ let themeStyles =
             textStyle(~color=Colors.light.textOnBackground, ()),
           "textLightOnBackground":
             textStyle(~color=Colors.light.textLightOnBackground, ()),
+          "textLightOnBackgroundDark":
+            textStyle(~color=Colors.light.textLightOnBackgroundDark, ()),
           "textMain": textStyle(~color=Colors.light.main, ()),
           "textOnMain": textStyle(~color=Colors.light.textOnMain, ()),
           "textButton":
@@ -118,6 +123,8 @@ let themeStyles =
             textStyle(~color=Colors.dark.textOnBackground, ()),
           "textLightOnBackground":
             textStyle(~color=Colors.dark.textLightOnBackground, ()),
+          "textLightOnBackgroundDark":
+            textStyle(~color=Colors.dark.textLightOnBackgroundDark, ()),
           "textMain": textStyle(~color=Colors.dark.main, ()),
           "textOnMain": textStyle(~color=Colors.dark.textOnMain, ()),
           "textButton": textStyle(~color=Predefined.Colors.Ios.dark.blue, ()),

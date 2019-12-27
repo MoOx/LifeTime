@@ -91,12 +91,6 @@ let make = (~onFiltersPress) => {
           </Text>
         </SpacedView>
       </View>;
-      // <Text>
-      //   {lastDay
-      //    ->Date.minDate(today->React.Ref.current)
-      //    ->Js.Date.toString
-      //    ->React.string}
-      // </Text>
     });
 
   let onViewableItemsChanged =
@@ -127,7 +121,7 @@ let make = (~onFiltersPress) => {
 
   <>
     <SpacedView>
-      <TitlePre style=themeStyles##textLightOnBackground>
+      <TitlePre style=themeStyles##textLightOnBackgroundDark>
         {Date.(
            today->React.Ref.current->dayLongString
            ++ " "
