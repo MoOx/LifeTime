@@ -13,6 +13,7 @@ let title = "Your LifeTime";
 
 [@react.component]
 let make = (~onFiltersPress) => {
+  let (settings, _setSettings) = React.useContext(AppSettings.context);
   let themeStyles = Theme.useStyles();
   let windowDimensions = Dimensions.useWindowDimensions();
   let styleWidth = Style.(style(~width=windowDimensions##width->dp, ()));
@@ -45,10 +46,18 @@ let make = (~onFiltersPress) => {
     );
   let initialScrollIndex = data->React.Ref.current->Array.length - 1;
 
-  let ((startDate, endDate), setCurrentDates) =
+  let ((startDate, endDate_), setCurrentDates) =
     React.useState(() =>
       data->React.Ref.current[data->React.Ref.current->Array.length - 1]
       ->Option.getWithDefault(todayDates->React.Ref.current)
+    );
+
+  let endDate = endDate_->Date.min(today->React.Ref.current);
+
+  let events = Calendars.useEvents(startDate, endDate);
+  let mapTitleDuration =
+    events->Option.map(es =>
+      es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration
     );
 
   let (todayFirst, _) = todayDates->React.Ref.current;
@@ -68,30 +77,36 @@ let make = (~onFiltersPress) => {
     );
 
   let renderItem =
-    React.useCallback0(renderItemProps => {
-      let (firstDay, lastDay) = renderItemProps##item;
-      <View style=styleWidth>
-        <SpacedView>
-          <Text style=themeStyles##textLightOnBackground>
-            (
-              if (todayFirst == firstDay) {
-                "Daily Average";
-              } else if (previousFirst == firstDay) {
-                "Last Week's Average";
-              } else {
-                firstDay->Js.Date.getDate->Js.Float.toString
-                ++ " - "
-                ++ lastDay->Js.Date.getDate->Js.Float.toString
-                ++ " "
-                ++ lastDay->Date.monthShortString
-                ++ " Average";
-              }
-            )
-            ->React.string
-          </Text>
-        </SpacedView>
-      </View>;
-    });
+    React.useCallback3(
+      renderItemProps => {
+        // Js.log2("render", renderItemProps##index);
+        let (firstDay, lastDay) = renderItemProps##item;
+        <View style=styleWidth>
+          <SpacedView>
+            <Text style=themeStyles##textLightOnBackground>
+              (
+                if (todayFirst == firstDay) {
+                  "Daily Average";
+                } else if (previousFirst == firstDay) {
+                  "Last Week's Average";
+                } else {
+                  firstDay->Js.Date.getDate->Js.Float.toString
+                  ++ " - "
+                  ++ lastDay->Js.Date.getDate->Js.Float.toString
+                  ++ " "
+                  ++ lastDay->Date.monthShortString
+                  ++ " Average";
+                }
+              )
+              ->React.string
+            </Text>
+            <Spacer />
+            <WeeklyGraph events mapTitleDuration startDate endDate />
+          </SpacedView>
+        </View>;
+      },
+      (startDate, endDate, events),
+    );
 
   let onViewableItemsChanged =
     React.useRef(itemsChanged =>
@@ -153,6 +168,7 @@ let make = (~onFiltersPress) => {
       pagingEnabled=true
       showsHorizontalScrollIndicator=false
       initialScrollIndex
+      initialNumToRender=2
       data={data->React.Ref.current}
       style={Style.list([themeStyles##background, styleWidth])}
       getItemLayout
@@ -162,11 +178,7 @@ let make = (~onFiltersPress) => {
     />
     <Separator style=themeStyles##separatorOnBackground />
     <Spacer />
-    <TopActivities
-      startDate
-      endDate={endDate->Date.minDate(today->React.Ref.current)}
-      onFiltersPress
-    />
+    <TopActivities mapTitleDuration onFiltersPress />
     <Spacer size=L />
   </>;
 };

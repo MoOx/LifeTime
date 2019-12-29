@@ -88,7 +88,7 @@ let make = (~navigation, ~route as _) => {
       )>
       <StickyHeader
         scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
-        scrollOffsetY=120.
+        scrollOffsetY=80.
         safeArea=true
         animateBackgroundOpacity=`yes
         backgroundElement

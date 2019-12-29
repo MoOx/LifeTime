@@ -4,13 +4,26 @@ let now = () => fromFloat(now());
 
 let dayLongString = date => {
   switch (date->getDay) {
+  | 0. => "Sunday"
   | 1. => "Monday"
   | 2. => "Tuesday"
   | 3. => "Wednesday"
   | 4. => "Thursday"
   | 5. => "Friday"
   | 6. => "Saturday"
-  | 7. => "Sunday"
+  | _ => ""
+  };
+};
+
+let dayShortString = date => {
+  switch (date->getDay) {
+  | 0. => "Sun"
+  | 1. => "Mon"
+  | 2. => "Tue"
+  | 3. => "Wed"
+  | 4. => "Thu"
+  | 5. => "Fri"
+  | 6. => "Sat"
   | _ => ""
   };
 };
@@ -55,10 +68,11 @@ let dateString = date => {
   date->getDate->Js.Float.toString;
 };
 
-let eventDurationInMs = (endDate, startDate) =>
-  endDate->fromString->valueOf -. startDate->fromString->valueOf;
+let durationInMs = (date1, date2) =>
+  (date1->valueOf -. date2->valueOf)->abs_float;
 
 let msToMin = duration => duration /. 1000. /. 60.;
+let msToDays = duration => duration->msToMin /. 60. /. 24.;
 
 let copy = date => date->valueOf->fromFloat;
 
@@ -84,7 +98,16 @@ let firstDayOfWeek = (~firstDayOfWeekIndex: int=1, givenDate: t) => {
 };
 
 let lastDayOfWeek = (~firstDayOfWeekIndex: int=1, givenDate: t) => {
-  firstDayOfWeek(~firstDayOfWeekIndex, givenDate)->addDays(~numberOfDays=7);
+  let fdow = firstDayOfWeek(~firstDayOfWeekIndex, givenDate);
+  makeWithYMDHMS(
+    ~year=fdow->getFullYear,
+    ~month=fdow->getMonth,
+    ~date=fdow->getDate +. 6.,
+    ~hours=23.,
+    ~minutes=59.,
+    ~seconds=59.,
+    (),
+  );
 };
 
 let firstDayOfMonth = date => {
@@ -103,8 +126,15 @@ let lastDayOfMonth = date => {
   );
 };
 
-let minDate = (d1, d2) =>
+let min = (d1, d2) =>
   if (d1->getTime < d2->getTime) {
+    d1;
+  } else {
+    d2;
+  };
+
+let max = (d1, d2) =>
+  if (d1->getTime > d2->getTime) {
     d1;
   } else {
     d2;
@@ -115,4 +145,35 @@ let weekDates = (~firstDayOfWeekIndex: int=1, date) => {
     firstDayOfWeek(~firstDayOfWeekIndex, date),
     lastDayOfWeek(~firstDayOfWeekIndex, date),
   );
+};
+
+let startOfDay = date => {
+  makeWithYMDHMS(
+    ~year=date->getFullYear,
+    ~month=date->getMonth,
+    ~date=date->getDate,
+    ~hours=0.,
+    ~minutes=0.,
+    ~seconds=0.,
+    (),
+  );
+};
+
+let endOfDay = date => {
+  makeWithYMDHMS(
+    ~year=date->getFullYear,
+    ~month=date->getMonth,
+    ~date=date->getDate,
+    ~hours=23.,
+    ~minutes=59.,
+    ~seconds=59.,
+    (),
+  );
+};
+
+let hasOverlap = (startA, endA, dateB) => {
+  let startB = dateB->startOfDay;
+  let endB = dateB->endOfDay;
+  // https://stackoverflow.com/a/325964/988941
+  startA->getTime <= endB->getTime && endA->getTime >= startB->getTime;
 };
