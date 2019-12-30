@@ -2,8 +2,8 @@ open Js.Date;
 
 let now = () => fromFloat(now());
 
-let dayLongString = date => {
-  switch (date->getDay) {
+let dayLongString = day => {
+  switch (day) {
   | 0. => "Sunday"
   | 1. => "Monday"
   | 2. => "Tuesday"
@@ -15,8 +15,8 @@ let dayLongString = date => {
   };
 };
 
-let dayShortString = date => {
-  switch (date->getDay) {
+let dayShortString = day => {
+  switch (day) {
   | 0. => "Sun"
   | 1. => "Mon"
   | 2. => "Tue"
@@ -28,8 +28,8 @@ let dayShortString = date => {
   };
 };
 
-let dayLetterString = date => {
-  switch (date->getDay) {
+let dayLetterString = day => {
+  switch (day) {
   | 0. => "S"
   | 1. => "M"
   | 2. => "T"
@@ -89,7 +89,7 @@ let msToDays = duration => duration->msToMin /. 60. /. 24.;
 
 let copy = date => date->valueOf->fromFloat;
 
-let addDays = (~numberOfDays, date) => {
+let addDays = (date, numberOfDays) => {
   let d = date->copy;
   d->setDate(d->getDate +. numberOfDays->float)->ignore;
   d;

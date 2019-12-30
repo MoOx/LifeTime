@@ -11,6 +11,17 @@ let styles =
 
 let title = "Your LifeTime";
 
+[@bs.module "react"]
+external useCallback4:
+  ([@bs.uncurry] ('input => 'output), ('a, 'b, 'c, 'd)) =>
+  React.callback('input, 'output) =
+  "useCallback";
+[@bs.module "react"]
+external useCallback5:
+  ([@bs.uncurry] ('input => 'output), ('a, 'b, 'c, 'd, 'e)) =>
+  React.callback('input, 'output) =
+  "useCallback";
+
 [@react.component]
 let make = (~onFiltersPress) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
@@ -27,7 +38,7 @@ let make = (~onFiltersPress) => {
     React.useRef(
       Date.weekDates(
         ~firstDayOfWeekIndex=1,
-        today->React.Ref.current->Date.addDays(~numberOfDays=-7),
+        today->React.Ref.current->Date.addDays(-7),
       ),
     );
 
@@ -40,19 +51,19 @@ let make = (~onFiltersPress) => {
             ~firstDayOfWeekIndex=1,
             today
             ->React.Ref.current
-            ->Date.addDays(~numberOfDays=- currentWeekReverseIndex * 7),
+            ->Date.addDays(- currentWeekReverseIndex * 7),
           )
         ),
     );
   let initialScrollIndex = data->React.Ref.current->Array.length - 1;
 
-  let ((startDate, endDate_), setCurrentDates) =
+  let ((startDate, supposedEndDate), setCurrentDates) =
     React.useState(() =>
       data->React.Ref.current[data->React.Ref.current->Array.length - 1]
       ->Option.getWithDefault(todayDates->React.Ref.current)
     );
 
-  let endDate = endDate_->Date.min(today->React.Ref.current);
+  let endDate = supposedEndDate->Date.min(today->React.Ref.current);
 
   let events = Calendars.useEvents(startDate, endDate);
   let mapTitleDuration =
@@ -77,7 +88,7 @@ let make = (~onFiltersPress) => {
     );
 
   let renderItem =
-    React.useCallback3(
+    useCallback5(
       renderItemProps => {
         // Js.log2("render", renderItemProps##index);
         let (firstDay, lastDay) = renderItemProps##item;
@@ -100,12 +111,12 @@ let make = (~onFiltersPress) => {
               )
               ->React.string
             </Text>
-            <Spacer />
-            <WeeklyGraph events mapTitleDuration startDate endDate />
+            <Spacer size=S />
+            <WeeklyGraph events mapTitleDuration startDate supposedEndDate />
           </SpacedView>
         </View>;
       },
-      (startDate, endDate, events),
+      (startDate, endDate, events, supposedEndDate, mapTitleDuration),
     );
 
   let onViewableItemsChanged =
@@ -138,7 +149,7 @@ let make = (~onFiltersPress) => {
     <SpacedView>
       <TitlePre style=themeStyles##textLightOnBackgroundDark>
         {Date.(
-           today->React.Ref.current->dayLongString
+           today->React.Ref.current->Js.Date.getDay->dayLongString
            ++ " "
            ++ today->React.Ref.current->dateString
            ++ " "

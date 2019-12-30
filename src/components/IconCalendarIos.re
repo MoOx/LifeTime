@@ -42,7 +42,7 @@ let make = (~style as s=?) => {
     vertical=XXS
     style=Style.(arrayOption([|Some(styles##container), s|]))>
     <Text style=styles##text numberOfLines=1 adjustsFontSizeToFit=true>
-      {today->Date.dayLongString->React.string}
+      {today->Js.Date.getDay->Date.dayLongString->React.string}
     </Text>
     <Text style=styles##number numberOfLines=1 adjustsFontSizeToFit=true>
       {today->Date.dateString->React.string}

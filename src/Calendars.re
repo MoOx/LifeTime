@@ -36,7 +36,6 @@ let useEvents = (startDate, endDate) => {
 
   React.useEffect3(
     () => {
-      Js.log("useEvents");
       ReactNativeCalendarEvents.fetchAllEvents(
         startDate->Js.Date.toISOString,
         endDate->Js.Date.toISOString,

@@ -5,10 +5,10 @@ open ReactNative;
 let make =
     (
       ~style as s,
-      ~rowStyle,
-      ~dashGap,
-      ~dashLength,
-      ~dashThickness,
+      ~rowStyle=`column,
+      ~dashGap=3.,
+      ~dashLength=3.,
+      ~dashThickness=StyleSheet.hairlineWidth,
       ~dashColor,
     ) => {
   let (layout, setLayout) = React.useState(() => None);
