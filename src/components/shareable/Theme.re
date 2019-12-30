@@ -40,6 +40,13 @@ module Colors = {
   };
 };
 
+let themedColors = theme => {
+  switch (theme) {
+  | `light => Predefined.Colors.Ios.light
+  | `dark => Predefined.Colors.Ios.dark
+  };
+};
+
 let themeStyles =
   ReactNative.(
     Style.{

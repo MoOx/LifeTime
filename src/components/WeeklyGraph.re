@@ -16,6 +16,7 @@ let graphHeight = 100.;
 [@react.component]
 let make = (~events, ~mapTitleDuration, ~startDate, ~endDate) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
+  let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
 
   let numberOfDays = Date.durationInMs(startDate, endDate)->Date.msToDays;
@@ -90,80 +91,102 @@ let make = (~events, ~mapTitleDuration, ~startDate, ~endDate) => {
       setWidth(_ => width);
     });
 
+  let dash =
+    <Dash
+      style=Style.(style(~alignSelf=`stretch, ()))
+      rowStyle=`column
+      dashGap=3.
+      dashLength=3.
+      dashThickness=StyleSheet.hairlineWidth
+      dashColor={Theme.themedColors(theme).gray4}
+    />;
+
   <View
     onLayout
     style=Style.(
       array([|
         Predefined.styles##rowSpaceBetween,
-        style(~alignItems=`flexEnd, ()),
+        style(
+          ~alignItems=`flexEnd,
+          ~borderTopWidth=StyleSheet.hairlineWidth,
+          ~borderTopColor=Theme.themedColors(theme).gray4,
+          (),
+        ),
       |])
     )>
+    dash
     {durationPerDate
      ->Option.map(dpd =>
          dpd
          ->Array.map(((date, mapPerCategories)) =>
-             <SpacedView
-               horizontal=XXS
-               vertical=None
-               key={date->Js.Date.toISOString}
-               style=Style.(
-                 viewStyle(
-                   ~width=(width /. dates->Array.length->float)->dp,
-                   ~flexDirection=`columnReverse,
-                   (),
-                 )
-               )>
-               {!Global.__DEV__
-                  ? React.null
-                  : <Text style=Style.(textStyle(~fontSize=6., ()))>
-                      {date->Date.dayShortString->React.string}
-                      {date->Js.Date.getDate->Js.Float.toString->React.string}
-                    </Text>}
-               {mapTitleDuration
-                ->Option.map(mapTitleDuration =>
-                    mapTitleDuration
-                    ->Array.map(((title, _)) =>
-                        mapPerCategories
-                        ->Map.String.toArray
-                        ->Array.map(((key, value)) =>
-                            key !== title
-                              ? React.null
-                              : <View
-                                  key
-                                  style=Style.(
-                                    array([|
-                                      themeStyles##backgroundGray,
-                                      viewStyle(
-                                        // ~backgroundColor=Calendars.color(key),
-                                        ~height=
-                                          (
-                                            graphHeight
-                                            /. maxDuration->Option.getWithDefault(
-                                                 0.,
-                                               )
-                                            *. value
-                                          )
-                                          ->dp,
-                                        (),
-                                      ),
-                                    |])
-                                  )>
-                                  {!Global.__DEV__
-                                     ? React.null
-                                     : <Text
-                                         style=Style.(
-                                           textStyle(~fontSize=6., ())
-                                         )>
-                                         key->React.string
-                                       </Text>}
-                                </View>
-                          )
-                        ->React.array
-                      )
-                    ->React.array
-                  )
-                ->Option.getWithDefault(React.null)}
-             </SpacedView>
+             <React.Fragment key={date->Js.Date.toISOString}>
+               <SpacedView
+                 horizontal=XS
+                 vertical=None
+                 style=Style.(
+                   viewStyle(
+                     ~width=(width /. dates->Array.length->float)->dp,
+                     ~flexDirection=`columnReverse,
+                     (),
+                   )
+                 )>
+                 <Text
+                   style=Style.(
+                     list([
+                       themeStyles##textLightOnBackground,
+                       textStyle(~fontSize=10., ()),
+                     ])
+                   )>
+                   {date->Date.dayLetterString->React.string}
+                 </Text>
+                 <Spacer size=XXS />
+                 {mapTitleDuration
+                  ->Option.map(mapTitleDuration =>
+                      mapTitleDuration
+                      ->Array.map(((title, _)) =>
+                          mapPerCategories
+                          ->Map.String.toArray
+                          ->Array.map(((key, value)) =>
+                              key !== title
+                                ? React.null
+                                : <View
+                                    key
+                                    style=Style.(
+                                      array([|
+                                        themeStyles##backgroundGray,
+                                        viewStyle(
+                                          // ~backgroundColor=Calendars.color(key),
+                                          ~height=
+                                            (
+                                              graphHeight
+                                              /. maxDuration->Option.getWithDefault(
+                                                   0.,
+                                                 )
+                                              *. value
+                                            )
+                                            ->dp,
+                                          (),
+                                        ),
+                                      |])
+                                    )>
+                                    {!Global.__DEV__
+                                       ? React.null
+                                       : <Text
+                                           style=Style.(
+                                             textStyle(~fontSize=6., ())
+                                           )>
+                                           key->React.string
+                                         </Text>}
+                                  </View>
+                            )
+                          ->React.array
+                        )
+                      ->React.array
+                    )
+                  ->Option.getWithDefault(React.null)}
+               </SpacedView>
+               dash
+             </React.Fragment>
            )
          //  </Text>
          //    {date->Js.Date.getDay->Js.Float.toString->React.string}
