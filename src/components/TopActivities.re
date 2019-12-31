@@ -14,7 +14,7 @@ let styles =
 let numberOfEventsToShow = 8;
 
 [@react.component]
-let make = (~mapTitleDuration, ~onFiltersPress) => {
+let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
   let themeStyles = Theme.useStyles();
   let calendars = Calendars.useCalendars(None);
@@ -91,7 +91,8 @@ let make = (~mapTitleDuration, ~onFiltersPress) => {
                     ++ (
                       durationM >= 1. ? durationM->Js.Float.toFixed ++ "m" : ""
                     );
-                  <TouchableOpacity onPress={_ => ()} key=title>
+                  <TouchableOpacity
+                    onPress={_ => onActivityPress(title)} key=title>
                     <Separator style=themeStyles##separatorOnBackground />
                     <SpacedView vertical=XS>
                       <View style=Predefined.styles##rowSpaceBetween>
@@ -135,14 +136,14 @@ let make = (~mapTitleDuration, ~onFiltersPress) => {
                             </Text>
                           </Row>
                         </View>
+                        <SVGChevronRight
+                          width={14.->ReactFromSvg.Size.dp}
+                          height={14.->ReactFromSvg.Size.dp}
+                          fill={Predefined.Colors.Ios.light.gray4}
+                        />
                       </View>
                     </SpacedView>
                   </TouchableOpacity>;
-                  // <SVGChevronRight
-                  //   width={14.->ReactFromSvg.Size.dp}
-                  //   height={14.->ReactFromSvg.Size.dp}
-                  //   fill={Predefined.Colors.Ios.light.gray4}
-                  // />
                 })
               ->React.array}
              <Separator style=themeStyles##separatorOnBackground />

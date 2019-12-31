@@ -3,15 +3,18 @@ open ReactMultiversal;
 
 [@react.component]
 let make = (~navigation, ~route as _) => {
+  let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   <>
-    <StatusBar barStyle=`darkContent />
-    <ScrollView style=themeStyles##background contentContainerStyle=Predefined.styles##flexGrow>
+    <StatusBar barStyle={theme->Theme.themedStatusBarStyle(`darkContent)} />
+    <ScrollView
+      style=themeStyles##background
+      contentContainerStyle=Predefined.styles##flexGrow>
       <ReactNativeSafeAreaContext.SafeAreaView
         style=Predefined.styles##flexGrow>
         <Welcome
           onAboutPrivacyPress={_ =>
-            navigation->Navigators.RootStackNavigator.Navigation.navigate(
+            navigation->Navigators.RootStack.Navigation.navigate(
               "PrivacyModalScreen",
             )
           }
@@ -25,7 +28,7 @@ let make = (~navigation, ~route as _) => {
             ->Future.tapOk(status =>
                 switch (status) {
                 | "authorized" =>
-                  navigation->Navigators.RootStackNavigator.Navigation.navigate(
+                  navigation->Navigators.RootStack.Navigation.navigate(
                     "HomeScreen",
                   )
                 | "denied"

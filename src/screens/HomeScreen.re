@@ -38,7 +38,7 @@ let make = (~navigation, ~route as _) => {
             // (otherwise navigation is kind of TOO QUICK)
             Js.Global.setTimeout(
               () =>
-                navigation->Navigators.RootStackNavigator.Navigation.navigate(
+                navigation->Navigators.RootStack.Navigation.navigate(
                   "WelcomeModalScreen",
                 ),
               100,
@@ -63,7 +63,7 @@ let make = (~navigation, ~route as _) => {
 
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
-    <StatusBar barStyle=`darkContent />
+    <StatusBar barStyle={theme->Theme.themedStatusBarStyle(`darkContent)} />
     <Animated.ScrollView
       style={Style.list([
         Predefined.styles##flexGrow,
@@ -99,8 +99,14 @@ let make = (~navigation, ~route as _) => {
         style=Predefined.styles##flexGrow>
         <Home
           onFiltersPress={() =>
-            navigation->Navigators.RootStackNavigator.Navigation.navigate(
+            navigation->Navigators.RootStack.Navigation.navigate(
               "FiltersModalScreen",
+            )
+          }
+          onActivityPress={activity =>
+            navigation->Navigators.MainStack.Navigation.navigateWithParams(
+              "ActivityOptionsScreen",
+              {"currentActivity": Some(activity)},
             )
           }
         />

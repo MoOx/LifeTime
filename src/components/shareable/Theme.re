@@ -32,11 +32,11 @@ module Colors = {
   let dark: colors = {
     background: Predefined.Colors.Ios.dark.gray6,
     backgroundDark: "#111",
-    textOnBackground: "rgba(255,255,255,0.9)",
+    textOnBackground: "rgba(255,255,255,0.98)",
     textLightOnBackground: Predefined.Colors.Ios.light.gray2,
     textLightOnBackgroundDark: Predefined.Colors.Ios.light.gray,
     main: Predefined.Colors.Ios.dark.indigo,
-    textOnMain: "rgba(255,255,255,0.9)",
+    textOnMain: "rgba(255,255,255,0.98)",
   };
 };
 
@@ -44,6 +44,15 @@ let themedColors = theme => {
   switch (theme) {
   | `light => Predefined.Colors.Ios.light
   | `dark => Predefined.Colors.Ios.dark
+  };
+};
+
+let themedStatusBarStyle = (theme, barStyle) => {
+  switch (theme, barStyle) {
+  | (`light, `lightContent) => `lightContent
+  | (`light, `darkContent) => `darkContent
+  | (`dark, `darkContent) => `lightContent
+  | (`dark, `lightContent) => `darkContent
   };
 };
 

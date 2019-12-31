@@ -1,11 +1,11 @@
 open ReactNavigation;
 
-module RootStackNavigator =
+module RootStack =
   Stack.Make({
-    type params = {. "name": string};
+    type params = {.};
   });
 
 module MainStack =
   Stack.Make({
-    type params = {. "name": string};
+    type params = {. "currentActivity": option(string)};
   });

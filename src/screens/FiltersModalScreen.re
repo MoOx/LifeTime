@@ -30,7 +30,7 @@ let make = (~navigation, ~route as _) => {
 
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
-    <StatusBar barStyle=`lightContent />
+    <StatusBar barStyle={theme->Theme.themedStatusBarStyle(`lightContent)} />
     <Animated.ScrollView
       style={Style.list([
         Predefined.styles##flexGrow,
@@ -65,9 +65,7 @@ let make = (~navigation, ~route as _) => {
         title=Filters.title
         right={({color, defaultStyle}) =>
           <TouchableOpacity
-            onPress={_ =>
-              navigation->Navigators.RootStackNavigator.Navigation.goBack()
-            }>
+            onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
             <Text style=Style.(array([|defaultStyle, style(~color, ())|]))>
               "Done"->React.string
             </Text>

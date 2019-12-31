@@ -23,7 +23,7 @@ external useCallback5:
   "useCallback";
 
 [@react.component]
-let make = (~onFiltersPress) => {
+let make = (~onFiltersPress, ~onActivityPress) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
   let themeStyles = Theme.useStyles();
   let windowDimensions = Dimensions.useWindowDimensions();
@@ -189,7 +189,7 @@ let make = (~onFiltersPress) => {
     />
     <Separator style=themeStyles##separatorOnBackground />
     <Spacer />
-    <TopActivities mapTitleDuration onFiltersPress />
+    <TopActivities mapTitleDuration onFiltersPress onActivityPress />
     <Spacer size=L />
   </>;
 };

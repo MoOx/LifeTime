@@ -6,6 +6,7 @@ type settings = {
   "theme": string,
   "lastUpdated": float,
   "calendarsIdsSkipped": array(string),
+  "eventsSkipped": array(string),
 };
 
 let themeToThemeString =
@@ -26,6 +27,7 @@ let defaultSettings = {
   "theme": "auto",
   "lastUpdated": 0.,
   "calendarsIdsSkipped": [||],
+  "eventsSkipped": [||],
 };
 
 let decodeJsonSettings = (json: Js.Json.t): settings => {
@@ -70,15 +72,39 @@ let decodeJsonSettings = (json: Js.Json.t): settings => {
                 | Js.Json.JSONString(id) => Some(id)
                 | _ =>
                   failwith(
-                    "LifeTime: decodeCalendarsIds: unable to decode string id",
+                    "LifeTime: decodeJsonSettings: unable to decode string calendarsIdsSkipped id",
                   )
                 }
               )
             | _ =>
-              failwith("LifeTime: decodeCalendarsIds: unable to decode array")
+              failwith(
+                "LifeTime: decodeJsonSettings: unable to decode calendarsIdsSkipped array",
+              )
             }
           )
         ->Option.getWithDefault(defaultSettings##calendarsIdsSkipped),
+      "eventsSkipped":
+        settings
+        ->Js.Dict.get("eventsSkipped")
+        ->Option.map(json =>
+            switch (Js.Json.classify(json)) {
+            | Js.Json.JSONArray(ids) =>
+              ids->Array.keepMap(jsonId =>
+                switch (Js.Json.classify(jsonId)) {
+                | Js.Json.JSONString(id) => Some(id)
+                | _ =>
+                  failwith(
+                    "LifeTime: decodeJsonSettings: unable to decode string eventsSkipped id",
+                  )
+                }
+              )
+            | _ =>
+              failwith(
+                "LifeTime: decodeJsonSettings: unable to decode eventsSkipped array",
+              )
+            }
+          )
+        ->Option.getWithDefault(defaultSettings##eventsSkipped),
     }
   | _ => failwith("LifeTime: decodeJsonSettings: unable to decode settings")
   };
