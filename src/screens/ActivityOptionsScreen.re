@@ -27,6 +27,7 @@ let make = (~navigation, ~route) => {
                    "theme": settings##theme,
                    "lastUpdated": settings##lastUpdated,
                    "calendarsIdsSkipped": settings##calendarsIdsSkipped,
+                   "eventsSkippedOn": settings##eventsSkippedOn,
                    "eventsSkipped":
                      settings##eventsSkipped->Array.concat([|activity|]),
                  }

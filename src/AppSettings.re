@@ -6,6 +6,7 @@ type settings = {
   "theme": string,
   "lastUpdated": float,
   "calendarsIdsSkipped": array(string),
+  "eventsSkippedOn": bool,
   "eventsSkipped": array(string),
 };
 
@@ -27,6 +28,7 @@ let defaultSettings = {
   "theme": "auto",
   "lastUpdated": 0.,
   "calendarsIdsSkipped": [||],
+  "eventsSkippedOn": true,
   "eventsSkipped": [||],
 };
 
@@ -83,6 +85,21 @@ let decodeJsonSettings = (json: Js.Json.t): settings => {
             }
           )
         ->Option.getWithDefault(defaultSettings##calendarsIdsSkipped),
+      "eventsSkippedOn":
+        settings
+        ->Js.Dict.get("eventsSkippedOn")
+        ->Option.map(json =>
+            switch (json->Js.Json.classify) {
+            | Js.Json.JSONTrue => true
+            | Js.Json.JSONFalse => false
+            | _ =>
+              Js.log(
+                "LifeTime: decodeJsonSettings: unable to decode eventsSkippedOn",
+              );
+              false;
+            }
+          )
+        ->Option.getWithDefault(false),
       "eventsSkipped":
         settings
         ->Js.Dict.get("eventsSkipped")

@@ -73,10 +73,9 @@ let filterEvents = (events, settings) =>
                         ->Option.getWithDefault("")
                    )) {
         false;
-      } else if (settings##eventsSkipped
-                 ->Array.some(eventName =>
-                     eventName == e##title->Option.getWithDefault("")
-                   )) {
+      } else if (settings##eventsSkippedOn
+                 && settings##eventsSkipped
+                    ->Array.some(eventName => eventName == e##title)) {
         false;
       } else {
         true;

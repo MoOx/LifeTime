@@ -34,6 +34,7 @@ let make = () => {
                "theme": "dark",
                "lastUpdated": settings##lastUpdated,
                "calendarsIdsSkipped": settings##calendarsIdsSkipped,
+               "eventsSkippedOn": settings##eventsSkippedOn,
                "eventsSkipped": settings##eventsSkipped,
              }
            )
@@ -50,6 +51,7 @@ let make = () => {
                "theme": "auto",
                "lastUpdated": settings##lastUpdated,
                "calendarsIdsSkipped": settings##calendarsIdsSkipped,
+               "eventsSkippedOn": settings##eventsSkippedOn,
                "eventsSkipped": settings##eventsSkipped,
              }
            )
@@ -66,6 +68,7 @@ let make = () => {
                "theme": "light",
                "lastUpdated": settings##lastUpdated,
                "calendarsIdsSkipped": settings##calendarsIdsSkipped,
+               "eventsSkippedOn": settings##eventsSkippedOn,
                "eventsSkipped": settings##eventsSkipped,
              }
            )

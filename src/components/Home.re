@@ -24,8 +24,9 @@ external useCallback5:
 
 [@react.component]
 let make = (~onFiltersPress, ~onActivityPress) => {
-  let (settings, _setSettings) = React.useContext(AppSettings.context);
+  let (settings, setSettings) = React.useContext(AppSettings.context);
   let themeStyles = Theme.useStyles();
+  let themeColors = Theme.useColors();
   let windowDimensions = Dimensions.useWindowDimensions();
   let styleWidth = Style.(style(~width=windowDimensions##width->dp, ()));
 
@@ -190,6 +191,35 @@ let make = (~onFiltersPress, ~onActivityPress) => {
     <Separator style=themeStyles##separatorOnBackground />
     <Spacer />
     <TopActivities mapTitleDuration onFiltersPress onActivityPress />
+    <Spacer />
+    <SpacedView horizontal=None>
+      <TouchableOpacity
+        onPress={_ =>
+          setSettings(settings =>
+            {
+              "theme": settings##theme,
+              "lastUpdated": settings##lastUpdated,
+              "calendarsIdsSkipped": settings##calendarsIdsSkipped,
+              "eventsSkippedOn": !settings##eventsSkippedOn,
+              "eventsSkipped": settings##eventsSkipped,
+            }
+          )
+        }>
+        <Separator style=themeStyles##separatorOnBackground />
+        <SpacedView vertical=XS style=themeStyles##background>
+          <Center>
+            {settings##eventsSkippedOn
+               ? <Text style=Style.(textStyle(~color=themeColors.blue, ()))>
+                   "Show Ignored"->React.string
+                 </Text>
+               : <Text style=Style.(textStyle(~color=themeColors.blue, ()))>
+                   "Hide Ignored"->React.string
+                 </Text>}
+          </Center>
+        </SpacedView>
+        <Separator style=themeStyles##separatorOnBackground />
+      </TouchableOpacity>
+    </SpacedView>
     <Spacer size=L />
   </>;
 };
