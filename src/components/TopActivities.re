@@ -83,17 +83,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
              {mapTitleDuration
               ->Array.slice(~offset=0, ~len=eventsToShow)
               ->Array.map(((title, totalDurationInMin)) => {
-                  let durationInH = totalDurationInMin /. 60.;
-                  let durationH = durationInH->int_of_float;
-                  let durationM =
-                    (durationInH -. durationH->float_of_int) *. 60.;
-                  let durationString =
-                    durationH->string_of_int
-                    ++ "h"
-                    ++ " "
-                    ++ (
-                      durationM >= 1. ? durationM->Js.Float.toFixed ++ "m" : ""
-                    );
+                  let durationString = totalDurationInMin->Date.minToString;
                   let (_, _, colorName, iconName) =
                     settings
                     ->Calendars.categoryIdFromEventTitle(title)

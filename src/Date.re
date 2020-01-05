@@ -84,8 +84,24 @@ let dateString = date => {
 let durationInMs = (date1, date2) =>
   (date1->valueOf -. date2->valueOf)->abs_float;
 
-let msToMin = duration => duration /. 1000. /. 60.;
-let msToDays = duration => duration->msToMin /. 60. /. 24.;
+let msToMin = ms => ms /. 1000. /. 60.;
+let msToHours = ms => ms->msToMin /. 60.;
+let msToDays = ms => ms->msToHours /. 24.;
+let minToHours = min => min /. 60.;
+
+let minToString = min => {
+  let durationInH = min->minToHours;
+  let durationH = durationInH->int_of_float;
+  let durationM = (durationInH -. durationH->float_of_int) *. 60.;
+  let hasH = durationH > 0;
+  let hasM = durationM >= 1.;
+
+  (hasH ? durationH->string_of_int ++ "h" ++ " " : "")
+  ++ (
+    hasM
+      ? durationM->Js.Float.toFixed ++ "m" : hasH ? "" : hasH ? "" : "0" ++ "m"
+  );
+};
 
 let copy = date => date->valueOf->fromFloat;
 

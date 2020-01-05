@@ -6,6 +6,7 @@ let styles =
   Style.(
     StyleSheet.create({
       "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
+      "smallText": textStyle(~fontSize=12., ~lineHeight=16. *. 1.4, ()),
     })
   );
 
@@ -123,7 +124,8 @@ let make = (~onFiltersPress, ~onActivityPress) => {
               )
               ->React.string
             </Text>
-            <Spacer size=S />
+          </SpacedView>
+          <SpacedView>
             <WeeklyGraph
               events
               mapCategoryDuration
@@ -132,6 +134,45 @@ let make = (~onFiltersPress, ~onActivityPress) => {
               supposedEndDate
             />
           </SpacedView>
+          <View style=Predefined.styles##row>
+            <Spacer size=S />
+            <View style=Predefined.styles##flexGrow>
+              <Separator style=themeStyles##separatorOnBackground />
+              <SpacedView
+                horizontal=None vertical=S style=Predefined.styles##row>
+                <View style=Predefined.styles##flexGrow>
+                  <Text style=themeStyles##textOnBackground>
+                    "Total Logged Time:"->React.string
+                  </Text>
+                </View>
+                <Text>
+                  <Text style=themeStyles##textLightOnBackgroundDark>
+                    {mapTitleDuration
+                     ->Option.map(mapTitleDuration =>
+                         mapTitleDuration->Array.reduce(
+                           0., (total, (_title, duration)) =>
+                           total +. duration
+                         )
+                       )
+                     ->Option.getWithDefault(0.)
+                     ->Date.minToString
+                     ->React.string}
+                  </Text>
+                  <Text
+                    style=Style.(
+                      list([
+                        themeStyles##textLightOnBackground,
+                        styles##smallText,
+                      ])
+                    )>
+                    {(" / " ++ (60. *. 24. *. 7.)->Date.minToString)
+                     ->React.string}
+                  </Text>
+                </Text>
+                <Spacer size=S />
+              </SpacedView>
+            </View>
+          </View>
         </View>;
       },
       (
