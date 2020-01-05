@@ -65,11 +65,12 @@ let make = () => {
         <Spacer size=XS />
       </Row>
     </View>
+    <Separator style=themeStyles##separatorOnBackground />
     <View style=themeStyles##background>
       {calendars
        ->Option.map(calendars =>
            calendars
-           ->Array.map(calendar =>
+           ->Array.mapWithIndex((index, calendar) =>
                <TouchableOpacity
                  key=calendar##id
                  onPress={_ =>
@@ -91,45 +92,56 @@ let make = () => {
                      }
                    )
                  }>
-                 <Separator style=themeStyles##separatorOnBackground />
-                 <SpacedView vertical=XS>
-                   <View style=Predefined.styles##rowSpaceBetween>
-                     <View>
-                       <Text
-                         style={Style.list([
-                           styles##text,
-                           themeStyles##textOnBackground,
-                         ])}>
-                         {calendar##title->React.string}
-                       </Text>
-                       <Text
-                         style={Style.list([
-                           styles##infoText,
-                           themeStyles##textGray2,
-                         ])}>
-                         {calendar##source->React.string}
-                       </Text>
-                     </View>
-                     {
-                       let skipped =
-                         settings##calendarsIdsSkipped
-                         ->Array.some(id => id == calendar##id);
-                       if (skipped) {
-                         <SVGcircle
-                           width={26.->ReactFromSvg.Size.dp}
-                           height={26.->ReactFromSvg.Size.dp}
-                           fill=calendar##color
-                         />;
-                       } else {
-                         <SVGcheckmarkcircle
-                           width={26.->ReactFromSvg.Size.dp}
-                           height={26.->ReactFromSvg.Size.dp}
-                           fill=calendar##color
-                         />;
-                       };
-                     }
+                 <View style=Predefined.styles##row>
+                   <Spacer size=S />
+                   <View style=Predefined.styles##flexGrow>
+                     <SpacedView
+                       vertical=XS
+                       horizontal=None
+                       style=Predefined.styles##rowCenter>
+                       <View style=Predefined.styles##flexGrow>
+                         <Text
+                           style={Style.list([
+                             styles##text,
+                             themeStyles##textOnBackground,
+                           ])}>
+                           {calendar##title->React.string}
+                         </Text>
+                         <Text
+                           style={Style.list([
+                             styles##infoText,
+                             themeStyles##textGray2,
+                           ])}>
+                           {calendar##source->React.string}
+                         </Text>
+                       </View>
+                       {
+                         let skipped =
+                           settings##calendarsIdsSkipped
+                           ->Array.some(id => id == calendar##id);
+                         if (skipped) {
+                           <SVGcircle
+                             width={26.->ReactFromSvg.Size.dp}
+                             height={26.->ReactFromSvg.Size.dp}
+                             fill=calendar##color
+                           />;
+                         } else {
+                           <SVGcheckmarkcircle
+                             width={26.->ReactFromSvg.Size.dp}
+                             height={26.->ReactFromSvg.Size.dp}
+                             fill=calendar##color
+                           />;
+                         };
+                       }
+                       <Spacer size=S />
+                     </SpacedView>
+                     {index !== calendars->Array.length - 1
+                        ? <Separator
+                            style=themeStyles##separatorOnBackground
+                          />
+                        : React.null}
                    </View>
-                 </SpacedView>
+                 </View>
                </TouchableOpacity>
              )
            ->React.array
