@@ -17,10 +17,10 @@ module Categories = {
     ("food", "Nutrition", "green", "carrot"),
     ("exercise", "Exercise", "pink", "workout"),
     ("work", "Work", "blue", "edit"),
-    ("social", "Social", "red", "social"),
+    ("social", "Social", "orange", "social"),
     ("self", "Self-care", "teal", "meditation"),
     ("fun", "Entertainment", "purple", "theatremask"),
-    ("chores", "Chores", "orange", "broom"),
+    ("chores", "Chores", "yellow", "broom"),
     // ("misc", "Miscellaneous", "yellow", "tag"),
     unknownCat,
   ];
@@ -39,38 +39,6 @@ module Categories = {
       | "pink" => t.pink
       | "blue" => t.blue
       | _ => t.gray4;
-      // color extracted from .shortcut files
-      // | "Red" => "0xFF4351FF" // Red: `0xFF4351FF` / `4282601983`
-      // | "Vermillion" => "0xFD6631FF" // Vermillion: `0xFD6631FF` / `4251333119`
-      // | "Apricot" => "0xFE9949FF" // Apricot: `0xFE9949FF` / `4271458815`
-      // | "Pollen" => "0xFEC418FF" // Pollen: `0xFEC418FF` / `4274264319`
-      // | "Mint" => "0xFFD426FF" // Mint: `0xFFD426FF` / `4292093695`
-      // | "Turquoise" => "0x19BD03FF" // Turquoise: `0x19BD03FF` / `431817727`
-      // | "Light Blue" => "0x55DAE1FF" // Light Blue: `0x55DAE1FF` / `1440408063`
-      // | "Cerulean" => "0x1B9AF7FF" // Cerulean: `0x1B9AF7FF` / `463140863`
-      // | "Delft Blue" => "0x3871DEFF" // Delft Blue: `0x3871DEFF` / `946986751`
-      // | "Violet" => "0x7B72E9FF" // Violet: `0x7B72E9FF` / `2071128575`
-      // | "Lilac" => "0xDB49D8FF" // Lilac: `0xDB49D8FF` / `3679049983`
-      // | "Light Pink" => "0xED4694FF" // Light Pink: `0xED4694FF` / `3980825855`
-      // | "Fog" => "0x000000FF" // Fog: `0x000000FF` / `255`
-      // | "Limestone" => "0xB4B2A9FF" // Limestone: `0xB4B2A9FF` / `3031607807`
-      // | "Sand" => "0xA9A9A9FF" // Sand: `0xA9A9A9FF` / `2846468607`
-      // | "Red" => "#E16267"
-      // | "Vermillion" => "#E36F55"
-      // | "Apricot" => "#D57A38"
-      // | "Pollen" => "#D1972D"
-      // | "Mint" => "#659E48"
-      // | "Turquoise" => "#4E9D86"
-      // | "LightBlue" => "#5796AA"
-      // | "Cerulean" => "#628ABE"
-      // | "DelftBlue" => "#6A77BF"
-      // | "Violet" => "#866FB8"
-      // | "Lilac" => "#B773BB"
-      // | "Light Pink" => "#D86C8A"
-      // | "Fog" => "#7D8995"
-      // | "Limestone" => "#828B85"
-      // | "Sand" => "#948983"
-      // | _ => "#7D8995";
     };
 
   module Icon = {
