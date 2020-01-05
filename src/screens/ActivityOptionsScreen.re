@@ -4,7 +4,6 @@ open ReactMultiversal;
 
 [@react.component]
 let make = (~navigation, ~route) => {
-  let (_settings, setSettings) = React.useContext(AppSettings.context);
   let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   <>
@@ -21,19 +20,9 @@ let make = (~navigation, ~route) => {
        ->Option.map(currentActivity =>
            <ActivityOptions
              activity=currentActivity
-             onIgnoreActivity={activity => {
-               setSettings(settings =>
-                 {
-                   "theme": settings##theme,
-                   "lastUpdated": settings##lastUpdated,
-                   "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-                   "eventsSkippedOn": settings##eventsSkippedOn,
-                   "eventsSkipped":
-                     settings##eventsSkipped->Array.concat([|activity|]),
-                 }
-               );
-               navigation->Navigators.RootStack.Navigation.goBack();
-             }}
+             onIgnoreActivity={() =>
+               navigation->Navigators.RootStack.Navigation.goBack()
+             }
            />
          )
        ->Option.getWithDefault(React.null)}

@@ -1,5 +1,6 @@
 open Belt;
 open ReactNative;
+open ReactMultiversal;
 open ReactNavigation;
 
 let styles =
@@ -33,6 +34,10 @@ module MainStackScreen = {
               ->Option.flatMap(params => params##currentActivity)
               ->Option.getWithDefault("Activity"),
             ~headerBackTitle="Back",
+            ~headerTitleContainerStyle=
+              Style.(
+                viewStyle(~paddingHorizontal=(Spacer.space *. 3.)->dp, ())
+              ),
             ~headerStyle=
               Style.(
                 list([

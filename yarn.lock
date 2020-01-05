@@ -10078,10 +10078,10 @@ react-error-overlay@^6.0.3:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.3.tgz#c378c4b0a21e88b2e159a3e62b2f531fd63bf60d"
   integrity sha512-bOUvMWFQVk5oz8Ded9Xb7WVdEi3QGLC8tH7HmYP0Fdp4Bn3qw0tRFmr5TW6mvahzvmrK4a6bqWGfCevBflP+Xw==
 
-react-from-svg@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/react-from-svg/-/react-from-svg-1.2.0.tgz#13af3f75ed980d7bf8b426c176c9f82c3bbf0a4a"
-  integrity sha512-h9NFEMvD/XqMDjZM4EEXGui5ka7ax3ZRDhL07yfiRzR+JeD6j/Jskc+E4VoaGOMn54XqzFIKp/P+RymYsMmhkw==
+react-from-svg@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/react-from-svg/-/react-from-svg-1.2.3.tgz#fa52452bde400e2011e8f21b973045c4180b6376"
+  integrity sha512-8yaGXa6MUJJdairdpqjpBFKxIY9KfEU0XxtI0hqB4DNA7/io5in5Iy3wd8IuDEGTULVFRyCaLZKNRD2BBjrLog==
   dependencies:
     bs-platform "^5.0.1"
     glob "^7.1.3"

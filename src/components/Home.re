@@ -21,6 +21,11 @@ external useCallback5:
   ([@bs.uncurry] ('input => 'output), ('a, 'b, 'c, 'd, 'e)) =>
   React.callback('input, 'output) =
   "useCallback";
+[@bs.module "react"]
+external useCallback6:
+  ([@bs.uncurry] ('input => 'output), ('a, 'b, 'c, 'd, 'e, 'f)) =>
+  React.callback('input, 'output) =
+  "useCallback";
 
 [@react.component]
 let make = (~onFiltersPress, ~onActivityPress) => {
@@ -71,6 +76,12 @@ let make = (~onFiltersPress, ~onActivityPress) => {
     events->Option.map(es =>
       es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration
     );
+  let mapCategoryDuration =
+    events->Option.map(es =>
+      settings->Calendars.mapCategoryDuration(
+        es->Calendars.filterEvents(settings),
+      )
+    );
 
   let (todayFirst, _) = todayDates->React.Ref.current;
   let (previousFirst, _) = previousDates->React.Ref.current;
@@ -89,7 +100,7 @@ let make = (~onFiltersPress, ~onActivityPress) => {
     );
 
   let renderItem =
-    useCallback5(
+    useCallback6(
       renderItemProps => {
         // Js.log2("render", renderItemProps##index);
         let (firstDay, lastDay) = renderItemProps##item;
@@ -113,11 +124,24 @@ let make = (~onFiltersPress, ~onActivityPress) => {
               ->React.string
             </Text>
             <Spacer size=S />
-            <WeeklyGraph events mapTitleDuration startDate supposedEndDate />
+            <WeeklyGraph
+              events
+              mapCategoryDuration
+              mapTitleDuration
+              startDate
+              supposedEndDate
+            />
           </SpacedView>
         </View>;
       },
-      (startDate, endDate, events, supposedEndDate, mapTitleDuration),
+      (
+        startDate,
+        endDate,
+        events,
+        supposedEndDate,
+        mapCategoryDuration,
+        mapTitleDuration,
+      ),
     );
 
   let onViewableItemsChanged =
@@ -198,10 +222,11 @@ let make = (~onFiltersPress, ~onActivityPress) => {
           setSettings(settings =>
             {
               "theme": settings##theme,
-              "lastUpdated": settings##lastUpdated,
+              "lastUpdated": Js.Date.now(),
               "calendarsIdsSkipped": settings##calendarsIdsSkipped,
               "eventsSkippedOn": !settings##eventsSkippedOn,
               "eventsSkipped": settings##eventsSkipped,
+              "eventsCategories": settings##eventsCategories,
             }
           )
         }>

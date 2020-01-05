@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="128px" height="128px" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 61.2 (89653) - https://sketch.com -->
-    <title>Slice</title>
-    <desc>Created with Sketch.</desc>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <path d="M64,112 C90.2588235,112 112,90.2588235 112,64 C112,37.7882353 90.2117647,16 63.9529412,16 C37.7411765,16 16,37.7882353 16,64 C16,90.2588235 37.7882353,112 64,112 Z M64,104 C41.7882353,104 24.0470588,86.2117647 24.0470588,64 C24.0470588,41.8352941 41.7411765,24 63.9529412,24 C86.1647059,24 103.952941,41.8352941 104.000093,64 C104.047059,86.2117647 86.2117647,104 64,104 Z" id="CheckmarkCircleFill" fill="#000000" fill-rule="nonzero"></path>
-    </g>
-</svg>

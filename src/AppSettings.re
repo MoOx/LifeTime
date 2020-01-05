@@ -8,6 +8,7 @@ type settings = {
   "calendarsIdsSkipped": array(string),
   "eventsSkippedOn": bool,
   "eventsSkipped": array(string),
+  "eventsCategories": array((string, string)) // title, category id
 };
 
 let themeToThemeString =
@@ -30,6 +31,7 @@ let defaultSettings = {
   "calendarsIdsSkipped": [||],
   "eventsSkippedOn": true,
   "eventsSkipped": [||],
+  "eventsCategories": [||] // @todo add some defaults?
 };
 
 let decodeJsonSettings = (json: Js.Json.t): settings => {
@@ -122,6 +124,53 @@ let decodeJsonSettings = (json: Js.Json.t): settings => {
             }
           )
         ->Option.getWithDefault(defaultSettings##eventsSkipped),
+      "eventsCategories":
+        settings
+        ->Js.Dict.get("eventsCategories")
+        ->Option.map(json =>
+            switch (Js.Json.classify(json)) {
+            | Js.Json.JSONArray(keyValue) =>
+              keyValue->Array.keepMap(jsonId =>
+                switch (Js.Json.classify(jsonId)) {
+                | Js.Json.JSONArray(s) =>
+                  let eventTitle =
+                    s[0]
+                    ->Option.map(s =>
+                        switch (Js.Json.classify(s)) {
+                        | Js.Json.JSONString(eventTitle) => eventTitle
+                        | _ =>
+                          failwith(
+                            "LifeTime: decodeJsonSettings: unable to decode string eventsCategories title",
+                          )
+                        }
+                      );
+                  let categoryId =
+                    s[1]
+                    ->Option.map(s =>
+                        switch (Js.Json.classify(s)) {
+                        | Js.Json.JSONString(categoryId) => categoryId
+                        | _ =>
+                          failwith(
+                            "LifeTime: decodeJsonSettings: unable to decode string eventsCategories title",
+                          )
+                        }
+                      );
+                  eventTitle->Option.flatMap(et =>
+                    categoryId->Option.map(ci => (et, ci))
+                  );
+                | _ =>
+                  failwith(
+                    "LifeTime: decodeJsonSettings: unable to decode string eventsCategories tuple",
+                  )
+                }
+              )
+            | _ =>
+              failwith(
+                "LifeTime: decodeJsonSettings: unable to decode eventsCategories array",
+              )
+            }
+          )
+        ->Option.getWithDefault(defaultSettings##eventsCategories),
     }
   | _ => failwith("LifeTime: decodeJsonSettings: unable to decode settings")
   };

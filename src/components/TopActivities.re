@@ -16,6 +16,8 @@ let numberOfEventsToShow = 8;
 [@react.component]
 let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
+
+  let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   let calendars = Calendars.useCalendars(None);
   let (eventsToShow, setEventsToShow) =
@@ -33,7 +35,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
       setWidth(_ => width);
     });
   // keep some place for duration string
-  let availableWidthForBar = width -. 85. -. SpacedView.space *. 2.;
+  let availableWidthForBar = width -. 85. -. SpacedView.space *. 4.;
 
   <>
     <View style=Predefined.styles##rowSpaceBetween>
@@ -91,52 +93,78 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                     ++ (
                       durationM >= 1. ? durationM->Js.Float.toFixed ++ "m" : ""
                     );
+                  let (_, _, colorName, iconName) =
+                    settings
+                    ->Calendars.categoryIdFromEventTitle(title)
+                    ->Calendars.Categories.getFromId;
+                  let color = theme->Calendars.Categories.getColor(colorName);
                   <TouchableOpacity
                     onPress={_ => onActivityPress(title)} key=title>
                     <Separator style=themeStyles##separatorOnBackground />
                     <SpacedView vertical=XS>
                       <View style=Predefined.styles##rowSpaceBetween>
-                        <View>
-                          <Text style=themeStyles##textOnBackground>
-                            title->React.string
-                          </Text>
-                          <Spacer size=XXS />
-                          <Row
-                            style=Style.(viewStyle(~alignItems=`center, ()))>
-                            <View
-                              style=Style.(
-                                array([|
-                                  themeStyles##backgroundGray3,
-                                  viewStyle(
-                                    // ~backgroundColor=Calendars.color(title),
-                                    ~width=
-                                      (
-                                        totalDurationInMin
-                                        /. maxDurationInMin
-                                        *. availableWidthForBar
-                                      )
-                                      ->dp,
-                                    ~height=6.->dp,
-                                    ~borderRadius=6.,
-                                    ~overflow=`hidden,
-                                    (),
-                                  ),
-                                |])
-                              )
-                            />
-                            <Spacer size=XXS />
+                        <View
+                          style=Style.(
+                            list([
+                              Predefined.styles##row,
+                              viewStyle(~flexShrink=1., ()),
+                            ])
+                          )>
+                          <Calendars.Categories.Icon
+                            name=iconName
+                            width={32.->Style.dp}
+                            height={32.->Style.dp}
+                            fill=color
+                          />
+                          <Spacer size=XS />
+                          <View
+                            style=Style.(
+                              list([viewStyle(~flexShrink=1., ())])
+                            )>
                             <Text
-                              style=Style.(
-                                array([|
-                                  styles##durationText,
-                                  themeStyles##textLightOnBackground,
-                                |])
-                              )>
-                              durationString->React.string
+                              style=themeStyles##textOnBackground
+                              numberOfLines=1>
+                              title->React.string
                             </Text>
-                          </Row>
+                            <Spacer size=XXS />
+                            <Row
+                              style=Style.(viewStyle(~alignItems=`center, ()))>
+                              <View
+                                style=Style.(
+                                  array([|
+                                    themeStyles##backgroundGray3,
+                                    viewStyle(
+                                      // ~backgroundColor=color,
+                                      ~width=
+                                        (
+                                          totalDurationInMin
+                                          /. maxDurationInMin
+                                          *. availableWidthForBar
+                                        )
+                                        ->dp,
+                                      ~height=6.->dp,
+                                      ~borderRadius=6.,
+                                      ~overflow=`hidden,
+                                      (),
+                                    ),
+                                  |])
+                                )
+                              />
+                              <Spacer size=XXS />
+                              <Text
+                                style=Style.(
+                                  array([|
+                                    styles##durationText,
+                                    themeStyles##textLightOnBackground,
+                                  |])
+                                )>
+                                durationString->React.string
+                              </Text>
+                            </Row>
+                          </View>
                         </View>
-                        <SVGChevronRight
+                        <Spacer size=XS />
+                        <SVGchevronright
                           width={14.->ReactFromSvg.Size.dp}
                           height={14.->ReactFromSvg.Size.dp}
                           fill={Predefined.Colors.Ios.light.gray4}

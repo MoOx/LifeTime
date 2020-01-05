@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128px" height="128px" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61.2 (89653) - https://sketch.com -->
+    <title>Slice</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M64,128 C99.0117647,128 128,99.0117647 128,64 C128,29.0509804 98.9490196,0 63.9372549,0 C28.9882353,0 0,29.0509804 0,64 C0,99.0117647 29.0509804,128 64,128 Z M64,117.333333 C34.3843137,117.333333 10.7294118,93.6156863 10.7294118,64 C10.7294118,34.4470588 34.3215686,10.6666667 63.9372549,10.6666667 C93.5529412,10.6666667 117.270588,34.4470588 117.333457,64 C117.396078,93.6156863 93.6156863,117.333333 64,117.333333 Z" id="circle" fill="#000000" fill-rule="nonzero"></path>
+    </g>
+</svg>

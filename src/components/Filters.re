@@ -40,6 +40,7 @@ let make = () => {
                        ->Option.getWithDefault([||]),
                      "eventsSkippedOn": settings##eventsSkippedOn,
                      "eventsSkipped": settings##eventsSkipped,
+                     "eventsCategories": settings##eventsCategories,
                    }
                  )
                }
@@ -55,6 +56,7 @@ let make = () => {
                      "calendarsIdsSkipped": [||],
                      "eventsSkippedOn": settings##eventsSkippedOn,
                      "eventsSkipped": settings##eventsSkipped,
+                     "eventsCategories": settings##eventsCategories,
                    }
                  )
                }
@@ -85,6 +87,7 @@ let make = () => {
                           }},
                        "eventsSkippedOn": settings##eventsSkippedOn,
                        "eventsSkipped": settings##eventsSkipped,
+                       "eventsCategories": settings##eventsCategories,
                      }
                    )
                  }>
@@ -112,13 +115,13 @@ let make = () => {
                          settings##calendarsIdsSkipped
                          ->Array.some(id => id == calendar##id);
                        if (skipped) {
-                         <SVGCircle
+                         <SVGcircle
                            width={26.->ReactFromSvg.Size.dp}
                            height={26.->ReactFromSvg.Size.dp}
                            fill=calendar##color
                          />;
                        } else {
-                         <SVGCheckmarkCircleFill
+                         <SVGcheckmarkcircle
                            width={26.->ReactFromSvg.Size.dp}
                            height={26.->ReactFromSvg.Size.dp}
                            fill=calendar##color

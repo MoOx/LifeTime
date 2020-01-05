@@ -32,10 +32,11 @@ let make = () => {
            setSettings(settings =>
              {
                "theme": "dark",
-               "lastUpdated": settings##lastUpdated,
+               "lastUpdated": Js.Date.now(),
                "calendarsIdsSkipped": settings##calendarsIdsSkipped,
                "eventsSkippedOn": settings##eventsSkippedOn,
                "eventsSkipped": settings##eventsSkipped,
+               "eventsCategories": settings##eventsCategories,
              }
            )
          }>
@@ -49,10 +50,11 @@ let make = () => {
            setSettings(settings =>
              {
                "theme": "auto",
-               "lastUpdated": settings##lastUpdated,
+               "lastUpdated": Js.Date.now(),
                "calendarsIdsSkipped": settings##calendarsIdsSkipped,
                "eventsSkippedOn": settings##eventsSkippedOn,
                "eventsSkipped": settings##eventsSkipped,
+               "eventsCategories": settings##eventsCategories,
              }
            )
          }>
@@ -66,10 +68,11 @@ let make = () => {
            setSettings(settings =>
              {
                "theme": "light",
-               "lastUpdated": settings##lastUpdated,
+               "lastUpdated": Js.Date.now(),
                "calendarsIdsSkipped": settings##calendarsIdsSkipped,
                "eventsSkippedOn": settings##eventsSkippedOn,
                "eventsSkipped": settings##eventsSkipped,
+               "eventsCategories": settings##eventsCategories,
              }
            )
          }>

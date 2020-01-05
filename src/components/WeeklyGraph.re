@@ -17,7 +17,14 @@ let graphHeight = 100.;
 let graphLetterHeight = 16.;
 
 [@react.component]
-let make = (~events, ~mapTitleDuration, ~startDate, ~supposedEndDate) => {
+let make =
+    (
+      ~events,
+      ~mapCategoryDuration,
+      ~mapTitleDuration as _,
+      ~startDate,
+      ~supposedEndDate,
+    ) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
   let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
@@ -42,8 +49,8 @@ let make = (~events, ~mapTitleDuration, ~startDate, ~supposedEndDate) => {
               events->Array.reduce(
                 Map.String.empty,
                 (mapPerCategories, e) => {
-                  // @todo real categories
-                  let cat = e##title;
+                  let cat =
+                    settings->Calendars.categoryIdFromEventTitle(e##title);
                   if (Date.hasOverlap(
                         e##startDate->Js.Date.fromString,
                         e##endDate->Js.Date.fromString,
@@ -284,21 +291,29 @@ let make = (~events, ~mapTitleDuration, ~startDate, ~supposedEndDate) => {
                        (),
                      )
                    )>
-                   {mapTitleDuration
-                    ->Option.map(mapTitleDuration =>
-                        mapTitleDuration
-                        ->Array.map(((title, _)) =>
+                   {mapCategoryDuration
+                    ->Option.map(mapCategoryDuration =>
+                        mapCategoryDuration
+                        ->Array.map(((title, _categoryId)) =>
                             mapPerCategories
                             ->Map.String.toArray
-                            ->Array.map(((key, value)) =>
-                                key !== title
+                            ->Array.map(((key, value)) => {
+                                let ecid =
+                                  settings->Calendars.categoryIdFromEventTitle(
+                                    title,
+                                  );
+                                let (_, _, color, _) =
+                                  Calendars.Categories.getFromId(ecid);
+                                let backgroundColor =
+                                  theme->Calendars.Categories.getColor(color);
+                                key != ecid
                                   ? React.null
                                   : <View
                                       key
                                       style=Style.(
                                         array([|
-                                          themeStyles##backgroundGray,
                                           viewStyle(
+                                            ~backgroundColor,
                                             ~height=
                                               (
                                                 graphHeight
@@ -316,12 +331,17 @@ let make = (~events, ~mapTitleDuration, ~startDate, ~supposedEndDate) => {
                                       //    ? React.null
                                       //    : <Text
                                       //        style=Style.(
-                                      //          textStyle(~fontSize=6., ())
+                                      //          textStyle(
+                                      //            ~fontSize=6.,
+                                      //            ~padding=2.->dp,
+                                      //            ~color="#fff",
+                                      //            (),
+                                      //          )
                                       //        )>
                                       //        key->React.string
                                       //      </Text>}
-                                    />
-                              )
+                                    />;
+                              })
                             ->React.array
                           )
                         ->React.array
@@ -329,9 +349,6 @@ let make = (~events, ~mapTitleDuration, ~startDate, ~supposedEndDate) => {
                     ->Option.getWithDefault(React.null)}
                  </SpacedView>
                )
-             //  </Text>
-             //    {date->Js.Date.getDay->Js.Float.toString->React.string}
-             //  <Text key={date->Js.Date.toISOString}>
              ->React.array
            )
          ->Option.getWithDefault(React.null)}
