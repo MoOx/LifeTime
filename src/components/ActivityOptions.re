@@ -18,10 +18,11 @@ let make = (~activity, ~onIgnoreActivity) => {
   let activitySlug = activity->Calendars.slugifyEventTitle;
   let isSkipped = Calendars.isEventSkipped(settings, activity);
   <SpacedView horizontal=None>
-    <Row> <Spacer size=S /> <BlockHeading text="Category" /> </Row>
+    <Row> <Spacer size=XS /> <BlockHeading text="Category" /> </Row>
+    <Separator style=themeStyles##separatorOnBackground />
     <View style=themeStyles##background>
       {Calendars.Categories.defaults
-       ->List.map(((id, name, colorName, iconName)) => {
+       ->List.mapWithIndex((index, (id, name, colorName, iconName)) => {
            let color = theme->Calendars.Categories.getColor(colorName);
            <TouchableOpacity
              key=id
@@ -43,43 +44,48 @@ let make = (~activity, ~onIgnoreActivity) => {
                  }
                )
              }>
-             <Separator style=themeStyles##separatorOnBackground />
-             <SpacedView vertical=XS>
-               <View style=Predefined.styles##rowSpaceBetween>
-                 <Row style=Predefined.styles##center>
-                   <Calendars.Categories.Icon
-                     name=iconName
-                     width={32.->Style.dp}
-                     height={32.->Style.dp}
-                     fill=color
-                   />
-                   <Spacer size=XS />
-                   <Text
-                     style={Style.list([
-                       styles##text,
-                       themeStyles##textOnBackground,
-                     ])}>
-                     name->React.string
-                   </Text>
-                 </Row>
-                 {if (id
-                      != settings->Calendars.categoryIdFromEventTitle(
-                           activity,
-                         )) {
-                    <SVGcircle
-                      width={26.->ReactFromSvg.Size.dp}
-                      height={26.->ReactFromSvg.Size.dp}
-                      fill=color
-                    />;
-                  } else {
-                    <SVGcheckmarkcircle
-                      width={26.->ReactFromSvg.Size.dp}
-                      height={26.->ReactFromSvg.Size.dp}
-                      fill=color
-                    />;
-                  }}
+             <View style=Predefined.styles##rowCenter>
+               <Spacer size=S />
+               <SpacedView vertical=XS horizontal=None>
+                 <Calendars.Categories.Icon name=iconName fill=color />
+               </SpacedView>
+               <Spacer size=XS />
+               <View style=Predefined.styles##flexGrow>
+                 <SpacedView vertical=XS horizontal=None>
+                   <View style=Predefined.styles##row>
+                     <View style=Predefined.styles##flexGrow>
+                       <Text
+                         style={Style.list([
+                           styles##text,
+                           themeStyles##textOnBackground,
+                         ])}>
+                         name->React.string
+                       </Text>
+                     </View>
+                     {if (id
+                          != settings->Calendars.categoryIdFromEventTitle(
+                               activity,
+                             )) {
+                        <SVGcircle
+                          width={26.->ReactFromSvg.Size.dp}
+                          height={26.->ReactFromSvg.Size.dp}
+                          fill=color
+                        />;
+                      } else {
+                        <SVGcheckmarkcircle
+                          width={26.->ReactFromSvg.Size.dp}
+                          height={26.->ReactFromSvg.Size.dp}
+                          fill=color
+                        />;
+                      }}
+                     <Spacer size=S />
+                   </View>
+                 </SpacedView>
+                 {index !== Calendars.Categories.defaults->List.length - 1
+                    ? <Separator style=themeStyles##separatorOnBackground />
+                    : React.null}
                </View>
-             </SpacedView>
+             </View>
            </TouchableOpacity>;
          })
        //  <View> <Spacer /> </View>
