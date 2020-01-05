@@ -77,7 +77,8 @@ module Categories = {
     open ReactNative;
 
     [@react.component]
-    let make = (~name, ~width, ~height, ~fill="white") => {
+    let make =
+        (~name, ~width=28.->Style.dp, ~height=28.->Style.dp, ~fill="white") => {
       <View
         style=Style.(
           viewStyle(

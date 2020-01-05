@@ -39,15 +39,16 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
 
   <>
     <View style=Predefined.styles##rowSpaceBetween>
-      <Row> <Spacer size=S /> <BlockHeading text="Top Activities" /> </Row>
+      <Row> <Spacer size=XS /> <BlockHeading text="Top Activities" /> </Row>
       <Row>
         <BlockHeadingTouchable
           onPress={_ => onFiltersPress()}
           text="Customize report"
         />
-        <Spacer size=S />
+        <Spacer size=XS />
       </Row>
     </View>
+    <Separator style=themeStyles##separatorOnBackground />
     <View onLayout style=themeStyles##background>
       {calendars
        ->Option.map(calendars =>
@@ -100,26 +101,28 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                   let color = theme->Calendars.Categories.getColor(colorName);
                   <TouchableOpacity
                     onPress={_ => onActivityPress(title)} key=title>
-                    <Separator style=themeStyles##separatorOnBackground />
-                    <SpacedView vertical=XS>
-                      <View style=Predefined.styles##rowSpaceBetween>
-                        <View
+                    <View style=Predefined.styles##rowCenter>
+                      <Spacer size=S />
+                      <SpacedView vertical=XS horizontal=None>
+                        <Calendars.Categories.Icon name=iconName fill=color />
+                      </SpacedView>
+                      <Spacer size=XS />
+                      <View style=Predefined.styles##flexGrow>
+                        <SpacedView
+                          vertical=XS
+                          horizontal=None
                           style=Style.(
                             list([
-                              Predefined.styles##row,
-                              viewStyle(~flexShrink=1., ()),
+                              Predefined.styles##rowCenter,
+                              Predefined.styles##flexShrink,
                             ])
                           )>
-                          <Calendars.Categories.Icon
-                            name=iconName
-                            width={32.->Style.dp}
-                            height={32.->Style.dp}
-                            fill=color
-                          />
-                          <Spacer size=XS />
                           <View
                             style=Style.(
-                              list([viewStyle(~flexShrink=1., ())])
+                              list([
+                                Predefined.styles##flexGrow,
+                                Predefined.styles##flexShrink,
+                              ])
                             )>
                             <Text
                               style=themeStyles##textOnBackground
@@ -162,25 +165,33 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                               </Text>
                             </Row>
                           </View>
-                        </View>
-                        <Spacer size=XS />
-                        <SVGchevronright
-                          width={14.->ReactFromSvg.Size.dp}
-                          height={14.->ReactFromSvg.Size.dp}
-                          fill={Predefined.Colors.Ios.light.gray4}
-                        />
+                          <Spacer size=XS />
+                          <SVGchevronright
+                            width={14.->ReactFromSvg.Size.dp}
+                            height={14.->ReactFromSvg.Size.dp}
+                            fill={Predefined.Colors.Ios.light.gray4}
+                          />
+                          <Spacer size=S />
+                        </SpacedView>
+                        <Separator style=themeStyles##separatorOnBackground />
                       </View>
-                    </SpacedView>
+                    </View>
                   </TouchableOpacity>;
                 })
               ->React.array}
-             <Separator style=themeStyles##separatorOnBackground />
              {
                let showMore = mapTitleDuration->Array.length > eventsToShow;
                let showLess = eventsToShow > numberOfEventsToShow;
                showMore || showLess
-                 ? <>
-                     <View style=Predefined.styles##rowSpaceBetween>
+                 ? <Row>
+                     <Spacer size=L />
+                     <View
+                       style=Style.(
+                         list([
+                           Predefined.styles##rowSpaceBetween,
+                           Predefined.styles##flexGrow,
+                         ])
+                       )>
                        {mapTitleDuration->Array.length > eventsToShow
                           ? <TouchableOpacity
                               onPress={_ =>
@@ -188,7 +199,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                                   eventsToShow + numberOfEventsToShow
                                 )
                               }>
-                              <SpacedView vertical=XS>
+                              <SpacedView vertical=XS horizontal=S>
                                 <Text style=themeStyles##textBlue>
                                   "Show More"->React.string
                                 </Text>
@@ -203,7 +214,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                                   eventsToShow - numberOfEventsToShow
                                 )
                               }>
-                              <SpacedView vertical=XS>
+                              <SpacedView vertical=XS horizontal=S>
                                 <Text style=themeStyles##textBlue>
                                   "Show Less"->React.string
                                 </Text>
@@ -212,9 +223,10 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                           : React.null}
                      </View>
                      <Separator style=themeStyles##separatorOnBackground />
-                   </>
+                   </Row>
                  : React.null;
              }
+             <Separator style=themeStyles##separatorOnBackground />
            </>
          )
        ->Option.getWithDefault(React.null)}

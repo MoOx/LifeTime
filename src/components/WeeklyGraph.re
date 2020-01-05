@@ -327,19 +327,6 @@ let make =
                                           ),
                                         |])
                                       )
-                                      // {!Global.__DEV__
-                                      //    ? React.null
-                                      //    : <Text
-                                      //        style=Style.(
-                                      //          textStyle(
-                                      //            ~fontSize=6.,
-                                      //            ~padding=2.->dp,
-                                      //            ~color="#fff",
-                                      //            (),
-                                      //          )
-                                      //        )>
-                                      //        key->React.string
-                                      //      </Text>}
                                     />;
                               })
                             ->React.array

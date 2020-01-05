@@ -186,7 +186,7 @@ let make = (~onFiltersPress, ~onActivityPress) => {
       <Title style=themeStyles##textOnBackground> title->React.string </Title>
     </SpacedView>
     <View style=Predefined.styles##rowSpaceBetween>
-      <Row> <Spacer size=S /> <BlockHeading text="Weekly Chart" /> </Row>
+      <Row> <Spacer size=XS /> <BlockHeading text="Weekly Chart" /> </Row>
       <Row>
         {todayFirst == startDate
            ? React.null
@@ -194,7 +194,7 @@ let make = (~onFiltersPress, ~onActivityPress) => {
                onPress=onShowThisWeek
                text="Show This Week"
              />}
-        <Spacer size=S />
+        <Spacer size=XS />
       </Row>
     </View>
     <Separator style=themeStyles##separatorOnBackground />

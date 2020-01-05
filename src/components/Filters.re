@@ -24,7 +24,7 @@ let make = () => {
   let isCalendarButtonHide = settings##calendarsIdsSkipped->Array.length === 0;
   <>
     <View style=Predefined.styles##rowSpaceBetween>
-      <Row> <Spacer size=S /> <BlockHeading text="Calendars" /> </Row>
+      <Row> <Spacer size=XS /> <BlockHeading text="Calendars" /> </Row>
       <Row>
         {isCalendarButtonHide
            ? <BlockHeadingTouchable
@@ -62,7 +62,7 @@ let make = () => {
                }
                text="Show All"
              />}
-        <Spacer size=S />
+        <Spacer size=XS />
       </Row>
     </View>
     <View style=themeStyles##background>
