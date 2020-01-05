@@ -13,7 +13,7 @@ let styles =
   );
 
 let slices = 4;
-let graphHeight = 100.;
+let graphHeight = 140.;
 let graphLetterHeight = 16.;
 
 [@react.component]
