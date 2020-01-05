@@ -106,7 +106,8 @@ let make = (~onFiltersPress, ~onActivityPress) => {
         // Js.log2("render", renderItemProps##index);
         let (firstDay, lastDay) = renderItemProps##item;
         <View style=styleWidth>
-          <SpacedView>
+          <Spacer />
+          <SpacedView vertical=None>
             <Text style=themeStyles##textLightOnBackground>
               (
                 if (todayFirst == firstDay) {
@@ -125,7 +126,8 @@ let make = (~onFiltersPress, ~onActivityPress) => {
               ->React.string
             </Text>
           </SpacedView>
-          <SpacedView>
+          <Spacer size=S />
+          <SpacedView vertical=None>
             <WeeklyGraph
               events
               mapCategoryDuration
