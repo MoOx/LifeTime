@@ -1,6 +1,7 @@
 open Belt;
 open ReactNative;
 open ReactMultiversal;
+open ReasonDateFns;
 
 let styles =
   Style.(
@@ -36,6 +37,7 @@ let make = (~onFiltersPress, ~onActivityPress) => {
   let windowDimensions = Dimensions.useWindowDimensions();
   let styleWidth = Style.(style(~width=windowDimensions##width->dp, ()));
 
+  let updatedAt = React.useRef(Date.now());
   let today = React.useRef(Date.now());
   let todayDates =
     React.useRef(
@@ -49,7 +51,7 @@ let make = (~onFiltersPress, ~onActivityPress) => {
       ),
     );
 
-  let data =
+  let weeks =
     React.useRef(
       Array.range(0, 51)
       ->Array.reverse
@@ -62,11 +64,11 @@ let make = (~onFiltersPress, ~onActivityPress) => {
           )
         ),
     );
-  let initialScrollIndex = data->React.Ref.current->Array.length - 1;
+  let initialScrollIndex = weeks->React.Ref.current->Array.length - 1;
 
   let ((startDate, supposedEndDate), setCurrentDates) =
     React.useState(() =>
-      data->React.Ref.current[data->React.Ref.current->Array.length - 1]
+      weeks->React.Ref.current[weeks->React.Ref.current->Array.length - 1]
       ->Option.getWithDefault(todayDates->React.Ref.current)
     );
 
@@ -248,7 +250,7 @@ let make = (~onFiltersPress, ~onActivityPress) => {
       showsHorizontalScrollIndicator=false
       initialScrollIndex
       initialNumToRender=2
-      data={data->React.Ref.current}
+      data={weeks->React.Ref.current}
       style={Style.list([themeStyles##background, styleWidth])}
       getItemLayout
       keyExtractor={((first, _), _index) => first->Js.Date.toString}
@@ -256,6 +258,20 @@ let make = (~onFiltersPress, ~onActivityPress) => {
       onViewableItemsChanged={onViewableItemsChanged->React.Ref.current}
     />
     <Separator style=themeStyles##separatorOnBackground />
+    <SpacedView vertical=XXS horizontal=S>
+      <Text
+        style=Style.(
+          list([styles##smallText, themeStyles##textLightOnBackgroundDark])
+        )>
+        {(
+           "Updated "
+           ++ updatedAt
+              ->React.Ref.current
+              ->DateFns.formatRelative(today->React.Ref.current)
+         )
+         ->React.string}
+      </Text>
+    </SpacedView>
     <Spacer />
     <TopActivities mapTitleDuration onFiltersPress onActivityPress />
     <Spacer />

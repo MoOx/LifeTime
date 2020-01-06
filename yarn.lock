@@ -4070,6 +4070,11 @@ data-urls@^1.0.0, data-urls@^1.1.0:
     whatwg-mimetype "^2.2.0"
     whatwg-url "^7.0.0"
 
+date-fns@^2.8.1:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.8.1.tgz#2109362ccb6c87c3ca011e9e31f702bc09e4123b"
+  integrity sha512-EL/C8IHvYRwAHYgFRse4MGAPSqlJVlOrhVYZ75iQBKrnv+ZedmYsgwH3t+BCDuZDXpoo07+q9j4qgSSOa7irJg==
+
 dayjs@^1.8.15:
   version "1.8.16"
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.8.16.tgz#2a3771de537255191b947957af2fd90012e71e64"
@@ -10374,6 +10379,11 @@ realpath-native@^1.1.0:
   integrity sha512-wlgPA6cCIIg9gKz0fgAPjnzh4yR/LnXovwuo9hvyGvx3h8nX4+/iLZplfUWasXpqD8BdnGnP5njOFjkUwPzvjA==
   dependencies:
     util.promisify "^1.0.0"
+
+reason-date-fns@^0.10.4:
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/reason-date-fns/-/reason-date-fns-0.10.4.tgz#8e0e90cdfc57e0855da95143ba115373dba195d9"
+  integrity sha512-GXwFc75YWGAsYOGnRYHdCOTxcI8GsAgr5+P9+U88p2aNVOsc30pOLAJE6RwjtERZKkk00GoMxbUWv572MsppPA==
 
 reason-future@^2.4.0, reason-future@^2.5.0:
   version "2.5.0"
