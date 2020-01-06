@@ -56,22 +56,19 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
          )
        ->Option.map(c =>
            if (c->Array.length === 0) {
-             <>
-               <Separator style=themeStyles##separatorOnBackground />
-               <SpacedView>
-                 <Center>
-                   <Spacer size=XXL />
-                   <Title style=themeStyles##textOnBackground>
-                     "No Events"->React.string
-                   </Title>
-                   <Spacer />
-                   <Text style=themeStyles##textLightOnBackground>
-                     "You should select at least a calendar"->React.string
-                   </Text>
-                   <Spacer size=XXL />
-                 </Center>
-               </SpacedView>
-             </>;
+             <SpacedView>
+               <Center>
+                 <Spacer size=XXL />
+                 <Title style=themeStyles##textOnBackground>
+                   "No Events"->React.string
+                 </Title>
+                 <Spacer />
+                 <Text style=themeStyles##textLightOnBackground>
+                   "You should select at least a calendar"->React.string
+                 </Text>
+                 <Spacer size=XXL />
+               </Center>
+             </SpacedView>;
            } else {
              React.null;
            }
@@ -80,142 +77,174 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
       {mapTitleDuration
        ->Option.map(mapTitleDuration =>
            <>
-             {mapTitleDuration
-              ->Array.slice(~offset=0, ~len=eventsToShow)
-              ->Array.map(((title, totalDurationInMin)) => {
-                  let durationString = totalDurationInMin->Date.minToString;
-                  let (_, _, colorName, iconName) =
-                    settings
-                    ->Calendars.categoryIdFromEventTitle(title)
-                    ->Calendars.Categories.getFromId;
-                  let color = theme->Calendars.Categories.getColor(colorName);
-                  <TouchableOpacity
-                    onPress={_ => onActivityPress(title)} key=title>
-                    <View style=Predefined.styles##rowCenter>
-                      <Spacer size=S />
-                      <SpacedView vertical=XS horizontal=None>
-                        <Calendars.Categories.Icon name=iconName fill=color />
-                      </SpacedView>
-                      <Spacer size=XS />
-                      <View style=Predefined.styles##flexGrow>
-                        <SpacedView
-                          vertical=XS
-                          horizontal=None
-                          style=Style.(
-                            list([
-                              Predefined.styles##rowCenter,
-                              Predefined.styles##flexShrink,
-                            ])
-                          )>
+             {switch (mapTitleDuration) {
+              | [||] =>
+                <SpacedView>
+                  <Center>
+                    <Spacer size=XXL />
+                    <Title style=themeStyles##textOnBackground>
+                      "No Events"->React.string
+                    </Title>
+                    <Spacer />
+                    <Text style=themeStyles##textLightOnBackground>
+                      "That's unexpected. Try filling the blanks!"
+                      ->React.string
+                    </Text>
+                    <Spacer size=XXL />
+                  </Center>
+                </SpacedView>
+              | _ =>
+                <>
+                  {mapTitleDuration
+                   ->Array.slice(~offset=0, ~len=eventsToShow)
+                   ->Array.map(((title, totalDurationInMin)) => {
+                       let durationString =
+                         totalDurationInMin->Date.minToString;
+                       let (_, _, colorName, iconName) =
+                         settings
+                         ->Calendars.categoryIdFromEventTitle(title)
+                         ->Calendars.Categories.getFromId;
+                       let color =
+                         theme->Calendars.Categories.getColor(colorName);
+                       <TouchableOpacity
+                         onPress={_ => onActivityPress(title)} key=title>
+                         <View style=Predefined.styles##rowCenter>
+                           <Spacer size=S />
+                           <SpacedView vertical=XS horizontal=None>
+                             <Calendars.Categories.Icon
+                               name=iconName
+                               fill=color
+                             />
+                           </SpacedView>
+                           <Spacer size=XS />
+                           <View style=Predefined.styles##flexGrow>
+                             <SpacedView
+                               vertical=XS
+                               horizontal=None
+                               style=Style.(
+                                 list([
+                                   Predefined.styles##rowCenter,
+                                   Predefined.styles##flexShrink,
+                                 ])
+                               )>
+                               <View
+                                 style=Style.(
+                                   list([
+                                     Predefined.styles##flexGrow,
+                                     Predefined.styles##flexShrink,
+                                   ])
+                                 )>
+                                 <Text
+                                   style=themeStyles##textOnBackground
+                                   numberOfLines=1>
+                                   title->React.string
+                                 </Text>
+                                 <Spacer size=XXS />
+                                 <Row
+                                   style=Style.(
+                                     viewStyle(~alignItems=`center, ())
+                                   )>
+                                   <View
+                                     style=Style.(
+                                       array([|
+                                         themeStyles##backgroundGray3,
+                                         viewStyle(
+                                           // ~backgroundColor=color,
+                                           ~width=
+                                             (
+                                               totalDurationInMin
+                                               /. maxDurationInMin
+                                               *. availableWidthForBar
+                                             )
+                                             ->dp,
+                                           ~height=6.->dp,
+                                           ~borderRadius=6.,
+                                           ~overflow=`hidden,
+                                           (),
+                                         ),
+                                       |])
+                                     )
+                                   />
+                                   <Spacer size=XXS />
+                                   <Text
+                                     style=Style.(
+                                       array([|
+                                         styles##durationText,
+                                         themeStyles##textLightOnBackground,
+                                       |])
+                                     )>
+                                     durationString->React.string
+                                   </Text>
+                                 </Row>
+                               </View>
+                               <Spacer size=XS />
+                               <SVGchevronright
+                                 width={14.->ReactFromSvg.Size.dp}
+                                 height={14.->ReactFromSvg.Size.dp}
+                                 fill={Predefined.Colors.Ios.light.gray4}
+                               />
+                               <Spacer size=S />
+                             </SpacedView>
+                             <Separator
+                               style=themeStyles##separatorOnBackground
+                             />
+                           </View>
+                         </View>
+                       </TouchableOpacity>;
+                     })
+                   ->React.array}
+                  {
+                    let showMore =
+                      mapTitleDuration->Array.length > eventsToShow;
+                    let showLess = eventsToShow > numberOfEventsToShow;
+                    showMore || showLess
+                      ? <Row>
+                          <Spacer size=L />
                           <View
                             style=Style.(
                               list([
+                                Predefined.styles##rowSpaceBetween,
                                 Predefined.styles##flexGrow,
-                                Predefined.styles##flexShrink,
                               ])
                             )>
-                            <Text
-                              style=themeStyles##textOnBackground
-                              numberOfLines=1>
-                              title->React.string
-                            </Text>
-                            <Spacer size=XXS />
-                            <Row
-                              style=Style.(viewStyle(~alignItems=`center, ()))>
-                              <View
-                                style=Style.(
-                                  array([|
-                                    themeStyles##backgroundGray3,
-                                    viewStyle(
-                                      // ~backgroundColor=color,
-                                      ~width=
-                                        (
-                                          totalDurationInMin
-                                          /. maxDurationInMin
-                                          *. availableWidthForBar
-                                        )
-                                        ->dp,
-                                      ~height=6.->dp,
-                                      ~borderRadius=6.,
-                                      ~overflow=`hidden,
-                                      (),
-                                    ),
-                                  |])
-                                )
-                              />
-                              <Spacer size=XXS />
-                              <Text
-                                style=Style.(
-                                  array([|
-                                    styles##durationText,
-                                    themeStyles##textLightOnBackground,
-                                  |])
-                                )>
-                                durationString->React.string
-                              </Text>
-                            </Row>
+                            {mapTitleDuration->Array.length > eventsToShow
+                               ? <TouchableOpacity
+                                   onPress={_ =>
+                                     setEventsToShow(eventsToShow =>
+                                       eventsToShow + numberOfEventsToShow
+                                     )
+                                   }>
+                                   <SpacedView vertical=XS horizontal=S>
+                                     <Text style=themeStyles##textBlue>
+                                       "Show More"->React.string
+                                     </Text>
+                                   </SpacedView>
+                                 </TouchableOpacity>
+                               : React.null}
+                            <Spacer />
+                            {eventsToShow > numberOfEventsToShow
+                               ? <TouchableOpacity
+                                   onPress={_ =>
+                                     setEventsToShow(eventsToShow =>
+                                       eventsToShow - numberOfEventsToShow
+                                     )
+                                   }>
+                                   <SpacedView vertical=XS horizontal=S>
+                                     <Text style=themeStyles##textBlue>
+                                       "Show Less"->React.string
+                                     </Text>
+                                   </SpacedView>
+                                 </TouchableOpacity>
+                               : React.null}
                           </View>
-                          <Spacer size=XS />
-                          <SVGchevronright
-                            width={14.->ReactFromSvg.Size.dp}
-                            height={14.->ReactFromSvg.Size.dp}
-                            fill={Predefined.Colors.Ios.light.gray4}
+                          <Separator
+                            style=themeStyles##separatorOnBackground
                           />
-                          <Spacer size=S />
-                        </SpacedView>
-                        <Separator style=themeStyles##separatorOnBackground />
-                      </View>
-                    </View>
-                  </TouchableOpacity>;
-                })
-              ->React.array}
-             {
-               let showMore = mapTitleDuration->Array.length > eventsToShow;
-               let showLess = eventsToShow > numberOfEventsToShow;
-               showMore || showLess
-                 ? <Row>
-                     <Spacer size=L />
-                     <View
-                       style=Style.(
-                         list([
-                           Predefined.styles##rowSpaceBetween,
-                           Predefined.styles##flexGrow,
-                         ])
-                       )>
-                       {mapTitleDuration->Array.length > eventsToShow
-                          ? <TouchableOpacity
-                              onPress={_ =>
-                                setEventsToShow(eventsToShow =>
-                                  eventsToShow + numberOfEventsToShow
-                                )
-                              }>
-                              <SpacedView vertical=XS horizontal=S>
-                                <Text style=themeStyles##textBlue>
-                                  "Show More"->React.string
-                                </Text>
-                              </SpacedView>
-                            </TouchableOpacity>
-                          : React.null}
-                       <Spacer />
-                       {eventsToShow > numberOfEventsToShow
-                          ? <TouchableOpacity
-                              onPress={_ =>
-                                setEventsToShow(eventsToShow =>
-                                  eventsToShow - numberOfEventsToShow
-                                )
-                              }>
-                              <SpacedView vertical=XS horizontal=S>
-                                <Text style=themeStyles##textBlue>
-                                  "Show Less"->React.string
-                                </Text>
-                              </SpacedView>
-                            </TouchableOpacity>
-                          : React.null}
-                     </View>
-                     <Separator style=themeStyles##separatorOnBackground />
-                   </Row>
-                 : React.null;
-             }
+                        </Row>
+                      : React.null;
+                  }
+                </>
+              }}
              <Separator style=themeStyles##separatorOnBackground />
            </>
          )
