@@ -182,10 +182,10 @@ let useCalendars = updater => {
   value;
 };
 
-let useEvents = (startDate, endDate) => {
+let useEvents = (startDate, endDate, updatedAt) => {
   let (events, setEvents) = React.useState(() => None);
 
-  React.useEffect3(
+  React.useEffect4(
     () => {
       ReactNativeCalendarEvents.fetchAllEvents(
         startDate->Js.Date.toISOString,
@@ -203,7 +203,7 @@ let useEvents = (startDate, endDate) => {
       ->ignore;
       None;
     },
-    (startDate, endDate, setEvents),
+    (startDate, endDate, setEvents, updatedAt),
   );
 
   events;

@@ -30,7 +30,7 @@ external useCallback6:
   "useCallback";
 
 [@react.component]
-let make = (~onFiltersPress, ~onActivityPress) => {
+let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
   let (settings, setSettings) = React.useContext(AppSettings.context);
   let themeStyles = Theme.useStyles();
   let themeColors = Theme.useColors();
@@ -38,6 +38,17 @@ let make = (~onFiltersPress, ~onActivityPress) => {
   let styleWidth = Style.(style(~width=windowDimensions##width->dp, ()));
 
   let updatedAt = React.useRef(Date.now());
+  React.useEffect1(
+    () => {
+      if (refreshing) {
+        updatedAt->React.Ref.setCurrent(Date.now());
+        onRefreshDone();
+      };
+      None;
+    },
+    [|refreshing|],
+  );
+
   let today = React.useRef(Date.now());
   let todayDates =
     React.useRef(
@@ -74,7 +85,8 @@ let make = (~onFiltersPress, ~onActivityPress) => {
 
   let endDate = supposedEndDate->Date.min(today->React.Ref.current);
 
-  let events = Calendars.useEvents(startDate, endDate);
+  let events =
+    Calendars.useEvents(startDate, endDate, updatedAt->React.Ref.current);
   let mapTitleDuration =
     events->Option.map(es =>
       es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration
@@ -258,19 +270,24 @@ let make = (~onFiltersPress, ~onActivityPress) => {
       onViewableItemsChanged={onViewableItemsChanged->React.Ref.current}
     />
     <Separator style=themeStyles##separatorOnBackground />
-    <SpacedView vertical=XXS horizontal=S>
+    <SpacedView vertical=XXS horizontal=S style=Predefined.styles##row>
       <Text
         style=Style.(
           list([styles##smallText, themeStyles##textLightOnBackgroundDark])
         )>
         {(
            "Updated "
-           ++ updatedAt
-              ->React.Ref.current
-              ->DateFns.formatRelative(today->React.Ref.current)
+           ++ DateFns.formatRelative(
+                today->React.Ref.current,
+                updatedAt->React.Ref.current,
+              )
          )
          ->React.string}
       </Text>
+      <Spacer size=XS />
+      {!refreshing
+         ? React.null
+         : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
     </SpacedView>
     <Spacer />
     <TopActivities mapTitleDuration onFiltersPress onActivityPress />

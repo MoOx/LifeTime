@@ -61,6 +61,20 @@ let make = (~navigation, ~route as _) => {
     [||],
   );
 
+  let (refreshing, setRefreshing) = React.useState(() => false);
+
+  let onRefresh =
+    React.useCallback2(
+      () => setRefreshing(_ => true),
+      (refreshing, setRefreshing),
+    );
+
+  let onRefreshDone =
+    React.useCallback2(
+      () => setRefreshing(_ => false),
+      (refreshing, setRefreshing),
+    );
+
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
     <StatusBar barStyle={theme->Theme.themedStatusBarStyle(`darkContent)} />
@@ -85,7 +99,8 @@ let make = (~navigation, ~route as _) => {
           |],
           eventOptions(~useNativeDriver=true, ()),
         )
-      )>
+      )
+      refreshControl={<RefreshControl refreshing onRefresh />}>
       <StickyHeader
         scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
         scrollOffsetY=80.
@@ -98,6 +113,8 @@ let make = (~navigation, ~route as _) => {
       <ReactNativeSafeAreaContext.SafeAreaView
         style=Predefined.styles##flexGrow>
         <Home
+          refreshing
+          onRefreshDone
           onFiltersPress={() =>
             navigation->Navigators.RootStack.Navigation.navigate(
               "FiltersModalScreen",
