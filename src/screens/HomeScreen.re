@@ -5,6 +5,7 @@ open ReactMultiversal;
 let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
+  let safeAreaInsets = ReactNativeSafeAreaContext.useSafeArea();
   // let themeColors = Theme.useColors();
   let backgroundElement =
     <>
@@ -79,10 +80,20 @@ let make = (~navigation, ~route as _) => {
   <>
     <StatusBar barStyle={theme->Theme.themedStatusBarStyle(`darkContent)} />
     <Animated.ScrollView
-      style={Style.list([
-        Predefined.styles##flexGrow,
-        themeStyles##backgroundDark,
-      ])}
+      style=Style.(
+        list([
+          Predefined.styles##flexGrow,
+          themeStyles##backgroundDark,
+          viewStyle(
+            ~marginTop=safeAreaInsets##top->dp,
+            ~marginBottom=safeAreaInsets##bottom->dp,
+            ~marginLeft=safeAreaInsets##left->dp,
+            ~marginRight=safeAreaInsets##right->dp,
+            ()
+          ),
+        ])
+      )
+      refreshControl={<RefreshControl refreshing onRefresh />}
       showsHorizontalScrollIndicator=false
       showsVerticalScrollIndicator=false
       scrollEventThrottle=16
@@ -99,8 +110,7 @@ let make = (~navigation, ~route as _) => {
           |],
           eventOptions(~useNativeDriver=true, ()),
         )
-      )
-      refreshControl={<RefreshControl refreshing onRefresh />}>
+      )>
       <StickyHeader
         scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
         scrollOffsetY=80.
@@ -110,24 +120,21 @@ let make = (~navigation, ~route as _) => {
         textStyle=themeStyles##textOnBackground
         title=Home.title
       />
-      <ReactNativeSafeAreaContext.SafeAreaView
-        style=Predefined.styles##flexGrow>
-        <Home
-          refreshing
-          onRefreshDone
-          onFiltersPress={() =>
-            navigation->Navigators.RootStack.Navigation.navigate(
-              "FiltersModalScreen",
-            )
-          }
-          onActivityPress={activity =>
-            navigation->Navigators.MainStack.Navigation.navigateWithParams(
-              "ActivityOptionsScreen",
-              {"currentActivity": Some(activity)},
-            )
-          }
-        />
-      </ReactNativeSafeAreaContext.SafeAreaView>
+      <Home
+        refreshing
+        onRefreshDone
+        onFiltersPress={() =>
+          navigation->Navigators.RootStack.Navigation.navigate(
+            "FiltersModalScreen",
+          )
+        }
+        onActivityPress={activity =>
+          navigation->Navigators.MainStack.Navigation.navigateWithParams(
+            "ActivityOptionsScreen",
+            {"currentActivity": Some(activity)},
+          )
+        }
+      />
     </Animated.ScrollView>
   </>;
 };
