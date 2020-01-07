@@ -79,62 +79,55 @@ let make = (~navigation, ~route as _) => {
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
     <StatusBar barStyle={theme->Theme.themedStatusBarStyle(`darkContent)} />
-    <Animated.ScrollView
-      style=Style.(
-        list([
-          Predefined.styles##flexGrow,
-          themeStyles##backgroundDark,
-          viewStyle(
-            ~marginTop=safeAreaInsets##top->dp,
-            ~marginBottom=safeAreaInsets##bottom->dp,
-            ~marginLeft=safeAreaInsets##left->dp,
-            ~marginRight=safeAreaInsets##right->dp,
-            ()
-          ),
-        ])
-      )
-      refreshControl={<RefreshControl refreshing onRefresh />}
-      showsHorizontalScrollIndicator=false
-      showsVerticalScrollIndicator=false
-      scrollEventThrottle=16
-      onScroll=Animated.(
-        event1(
-          [|
-            {
-              "nativeEvent": {
-                "contentOffset": {
-                  y: scrollYAnimatedValue->React.Ref.current,
+    <StickyHeader
+      scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
+      animateTranslateY=false
+      scrollOffsetY=80.
+      safeArea=true
+      animateBackgroundOpacity=`yes
+      backgroundElement
+      textStyle=themeStyles##textOnBackground
+      title=Home.title
+    />
+    <ReactNativeSafeAreaContext.SafeAreaView>
+      <Animated.ScrollView
+        style=Style.(
+          list([Predefined.styles##flexGrow, themeStyles##backgroundDark])
+        )
+        refreshControl={<RefreshControl refreshing onRefresh />}
+        showsHorizontalScrollIndicator=false
+        showsVerticalScrollIndicator=false
+        scrollEventThrottle=16
+        onScroll=Animated.(
+          event1(
+            [|
+              {
+                "nativeEvent": {
+                  "contentOffset": {
+                    y: scrollYAnimatedValue->React.Ref.current,
+                  },
                 },
               },
-            },
-          |],
-          eventOptions(~useNativeDriver=true, ()),
-        )
-      )>
-      <StickyHeader
-        scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
-        scrollOffsetY=80.
-        safeArea=true
-        animateBackgroundOpacity=`yes
-        backgroundElement
-        textStyle=themeStyles##textOnBackground
-        title=Home.title
-      />
-      <Home
-        refreshing
-        onRefreshDone
-        onFiltersPress={() =>
-          navigation->Navigators.RootStack.Navigation.navigate(
-            "FiltersModalScreen",
+            |],
+            eventOptions(~useNativeDriver=true, ()),
           )
-        }
-        onActivityPress={activity =>
-          navigation->Navigators.MainStack.Navigation.navigateWithParams(
-            "ActivityOptionsScreen",
-            {"currentActivity": Some(activity)},
-          )
-        }
-      />
-    </Animated.ScrollView>
+        )>
+        <Home
+          refreshing
+          onRefreshDone
+          onFiltersPress={() =>
+            navigation->Navigators.RootStack.Navigation.navigate(
+              "FiltersModalScreen",
+            )
+          }
+          onActivityPress={activity =>
+            navigation->Navigators.MainStack.Navigation.navigateWithParams(
+              "ActivityOptionsScreen",
+              {"currentActivity": Some(activity)},
+            )
+          }
+        />
+      </Animated.ScrollView>
+    </ReactNativeSafeAreaContext.SafeAreaView>
   </>;
 };
