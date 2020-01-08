@@ -38,17 +38,7 @@ module StatsStackScreen = {
               Style.(
                 viewStyle(~paddingHorizontal=(Spacer.space *. 3.)->dp, ())
               ),
-            ~headerStyle=
-              Style.(
-                list([
-                  themeStyle##background,
-                  viewStyle(
-                    ~borderBottomColor=themeColors.gray4,
-                    ~shadowColor=themeColors.gray4,
-                    (),
-                  ),
-                ])
-              ),
+            ~headerStyle=themeStyle##stackHeader,
             ~headerTitleStyle=themeStyle##textOnBackground,
             ~headerTintColor=themeColors.blue,
             (),
@@ -56,6 +46,32 @@ module StatsStackScreen = {
         }
       />
     </StatsStack.Navigator>;
+  };
+};
+
+module SettingsStackScreen = {
+  open Navigators;
+
+  [@react.component]
+  let make = (~navigation as _) => {
+    let themeStyle = Theme.useStyles();
+    let themeColors = Theme.useColors();
+    <SettingsStack.Navigator
+      screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
+      <SettingsStack.Screen
+        name="SettingsScreen"
+        component=SettingsScreen.make
+        options={_ =>
+          SettingsStack.options(
+            ~title="Settings",
+            ~headerStyle=themeStyle##stackHeader,
+            ~headerTitleStyle=themeStyle##textOnBackground,
+            ~headerTintColor=themeColors.blue,
+            (),
+          )
+        }
+      />
+    </SettingsStack.Navigator>;
   };
 };
 
@@ -88,7 +104,24 @@ module TabsScreen = {
             ~title="Summary",
             ~tabBarIcon=
               tabBarIconProps =>
-                <SVGheart
+                <SVGtimeline
+                  width={tabBarIconProps##size->ReactFromSvg.Size.dp}
+                  height={tabBarIconProps##size->ReactFromSvg.Size.dp}
+                  fill=tabBarIconProps##color
+                />,
+            (),
+          )
+        }
+      />
+      <Tabs.Screen
+        name="SettingsStack"
+        component=SettingsStackScreen.make
+        options={props =>
+          Tabs.options(
+            ~title="Settings",
+            ~tabBarIcon=
+              tabBarIconProps =>
+                <SVGsettings
                   width={tabBarIconProps##size->ReactFromSvg.Size.dp}
                   height={tabBarIconProps##size->ReactFromSvg.Size.dp}
                   fill=tabBarIconProps##color
@@ -142,7 +175,6 @@ let app = () => {
         <RootNavigator />
       </Native.NavigationNativeContainer>
       <Bootsplash />
-      {Global.__DEV__ ? <Dev /> : React.null}
     </AppSettings.ContextProvider>
   </ReactNativeDarkMode.DarkModeProvider>;
 };

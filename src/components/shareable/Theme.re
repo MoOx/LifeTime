@@ -104,6 +104,13 @@ let themeStyles =
           "textOnMain": textStyle(~color=Colors.light.textOnMain, ()),
           "textButton":
             textStyle(~color=Predefined.Colors.Ios.light.blue, ()),
+          "stackHeader":
+            viewStyle(
+              ~backgroundColor=Colors.light.background,
+              ~borderBottomColor=Predefined.Colors.Ios.light.gray4,
+              ~shadowColor=Predefined.Colors.Ios.light.gray4,
+              (),
+            ),
         }),
       dark:
         StyleSheet.create({
@@ -144,6 +151,13 @@ let themeStyles =
           "textMain": textStyle(~color=Colors.dark.main, ()),
           "textOnMain": textStyle(~color=Colors.dark.textOnMain, ()),
           "textButton": textStyle(~color=Predefined.Colors.Ios.dark.blue, ()),
+          "stackHeader":
+            viewStyle(
+              ~backgroundColor=Colors.dark.background,
+              ~borderBottomColor=Predefined.Colors.Ios.dark.gray4,
+              ~shadowColor=Predefined.Colors.Ios.dark.gray4,
+              (),
+            ),
         }),
     }
   );

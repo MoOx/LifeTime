@@ -122,7 +122,7 @@ let make = (~activity, ~onIgnoreActivity) => {
       </SpacedView>
       <Separator style=themeStyles##separatorOnBackground />
     </TouchableOpacity>
-    <SpacedView horizontal=XS vertical=XXS>
+    <SpacedView horizontal=S vertical=XXS>
       <Text
         style=Style.(
           list([

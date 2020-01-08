@@ -1,6 +1,11 @@
 open ReactNavigation;
 
-module RootStack =
+module StatsStack =
+  Stack.Make({
+    type params = {. "currentActivity": option(string)};
+  });
+
+module SettingsStack =
   Stack.Make({
     type params = {.};
   });
@@ -10,7 +15,7 @@ module Tabs =
     type params = {.};
   });
 
-module StatsStack =
+module RootStack =
   Stack.Make({
-    type params = {. "currentActivity": option(string)};
+    type params = {.};
   });
