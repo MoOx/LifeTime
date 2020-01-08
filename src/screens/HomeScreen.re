@@ -132,7 +132,7 @@ let make = (~navigation, ~route as _) => {
             )
           }
           onActivityPress={activity =>
-            navigation->Navigators.MainStack.Navigation.navigateWithParams(
+            navigation->Navigators.StatsStack.Navigation.navigateWithParams(
               "ActivityOptionsScreen",
               {"currentActivity": Some(activity)},
             )

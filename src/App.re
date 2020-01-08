@@ -10,25 +10,25 @@ let styles =
     })
   );
 
-module MainStackScreen = {
+module StatsStackScreen = {
   open Navigators;
 
   [@react.component]
-  let make = (~navigation as _, ~route as _) => {
-    let themedStyle = Theme.useStyles();
-    let themedColors = Theme.useColors();
-    <MainStack.Navigator
+  let make = (~navigation as _) => {
+    let themeStyle = Theme.useStyles();
+    let themeColors = Theme.useColors();
+    <StatsStack.Navigator
       screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
-      <MainStack.Screen
+      <StatsStack.Screen
         name="HomeScreen"
         component=HomeScreen.make
-        options={_ => MainStack.options(~headerShown=false, ())}
+        options={_ => StatsStack.options(~headerShown=false, ())}
       />
-      <MainStack.Screen
+      <StatsStack.Screen
         name="ActivityOptionsScreen"
         component=ActivityOptionsScreen.make
         options={screenOptions =>
-          MainStack.options(
+          StatsStack.options(
             ~title=
               screenOptions##route##params
               ->Option.flatMap(params => params##currentActivity)
@@ -41,21 +41,63 @@ module MainStackScreen = {
             ~headerStyle=
               Style.(
                 list([
-                  themedStyle##background,
+                  themeStyle##background,
                   viewStyle(
-                    ~borderBottomColor=themedColors.gray4,
-                    ~shadowColor=themedColors.gray4,
+                    ~borderBottomColor=themeColors.gray4,
+                    ~shadowColor=themeColors.gray4,
                     (),
                   ),
                 ])
               ),
-            ~headerTitleStyle=themedStyle##textOnBackground,
-            ~headerTintColor=themedColors.blue,
+            ~headerTitleStyle=themeStyle##textOnBackground,
+            ~headerTintColor=themeColors.blue,
             (),
           )
         }
       />
-    </MainStack.Navigator>;
+    </StatsStack.Navigator>;
+  };
+};
+
+module TabsScreen = {
+  open Navigators;
+
+  [@react.component]
+  let make = (~navigation as _, ~route as _) => {
+    let themeStyle = Theme.useStyles();
+    let themeColors = Theme.useColors();
+    <Tabs.Navigator
+      initialRouteName="StatsStack"
+      tabBarOptions={Tabs.bottomTabBarOptions(
+        ~activeTintColor=themeColors.blue,
+        ~inactiveTintColor=themeColors.gray,
+        ~style=
+          Style.(
+            list([
+              themeStyle##background,
+              viewStyle(~borderTopColor=themeColors.gray4, ()),
+            ])
+          ),
+        (),
+      )}>
+      <Tabs.Screen
+        name="StatsStack"
+        component=StatsStackScreen.make
+        options={props =>
+          Tabs.options(
+            ~title="Summary",
+            ~tabBarIcon=
+              tabBarIconProps =>
+                <SVGheart
+                  width={tabBarIconProps##size->ReactFromSvg.Size.dp}
+                  height={tabBarIconProps##size->ReactFromSvg.Size.dp}
+                  fill=tabBarIconProps##color
+                />,
+            (),
+          )
+        }
+      />
+    </Tabs.Navigator>;
   };
 };
 
@@ -65,14 +107,14 @@ module RootNavigator = {
   [@react.component]
   let make = () => {
     <RootStack.Navigator
-      initialRouteName="MainStack"
+      initialRouteName="Tabs"
       mode=`modal
       headerMode=`none
       screenOptions={_ =>
         RootStack.options(~gestureEnabled=true, ~cardOverlayEnabled=true, ())
         ->Stack.mergeOptions(Stack.TransitionPresets.modalPresentationIOS)
       }>
-      <RootStack.Screen name="MainStack" component=MainStackScreen.make />
+      <RootStack.Screen name="Tabs" component=TabsScreen.make />
       <RootStack.Screen
         name="WelcomeModalScreen"
         component=WelcomeScreen.make

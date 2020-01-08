@@ -5,7 +5,12 @@ module RootStack =
     type params = {.};
   });
 
-module MainStack =
+module Tabs =
+  BottomTabs.Make({
+    type params = {.};
+  });
+
+module StatsStack =
   Stack.Make({
     type params = {. "currentActivity": option(string)};
   });
