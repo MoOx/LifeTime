@@ -6,7 +6,6 @@ let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeArea();
-  // let themeColors = Theme.useColors();
   let backgroundElement =
     <>
       <View
@@ -79,20 +78,32 @@ let make = (~navigation, ~route as _) => {
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
     <StatusBar barStyle={theme->Theme.themedStatusBarStyle(`darkContent)} />
-    <StickyHeader
-      scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
-      animateTranslateY=false
-      scrollOffsetY=80.
-      safeArea=true
-      animateBackgroundOpacity=`yes
-      backgroundElement
-      textStyle=themeStyles##textOnBackground
-      title=Home.title
-    />
-    <ReactNativeSafeAreaContext.SafeAreaView>
+    <View
+      style=Style.(
+        list([Predefined.styles##flexGrow, themeStyles##backgroundDark])
+      )>
+      <StickyHeader
+        scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
+        scrollOffsetY=80.
+        safeArea=true
+        animateTranslateY=false
+        animateBackgroundOpacity=`yes
+        backgroundElement
+        textStyle=themeStyles##textOnBackground
+        title=Home.title
+      />
       <Animated.ScrollView
         style=Style.(
-          list([Predefined.styles##flexGrow, themeStyles##backgroundDark])
+          list([
+            Predefined.styles##flexGrow,
+            viewStyle(
+              ~marginTop=safeAreaInsets##top->dp,
+              // no bottom, handled by bottom tabs
+              ~paddingLeft=safeAreaInsets##left->dp,
+              ~paddingRight=safeAreaInsets##right->dp,
+              (),
+            ),
+          ])
         )
         refreshControl={<RefreshControl refreshing onRefresh />}
         showsHorizontalScrollIndicator=false
@@ -128,6 +139,6 @@ let make = (~navigation, ~route as _) => {
           }
         />
       </Animated.ScrollView>
-    </ReactNativeSafeAreaContext.SafeAreaView>
+    </View>
   </>;
 };

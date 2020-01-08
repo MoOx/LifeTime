@@ -321,6 +321,6 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
         <Separator style=themeStyles##separatorOnBackground />
       </TouchableOpacity>
     </SpacedView>
-    <Spacer size=L />
+    <Spacer />
   </>;
 };
