@@ -2,7 +2,7 @@ open ReactNative;
 open ReactMultiversal;
 
 [@react.component]
-let make = (~navigation as _, ~route as _) => {
+let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeArea();
@@ -21,7 +21,7 @@ let make = (~navigation as _, ~route as _) => {
         animateBackgroundOpacity=`yes
         backgroundElement={<StickyHeaderBackground />}
         textStyle=themeStyles##textOnBackground
-        title=SettingsView.title
+        title=Goals.title
       />
       <Animated.ScrollView
         style=Style.(
@@ -53,7 +53,19 @@ let make = (~navigation as _, ~route as _) => {
             eventOptions(~useNativeDriver=true, ()),
           )
         )>
-        <SettingsView />
+        <Goals
+          // onCreatePress={() =>
+          //   navigation->Navigators.RootStack.Navigation.navigate(
+          //     "FiltersModalScreen",
+          //   )
+          // }
+          // onEditPress={activity =>
+          //   navigation->Navigators.StatsStack.Navigation.navigateWithParams(
+          //     "ActivityOptionsScreen",
+          //     {"currentActivity": Some(activity)},
+          //   )
+          // }
+        />
       </Animated.ScrollView>
     </View>
   </>;

@@ -1,8 +1,5 @@
-open Belt;
 open ReactNative;
 open ReactMultiversal;
-
-Settings.get;
 
 let styles =
   Style.(
@@ -11,13 +8,19 @@ let styles =
     })
   );
 
+let title = "Settings";
+
 [@react.component]
 let make = () => {
   let (settings, setSettings) = React.useContext(AppSettings.context);
   let themeKey = settings##theme->AppSettings.themeStringToTheme;
   let themeStyles = Theme.useStyles();
   let themeColors = Theme.useColors();
-  <SpacedView horizontal=None>
+  <>
+    <SpacedView>
+      <TitlePre> " "->React.string </TitlePre>
+      <Title style=themeStyles##textOnBackground> title->React.string </Title>
+    </SpacedView>
     <Row> <Spacer size=XS /> <BlockHeading text="Theme" /> </Row>
     <Separator style=themeStyles##separatorOnBackground />
     <View style=themeStyles##background>
@@ -231,5 +234,5 @@ let make = () => {
       </TouchableOpacity>
     </View>
     <Separator style=themeStyles##separatorOnBackground />
-  </SpacedView>;
+  </>;
 };

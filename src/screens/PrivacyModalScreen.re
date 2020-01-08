@@ -6,27 +6,6 @@ let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   let themeColors = Theme.useColors();
-  let backgroundElement =
-    <>
-      <View
-        style=Style.(
-          list([
-            StyleSheet.absoluteFill,
-            themeStyles##background,
-            style(~opacity=0.8, ()),
-          ])
-        )
-      />
-      <BlurView
-        nativeBlurType={
-          switch (theme) {
-          | `dark => `dark
-          | `light => `light
-          }
-        }
-        style=StyleSheet.absoluteFill
-      />
-    </>;
 
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
@@ -58,7 +37,7 @@ let make = (~navigation, ~route as _) => {
         scrollOffsetY=120.
         safeArea=false
         animateBackgroundOpacity=`yes
-        backgroundElement
+        backgroundElement={<StickyHeaderBackground />}
         color={themeColors.blue}
         color2={themeColors.blue}
         textStyle=themeStyles##textOnBackground

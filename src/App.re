@@ -54,22 +54,23 @@ module SettingsStackScreen = {
 
   [@react.component]
   let make = (~navigation as _) => {
-    let themeStyle = Theme.useStyles();
-    let themeColors = Theme.useColors();
+    // let themeStyle = Theme.useStyles();
+    // let themeColors = Theme.useColors();
     <SettingsStack.Navigator
       screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
       <SettingsStack.Screen
         name="SettingsScreen"
         component=SettingsScreen.make
-        options={_ =>
-          SettingsStack.options(
-            ~title="Settings",
-            ~headerStyle=themeStyle##stackHeader,
-            ~headerTitleStyle=themeStyle##textOnBackground,
-            ~headerTintColor=themeColors.blue,
-            (),
-          )
-        }
+        options={_ => StatsStack.options(~headerShown=false, ())}
+        // options={_ =>
+        //   SettingsStack.options(
+        //     ~title="Settings",
+        //     ~headerStyle=themeStyle##stackHeader,
+        //     ~headerTitleStyle=themeStyle##textOnBackground,
+        //     ~headerTintColor=themeColors.blue,
+        //     (),
+        //   )
+        // }
       />
     </SettingsStack.Navigator>;
   };

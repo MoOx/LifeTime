@@ -6,27 +6,7 @@ let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeArea();
-  let backgroundElement =
-    <>
-      <View
-        style=Style.(
-          list([
-            StyleSheet.absoluteFill,
-            themeStyles##background,
-            style(~opacity=0.8, ()),
-          ])
-        )
-      />
-      <BlurView
-        nativeBlurType={
-          switch (theme) {
-          | `dark => `dark
-          | `light => `light
-          }
-        }
-        style=StyleSheet.absoluteFill
-      />
-    </>;
+
   React.useEffect1(
     () => {
       open ReactNativePermissions;
@@ -88,7 +68,7 @@ let make = (~navigation, ~route as _) => {
         safeArea=true
         animateTranslateY=false
         animateBackgroundOpacity=`yes
-        backgroundElement
+        backgroundElement={<StickyHeaderBackground />}
         textStyle=themeStyles##textOnBackground
         title=Home.title
       />
