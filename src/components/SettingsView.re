@@ -1,3 +1,4 @@
+open Belt;
 open ReactNative;
 open ReactMultiversal;
 
@@ -16,6 +17,25 @@ let make = () => {
   let themeKey = settings##theme->AppSettings.themeStringToTheme;
   let themeStyles = Theme.useStyles();
   let themeColors = Theme.useColors();
+
+  let handleImport =
+    React.useCallback1(
+      () =>
+        Clipboard.getString()
+        ->FutureJs.fromPromise(error => {
+            // @todo ?
+            Js.log2("LifeTime: import: ", error);
+            error;
+          })
+        ->Future.tapOk(res =>
+            setSettings(_ =>
+              res->Js.Json.parseExn->AppSettings.decodeJsonSettings
+            )
+          )
+        ->ignore,
+      [|setSettings|],
+    );
+
   <>
     <SpacedView>
       <TitlePre> " "->React.string </TitlePre>
@@ -222,7 +242,7 @@ let make = () => {
                 styles##text,
                 themeStyles##textOnBackground,
               ])}>
-              "System Settings"->React.string
+              "App System Settings"->React.string
             </Text>
             <SVGchevronright
               width={14.->ReactFromSvg.Size.dp}
@@ -234,5 +254,127 @@ let make = () => {
       </TouchableOpacity>
     </View>
     <Separator style=themeStyles##separatorOnBackground />
+    <Spacer size=XXL />
+    <Row> <Spacer size=XS /> <BlockHeading text="Danger Zone" /> </Row>
+    <Separator style=themeStyles##separatorOnBackground />
+    <View style=themeStyles##background>
+      <TouchableOpacity
+        onPress={_ => {
+          Clipboard.setString(
+            settings
+            ->Js.Json.stringifyAny
+            ->Option.getWithDefault("LifeTime export: error"),
+          );
+          Alert.alert(
+            ~title="Export Finished",
+            ~message=
+              "Data are in you clipboard. Be sure to paste that in a safe place.",
+            ~buttons=[|Alert.button(~text="Ok", ~style=`default, ())|],
+            (),
+          );
+        }}>
+        <View style=Predefined.styles##rowCenter>
+          <Spacer size=S />
+          <SpacedView vertical=XS horizontal=None>
+            <SVGexport
+              width={28.->ReactFromSvg.Size.dp}
+              height={28.->ReactFromSvg.Size.dp}
+              fill={themeColors.blue}
+            />
+          </SpacedView>
+          <Spacer size=XS />
+          <View style=Predefined.styles##flexGrow>
+            <SpacedView vertical=XS horizontal=None>
+              <View style=Predefined.styles##row>
+                <View
+                  style=Style.(
+                    list([
+                      Predefined.styles##flexGrow,
+                      viewStyle(~justifyContent=`center, ()),
+                    ])
+                  )>
+                  <Text
+                    style={Style.list([
+                      styles##text,
+                      themeStyles##textOnBackground,
+                    ])}>
+                    "Export Backup"->React.string
+                  </Text>
+                </View>
+                <Spacer size=S />
+              </View>
+            </SpacedView>
+            <Separator style=themeStyles##separatorOnBackground />
+          </View>
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={_ =>
+          Alert.alert(
+            ~title="Import Data from Clipboard?",
+            ~message=
+              "This is a destructive command, all settings will be overwritten by the content of the clipboard (assuming that's a valid Export Backup).",
+            ~buttons=[|
+              Alert.button(~text="Cancel", ~style=`default, ()),
+              Alert.button(
+                ~text="Import",
+                ~style=`destructive,
+                ~onPress=() => handleImport(),
+                (),
+              ),
+            |],
+            (),
+          )
+        }>
+        <View style=Predefined.styles##rowCenter>
+          <Spacer size=S />
+          <SpacedView vertical=XS horizontal=None>
+            <SVGimport
+              width={28.->ReactFromSvg.Size.dp}
+              height={28.->ReactFromSvg.Size.dp}
+              fill={themeColors.blue}
+            />
+          </SpacedView>
+          <Spacer size=XS />
+          <View style=Predefined.styles##flexGrow>
+            <SpacedView vertical=XS horizontal=None>
+              <View style=Predefined.styles##row>
+                <View
+                  style=Style.(
+                    list([
+                      Predefined.styles##flexGrow,
+                      viewStyle(~justifyContent=`center, ()),
+                    ])
+                  )>
+                  <Text
+                    style={Style.list([
+                      styles##text,
+                      themeStyles##textOnBackground,
+                    ])}>
+                    "Import Backup"->React.string
+                  </Text>
+                </View>
+                <Spacer size=S />
+              </View>
+            </SpacedView>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </View>
+    // <Separator style=themeStyles##separatorOnBackground />
+    <Separator style=themeStyles##separatorOnBackground />
+    <SpacedView horizontal=S vertical=XXS>
+      <Text
+        style=Style.(
+          list([
+            themeStyles##textLightOnBackgroundDark,
+            textStyle(~fontSize=12., ()),
+          ])
+        )>
+        "Export is placing data into your clipboard. Import assume that you have your export in the clipboard."
+        ->React.string
+      </Text>
+    </SpacedView>
+    <Spacer />
   </>;
 };
