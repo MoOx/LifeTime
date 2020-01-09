@@ -47,7 +47,7 @@ let make = (~activity, ~onIgnoreActivity) => {
              <View style=Predefined.styles##rowCenter>
                <Spacer size=S />
                <SpacedView vertical=XS horizontal=None>
-                 <Calendars.Categories.Icon name=iconName fill=color />
+                 <NamedIcon name=iconName fill=color />
                </SpacedView>
                <Spacer size=XS />
                <View style=Predefined.styles##flexGrow>

@@ -111,7 +111,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                          <View style=Predefined.styles##rowCenter>
                            <Spacer size=S />
                            <SpacedView vertical=XS horizontal=None>
-                             <Calendars.Categories.Icon
+                             <NamedIcon
                                name=iconName
                                fill=color
                              />
