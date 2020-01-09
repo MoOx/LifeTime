@@ -3,13 +3,12 @@ open ReactMultiversal;
 
 [@react.component]
 let make = (~navigation, ~route as _) => {
-  let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   let themeColors = Theme.useColors();
 
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
-    <StatusBar barStyle={theme->Theme.themedStatusBarStyle(`lightContent)} />
+    <StatusBar barStyle=`lightContent />
     <Animated.ScrollView
       style={Style.list([
         Predefined.styles##flexGrow,
