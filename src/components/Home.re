@@ -37,16 +37,36 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
   let windowDimensions = Dimensions.useWindowDimensions();
   let styleWidth = Style.(style(~width=windowDimensions##width->dp, ()));
 
-  let updatedAt = React.useRef(Date.now());
+  let (updatedAt, setUpdatedAt) = React.useState(_ => Date.now());
   React.useEffect1(
     () => {
       if (refreshing) {
-        updatedAt->React.Ref.setCurrent(Date.now());
+        setUpdatedAt(_ => Date.now());
         onRefreshDone();
       };
       None;
     },
     [|refreshing|],
+  );
+
+  React.useEffect1(
+    () => {
+      let handleAppStateChange = newAppState =>
+        if (newAppState == AppState.active) {
+          setUpdatedAt(_ => Date.now());
+        };
+
+      AppState.addEventListener(
+        `change(state => handleAppStateChange(state)),
+      );
+      Some(
+        () =>
+          AppState.removeEventListener(
+            `change(state => handleAppStateChange(state)),
+          ),
+      );
+    },
+    [|setUpdatedAt|],
   );
 
   let today = React.useRef(Date.now());
@@ -85,8 +105,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
 
   let endDate = supposedEndDate->Date.min(today->React.Ref.current);
 
-  let events =
-    Calendars.useEvents(startDate, endDate, updatedAt->React.Ref.current);
+  let events = Calendars.useEvents(startDate, endDate, updatedAt);
   let mapTitleDuration =
     events->Option.map(es =>
       es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration
@@ -277,10 +296,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
         )>
         {(
            "Updated "
-           ++ DateFns.formatRelative(
-                today->React.Ref.current,
-                updatedAt->React.Ref.current,
-              )
+           ++ DateFns.formatRelative(today->React.Ref.current, updatedAt)
          )
          ->React.string}
       </Text>
