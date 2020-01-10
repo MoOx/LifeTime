@@ -169,6 +169,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
               supposedEndDate
             />
           </SpacedView>
+          <Spacer size=S />
           <View style=Predefined.styles##row>
             <Spacer size=S />
             <View style=Predefined.styles##flexGrow>
@@ -191,16 +192,6 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
                        )
                      ->Option.getWithDefault(0.)
                      ->Date.minToString
-                     ->React.string}
-                  </Text>
-                  <Text
-                    style=Style.(
-                      list([
-                        themeStyles##textLightOnBackground,
-                        styles##smallText,
-                      ])
-                    )>
-                    {(" / " ++ (60. *. 24. *. 7.)->Date.minToString)
                      ->React.string}
                   </Text>
                 </Text>

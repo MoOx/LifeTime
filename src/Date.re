@@ -84,23 +84,38 @@ let dateString = date => {
 let durationInMs = (date1, date2) =>
   (date1->valueOf -. date2->valueOf)->abs_float;
 
-let msToMin = ms => ms /. 1000. /. 60.;
+let msToS = ms => ms /. 1000.;
+let msToMin = ms => ms->msToS /. 60.;
 let msToHours = ms => ms->msToMin /. 60.;
 let msToDays = ms => ms->msToHours /. 24.;
+
+let daysToHours = d => d *. 24.;
+let hoursToDays = h => h /. 24.;
+
 let minToHours = min => min /. 60.;
+let hoursToMin = h => h *. 60.;
+
+let daysToMin = d => d->daysToHours->hoursToMin;
+let minToDays = min => min->minToHours->hoursToDays;
 
 let minToString = min => {
-  let durationInH = min->minToHours;
-  let durationH = durationInH->int_of_float;
-  let durationM = (durationInH -. durationH->float_of_int) *. 60.;
+  let durationD = min->minToDays->int_of_float;
+  let durationH =
+    (min->minToHours -. durationD->float_of_int->daysToHours)->int_of_float;
+  let durationM =
+    (
+      min
+      -. durationD->float_of_int->daysToMin
+      -. durationH->float_of_int->hoursToMin
+    )
+    ->int_of_float;
+  let hasD = durationD > 0;
   let hasH = durationH > 0;
-  let hasM = durationM >= 1.;
+  let hasM = durationM > 0;
 
-  (hasH ? durationH->string_of_int ++ "h" ++ " " : "")
-  ++ (
-    hasM
-      ? durationM->Js.Float.toFixed ++ "m" : hasH ? "" : hasH ? "" : "0" ++ "m"
-  );
+  (hasD ? durationD->string_of_int ++ "d" ++ " " : "")
+  ++ (hasH ? durationH->string_of_int ++ "h" ++ " " : "")
+  ++ (hasM ? durationM->string_of_int ++ "m" : hasD || hasH ? "" : "0" ++ "m");
 };
 
 let copy = date => date->valueOf->fromFloat;
