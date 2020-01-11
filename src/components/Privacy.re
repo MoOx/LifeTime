@@ -2,12 +2,11 @@ open ReactNative;
 open ReactMultiversal;
 
 let styles =
-  Style.(
-    StyleSheet.create({
-      "container": viewStyle(~flexGrow=1., ()),
-      "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
-    })
-  );
+  Style.{
+    "container": viewStyle(~flexGrow=1., ()),
+    "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
+  }
+  ->StyleSheet.create;
 
 let title = "LifeTime & Privacy";
 

@@ -194,7 +194,7 @@ let text =
 
 let themeStyles = {
   light:
-    StyleSheet.create({
+    {
       "backgroundMain": viewStyle(~backgroundColor=Colors.light.main, ()),
       "background": viewStyle(~backgroundColor=Colors.light.background, ()),
       "separatorOnBackground":
@@ -239,9 +239,10 @@ let themeStyles = {
           ~shadowColor=Predefined.Colors.Ios.light.gray4,
           (),
         ),
-    }),
+    }
+    ->StyleSheet.create,
   dark:
-    StyleSheet.create({
+    {
       "backgroundMain": viewStyle(~backgroundColor=Colors.dark.main, ()),
       "background": viewStyle(~backgroundColor=Colors.dark.background, ()),
       "separatorOnBackground":
@@ -286,7 +287,8 @@ let themeStyles = {
           ~shadowColor=Predefined.Colors.Ios.dark.gray4,
           (),
         ),
-    }),
+    }
+    ->StyleSheet.create,
 };
 
 let useTheme = (): t => {

@@ -3,14 +3,13 @@ open ReactNative;
 open ReactMultiversal;
 
 let styles =
-  Style.(
-    StyleSheet.create({
-      "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
-      "durationText":
-        textStyle(~fontSize=12., ~lineHeight=12., ~fontWeight=`_700, ()),
-      "dash": style(~alignSelf=`stretch, ()),
-    })
-  );
+  Style.{
+    "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
+    "durationText":
+      textStyle(~fontSize=12., ~lineHeight=12., ~fontWeight=`_700, ()),
+    "dash": style(~alignSelf=`stretch, ()),
+  }
+  ->StyleSheet.create;
 
 let slices = 4;
 let graphHeight = 140.;

@@ -2,45 +2,43 @@ open ReactNative;
 open ReactMultiversal;
 
 let styles =
-  Style.(
-    StyleSheet.create({
-      "content": viewStyle(~flexGrow=1., ~justifyContent=`center, ()),
-      "pitch":
-        viewStyle(~flexGrow=1., ~flexShrink=1., ~justifyContent=`center, ()),
-      "icon":
-        imageStyle(
-          ~width=76.->dp,
-          ~height=76.->dp,
-          ~borderRadius=16.,
-          ~alignSelf=`flexStart,
-          (),
-        ),
-      "title":
-        textStyle(~fontSize=58., ~lineHeight=58., ~fontWeight=`_100, ()),
-      "appName":
-        textStyle(
-          ~fontSize=68.,
-          ~lineHeight=68.,
-          ~fontWeight=`_800,
-          // ~color=Consts.Colors.color1,
-          (),
-        ),
-      "baseline": textStyle(~fontSize=18., ~lineHeight=18. *. 1.4, ()),
-      "bottom": viewStyle(),
-      "iconCalendar": imageStyle(~width=48.->dp, ~height=48.->dp, ()),
-      "bottomText": viewStyle(~flexShrink=1., ()),
-      "permissions":
-        textStyle(~flexShrink=1., ~fontSize=12., ~lineHeight=12. *. 1.4, ()),
-      "permissionsLink":
-        textStyle(
-          ~flexShrink=1.,
-          ~fontSize=14.,
-          ~lineHeight=14. *. 1.4,
-          ~fontWeight=`_600,
-          (),
-        ),
-    })
-  );
+  Style.{
+    "content": viewStyle(~flexGrow=1., ~justifyContent=`center, ()),
+    "pitch":
+      viewStyle(~flexGrow=1., ~flexShrink=1., ~justifyContent=`center, ()),
+    "icon":
+      imageStyle(
+        ~width=76.->dp,
+        ~height=76.->dp,
+        ~borderRadius=16.,
+        ~alignSelf=`flexStart,
+        (),
+      ),
+    "title": textStyle(~fontSize=58., ~lineHeight=58., ~fontWeight=`_100, ()),
+    "appName":
+      textStyle(
+        ~fontSize=68.,
+        ~lineHeight=68.,
+        ~fontWeight=`_800,
+        // ~color=Consts.Colors.color1,
+        (),
+      ),
+    "baseline": textStyle(~fontSize=18., ~lineHeight=18. *. 1.4, ()),
+    "bottom": viewStyle(),
+    "iconCalendar": imageStyle(~width=48.->dp, ~height=48.->dp, ()),
+    "bottomText": viewStyle(~flexShrink=1., ()),
+    "permissions":
+      textStyle(~flexShrink=1., ~fontSize=12., ~lineHeight=12. *. 1.4, ()),
+    "permissionsLink":
+      textStyle(
+        ~flexShrink=1.,
+        ~fontSize=14.,
+        ~lineHeight=14. *. 1.4,
+        ~fontWeight=`_600,
+        (),
+      ),
+  }
+  ->StyleSheet.create;
 
 let icon = Packager.require("../../public/Icon.png");
 

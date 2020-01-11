@@ -3,16 +3,15 @@ open ReactNative;
 open ReactMultiversal;
 
 let styles =
-  Style.(
-    StyleSheet.create({
-      "container": viewStyle(~flexGrow=1., ()),
-      "options": viewStyle(~flexDirection=`row, ~justifyContent=`flexEnd, ()),
-      "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
-      "infoText": textStyle(~fontSize=12., ~lineHeight=12. *. 1.4, ()),
-      "durationText":
-        textStyle(~fontSize=12., ~lineHeight=12., ~fontWeight=`_700, ()),
-    })
-  );
+  Style.{
+    "container": viewStyle(~flexGrow=1., ()),
+    "options": viewStyle(~flexDirection=`row, ~justifyContent=`flexEnd, ()),
+    "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
+    "infoText": textStyle(~fontSize=12., ~lineHeight=12. *. 1.4, ()),
+    "durationText":
+      textStyle(~fontSize=12., ~lineHeight=12., ~fontWeight=`_700, ()),
+  }
+  ->StyleSheet.create;
 
 let title = "Filters";
 

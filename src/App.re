@@ -4,11 +4,8 @@ open ReactMultiversal;
 open ReactNavigation;
 
 let styles =
-  Style.(
-    StyleSheet.create({
-      "container": viewStyle(~flexGrow=1., ~backgroundColor="#fff", ()),
-    })
-  );
+  Style.{"container": viewStyle(~flexGrow=1., ~backgroundColor="#fff", ())}
+  ->StyleSheet.create;
 
 module StatsStackScreen = {
   open Navigators;
@@ -58,31 +55,30 @@ module GoalsStackScreen = {
     let themeColors = Theme.useColors();
     <GoalsStack.Navigator
       screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
-
-        <GoalsStack.Screen
-          name="GoalsScreen"
-          component=GoalsScreen.make
-          options={_ => GoalsStack.options(~headerShown=false, ())}
-        />
-      </GoalsStack.Navigator>;
-      // <GoalsStack.Screen
-      //   name="GoalMinimumScreen"
-      //   component=GoalMinimumScreen.make
-      //   options={_screenOptions =>
-      //     GoalsStack.options(
-      //       ~title="Add a goal",
-      //       ~headerBackTitle="Back",
-      //       ~headerTitleContainerStyle=
-      //         Style.(
-      //           viewStyle(~paddingHorizontal=(Spacer.space *. 3.)->dp, ())
-      //         ),
-      //       ~headerStyle=themeStyle##stackHeader,
-      //       ~headerTitleStyle=themeStyle##textOnBackground,
-      //       ~headerTintColor=themeColors.blue,
-      //       (),
-      //     )
-      //   }
-      // />
+      <GoalsStack.Screen
+        name="GoalsScreen"
+        component=GoalsScreen.make
+        options={_ => GoalsStack.options(~headerShown=false, ())}
+      />
+    </GoalsStack.Navigator>;
+    // <GoalsStack.Screen
+    //   name="GoalMinimumScreen"
+    //   component=GoalMinimumScreen.make
+    //   options={_screenOptions =>
+    //     GoalsStack.options(
+    //       ~title="Add a goal",
+    //       ~headerBackTitle="Back",
+    //       ~headerTitleContainerStyle=
+    //         Style.(
+    //           viewStyle(~paddingHorizontal=(Spacer.space *. 3.)->dp, ())
+    //         ),
+    //       ~headerStyle=themeStyle##stackHeader,
+    //       ~headerTitleStyle=themeStyle##textOnBackground,
+    //       ~headerTintColor=themeColors.blue,
+    //       (),
+    //     )
+    //   }
+    // />
   };
 };
 

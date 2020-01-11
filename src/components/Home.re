@@ -4,12 +4,11 @@ open ReactMultiversal;
 open ReasonDateFns;
 
 let styles =
-  Style.(
-    StyleSheet.create({
-      "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
-      "smallText": textStyle(~fontSize=12., ~lineHeight=16. *. 1.4, ()),
-    })
-  );
+  Style.{
+    "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
+    "smallText": textStyle(~fontSize=12., ~lineHeight=16. *. 1.4, ()),
+  }
+  ->StyleSheet.create;
 
 let title = "Your LifeTime";
 

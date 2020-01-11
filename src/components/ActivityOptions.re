@@ -3,11 +3,8 @@ open ReactNative;
 open ReactMultiversal;
 
 let styles =
-  Style.(
-    StyleSheet.create({
-      "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
-    })
-  );
+  Style.{"text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ())}
+  ->StyleSheet.create;
 
 [@react.component]
 let make = (~activity, ~onIgnoreActivity) => {

@@ -2,13 +2,12 @@ open ReactNative;
 open ReactMultiversal;
 
 let styles =
-  Style.(
-    StyleSheet.create({
-      "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
-      "mediumText": textStyle(~fontSize=14., ~lineHeight=14. *. 1.4, ()),
-      "smallText": textStyle(~fontSize=12., ~lineHeight=16. *. 1.4, ()),
-    })
-  );
+  Style.{
+    "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
+    "mediumText": textStyle(~fontSize=14., ~lineHeight=14. *. 1.4, ()),
+    "smallText": textStyle(~fontSize=12., ~lineHeight=16. *. 1.4, ()),
+  }
+  ->StyleSheet.create;
 
 let title = "Goals";
 

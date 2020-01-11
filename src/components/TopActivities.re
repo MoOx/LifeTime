@@ -3,13 +3,12 @@ open ReactNative;
 open ReactMultiversal;
 
 let styles =
-  Style.(
-    StyleSheet.create({
-      "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
-      "durationText":
-        textStyle(~fontSize=12., ~lineHeight=12., ~fontWeight=`_700, ()),
-    })
-  );
+  Style.{
+    "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
+    "durationText":
+      textStyle(~fontSize=12., ~lineHeight=12., ~fontWeight=`_700, ()),
+  }
+  ->StyleSheet.create;
 
 let numberOfEventsToShow = 8;
 

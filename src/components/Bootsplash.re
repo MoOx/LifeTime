@@ -1,14 +1,12 @@
 open ReactNative;
 
 let styles =
-  Style.(
-    StyleSheet.create({
-      "bootsplash":
-        viewStyle(~justifyContent=`center, ~alignItems=`center, ()),
-      "background": viewStyle(~width=100.->pct, ~height=100.->pct, ()),
-      "logo": imageStyle(~height=128.->dp, ~width=128.->dp, ()),
-    })
-  );
+  Style.{
+    "bootsplash": viewStyle(~justifyContent=`center, ~alignItems=`center, ()),
+    "background": viewStyle(~width=100.->pct, ~height=100.->pct, ()),
+    "logo": imageStyle(~height=128.->dp, ~width=128.->dp, ()),
+  }
+  ->StyleSheet.create;
 
 let background = Packager.require("../../public/Gradient.png");
 let logo = Packager.require("../../public/Icon-transparent.png");
