@@ -145,7 +145,7 @@ let text =
       textStyle(
         ~fontSize=17.,
         ~lineHeight=22.,
-        // ~letterSpacing=-0.41,
+        ~letterSpacing=-0.41,
         ~fontWeight=fontWeights.regular,
         (),
       ),
