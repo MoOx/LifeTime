@@ -1618,6 +1618,11 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/masked-view/-/masked-view-0.1.5.tgz#25421be6cd943a4b1660b62cfbcd45be8891462c"
   integrity sha512-Lj1DzfCmW0f4HnmHtEuX8Yy2f7cnUA8r5KGGUuDDGtQt1so6QJkKeUmsnLo2zYDtsF8due6hvIL06Vdo5xxuLQ==
 
+"@react-native-community/slider@^2.0.8":
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/@react-native-community/slider/-/slider-2.0.8.tgz#c4a3c342638270e0adc942b51427ec17104a786d"
+  integrity sha512-FZC3wjYzHQiD7jT7ALy3QNccyLj9zQBRiKGBFr/QvrWLkVg5orpIJ53aYFXm3eOkNvUV+wjhoI9uCkh3LCN2+A==
+
 "@react-navigation/bottom-tabs@^5.0.0-alpha.29":
   version "5.0.0-alpha.29"
   resolved "https://registry.yarnpkg.com/@react-navigation/bottom-tabs/-/bottom-tabs-5.0.0-alpha.29.tgz#dce9c4f15ae50567fe96575459cc3a33342fa957"
@@ -1669,6 +1674,11 @@
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/@reason-react-native/safe-area-context/-/safe-area-context-0.6.0.tgz#11174e4cbab13a6032bc25e002d9647b1fec3654"
   integrity sha512-v8Jz86jaBd2AgXt50HZ0Srp9uHGUTRJvDgRrIrRzB11PninmrJ8ai7v8pAEADQhVT31UEWXw1R3hWPq9oVnb9g==
+
+"@reason-react-native/slider@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@reason-react-native/slider/-/slider-2.0.2.tgz#eb407a9d43de3f3662e6419fad2d77b9bdb76e3d"
+  integrity sha512-BzlBSaGZsN2NZuXAuIKoe09MjIQXvpG13G1yNCM9q945Idp1gK7qi/NCPpweWzT3ejGsKj37nodwf9EgDYXXYA==
 
 "@svgr/babel-plugin-add-jsx-attribute@^4.2.0":
   version "4.2.0"
