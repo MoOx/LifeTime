@@ -63,7 +63,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                    "No Events"->React.string
                  </Title>
                  <Spacer />
-                 <Text style=themeStyles##textLightOnBackground>
+                 <Text style=themeStyles##textVeryLightOnBackground>
                    "You should select at least a calendar"->React.string
                  </Text>
                  <Spacer size=XXL />
@@ -86,7 +86,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                       "No Events"->React.string
                     </Title>
                     <Spacer />
-                    <Text style=themeStyles##textLightOnBackground>
+                    <Text style=themeStyles##textVeryLightOnBackground>
                       "That's unexpected. Try filling the blanks!"
                       ->React.string
                     </Text>
@@ -111,10 +111,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                          <View style=Predefined.styles##rowCenter>
                            <Spacer size=S />
                            <SpacedView vertical=XS horizontal=None>
-                             <NamedIcon
-                               name=iconName
-                               fill=color
-                             />
+                             <NamedIcon name=iconName fill=color />
                            </SpacedView>
                            <Spacer size=XS />
                            <View style=Predefined.styles##flexGrow>
@@ -170,7 +167,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                                      style=Style.(
                                        array([|
                                          styles##durationText,
-                                         themeStyles##textLightOnBackground,
+                                         themeStyles##textVeryLightOnBackground,
                                        |])
                                      )>
                                      durationString->React.string

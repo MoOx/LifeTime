@@ -158,7 +158,7 @@ let make =
                  <Text
                    style=Style.(
                      list([
-                       themeStyles##textLightOnBackground,
+                       themeStyles##textVeryLightOnBackground,
                        textStyle(~fontSize=10., ()),
                      ])
                    )>
@@ -240,7 +240,7 @@ let make =
                               ~right=(-20.)->dp,
                               (),
                             ),
-                            themeStyles##textLightOnBackground,
+                            themeStyles##textVeryLightOnBackground,
                             textStyle(~fontSize=10., ~lineHeight=10., ()),
                           ])
                         )>

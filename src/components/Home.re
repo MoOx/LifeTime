@@ -141,7 +141,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
         <View style=styleWidth>
           <Spacer />
           <SpacedView vertical=None>
-            <Text style=themeStyles##textLightOnBackground>
+            <Text style=themeStyles##textVeryLightOnBackground>
               (
                 if (todayFirst == firstDay) {
                   "Daily Average";
