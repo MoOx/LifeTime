@@ -30,6 +30,7 @@ let make = (~navigation, ~route as _) => {
             viewStyle(
               ~marginTop=safeAreaInsets##top->dp,
               // no bottom, handled by bottom tabs
+              // ~marginBottom=safeAreaInsets##bottom->dp,
               ~paddingLeft=safeAreaInsets##left->dp,
               ~paddingRight=safeAreaInsets##right->dp,
               (),
@@ -54,11 +55,11 @@ let make = (~navigation, ~route as _) => {
           )
         )>
         <Goals
-          // onCreatePress={() =>
-          //   navigation->Navigators.RootStack.Navigation.navigate(
-          //     "FiltersModalScreen",
-          //   )
-          // }
+          onNewGoalPress={() =>
+            navigation->Navigators.RootStack.Navigation.navigate(
+              "GoalNewModalScreen",
+            )
+          }
           // onEditPress={activity =>
           //   navigation->Navigators.StatsStack.Navigation.navigateWithParams(
           //     "ActivityOptionsScreen",

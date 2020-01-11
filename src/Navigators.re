@@ -5,6 +5,11 @@ module StatsStack =
     type params = {. "currentActivity": option(string)};
   });
 
+module GoalsStack =
+  Stack.Make({
+    type params = {.};
+  });
+
 module SettingsStack =
   Stack.Make({
     type params = {.};

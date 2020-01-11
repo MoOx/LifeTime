@@ -49,6 +49,43 @@ module StatsStackScreen = {
   };
 };
 
+module GoalsStackScreen = {
+  open Navigators;
+
+  [@react.component]
+  let make = (~navigation as _) => {
+    let themeStyle = Theme.useStyles();
+    let themeColors = Theme.useColors();
+    <GoalsStack.Navigator
+      screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
+
+        <GoalsStack.Screen
+          name="GoalsScreen"
+          component=GoalsScreen.make
+          options={_ => GoalsStack.options(~headerShown=false, ())}
+        />
+      </GoalsStack.Navigator>;
+      // <GoalsStack.Screen
+      //   name="GoalMinimumScreen"
+      //   component=GoalMinimumScreen.make
+      //   options={_screenOptions =>
+      //     GoalsStack.options(
+      //       ~title="Add a goal",
+      //       ~headerBackTitle="Back",
+      //       ~headerTitleContainerStyle=
+      //         Style.(
+      //           viewStyle(~paddingHorizontal=(Spacer.space *. 3.)->dp, ())
+      //         ),
+      //       ~headerStyle=themeStyle##stackHeader,
+      //       ~headerTitleStyle=themeStyle##textOnBackground,
+      //       ~headerTintColor=themeColors.blue,
+      //       (),
+      //     )
+      //   }
+      // />
+  };
+};
+
 module SettingsStackScreen = {
   open Navigators;
 
@@ -100,7 +137,7 @@ module TabsScreen = {
       <Tabs.Screen
         name="StatsStack"
         component=StatsStackScreen.make
-        options={props =>
+        options={_props =>
           Tabs.options(
             ~title="Summary",
             ~tabBarIcon=
@@ -115,9 +152,26 @@ module TabsScreen = {
         }
       />
       <Tabs.Screen
+        name="GoalsStack"
+        component=GoalsStackScreen.make
+        options={_props =>
+          Tabs.options(
+            ~title="Goals",
+            ~tabBarIcon=
+              tabBarIconProps =>
+                <SVGpennant
+                  width={tabBarIconProps##size->ReactFromSvg.Size.dp}
+                  height={tabBarIconProps##size->ReactFromSvg.Size.dp}
+                  fill=tabBarIconProps##color
+                />,
+            (),
+          )
+        }
+      />
+      <Tabs.Screen
         name="SettingsStack"
         component=SettingsStackScreen.make
-        options={props =>
+        options={_props =>
           Tabs.options(
             ~title="Settings",
             ~tabBarIcon=
@@ -162,6 +216,10 @@ module RootNavigator = {
       <RootStack.Screen
         name="FiltersModalScreen"
         component=FiltersModalScreen.make
+      />
+      <RootStack.Screen
+        name="GoalNewModalScreen"
+        component=GoalNewModalScreen.make
       />
     </RootStack.Navigator>;
   };

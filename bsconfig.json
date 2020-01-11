@@ -21,9 +21,10 @@
     "reason-react-navigation",
     "react-multiversal",
     "reason-future",
-    "@reason-react-native/safe-area-context",
     "react-from-svg",
+    "reason-date-fns",
+    "@reason-react-native/safe-area-context",
     "@reason-react-native/async-storage",
-    "reason-date-fns"
+    "@reason-react-native/slider"
   ]
 }
