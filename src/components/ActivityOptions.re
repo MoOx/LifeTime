@@ -122,21 +122,13 @@ let make = (~activity, ~onIgnoreActivity) => {
       </SpacedView>
       <Separator style=themeStyles##separatorOnBackground />
     </TouchableOpacity>
-    <SpacedView horizontal=S vertical=XXS>
-      <Text
-        style=Style.(
-          list([
-            themeStyles##textLightOnBackgroundDark,
-            textStyle(~fontSize=12., ()),
-          ])
-        )>
-        (
-          !isSkipped
-            ? "This will hide similar events from all reports."
-            : "This will put back similar events in all reports."
-        )
-        ->React.string
-      </Text>
-    </SpacedView>
+    <BlockFootnote>
+      (
+        !isSkipped
+          ? "This will hide similar events from all reports."
+          : "This will put back similar events in all reports."
+      )
+      ->React.string
+    </BlockFootnote>
   </SpacedView>;
 };
