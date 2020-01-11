@@ -177,12 +177,24 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
               <SpacedView
                 horizontal=None vertical=S style=Predefined.styles##row>
                 <View style=Predefined.styles##flexGrow>
-                  <Text style=themeStyles##textOnBackground>
-                    "Total Logged Time:"->React.string
+                  <Text
+                    style=Style.(
+                      list([
+                        Theme.text##callout,
+                        themeStyles##textOnBackground,
+                      ])
+                    )>
+                    "Total Logged Time"->React.string
                   </Text>
                 </View>
                 <Text>
-                  <Text style=themeStyles##textLightOnBackgroundDark>
+                  <Text
+                    style=Style.(
+                      list([
+                        Theme.text##callout,
+                        themeStyles##textLightOnBackground,
+                      ])
+                    )>
                     {mapTitleDuration
                      ->Option.map(mapTitleDuration =>
                          mapTitleDuration->Array.reduce(
