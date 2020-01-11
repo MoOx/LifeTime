@@ -169,7 +169,9 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                                          styles##durationText,
                                          themeStyles##textVeryLightOnBackground,
                                        |])
-                                     )>
+                                     )
+                                     numberOfLines=1
+                                     adjustsFontSizeToFit=true>
                                      durationString->React.string
                                    </Text>
                                  </Row>
