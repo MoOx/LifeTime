@@ -113,8 +113,8 @@ let minToString = min => {
   let hasH = durationH > 0;
   let hasM = durationM > 0;
 
-  (hasD ? durationD->string_of_int ++ "d" ++ " " : "")
-  ++ (hasH ? durationH->string_of_int ++ "h" ++ " " : "")
+  (hasD ? durationD->string_of_int ++ "d" ++ (hasH || hasM ? " " : "") : "")
+  ++ (hasH ? durationH->string_of_int ++ "h" ++ (hasM ? " " : "") : "")
   ++ (hasM ? durationM->string_of_int ++ "m" : hasD || hasH ? "" : "0" ++ "m");
 };
 
