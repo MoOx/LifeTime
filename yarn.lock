@@ -10405,9 +10405,9 @@ reason-react-native@^0.61.0:
   resolved "https://registry.yarnpkg.com/reason-react-native/-/reason-react-native-0.61.0.tgz#61579b309305b03c4cc7f44e9b6f2be3603474b4"
   integrity sha512-HBkbeNFpIsyMZw0jj0YutX1RsujRfwhAtcxxN5tK9W8lClUedaUxzi5pIqmf6XsE02/23TOWh9tNXS0ltM8S2A==
 
-"reason-react-navigation@https://github.com/reason-react-native/reason-react-navigation#1ebf874":
+"reason-react-navigation@https://github.com/reason-react-native/reason-react-navigation#ae00fdb":
   version "4.0.0-alpha.0"
-  resolved "https://github.com/reason-react-native/reason-react-navigation#1ebf874051230b335ad124c57e02e6a0c46dc950"
+  resolved "https://github.com/reason-react-native/reason-react-navigation#ae00fdb34a86bfbb45c88bd4951900dd29f0dfa3"
 
 reason-react@^0.7.0:
   version "0.7.0"

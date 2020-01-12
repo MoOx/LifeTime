@@ -12,7 +12,7 @@ let background = Packager.require("../../public/Gradient.png");
 let logo = Packager.require("../../public/Icon-transparent.png");
 
 [@react.component]
-let make = () => {
+let make = (~isReady) => {
   let windowDimensions = Dimensions.useWindowDimensions();
   let (bootSplashIsVisible, setBootSplashIsVisible) =
     React.useState(() => true);
@@ -22,9 +22,9 @@ let make = () => {
   let animatedTranslateY = React.useRef(Animated.Value.create(0.));
   let animatedOpacity = React.useRef(Animated.Value.create(1.));
 
-  React.useEffect2(
+  React.useEffect3(
     () => {
-      if (logoIsLoaded && backgroundIsLoaded) {
+      if (logoIsLoaded && backgroundIsLoaded && isReady) {
         ReactNativeBootsplash.hide(None);
         Animated.(
           stagger(
@@ -69,7 +69,7 @@ let make = () => {
       };
       None;
     },
-    (logoIsLoaded, backgroundIsLoaded),
+    (logoIsLoaded, backgroundIsLoaded, isReady),
   );
   !bootSplashIsVisible
     ? React.null

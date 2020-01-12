@@ -51,8 +51,6 @@ module GoalsStackScreen = {
 
   [@react.component]
   let make = (~navigation as _) => {
-    let themeStyle = Theme.useStyles();
-    let themeColors = Theme.useColors();
     <GoalsStack.Navigator
       screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
       <GoalsStack.Screen
@@ -61,24 +59,6 @@ module GoalsStackScreen = {
         options={_ => GoalsStack.options(~headerShown=false, ())}
       />
     </GoalsStack.Navigator>;
-    // <GoalsStack.Screen
-    //   name="GoalMinimumScreen"
-    //   component=GoalMinimumScreen.make
-    //   options={_screenOptions =>
-    //     GoalsStack.options(
-    //       ~title="Add a goal",
-    //       ~headerBackTitle="Back",
-    //       ~headerTitleContainerStyle=
-    //         Style.(
-    //           viewStyle(~paddingHorizontal=(Spacer.space *. 3.)->dp, ())
-    //         ),
-    //       ~headerStyle=themeStyle##stackHeader,
-    //       ~headerTitleStyle=themeStyle##textOnBackground,
-    //       ~headerTintColor=themeColors.blue,
-    //       (),
-    //     )
-    //   }
-    // />
   };
 };
 
@@ -87,23 +67,12 @@ module SettingsStackScreen = {
 
   [@react.component]
   let make = (~navigation as _) => {
-    // let themeStyle = Theme.useStyles();
-    // let themeColors = Theme.useColors();
     <SettingsStack.Navigator
       screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
       <SettingsStack.Screen
         name="SettingsScreen"
         component=SettingsScreen.make
         options={_ => StatsStack.options(~headerShown=false, ())}
-        // options={_ =>
-        //   SettingsStack.options(
-        //     ~title="Settings",
-        //     ~headerStyle=themeStyle##stackHeader,
-        //     ~headerTitleStyle=themeStyle##textOnBackground,
-        //     ~headerTintColor=themeColors.blue,
-        //     (),
-        //   )
-        // }
       />
     </SettingsStack.Navigator>;
   };
@@ -220,16 +189,78 @@ module RootNavigator = {
     </RootStack.Navigator>;
   };
 };
+type navigationState;
+let navigationStateStorageKey = "react-navigation:state";
 
 [@react.component]
 let app = () => {
+  let (initialStateContainer, setInitialState) = React.useState(() => None);
+
+  React.useEffect1(
+    () => {
+      if (initialStateContainer->Option.isNone) {
+        ReactNativeAsyncStorage.getItem(navigationStateStorageKey)
+        ->FutureJs.fromPromise(error => {
+            // @todo ?
+            Js.log2("Restoring Navigation State: ", error);
+            error;
+          })
+        ->Future.tap(res =>
+            switch (res) {
+            | Result.Ok(jsonState) =>
+              switch (jsonState->Js.Null.toOption) {
+              | Some(jsonState) =>
+                switch (Js.Json.parseExn(jsonState)) {
+                | state => setInitialState(_ => Some(Some(state)))
+                | exception _ =>
+                  Js.log2(
+                    "Restoring Navigation State: unable to decode valid json",
+                    jsonState,
+                  );
+                  setInitialState(_ => Some(None));
+                }
+              | None => setInitialState(_ => Some(None))
+              }
+            | Result.Error(e) =>
+              Js.log2(
+                "Restoring Navigation State: unable to get json state",
+                e,
+              );
+              setInitialState(_ => Some(None));
+            }
+          )
+        ->ignore;
+      };
+      None;
+    },
+    [|initialStateContainer|],
+  );
+
   let (settings, setSettings) = AppSettings.useSettings();
+  let isReady = initialStateContainer->Option.isSome;
   <ReactNativeDarkMode.DarkModeProvider>
     <AppSettings.ContextProvider value=(settings, setSettings)>
-      <Native.NavigationNativeContainer>
-        <RootNavigator />
-      </Native.NavigationNativeContainer>
-      <Bootsplash />
+      {initialStateContainer
+       ->Option.map(initialState =>
+           <Native.NavigationNativeContainer
+             ?initialState
+             onStateChange={state => {
+               let maybeJsonState = Js.Json.stringifyAny(state);
+               switch (maybeJsonState) {
+               | Some(jsonState) =>
+                 ReactNativeAsyncStorage.setItem(
+                   navigationStateStorageKey,
+                   jsonState,
+                 )
+                 ->ignore
+               | None => Js.log("Unable to stringify navigation state")
+               };
+             }}>
+             <RootNavigator />
+           </Native.NavigationNativeContainer>
+         )
+       ->Option.getWithDefault(React.null)}
+      <Bootsplash isReady />
     </AppSettings.ContextProvider>
   </ReactNativeDarkMode.DarkModeProvider>;
 };
