@@ -253,14 +253,16 @@ let make = () => {
     <Separator style=themeStyles##separatorOnBackground />
     <View style=themeStyles##background>
       {Calendars.Categories.defaults
-       ->List.map(category =>
+       ->List.map(category => {
+           let (_, key, _, _) = category;
            <CategorySelectable
+             key
              category
              selected=true
              onPress={_ => ()}
              separator=true
-           />
-         )
+           />;
+         })
        ->List.toArray
        ->React.array}
     </View>
