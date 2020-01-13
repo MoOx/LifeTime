@@ -243,7 +243,7 @@ let make = () => {
       </TouchableOpacity>
     </View>
     <Separator style=themeStyles##separatorOnBackground />
-    <Spacer size=XXL />
+    <Spacer size=L />
     <Row> <Spacer size=XS /> <BlockHeading text="Danger Zone" /> </Row>
     <Separator style=themeStyles##separatorOnBackground />
     <View style=themeStyles##background>
@@ -350,10 +350,46 @@ let make = () => {
         </View>
       </TouchableOpacity>
     </View>
-    // <Separator style=themeStyles##separatorOnBackground />
     <Separator style=themeStyles##separatorOnBackground />
     <BlockFootnote>
       "Export is placing data into your clipboard. Import assume that you have your export in the clipboard."
+      ->React.string
+    </BlockFootnote>
+    <Spacer size=L />
+    <Separator style=themeStyles##separatorOnBackground />
+    <View style=themeStyles##background>
+      <TouchableOpacity
+        onPress={_ =>
+          Alert.alert(
+            ~title="Reset Settings & Erase All Data?",
+            ~message=
+              "This is a destructive operation and will wipe all settings & data. It cannot be undone unless you use an Export.",
+            ~buttons=[|
+              Alert.button(~text="Cancel", ~style=`default, ()),
+              Alert.button(
+                ~text="Reset",
+                ~style=`destructive,
+                ~onPress=() => setSettings(_ => AppSettings.defaultSettings),
+                (),
+              ),
+            |],
+            (),
+          )
+        }>
+        <SpacedView
+          vertical=XS horizontal=XS style=Predefined.styles##rowCenter>
+          <Text
+            style=Style.(
+              list([styles##text, textStyle(~color=themeColors.red, ())])
+            )>
+            "Reset Settings & Erase All Data"->React.string
+          </Text>
+        </SpacedView>
+      </TouchableOpacity>
+    </View>
+    <Separator style=themeStyles##separatorOnBackground />
+    <BlockFootnote>
+      "This is a destructive operation and will delete all application data. All your calendars and events are safe and untouched."
       ->React.string
     </BlockFootnote>
     <Spacer />
