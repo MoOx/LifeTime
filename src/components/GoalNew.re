@@ -467,7 +467,7 @@ let make = () => {
                           list([
                             Predefined.styles##rowCenter,
                             viewStyle(
-                              ~backgroundColor="rgba(255,255,255,0.025)",
+                              ~backgroundColor="rgba(125,125,125,0.03)",
                               ~opacity=selectedCat ? 0.5 : 1.,
                               (),
                             ),
