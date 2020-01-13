@@ -327,7 +327,9 @@ let make = () => {
                  selActs;
                }
              );
-           let canOpenCategory = id != ActivityCategories.unknown;
+           let canOpenCategory =
+             id != ActivityCategories.unknown
+             && categoryActivities->Array.length > 0;
            <React.Fragment key=id>
              <View style=Predefined.styles##rowCenter>
                <Spacer size=S />
@@ -415,27 +417,24 @@ let make = () => {
                                   <Spacer size=S />
                                 </>
                               : React.null}
-                           {canOpenCategory
-                              // using a key because (at least in simulator, it seems to be buggy)
-                              ? <Animated.View
-                                  key={opened ? "opened" : "unopened"}
-                                  style=Style.(
-                                    viewStyle(
-                                      ~transform=[|
-                                        rotate(
-                                          ~rotate=(opened ? 90. : 0.)->deg,
-                                        ),
-                                      |],
-                                      (),
-                                    )
-                                  )>
-                                  <SVGchevronright
-                                    width={14.->ReactFromSvg.Size.dp}
-                                    height={14.->ReactFromSvg.Size.dp}
-                                    fill={Predefined.Colors.Ios.light.gray4}
-                                  />
-                                </Animated.View>
-                              : React.null}
+                           // using a key because (at least in simulator, it seems to be buggy)
+                           <Animated.View
+                             key={opened ? "opened" : "unopened"}
+                             style=Style.(
+                               viewStyle(
+                                 ~opacity=canOpenCategory ? 1. : 0.05,
+                                 ~transform=[|
+                                   rotate(~rotate=(opened ? 90. : 0.)->deg),
+                                 |],
+                                 (),
+                               )
+                             )>
+                             <SVGchevronright
+                               width={14.->ReactFromSvg.Size.dp}
+                               height={14.->ReactFromSvg.Size.dp}
+                               fill={Predefined.Colors.Ios.light.gray4}
+                             />
+                           </Animated.View>
                            <Spacer size=S />
                          </View>
                        </SpacedView>
@@ -451,185 +450,103 @@ let make = () => {
              </View>
              {opened
                 ? {
-                  switch (categoryActivities) {
-                  | [||] =>
-                    <View
-                      style=Style.(
-                        list([
-                          Predefined.styles##rowCenter,
-                          viewStyle(
-                            ~backgroundColor="rgba(255,255,255,0.025)",
-                            ~opacity=selectedCat ? 0.5 : 1.,
-                            (),
-                          ),
-                        ])
-                      )>
-                      <Spacer size=S />
-                      <TouchableWithoutFeedback
-                        disabled=selectedCat
-                        onPress={_ => handleCategoryCheck(id, [||])}>
-                        <View>
-                          <SpacedView vertical=XS horizontal=None>
-                            {if (!selectedCat) {
-                               <SVGcircle
-                                 width={22.->ReactFromSvg.Size.dp}
-                                 height={22.->ReactFromSvg.Size.dp}
-                                 fill={theme.colors.gray}
-                               />;
-                             } else {
-                               <SVGcheckmarkcircle
-                                 width={22.->ReactFromSvg.Size.dp}
-                                 height={22.->ReactFromSvg.Size.dp}
-                                 fill={theme.colors.blue}
-                               />;
-                             }}
-                          </SpacedView>
-                        </View>
-                      </TouchableWithoutFeedback>
-                      <TouchableWithoutFeedback
-                        disabled=selectedCat
-                        onPress={_ => handleCategoryCheck(id, [||])}>
-                        <View style=Predefined.styles##flex>
-                          <View style=Predefined.styles##rowCenter>
-                            <SpacedView
-                              vertical=XS
-                              horizontal={Custom(13.)}
-                              style=Predefined.styles##center>
-                              <NamedIcon
-                                name=iconName
-                                fill=color
-                                width={22.->Style.dp}
-                                height={22.->Style.dp}
-                              />
+                  categoryActivities
+                  ->Array.mapWithIndex((index, activity) => {
+                      let selected =
+                        selectedCat
+                        || activitiesSelected->Array.some(key =>
+                             Activities.isSimilar(key, activity##title)
+                           );
+                      let separator =
+                        separator
+                        || index != categoryActivities->Array.length
+                        - 1;
+                      <View
+                        key=activity##title
+                        style=Style.(
+                          list([
+                            Predefined.styles##rowCenter,
+                            viewStyle(
+                              ~backgroundColor="rgba(255,255,255,0.025)",
+                              ~opacity=selectedCat ? 0.5 : 1.,
+                              (),
+                            ),
+                          ])
+                        )>
+                        <Spacer size=S />
+                        <TouchableWithoutFeedback
+                          disabled=selectedCat
+                          onPress={_ =>
+                            handleActivityCheckPress(activity##title)
+                          }>
+                          <View>
+                            <SpacedView vertical=XS horizontal=None>
+                              {if (!selected) {
+                                 <SVGcircle
+                                   width={22.->ReactFromSvg.Size.dp}
+                                   height={22.->ReactFromSvg.Size.dp}
+                                   fill={theme.colors.gray}
+                                 />;
+                               } else {
+                                 <SVGcheckmarkcircle
+                                   width={22.->ReactFromSvg.Size.dp}
+                                   height={22.->ReactFromSvg.Size.dp}
+                                   fill={theme.colors.blue}
+                                 />;
+                               }}
                             </SpacedView>
-                            <View style=Predefined.styles##flex>
-                              <SpacedView vertical=XS horizontal=None>
-                                <View style=Predefined.styles##rowCenter>
-                                  <View style=Predefined.styles##flex>
-                                    <Text
-                                      style=Style.(
-                                        list([
-                                          Predefined.styles##flex,
-                                          Theme.text##callout,
-                                          theme.styles##textLightOnBackground,
-                                        ])
-                                      )
-                                      numberOfLines=1>
-                                      "All future activities"->React.string
-                                    </Text>
-                                  </View>
-                                  <Spacer size=S />
-                                </View>
-                              </SpacedView>
-                              {separator
-                                 ? <Separator
-                                     style=theme.styles##separatorOnBackground
-                                   />
-                                 : React.null}
-                            </View>
                           </View>
-                        </View>
-                      </TouchableWithoutFeedback>
-                    </View>
-                  | _ =>
-                    categoryActivities
-                    ->Array.mapWithIndex((index, activity) => {
-                        let selected =
-                          selectedCat
-                          || activitiesSelected->Array.some(key =>
-                               Activities.isSimilar(key, activity##title)
-                             );
-                        let separator =
-                          separator
-                          || index != categoryActivities->Array.length
-                          - 1;
-                        <View
-                          key=activity##title
-                          style=Style.(
-                            list([
-                              Predefined.styles##rowCenter,
-                              viewStyle(
-                                ~backgroundColor="rgba(255,255,255,0.025)",
-                                ~opacity=selectedCat ? 0.5 : 1.,
-                                (),
-                              ),
-                            ])
-                          )>
-                          <Spacer size=S />
-                          <TouchableWithoutFeedback
-                            disabled=selectedCat
-                            onPress={_ =>
-                              handleActivityCheckPress(activity##title)
-                            }>
-                            <View>
-                              <SpacedView vertical=XS horizontal=None>
-                                {if (!selected) {
-                                   <SVGcircle
-                                     width={22.->ReactFromSvg.Size.dp}
-                                     height={22.->ReactFromSvg.Size.dp}
-                                     fill={theme.colors.gray}
-                                   />;
-                                 } else {
-                                   <SVGcheckmarkcircle
-                                     width={22.->ReactFromSvg.Size.dp}
-                                     height={22.->ReactFromSvg.Size.dp}
-                                     fill={theme.colors.blue}
-                                   />;
-                                 }}
+                        </TouchableWithoutFeedback>
+                        <TouchableWithoutFeedback
+                          disabled=selectedCat
+                          onPress={_ =>
+                            handleActivityCheckPress(activity##title)
+                          }>
+                          <View style=Predefined.styles##flex>
+                            <View style=Predefined.styles##rowCenter>
+                              <SpacedView
+                                vertical=XS
+                                horizontal={Custom(13.)}
+                                style=Predefined.styles##center>
+                                <NamedIcon
+                                  name=iconName
+                                  fill=color
+                                  width={22.->Style.dp}
+                                  height={22.->Style.dp}
+                                />
                               </SpacedView>
-                            </View>
-                          </TouchableWithoutFeedback>
-                          <TouchableWithoutFeedback
-                            disabled=selectedCat
-                            onPress={_ =>
-                              handleActivityCheckPress(activity##title)
-                            }>
-                            <View style=Predefined.styles##flex>
-                              <View style=Predefined.styles##rowCenter>
-                                <SpacedView
-                                  vertical=XS
-                                  horizontal={Custom(13.)}
-                                  style=Predefined.styles##center>
-                                  <NamedIcon
-                                    name=iconName
-                                    fill=color
-                                    width={22.->Style.dp}
-                                    height={22.->Style.dp}
-                                  />
-                                </SpacedView>
-                                <View style=Predefined.styles##flex>
-                                  <SpacedView vertical=XS horizontal=None>
-                                    <View style=Predefined.styles##rowCenter>
-                                      <View style=Predefined.styles##flex>
-                                        <Text
-                                          style=Style.(
-                                            list([
-                                              Predefined.styles##flex,
-                                              Theme.text##body,
-                                              theme.styles##textOnBackground,
-                                            ])
-                                          )
-                                          numberOfLines=1>
-                                          {activity##title->React.string}
-                                        </Text>
-                                      </View>
-                                      <Spacer size=S />
+                              <View style=Predefined.styles##flex>
+                                <SpacedView vertical=XS horizontal=None>
+                                  <View style=Predefined.styles##rowCenter>
+                                    <View style=Predefined.styles##flex>
+                                      <Text
+                                        style=Style.(
+                                          list([
+                                            Predefined.styles##flex,
+                                            Theme.text##body,
+                                            theme.styles##textOnBackground,
+                                          ])
+                                        )
+                                        numberOfLines=1>
+                                        {activity##title->React.string}
+                                      </Text>
                                     </View>
-                                  </SpacedView>
-                                  {separator
-                                     ? <Separator
-                                         style=
-                                           theme.styles##separatorOnBackground
-                                       />
-                                     : React.null}
-                                </View>
+                                    <Spacer size=S />
+                                  </View>
+                                </SpacedView>
+                                {separator
+                                   ? <Separator
+                                       style=
+                                         theme.styles##separatorOnBackground
+                                     />
+                                   : React.null}
                               </View>
                             </View>
-                          </TouchableWithoutFeedback>
-                        </View>;
-                      })
-                    ->React.array
-                  };
+                          </View>
+                        </TouchableWithoutFeedback>
+                      </View>;
+                    })
+                  ->React.array;
                 }
                 : React.null}
            </React.Fragment>;
