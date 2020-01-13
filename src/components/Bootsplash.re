@@ -13,7 +13,6 @@ let logo = Packager.require("../../public/Icon-transparent.png");
 
 [@react.component]
 let make = (~isReady) => {
-  let windowDimensions = Dimensions.useWindowDimensions();
   let (bootSplashIsVisible, setBootSplashIsVisible) =
     React.useState(() => true);
   let (logoIsLoaded, setLogoIsLoaded) = React.useState(() => false);
@@ -27,37 +26,12 @@ let make = (~isReady) => {
       if (logoIsLoaded && backgroundIsLoaded && isReady) {
         ReactNativeBootsplash.hide(None);
         Animated.(
-          stagger(
-            250.,
-            [|
-              spring(
-                animatedTranslateY->React.Ref.current,
-                Value.Spring.config(
-                  ~useNativeDriver=true,
-                  ~toValue=(-50.)->Value.Spring.fromRawValue,
-                  (),
-                ),
-              ),
-              spring(
-                animatedTranslateY->React.Ref.current,
-                Value.Spring.config(
-                  ~useNativeDriver=true,
-                  ~toValue=windowDimensions##height->Value.Spring.fromRawValue,
-                  (),
-                ),
-              ),
-            |],
-          )
-          ->Animation.start()
-        );
-        Animated.(
           timing(
             animatedOpacity->React.Ref.current,
             Value.Timing.config(
               ~useNativeDriver=true,
               ~toValue=0.->Value.Timing.fromRawValue,
-              ~duration=150.,
-              ~delay=350.,
+              ~duration=250.,
               (),
             ),
           )
