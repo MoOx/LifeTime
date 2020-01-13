@@ -1,6 +1,6 @@
 open Belt;
 
-let slugifyEventTitle = e => e->Js.String.toLowerCase;
+let simplifyEventTitleForComparison = e => e->Js.String.toLowerCase;
 
 module Categories = {
   type id = string;
@@ -58,7 +58,9 @@ let categoryIdFromEventTitle = (settings, eventTitle) => {
   let (_, cId) =
     settings##eventsCategories
     ->Array.keep(((e, c)) =>
-        e == eventTitle->slugifyEventTitle && c->isCategoryIdValid
+        e->simplifyEventTitleForComparison
+        == eventTitle->simplifyEventTitleForComparison
+        && c->isCategoryIdValid
       )[0]
     ->Option.getWithDefault(("", Categories.unknown));
   cId;
@@ -140,7 +142,8 @@ let filterEvents = (events, settings) =>
       } else if (settings##eventsSkippedOn
                  && settings##eventsSkipped
                     ->Array.some(eventName =>
-                        eventName == e##title->slugifyEventTitle
+                        eventName->simplifyEventTitleForComparison
+                        == e##title->simplifyEventTitleForComparison
                       )) {
         false;
       } else {
@@ -179,7 +182,7 @@ let mapTitleDuration = events => {
   ->Array.reduce(
       Map.String.empty,
       (map, e) => {
-        let key = e##title->slugifyEventTitle;
+        let key = e##title->simplifyEventTitleForComparison;
         map->Map.String.set(
           key,
           map
@@ -212,5 +215,9 @@ let mapCategoryDuration = (settings, events) => {
 
 let isEventSkipped = (settings, evt) => {
   Js.log2(settings##eventsSkipped, evt);
-  settings##eventsSkipped->Array.some(e => e == evt->slugifyEventTitle);
+  settings##eventsSkipped
+  ->Array.some(e =>
+      e->simplifyEventTitleForComparison
+      == evt->simplifyEventTitleForComparison
+    );
 };

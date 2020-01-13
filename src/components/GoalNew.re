@@ -18,14 +18,18 @@ let quickDurations = [|30., 45., 60., 90.|];
 
 [@react.component]
 let make = () => {
-  //   let (settings, setSettings) = React.useContext(AppSettings.context);
-  //   let theme = Theme.useTheme();
+  let (settings, setSettings) = React.useContext(AppSettings.context);
+  let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   let themeColors = Theme.useColors();
   let (minutes, setMinutes) = React.useState(() => 60.);
   let (days, setDays) =
     React.useState(() => Array.range(0, 6)->Array.map(_ => true));
-  // let (categories, setCategories) = React.useState(() => [||]);
+  let (categoriesSelected, setCategoriesSelected) =
+    React.useState(() => [||]);
+  let (categoriesOpened, setCategoriesOpen) = React.useState(() => [||]);
+  let (activitiesSelected, setActivitiesSelected) =
+    React.useState(() => [||]);
   let numberOfDays =
     days->Array.reduce(0., (total, dayOn) => dayOn ? total +. 1. : total);
   let durationInMinutes =
@@ -51,6 +55,52 @@ let make = () => {
         )
       )
     />;
+
+  let handleCategoryCheck =
+    React.useCallback2(
+      (id, selectedCategoryActivities) => {
+        setCategoriesSelected(categoriesSelected =>
+          if (categoriesSelected->Array.some(catKey => catKey == id)) {
+            categoriesSelected->Array.keep(catKey => catKey != id);
+          } else {
+            categoriesSelected->Array.concat([|id|]);
+          }
+        );
+        setActivitiesSelected(activitiesSelected =>
+          activitiesSelected->Array.keep(act =>
+            !
+              selectedCategoryActivities->Array.some(selCatAct =>
+                selCatAct == act
+              )
+          )
+        );
+      },
+      (setCategoriesSelected, setActivitiesSelected),
+    );
+  let handleCategoryOpen =
+    React.useCallback1(
+      key =>
+        setCategoriesOpen(categoriesOpened =>
+          if (categoriesOpened->Array.some(catKey => catKey == key)) {
+            categoriesOpened->Array.keep(catKey => catKey != key);
+          } else {
+            categoriesOpened->Array.concat([|key|]);
+          }
+        ),
+      [|setCategoriesOpen|],
+    );
+  let handleActivityCheckPress =
+    React.useCallback1(
+      key =>
+        setActivitiesSelected(activitiesSelected =>
+          if (activitiesSelected->Array.some(act => act == key)) {
+            activitiesSelected->Array.keep(act => act != key);
+          } else {
+            activitiesSelected->Array.concat([|key|]);
+          }
+        ),
+      [|setActivitiesSelected|],
+    );
 
   <SpacedView horizontal=None>
     <Row> <Spacer size=XS /> <BlockHeading text="Days" /> </Row>
@@ -141,7 +191,7 @@ let make = () => {
             "0"->React.string
           </Text>
           <Spacer size=XS />
-          <View style=Predefined.styles##flexGrow>
+          <View style=Predefined.styles##flex>
             <View
               style=Style.(
                 list([
@@ -157,7 +207,7 @@ let make = () => {
               dash
             </View>
             <ReactNativeSlider
-              style=Predefined.styles##flexGrow
+              style=Predefined.styles##flex
               minimumValue=0.
               maximumValue={24. *. 60.}
               step=15.
@@ -177,13 +227,13 @@ let make = () => {
       </SpacedView>
       <View style=Predefined.styles##rowSpaceBetween>
         <Spacer />
-        <View style=Predefined.styles##flexGrow>
+        <View style=Predefined.styles##flex>
           <Separator style=themeStyles##separatorOnBackground />
           <SpacedView horizontal=None vertical=S style=Predefined.styles##row>
             <Text
               style=Style.(
                 list([
-                  Predefined.styles##flexGrow,
+                  Predefined.styles##flex,
                   Theme.text##callout,
                   themeStyles##textOnBackground,
                 ])
@@ -209,13 +259,13 @@ let make = () => {
       </View>
       <View style=Predefined.styles##rowSpaceBetween>
         <Spacer />
-        <View style=Predefined.styles##flexGrow>
+        <View style=Predefined.styles##flex>
           <Separator style=themeStyles##separatorOnBackground />
           <SpacedView horizontal=None vertical=S style=Predefined.styles##row>
             <Text
               style=Style.(
                 list([
-                  Predefined.styles##flexGrow,
+                  Predefined.styles##flex,
                   Theme.text##callout,
                   themeStyles##textOnBackground,
                   textStyle(~fontWeight=Theme.fontWeights.medium, ()),
@@ -253,17 +303,231 @@ let make = () => {
     <Separator style=themeStyles##separatorOnBackground />
     <View style=themeStyles##background>
       {Calendars.Categories.defaults
-       ->List.map(category => {
-           let (_, key, _, _) = category;
-           <CategorySelectable
-             key
-             category
-             selected=true
-             onPress={_ => ()}
-             separator=true
-           />;
-         })
        ->List.toArray
+       ->Array.mapWithIndex((index, category) => {
+           let (id, name, colorName, iconName) = category;
+           let color = theme->Calendars.Categories.getColor(colorName);
+           let selectedCat =
+             categoriesSelected->Array.some(catKey => catKey == id);
+           let opened = categoriesOpened->Array.some(catKey => catKey == id);
+           let separator =
+             index != Calendars.Categories.defaults->List.length - 1;
+           let categoryActivities =
+             settings##eventsCategories->Array.keep(((_e, c)) => c == id);
+           let selectedCategoryActivities =
+             categoryActivities->Array.reduce([||], (selActs, (event, _)) =>
+               if (activitiesSelected->Array.some(acti =>
+                     acti->Calendars.simplifyEventTitleForComparison
+                     == event->Calendars.simplifyEventTitleForComparison
+                   )) {
+                 selActs->Array.concat([|event|]);
+               } else {
+                 selActs;
+               }
+             );
+           let canOpenCategory = id != Calendars.Categories.unknown;
+           <React.Fragment key=id>
+             <View style=Predefined.styles##rowCenter>
+               <Spacer size=S />
+               <TouchableOpacity
+                 onPress={_ =>
+                   handleCategoryCheck(id, selectedCategoryActivities)
+                 }>
+                 <SpacedView vertical=XS horizontal=None>
+                   {if (!selectedCat) {
+                      <SVGcircle
+                        width={22.->ReactFromSvg.Size.dp}
+                        height={22.->ReactFromSvg.Size.dp}
+                        fill={themeColors.gray}
+                      />;
+                    } else {
+                      <SVGcheckmarkcircle
+                        width={22.->ReactFromSvg.Size.dp}
+                        height={22.->ReactFromSvg.Size.dp}
+                        fill={themeColors.blue}
+                      />;
+                    }}
+                 </SpacedView>
+               </TouchableOpacity>
+               <Spacer size=XS />
+               <TouchableOpacity
+                 onPress={_ =>
+                   canOpenCategory
+                     ? handleCategoryOpen(id)
+                     : handleCategoryCheck(id, selectedCategoryActivities)
+                 }
+                 style=Predefined.styles##flex>
+                 <View style=Predefined.styles##rowCenter>
+                   <SpacedView vertical=XS horizontal=None>
+                     <NamedIcon name=iconName fill=color />
+                   </SpacedView>
+                   <Spacer size=XS />
+                   <View style=Predefined.styles##flex>
+                     <SpacedView
+                       vertical=XS
+                       horizontal=None
+                       style=Style.(
+                         list([
+                           Predefined.styles##flex,
+                           Predefined.styles##center,
+                         ])
+                       )>
+                       <View style=Predefined.styles##rowCenter>
+                         <View style=Predefined.styles##flex>
+                           <Text
+                             style={Style.list([
+                               Theme.text##body,
+                               themeStyles##textOnBackground,
+                             ])}>
+                             name->React.string
+                           </Text>
+                         </View>
+                         {selectedCat
+                          || selectedCategoryActivities->Array.length > 0
+                            ? <>
+                                <Text
+                                  style={Style.list([
+                                    Theme.text##subhead,
+                                    themeStyles##textVeryLightOnBackground,
+                                  ])}>
+                                  (
+                                    selectedCat
+                                      ? "All"
+                                      : {
+                                        let numberOfActivities =
+                                          selectedCategoryActivities->Array.length;
+                                        switch (numberOfActivities) {
+                                        | 1 =>
+                                          numberOfActivities->string_of_int
+                                          ++ " activity"
+                                        | _ =>
+                                          numberOfActivities->string_of_int
+                                          ++ " activities"
+                                        };
+                                      }
+                                  )
+                                  ->React.string
+                                </Text>
+                                <Spacer size=S />
+                              </>
+                            : React.null}
+                         {canOpenCategory
+                            ? // using a key because (at least in simulator, it seems to be buggy)
+                              <Animated.View
+                                key={opened ? "opened" : "unopened"}
+                                style=Style.(
+                                  viewStyle(
+                                    ~transform=[|
+                                      rotate(
+                                        ~rotate=(opened ? 90. : 0.)->deg,
+                                      ),
+                                    |],
+                                    (),
+                                  )
+                                )>
+                                <SVGchevronright
+                                  width={14.->ReactFromSvg.Size.dp}
+                                  height={14.->ReactFromSvg.Size.dp}
+                                  fill={Predefined.Colors.Ios.light.gray4}
+                                />
+                              </Animated.View>
+                            : React.null}
+                         <Spacer size=S />
+                       </View>
+                     </SpacedView>
+                     {separator
+                        ? <Separator
+                            style=themeStyles##separatorOnBackground
+                          />
+                        : React.null}
+                   </View>
+                 </View>
+               </TouchableOpacity>
+             </View>
+             {opened
+                ? {
+                  categoryActivities
+                  ->Array.mapWithIndex((index, (event, _)) => {
+                      let selected =
+                        selectedCat
+                        || activitiesSelected->Array.some(key =>
+                             key->Calendars.simplifyEventTitleForComparison
+                             == event->Calendars.simplifyEventTitleForComparison
+                           );
+                      let separator =
+                        separator
+                        || index != categoryActivities->Array.length
+                        - 1;
+                      <View
+                        key=event
+                        style=Style.(
+                          list([
+                            Predefined.styles##rowCenter,
+                            viewStyle(~opacity=selectedCat ? 0.5 : 1., ()),
+                          ])
+                        )>
+                        <Spacer size=S />
+                        <TouchableOpacity
+                          disabled=selectedCat
+                          onPress={_ => handleActivityCheckPress(event)}>
+                          <SpacedView vertical=XS horizontal=None>
+                            {if (!selected) {
+                               <SVGcircle
+                                 width={22.->ReactFromSvg.Size.dp}
+                                 height={22.->ReactFromSvg.Size.dp}
+                                 fill={themeColors.gray}
+                               />;
+                             } else {
+                               <SVGcheckmarkcircle
+                                 width={22.->ReactFromSvg.Size.dp}
+                                 height={22.->ReactFromSvg.Size.dp}
+                                 fill={themeColors.blue}
+                               />;
+                             }}
+                          </SpacedView>
+                        </TouchableOpacity>
+                        <Spacer size=XS />
+                        <TouchableOpacity
+                          disabled=selectedCat
+                          onPress={_ => handleActivityCheckPress(event)}
+                          style=Predefined.styles##flex>
+                          <View style=Predefined.styles##rowCenter>
+                            <Spacer size=M />
+                            <Spacer size=M />
+                            <View style=Predefined.styles##flex>
+                              <SpacedView vertical=XS horizontal=None>
+                                <View style=Predefined.styles##rowCenter>
+                                  <View style=Predefined.styles##flex>
+                                    <Text
+                                      style=Style.(
+                                        list([
+                                          Predefined.styles##flex,
+                                          Theme.text##body,
+                                          themeStyles##textOnBackground,
+                                        ])
+                                      )
+                                      numberOfLines=1>
+                                      event->React.string
+                                    </Text>
+                                  </View>
+                                  <Spacer size=S />
+                                </View>
+                              </SpacedView>
+                              {separator
+                                 ? <Separator
+                                     style=themeStyles##separatorOnBackground
+                                   />
+                                 : React.null}
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                      </View>;
+                    })
+                  ->React.array;
+                }
+                : React.null}
+           </React.Fragment>;
+         })
        ->React.array}
     </View>
     <Separator style=themeStyles##separatorOnBackground />

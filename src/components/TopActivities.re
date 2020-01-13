@@ -123,13 +123,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                                    Predefined.styles##flexShrink,
                                  ])
                                )>
-                               <View
-                                 style=Style.(
-                                   list([
-                                     Predefined.styles##flexGrow,
-                                     Predefined.styles##flexShrink,
-                                   ])
-                                 )>
+                               <View style=Predefined.styles##flex>
                                  <Text
                                    style=themeStyles##textOnBackground
                                    numberOfLines=1>

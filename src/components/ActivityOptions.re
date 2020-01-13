@@ -12,7 +12,8 @@ let make = (~activity, ~onIgnoreActivity) => {
   let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   let themeColors = Theme.useColors();
-  let activitySlug = activity->Calendars.slugifyEventTitle;
+  let simplifiedActivityTitle =
+    activity->Calendars.simplifyEventTitleForComparison;
   let isSkipped = Calendars.isEventSkipped(settings, activity);
   <SpacedView horizontal=None>
     <Row> <Spacer size=XS /> <BlockHeading text="Category" /> </Row>
@@ -34,10 +35,11 @@ let make = (~activity, ~onIgnoreActivity) => {
                    "eventsSkipped": settings##eventsSkipped,
                    "eventsCategories":
                      settings##eventsCategories
-                     ->Array.keep(((eventSlug, _c)) =>
-                         eventSlug != activitySlug
+                     ->Array.keep(((event, _c)) =>
+                         event->Calendars.simplifyEventTitleForComparison
+                         != simplifiedActivityTitle
                        )
-                     ->Array.concat([|(activitySlug, id)|]),
+                     ->Array.concat([|(simplifiedActivityTitle, id)|]),
                  }
                )
              }>
@@ -102,8 +104,8 @@ let make = (~activity, ~onIgnoreActivity) => {
             "eventsSkippedOn": settings##eventsSkippedOn,
             "eventsSkipped":
               !isSkipped
-                ? settings##eventsSkipped->Array.concat([|activitySlug|])
-                : settings##eventsSkipped->Array.keep(e => e != activitySlug),
+                ? settings##eventsSkipped->Array.concat([|activity|])
+                : settings##eventsSkipped->Array.keep(e => e != activity),
             "eventsCategories": settings##eventsCategories,
           };
         });

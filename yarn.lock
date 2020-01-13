@@ -10162,9 +10162,9 @@ react-is@^16.8.1, react-is@^16.8.4, react-is@^16.9.0:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.10.2.tgz#984120fd4d16800e9a738208ab1fba422d23b5ab"
   integrity sha512-INBT1QEgtcCCgvccr5/86CfD71fw9EPmDxgiJX4I2Ddr6ZsV6iFXsuby+qWJPtmNuMY0zByTsG4468P7nHuNWA==
 
-"react-multiversal@https://github.com/MoOx/react-multiversal#c21bc11":
+"react-multiversal@https://github.com/MoOx/react-multiversal#d9664f2":
   version "0.0.0"
-  resolved "https://github.com/MoOx/react-multiversal#c21bc11f2599d4fd0dfab20b1c78b842728b0fca"
+  resolved "https://github.com/MoOx/react-multiversal#d9664f21dbfb11151db2cffe1aa2bf8f3ed7bb5f"
   dependencies:
     "@react-native-community/blur" "^3.4.1"
     react-native-safe-area-context "^0.6.1"
