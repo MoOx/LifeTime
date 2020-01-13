@@ -16,6 +16,7 @@
     }
   ],
   "bs-dependencies": [
+    "@glennsl/bs-json",
     "reason-react",
     "reason-react-native",
     "reason-react-navigation",

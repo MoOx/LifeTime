@@ -12,15 +12,15 @@ let title = "LifeTime & Privacy";
 
 [@react.component]
 let make = () => {
-  let themeStyles = Theme.useStyles();
+  let theme = Theme.useTheme(AppSettings.useTheme());
 
   <SpacedView horizontal=L vertical=XL style=styles##container>
     <Center>
-      <Title style=themeStyles##textOnBackground> title->React.string </Title>
+      <Title style=theme.styles##textOnBackground> title->React.string </Title>
     </Center>
     <Spacer size=L />
     <Text
-      style=Style.(array([|styles##text, themeStyles##textOnBackground|]))>
+      style=Style.(array([|styles##text, theme.styles##textOnBackground|]))>
       {j|LifeTime is designed to protect your information.
 
 LifeTime only run computation on your device and does not share your information anywhere.

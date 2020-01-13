@@ -3,21 +3,20 @@ open ReactMultiversal;
 
 [@react.component]
 let make = () => {
-  let theme = Theme.useTheme();
-  let themeStyles = Theme.useStyles();
+  let theme = Theme.useTheme(AppSettings.useTheme());
   <>
     <View
       style=Style.(
         list([
           StyleSheet.absoluteFill,
-          themeStyles##background,
+          theme.styles##background,
           style(~opacity=0.8, ()),
         ])
       )
     />
     <BlurView
       nativeBlurType={
-        switch (theme) {
+        switch (theme.mode) {
         | `dark => `dark
         | `light => `light
         }

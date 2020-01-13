@@ -12,8 +12,7 @@ module StatsStackScreen = {
 
   [@react.component]
   let make = (~navigation as _) => {
-    let themeStyle = Theme.useStyles();
-    let themeColors = Theme.useColors();
+    let theme = Theme.useTheme(AppSettings.useTheme());
     <StatsStack.Navigator
       screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
       <StatsStack.Screen
@@ -28,16 +27,16 @@ module StatsStackScreen = {
           StatsStack.options(
             ~title=
               screenOptions##route##params
-              ->Option.flatMap(params => params##currentActivity)
+              ->Option.flatMap(params => params##currentActivityTitle)
               ->Option.getWithDefault("Activity"),
             ~headerBackTitle="Back",
             ~headerTitleContainerStyle=
               Style.(
                 viewStyle(~paddingHorizontal=(Spacer.space *. 3.)->dp, ())
               ),
-            ~headerStyle=themeStyle##stackHeader,
-            ~headerTitleStyle=themeStyle##textOnBackground,
-            ~headerTintColor=themeColors.blue,
+            ~headerStyle=theme.styles##stackHeader,
+            ~headerTitleStyle=theme.styles##textOnBackground,
+            ~headerTintColor=theme.colors.blue,
             (),
           )
         }
@@ -83,18 +82,17 @@ module TabsScreen = {
 
   [@react.component]
   let make = (~navigation as _, ~route as _) => {
-    let themeStyle = Theme.useStyles();
-    let themeColors = Theme.useColors();
+    let theme = Theme.useTheme(AppSettings.useTheme());
     <Tabs.Navigator
       initialRouteName="StatsStack"
       tabBarOptions={Tabs.bottomTabBarOptions(
-        ~activeTintColor=themeColors.blue,
-        ~inactiveTintColor=themeColors.gray,
+        ~activeTintColor=theme.colors.blue,
+        ~inactiveTintColor=theme.colors.gray,
         ~style=
           Style.(
             list([
-              themeStyle##background,
-              viewStyle(~borderTopColor=themeColors.gray4, ()),
+              theme.styles##background,
+              viewStyle(~borderTopColor=theme.colors.gray4, ()),
             ])
           ),
         (),

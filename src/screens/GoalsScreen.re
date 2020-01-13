@@ -3,15 +3,14 @@ open ReactMultiversal;
 
 [@react.component]
 let make = (~navigation, ~route as _) => {
-  let theme = Theme.useTheme();
-  let themeStyles = Theme.useStyles();
+  let theme = Theme.useTheme(AppSettings.useTheme());
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeArea();
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
-    <StatusBar barStyle={theme->Theme.themedStatusBarStyle(`darkContent)} />
+    <StatusBar barStyle={Theme.statusBarStyle(theme.mode, `darkContent)} />
     <View
       style=Style.(
-        list([Predefined.styles##flexGrow, themeStyles##backgroundDark])
+        list([Predefined.styles##flexGrow, theme.styles##backgroundDark])
       )>
       <StickyHeader
         scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
@@ -20,7 +19,7 @@ let make = (~navigation, ~route as _) => {
         animateTranslateY=false
         animateBackgroundOpacity=`yes
         backgroundElement={<StickyHeaderBackground />}
-        textStyle=themeStyles##textOnBackground
+        textStyle=theme.styles##textOnBackground
         title=Goals.title
       />
       <Animated.ScrollView
@@ -63,7 +62,7 @@ let make = (~navigation, ~route as _) => {
           // onEditPress={activity =>
           //   navigation->Navigators.StatsStack.Navigation.navigateWithParams(
           //     "ActivityOptionsScreen",
-          //     {"currentActivity": Some(activity)},
+          //     {"currentActivityTitle": Some(activity)},
           //   )
           // }
         />

@@ -3,8 +3,7 @@ open ReactMultiversal;
 
 [@react.component]
 let make = (~navigation, ~route as _) => {
-  let themeStyles = Theme.useStyles();
-  let themeColors = Theme.useColors();
+  let theme = Theme.useTheme(AppSettings.useTheme());
 
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
@@ -12,7 +11,7 @@ let make = (~navigation, ~route as _) => {
     <Animated.ScrollView
       style={Style.list([
         Predefined.styles##flexGrow,
-        themeStyles##backgroundDark,
+        theme.styles##backgroundDark,
       ])}
       showsHorizontalScrollIndicator=false
       showsVerticalScrollIndicator=false
@@ -37,9 +36,9 @@ let make = (~navigation, ~route as _) => {
         safeArea=false
         backgroundElement={<StickyHeaderBackground />}
         // animateBackgroundOpacity=`yes
-        color={themeColors.blue}
-        color2={themeColors.blue}
-        textStyle=themeStyles##textOnBackground
+        color={theme.colors.blue}
+        color2={theme.colors.blue}
+        textStyle=theme.styles##textOnBackground
         title=Filters.title
         right={({color, defaultStyle}) =>
           <TouchableOpacity

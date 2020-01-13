@@ -18,7 +18,7 @@ let title = "Filters";
 [@react.component]
 let make = () => {
   let (settings, setSettings) = React.useContext(AppSettings.context);
-  let themeStyles = Theme.useStyles();
+  let theme = Theme.useTheme(AppSettings.useTheme());
   let calendars = Calendars.useCalendars();
   let isCalendarButtonHide = settings##calendarsIdsSkipped->Array.length === 0;
   <>
@@ -39,7 +39,7 @@ let make = () => {
                        ->Option.getWithDefault([||]),
                      "activitiesSkippedFlag": settings##activitiesSkippedFlag,
                      "activitiesSkipped": settings##activitiesSkipped,
-                     "activitiesCategories": settings##activitiesCategories,
+                     "activities": settings##activities,
                    }
                  )
                }
@@ -55,7 +55,7 @@ let make = () => {
                      "calendarsIdsSkipped": [||],
                      "activitiesSkippedFlag": settings##activitiesSkippedFlag,
                      "activitiesSkipped": settings##activitiesSkipped,
-                     "activitiesCategories": settings##activitiesCategories,
+                     "activities": settings##activities,
                    }
                  )
                }
@@ -64,8 +64,8 @@ let make = () => {
         <Spacer size=XS />
       </Row>
     </View>
-    <Separator style=themeStyles##separatorOnBackground />
-    <View style=themeStyles##background>
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
       {calendars
        ->Option.map(calendars =>
            calendars
@@ -88,7 +88,7 @@ let make = () => {
                        "activitiesSkippedFlag":
                          settings##activitiesSkippedFlag,
                        "activitiesSkipped": settings##activitiesSkipped,
-                       "activitiesCategories": settings##activitiesCategories,
+                       "activities": settings##activities,
                      }
                    )
                  }>
@@ -103,14 +103,14 @@ let make = () => {
                          <Text
                            style={Style.list([
                              styles##text,
-                             themeStyles##textOnBackground,
+                             theme.styles##textOnBackground,
                            ])}>
                            {calendar##title->React.string}
                          </Text>
                          <Text
                            style={Style.list([
                              styles##infoText,
-                             themeStyles##textGray2,
+                             theme.styles##textGray2,
                            ])}>
                            {calendar##source->React.string}
                          </Text>
@@ -137,7 +137,7 @@ let make = () => {
                      </SpacedView>
                      {index !== calendars->Array.length - 1
                         ? <Separator
-                            style=themeStyles##separatorOnBackground
+                            style=theme.styles##separatorOnBackground
                           />
                         : React.null}
                    </View>
@@ -147,7 +147,7 @@ let make = () => {
            ->React.array
          )
        ->Option.getWithDefault(React.null)}
-      <Separator style=themeStyles##separatorOnBackground />
+      <Separator style=theme.styles##separatorOnBackground />
     </View>
   </>;
 };

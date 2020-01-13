@@ -19,9 +19,9 @@ let quickDurations = [|30., 45., 60., 90.|];
 [@react.component]
 let make = () => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
-  let theme = Theme.useTheme();
-  let themeStyles = Theme.useStyles();
-  let themeColors = Theme.useColors();
+
+  let theme = Theme.useTheme(AppSettings.useTheme());
+
   let (minutes, setMinutes) = React.useState(() => 60.);
   let (days, setDays) =
     React.useState(() => Array.range(0, 6)->Array.map(_ => true));
@@ -50,7 +50,7 @@ let make = () => {
         viewStyle(
           ~width=1.->dp,
           ~height=12.->dp,
-          ~backgroundColor=themeColors.gray5,
+          ~backgroundColor=theme.colors.gray5,
           (),
         )
       )
@@ -104,8 +104,8 @@ let make = () => {
 
   <SpacedView horizontal=None>
     <Row> <Spacer size=XS /> <BlockHeading text="Days" /> </Row>
-    <Separator style=themeStyles##separatorOnBackground />
-    <View style=themeStyles##background>
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
       <SpacedView style=Predefined.styles##rowSpaceBetween>
         {days
          ->Array.mapWithIndex((index, dayOn) =>
@@ -121,7 +121,7 @@ let make = () => {
                <Text
                  style={Style.list([
                    Theme.text##caption1,
-                   themeStyles##textVeryLightOnBackground,
+                   theme.styles##textVeryLightOnBackground,
                  ])}>
                  {index->float->Date.dayShortString->React.string}
                </Text>
@@ -130,13 +130,13 @@ let make = () => {
                   <SVGcircle
                     width={26.->ReactFromSvg.Size.dp}
                     height={26.->ReactFromSvg.Size.dp}
-                    fill={themeColors.gray}
+                    fill={theme.colors.gray}
                   />;
                 } else {
                   <SVGcheckmarkcircle
                     width={26.->ReactFromSvg.Size.dp}
                     height={26.->ReactFromSvg.Size.dp}
-                    fill={themeColors.blue}
+                    fill={theme.colors.blue}
                   />;
                 }}
              </TouchableOpacity>
@@ -144,15 +144,15 @@ let make = () => {
          ->React.array}
       </SpacedView>
     </View>
-    <Separator style=themeStyles##separatorOnBackground />
+    <Separator style=theme.styles##separatorOnBackground />
     <BlockFootnote>
       "Select the days where you would like to respect this goal."
       ->React.string
     </BlockFootnote>
     <Spacer />
     <Row> <Spacer size=XS /> <BlockHeading text="Duration" /> </Row>
-    <Separator style=themeStyles##separatorOnBackground />
-    <View style=themeStyles##background>
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
       <Spacer size=S />
       <View style=Predefined.styles##rowSpaceBetween>
         <Spacer />
@@ -167,7 +167,7 @@ let make = () => {
                      list([
                        Theme.text##subhead,
                        textStyle(
-                         ~color=themeColors.blue,
+                         ~color=theme.colors.blue,
                          ~fontWeight=Theme.fontWeights.semiBold,
                          (),
                        ),
@@ -186,7 +186,7 @@ let make = () => {
           <Text
             style={Style.list([
               Theme.text##caption1,
-              themeStyles##textVeryLightOnBackground,
+              theme.styles##textVeryLightOnBackground,
             ])}>
             "0"->React.string
           </Text>
@@ -219,7 +219,7 @@ let make = () => {
           <Text
             style={Style.list([
               Theme.text##caption1,
-              themeStyles##textVeryLightOnBackground,
+              theme.styles##textVeryLightOnBackground,
             ])}>
             "24"->React.string
           </Text>
@@ -228,14 +228,14 @@ let make = () => {
       <View style=Predefined.styles##rowSpaceBetween>
         <Spacer />
         <View style=Predefined.styles##flex>
-          <Separator style=themeStyles##separatorOnBackground />
+          <Separator style=theme.styles##separatorOnBackground />
           <SpacedView horizontal=None vertical=S style=Predefined.styles##row>
             <Text
               style=Style.(
                 list([
                   Predefined.styles##flex,
                   Theme.text##callout,
-                  themeStyles##textOnBackground,
+                  theme.styles##textOnBackground,
                 ])
               )>
               "Average Time per Day"->React.string
@@ -244,7 +244,7 @@ let make = () => {
               style=Style.(
                 list([
                   Theme.text##callout,
-                  themeStyles##textLightOnBackground,
+                  theme.styles##textLightOnBackground,
                 ])
               )
               numberOfLines=1
@@ -260,14 +260,14 @@ let make = () => {
       <View style=Predefined.styles##rowSpaceBetween>
         <Spacer />
         <View style=Predefined.styles##flex>
-          <Separator style=themeStyles##separatorOnBackground />
+          <Separator style=theme.styles##separatorOnBackground />
           <SpacedView horizontal=None vertical=S style=Predefined.styles##row>
             <Text
               style=Style.(
                 list([
                   Predefined.styles##flex,
                   Theme.text##callout,
-                  themeStyles##textOnBackground,
+                  theme.styles##textOnBackground,
                   textStyle(~fontWeight=Theme.fontWeights.medium, ()),
                 ])
               )>
@@ -277,7 +277,7 @@ let make = () => {
               style=Style.(
                 list([
                   Theme.text##callout,
-                  themeStyles##textLightOnBackground,
+                  theme.styles##textLightOnBackground,
                   textStyle(~fontWeight=Theme.fontWeights.semiBold, ()),
                 ])
               )
@@ -290,7 +290,7 @@ let make = () => {
         </View>
       </View>
     </View>
-    <Separator style=themeStyles##separatorOnBackground />
+    <Separator style=theme.styles##separatorOnBackground />
     <BlockFootnote>
       {j|Goals are mesured on a weekly basis. The time spent on an entire week is what matters to achieve your goal.|j}
       ->React.string
@@ -300,32 +300,32 @@ let make = () => {
       <Spacer size=XS />
       <BlockHeading text="Category or Activity" />
     </Row>
-    <Separator style=themeStyles##separatorOnBackground />
-    <View style=themeStyles##background>
-      {Calendars.Categories.defaults
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
+      {ActivityCategories.defaults
        ->List.toArray
        ->Array.mapWithIndex((index, category) => {
            let (id, name, colorName, iconName) = category;
-           let color = theme->Calendars.Categories.getColor(colorName);
+           let color = ActivityCategories.getColor(theme.mode, colorName);
            let selectedCat =
              categoriesSelected->Array.some(catKey => catKey == id);
            let opened = categoriesOpened->Array.some(catKey => catKey == id);
            let separator =
-             index != Calendars.Categories.defaults->List.length - 1;
+             index != ActivityCategories.defaults->List.length - 1;
            let categoryActivities =
-             settings##activitiesCategories->Array.keep(((_e, c)) => c == id);
+             settings##activities
+             ->Array.keep(activity => activity##categoryId == id);
            let selectedCategoryActivities =
-             categoryActivities->Array.reduce([||], (selActs, (event, _)) =>
+             categoryActivities->Array.reduce([||], (selActs, activity) =>
                if (activitiesSelected->Array.some(acti =>
-                     acti->Calendars.simplifyEventTitleForComparison
-                     == event->Calendars.simplifyEventTitleForComparison
+                     Activities.isSimilar(acti, activity##title)
                    )) {
-                 selActs->Array.concat([|event|]);
+                 selActs->Array.concat([|activity##title|]);
                } else {
                  selActs;
                }
              );
-           let canOpenCategory = id != Calendars.Categories.unknown;
+           let canOpenCategory = id != ActivityCategories.unknown;
            <React.Fragment key=id>
              <View style=Predefined.styles##rowCenter>
                <Spacer size=S />
@@ -338,13 +338,13 @@ let make = () => {
                       <SVGcircle
                         width={22.->ReactFromSvg.Size.dp}
                         height={22.->ReactFromSvg.Size.dp}
-                        fill={themeColors.gray}
+                        fill={theme.colors.gray}
                       />;
                     } else {
                       <SVGcheckmarkcircle
                         width={22.->ReactFromSvg.Size.dp}
                         height={22.->ReactFromSvg.Size.dp}
-                        fill={themeColors.blue}
+                        fill={theme.colors.blue}
                       />;
                     }}
                  </SpacedView>
@@ -377,7 +377,7 @@ let make = () => {
                            <Text
                              style={Style.list([
                                Theme.text##body,
-                               themeStyles##textOnBackground,
+                               theme.styles##textOnBackground,
                              ])}>
                              name->React.string
                            </Text>
@@ -388,7 +388,7 @@ let make = () => {
                                 <Text
                                   style={Style.list([
                                     Theme.text##subhead,
-                                    themeStyles##textVeryLightOnBackground,
+                                    theme.styles##textVeryLightOnBackground,
                                   ])}>
                                   (
                                     selectedCat
@@ -412,8 +412,8 @@ let make = () => {
                               </>
                             : React.null}
                          {canOpenCategory
-                            ? // using a key because (at least in simulator, it seems to be buggy)
-                              <Animated.View
+                            // using a key because (at least in simulator, it seems to be buggy)
+                            ? <Animated.View
                                 key={opened ? "opened" : "unopened"}
                                 style=Style.(
                                   viewStyle(
@@ -437,7 +437,7 @@ let make = () => {
                      </SpacedView>
                      {separator
                         ? <Separator
-                            style=themeStyles##separatorOnBackground
+                            style=theme.styles##separatorOnBackground
                           />
                         : React.null}
                    </View>
@@ -447,19 +447,18 @@ let make = () => {
              {opened
                 ? {
                   categoryActivities
-                  ->Array.mapWithIndex((index, (event, _)) => {
+                  ->Array.mapWithIndex((index, activity) => {
                       let selected =
                         selectedCat
                         || activitiesSelected->Array.some(key =>
-                             key->Calendars.simplifyEventTitleForComparison
-                             == event->Calendars.simplifyEventTitleForComparison
+                             Activities.isSimilar(key, activity##title)
                            );
                       let separator =
                         separator
                         || index != categoryActivities->Array.length
                         - 1;
                       <View
-                        key=event
+                        key=activity##title
                         style=Style.(
                           list([
                             Predefined.styles##rowCenter,
@@ -469,19 +468,21 @@ let make = () => {
                         <Spacer size=S />
                         <TouchableOpacity
                           disabled=selectedCat
-                          onPress={_ => handleActivityCheckPress(event)}>
+                          onPress={_ =>
+                            handleActivityCheckPress(activity##title)
+                          }>
                           <SpacedView vertical=XS horizontal=None>
                             {if (!selected) {
                                <SVGcircle
                                  width={22.->ReactFromSvg.Size.dp}
                                  height={22.->ReactFromSvg.Size.dp}
-                                 fill={themeColors.gray}
+                                 fill={theme.colors.gray}
                                />;
                              } else {
                                <SVGcheckmarkcircle
                                  width={22.->ReactFromSvg.Size.dp}
                                  height={22.->ReactFromSvg.Size.dp}
-                                 fill={themeColors.blue}
+                                 fill={theme.colors.blue}
                                />;
                              }}
                           </SpacedView>
@@ -489,7 +490,9 @@ let make = () => {
                         <Spacer size=XS />
                         <TouchableOpacity
                           disabled=selectedCat
-                          onPress={_ => handleActivityCheckPress(event)}
+                          onPress={_ =>
+                            handleActivityCheckPress(activity##title)
+                          }
                           style=Predefined.styles##flex>
                           <View style=Predefined.styles##rowCenter>
                             <Spacer size=M />
@@ -503,11 +506,11 @@ let make = () => {
                                         list([
                                           Predefined.styles##flex,
                                           Theme.text##body,
-                                          themeStyles##textOnBackground,
+                                          theme.styles##textOnBackground,
                                         ])
                                       )
                                       numberOfLines=1>
-                                      event->React.string
+                                      {activity##title->React.string}
                                     </Text>
                                   </View>
                                   <Spacer size=S />
@@ -515,7 +518,7 @@ let make = () => {
                               </SpacedView>
                               {separator
                                  ? <Separator
-                                     style=themeStyles##separatorOnBackground
+                                     style=theme.styles##separatorOnBackground
                                    />
                                  : React.null}
                             </View>
@@ -530,7 +533,7 @@ let make = () => {
          })
        ->React.array}
     </View>
-    <Separator style=themeStyles##separatorOnBackground />
+    <Separator style=theme.styles##separatorOnBackground />
     <BlockFootnote>
       {j|By selecting a category, all future activities in that category will be included.|j}
       ->React.string

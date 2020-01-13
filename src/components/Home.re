@@ -31,8 +31,7 @@ external useCallback6:
 [@react.component]
 let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
   let (settings, setSettings) = React.useContext(AppSettings.context);
-  let themeStyles = Theme.useStyles();
-  let themeColors = Theme.useColors();
+  let theme = Theme.useTheme(AppSettings.useTheme());
   let windowDimensions = Dimensions.useWindowDimensions();
   let styleWidth = Style.(style(~width=windowDimensions##width->dp, ()));
 
@@ -140,7 +139,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
         <View style=styleWidth>
           <Spacer />
           <SpacedView vertical=None>
-            <Text style=themeStyles##textVeryLightOnBackground>
+            <Text style=theme.styles##textVeryLightOnBackground>
               (
                 if (todayFirst == firstDay) {
                   "Daily Average";
@@ -172,7 +171,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
           <View style=Predefined.styles##row>
             <Spacer size=S />
             <View style=Predefined.styles##flexGrow>
-              <Separator style=themeStyles##separatorOnBackground />
+              <Separator style=theme.styles##separatorOnBackground />
               <SpacedView
                 horizontal=None vertical=S style=Predefined.styles##row>
                 <View style=Predefined.styles##flexGrow>
@@ -180,7 +179,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
                     style=Style.(
                       list([
                         Theme.text##callout,
-                        themeStyles##textOnBackground,
+                        theme.styles##textOnBackground,
                       ])
                     )>
                     "Total Logged Time"->React.string
@@ -191,7 +190,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
                     style=Style.(
                       list([
                         Theme.text##callout,
-                        themeStyles##textLightOnBackground,
+                        theme.styles##textLightOnBackground,
                       ])
                     )>
                     {mapTitleDuration
@@ -250,7 +249,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
 
   <>
     <SpacedView>
-      <TitlePre style=themeStyles##textLightOnBackgroundDark>
+      <TitlePre style=theme.styles##textLightOnBackgroundDark>
         {Date.(
            today->React.Ref.current->Js.Date.getDay->dayLongString
            ++ " "
@@ -261,7 +260,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
          ->Js.String.toUpperCase
          ->React.string}
       </TitlePre>
-      <Title style=themeStyles##textOnBackground> title->React.string </Title>
+      <Title style=theme.styles##textOnBackground> title->React.string </Title>
     </SpacedView>
     <View style=Predefined.styles##rowSpaceBetween>
       <Row> <Spacer size=XS /> <BlockHeading text="Weekly Chart" /> </Row>
@@ -275,7 +274,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
         <Spacer size=XS />
       </Row>
     </View>
-    <Separator style=themeStyles##separatorOnBackground />
+    <Separator style=theme.styles##separatorOnBackground />
     <FlatList
       ref=flatListRef
       horizontal=true
@@ -284,13 +283,13 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
       initialScrollIndex
       initialNumToRender=2
       data={weeks->React.Ref.current}
-      style={Style.list([themeStyles##background, styleWidth])}
+      style={Style.list([theme.styles##background, styleWidth])}
       getItemLayout
       keyExtractor={((first, _), _index) => first->Js.Date.toString}
       renderItem
       onViewableItemsChanged={onViewableItemsChanged->React.Ref.current}
     />
-    <Separator style=themeStyles##separatorOnBackground />
+    <Separator style=theme.styles##separatorOnBackground />
     <BlockFootnote>
       {(
          "Updated "
@@ -315,23 +314,23 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
               "calendarsIdsSkipped": settings##calendarsIdsSkipped,
               "activitiesSkippedFlag": !settings##activitiesSkippedFlag,
               "activitiesSkipped": settings##activitiesSkipped,
-              "activitiesCategories": settings##activitiesCategories,
+              "activities": settings##activities,
             }
           )
         }>
-        <Separator style=themeStyles##separatorOnBackground />
-        <SpacedView vertical=XS style=themeStyles##background>
+        <Separator style=theme.styles##separatorOnBackground />
+        <SpacedView vertical=XS style=theme.styles##background>
           <Center>
             {settings##activitiesSkippedFlag
-               ? <Text style=Style.(textStyle(~color=themeColors.blue, ()))>
-                   "Show Ignored"->React.string
+               ? <Text style=Style.(textStyle(~color=theme.colors.blue, ()))>
+                   "Reveal Hidden Activities"->React.string
                  </Text>
-               : <Text style=Style.(textStyle(~color=themeColors.blue, ()))>
-                   "Hide Ignored"->React.string
+               : <Text style=Style.(textStyle(~color=theme.colors.blue, ()))>
+                   "Mask Hidden Activities"->React.string
                  </Text>}
           </Center>
         </SpacedView>
-        <Separator style=themeStyles##separatorOnBackground />
+        <Separator style=theme.styles##separatorOnBackground />
       </TouchableOpacity>
     </SpacedView>
     <Spacer />

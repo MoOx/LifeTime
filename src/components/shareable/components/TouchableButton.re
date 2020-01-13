@@ -16,7 +16,7 @@ let styles =
 
 [@react.component]
 let make = (~onPress, ~text, ~styles as s=?) => {
-  let themeStyles = Theme.useStyles();
+  let theme = Theme.useTheme(AppSettings.useTheme());
 
   <TouchableOpacity onPress>
     <SpacedView
@@ -24,11 +24,11 @@ let make = (~onPress, ~text, ~styles as s=?) => {
       style=Style.(
         arrayOption([|
           Some(styles##container),
-          Some(themeStyles##backgroundMain),
+          Some(theme.styles##backgroundMain),
           s,
         |])
       )>
-      <Text style=Style.(array([|styles##text, themeStyles##textOnMain|]))>
+      <Text style=Style.(array([|styles##text, theme.styles##textOnMain|]))>
         text->React.string
       </Text>
     </SpacedView>

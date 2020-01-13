@@ -1,77 +1,11 @@
 open Belt;
 
-let simplifyEventTitleForComparison = e => e->Js.String.toLowerCase;
-
-module Categories = {
-  type id = string;
-  type name = string;
-  type color = string;
-  type icon = NamedIcon.t;
-
-  type cat = (id, name, color, icon);
-
-  let unknown: id = "unknown";
-  let unknownCat: cat = (unknown, "Uncategorized", "gray", `bookmark);
-  let defaults: list(cat) = [
-    ("rest", "Rest", "indigo", `moonsymbol),
-    ("food", "Nutrition", "green", `carrot),
-    ("exercise", "Exercise", "pink", `workout),
-    ("work", "Work", "blue", `edit),
-    ("social", "Social", "orange", `social),
-    ("self", "Self-care", "teal", `meditation),
-    ("fun", "Entertainment", "purple", `theatremask),
-    ("chores", "Chores", "yellow", `broom),
-    // ("misc", "Miscellaneous", "yellow", `tag),
-    unknownCat,
-  ];
-
-  let getColor: (Theme.t, color) => string =
-    theme => {
-      let t = Theme.themedColors(theme);
-      fun
-      | "red" => t.red
-      | "orange" => t.orange
-      | "yellow" => t.yellow
-      | "green" => t.green
-      | "indigo" => t.indigo
-      | "teal" => t.teal
-      | "purple" => t.purple
-      | "pink" => t.pink
-      | "blue" => t.blue
-      | _ => t.gray4;
-    };
-
-  let getFromId: id => cat =
-    cid =>
-      defaults
-      ->List.keepMap(((id, name, color, icon)) =>
-          id == cid ? Some((id, name, color, icon)) : None
-        )
-      ->List.head
-      ->Option.getWithDefault(unknownCat);
-};
-
-let isCategoryIdValid = cid =>
-  Categories.defaults->List.some(((id, _, _, _)) => id == cid);
-
-let categoryIdFromEventTitle = (settings, eventTitle) => {
-  let (_, cId) =
-    settings##activitiesCategories
-    ->Array.keep(((e, c)) =>
-        e->simplifyEventTitleForComparison
-        == eventTitle->simplifyEventTitleForComparison
-        && c->isCategoryIdValid
-      )[0]
-    ->Option.getWithDefault(("", Categories.unknown));
-  cId;
-};
-
 let sort = calendars =>
   calendars->SortArray.stableSortBy((a, b) =>
     a##title > b##title ? 1 : a##title < b##title ? (-1) : 0
   );
 
-let availableCalendars = (calendars, settings: AppSettings.settings) =>
+let availableCalendars = (calendars, settings: AppSettings.t) =>
   calendars
   ->Array.keep(c =>
       !settings##calendarsIdsSkipped->Array.some(cs => cs == c##id)
@@ -124,7 +58,11 @@ let useEvents = (startDate, endDate, updatedAt) => {
   events;
 };
 
-let filterEvents = (events, settings) =>
+let filterEvents =
+    (
+      events: array(ReactNativeCalendarEvents.calendarEventReadable),
+      settings: AppSettings.t,
+    ) =>
   events->Array.keep(e
     // filters out all day events
     =>
@@ -141,9 +79,8 @@ let filterEvents = (events, settings) =>
         false;
       } else if (settings##activitiesSkippedFlag
                  && settings##activitiesSkipped
-                    ->Array.some(eventName =>
-                        eventName->simplifyEventTitleForComparison
-                        == e##title->simplifyEventTitleForComparison
+                    ->Array.some(skipped =>
+                        Activities.isSimilar(skipped, e##title)
                       )) {
         false;
       } else {
@@ -182,7 +119,7 @@ let mapTitleDuration = events => {
   ->Array.reduce(
       Map.String.empty,
       (map, e) => {
-        let key = e##title->simplifyEventTitleForComparison;
+        let key = e##title->Activities.minifyName;
         map->Map.String.set(
           key,
           map
@@ -193,6 +130,17 @@ let mapTitleDuration = events => {
       },
     )
   ->mapToSortedArrayPerDuration;
+};
+
+let categoryIdFromActivityTitle = (settings, activityName) => {
+  let activity =
+    settings##activities
+    ->Array.keep(acti =>
+        Activities.isSimilar(acti##title, activityName)
+        && acti##categoryId->ActivityCategories.isIdValid
+      )[0]
+    ->Option.getWithDefault(Activities.unknown);
+  activity##categoryId;
 };
 
 let mapCategoryDuration = (settings, events) => {
@@ -200,7 +148,7 @@ let mapCategoryDuration = (settings, events) => {
   ->Array.reduce(
       Map.String.empty,
       (map, e) => {
-        let key = settings->categoryIdFromEventTitle(e##title);
+        let key = settings->categoryIdFromActivityTitle(e##title);
         map->Map.String.set(
           key,
           map
@@ -211,12 +159,4 @@ let mapCategoryDuration = (settings, events) => {
       },
     )
   ->mapToSortedArrayPerDuration;
-};
-
-let isEventSkipped = (settings, evt) => {
-  settings##activitiesSkipped
-  ->Array.some(e =>
-      e->simplifyEventTitleForComparison
-      == evt->simplifyEventTitleForComparison
-    );
 };

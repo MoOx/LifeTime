@@ -25,8 +25,8 @@ let make =
       ~supposedEndDate,
     ) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
-  let theme = Theme.useTheme();
-  let themeStyles = Theme.useStyles();
+
+  let theme = Theme.useTheme(AppSettings.useTheme());
 
   let supposedNumberOfDays =
     Date.durationInMs(startDate, supposedEndDate)->Date.msToDays;
@@ -49,7 +49,7 @@ let make =
                 Map.String.empty,
                 (mapPerCategories, e) => {
                   let cat =
-                    settings->Calendars.categoryIdFromEventTitle(e##title);
+                    settings->Calendars.categoryIdFromActivityTitle(e##title);
                   if (Date.hasOverlap(
                         e##startDate->Js.Date.fromString,
                         e##endDate->Js.Date.fromString,
@@ -108,7 +108,7 @@ let make =
       viewStyle(
         ~alignItems=`flexEnd,
         ~borderTopWidth=StyleSheet.hairlineWidth,
-        ~borderTopColor=Theme.themedColors(theme).gray4,
+        ~borderTopColor=theme.colors.gray4,
         ~height=(graphHeight +. graphLetterHeight)->dp,
         (),
       )
@@ -140,7 +140,7 @@ let make =
                      ),
                    ])
                  )
-                 dashColor={Theme.themedColors(theme).gray4}
+                 dashColor={theme.colors.gray4}
                />
                <SpacedView
                  horizontal=XXS
@@ -157,7 +157,7 @@ let make =
                  <Text
                    style=Style.(
                      list([
-                       themeStyles##textVeryLightOnBackground,
+                       theme.styles##textVeryLightOnBackground,
                        textStyle(~fontSize=10., ()),
                      ])
                    )>
@@ -184,7 +184,7 @@ let make =
               ),
             ])
           )
-          dashColor={Theme.themedColors(theme).gray4}
+          dashColor={theme.colors.gray4}
         />
       </View>
       {maxDuration
@@ -213,7 +213,7 @@ let make =
                             ~right=0.->dp,
                             ~bottom=(100. /. slices->float *. i->float)->pct,
                             ~height=StyleSheet.hairlineWidth->dp,
-                            ~backgroundColor=Theme.themedColors(theme).gray5,
+                            ~backgroundColor=theme.colors.gray5,
                             (),
                           ),
                         ])
@@ -239,7 +239,7 @@ let make =
                               ~right=(-20.)->dp,
                               (),
                             ),
-                            themeStyles##textVeryLightOnBackground,
+                            theme.styles##textVeryLightOnBackground,
                             textStyle(~fontSize=10., ~lineHeight=10., ()),
                           ])
                         )>
@@ -262,7 +262,7 @@ let make =
                      ~right=0.->dp,
                      ~bottom=0.->pct,
                      ~height=StyleSheet.hairlineWidth->dp,
-                     ~backgroundColor=Theme.themedColors(theme).gray5,
+                     ~backgroundColor=theme.colors.gray5,
                      (),
                    ),
                  ])
@@ -298,13 +298,16 @@ let make =
                             ->Map.String.toArray
                             ->Array.map(((key, value)) => {
                                 let ecid =
-                                  settings->Calendars.categoryIdFromEventTitle(
+                                  settings->Calendars.categoryIdFromActivityTitle(
                                     title,
                                   );
-                                let (_, _, color, _) =
-                                  Calendars.Categories.getFromId(ecid);
+                                let (_, _, colorName, _) =
+                                  ActivityCategories.getFromId(ecid);
                                 let backgroundColor =
-                                  theme->Calendars.Categories.getColor(color);
+                                  ActivityCategories.getColor(
+                                    theme.mode,
+                                    colorName,
+                                  );
                                 key != ecid
                                   ? React.null
                                   : <View

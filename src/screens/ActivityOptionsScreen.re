@@ -4,23 +4,22 @@ open ReactMultiversal;
 
 [@react.component]
 let make = (~navigation, ~route) => {
-  let theme = Theme.useTheme();
-  let themeStyles = Theme.useStyles();
+  let theme = Theme.useTheme(AppSettings.useTheme());
   <>
-    <StatusBar barStyle={theme->Theme.themedStatusBarStyle(`darkContent)} />
+    <StatusBar barStyle={Theme.statusBarStyle(theme.mode, `darkContent)} />
     <Animated.ScrollView
       style={Style.list([
         Predefined.styles##flexGrow,
-        themeStyles##backgroundDark,
+        theme.styles##backgroundDark,
       ])}
       showsHorizontalScrollIndicator=false
       showsVerticalScrollIndicator=false>
       {route##params
-       ->Option.flatMap(params => params##currentActivity)
-       ->Option.map(currentActivity =>
+       ->Option.flatMap(params => params##currentActivityTitle)
+       ->Option.map(currentActivityTitle =>
            <ActivityOptions
-             activity=currentActivity
-             onIgnoreActivity={() =>
+             activityTitle=currentActivityTitle
+             onSkipActivity={() =>
                navigation->Navigators.RootStack.Navigation.goBack()
              }
            />

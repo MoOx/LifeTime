@@ -10,17 +10,16 @@ let styles =
   }
   ->StyleSheet.create;
 
-let numberOfEventsToShow = 8;
+let numberOfActivitiesToShow = 8;
 
 [@react.component]
 let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
 
-  let theme = Theme.useTheme();
-  let themeStyles = Theme.useStyles();
+  let theme = Theme.useTheme(AppSettings.useTheme());
   let calendars = Calendars.useCalendars(None);
-  let (eventsToShow, setEventsToShow) =
-    React.useState(() => numberOfEventsToShow);
+  let (activitiesToShow, setActivitiesToShow) =
+    React.useState(() => numberOfActivitiesToShow);
 
   let (_, maxDurationInMin) =
     mapTitleDuration
@@ -47,8 +46,8 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
         <Spacer size=XS />
       </Row>
     </View>
-    <Separator style=themeStyles##separatorOnBackground />
-    <View onLayout style=themeStyles##background>
+    <Separator style=theme.styles##separatorOnBackground />
+    <View onLayout style=theme.styles##background>
       {calendars
        ->Option.map(calendars =>
            Calendars.availableCalendars(calendars, settings)
@@ -58,11 +57,11 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
              <SpacedView>
                <Center>
                  <Spacer size=XXL />
-                 <Title style=themeStyles##textOnBackground>
+                 <Title style=theme.styles##textOnBackground>
                    "No Events"->React.string
                  </Title>
                  <Spacer />
-                 <Text style=themeStyles##textVeryLightOnBackground>
+                 <Text style=theme.styles##textVeryLightOnBackground>
                    "You should select at least a calendar"->React.string
                  </Text>
                  <Spacer size=XXL />
@@ -74,18 +73,21 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
          )
        ->Option.getWithDefault(React.null)}
       {mapTitleDuration
-       ->Option.map(mapTitleDuration =>
+       ->Option.map(mapTitleDuration => {
+           let shouldShowMore =
+             mapTitleDuration->Array.length > activitiesToShow;
+           let shouldShowLess = activitiesToShow > numberOfActivitiesToShow;
            <>
              {switch (mapTitleDuration) {
               | [||] =>
                 <SpacedView>
                   <Center>
                     <Spacer size=XXL />
-                    <Title style=themeStyles##textOnBackground>
+                    <Title style=theme.styles##textOnBackground>
                       "No Events"->React.string
                     </Title>
                     <Spacer />
-                    <Text style=themeStyles##textVeryLightOnBackground>
+                    <Text style=theme.styles##textVeryLightOnBackground>
                       "That's unexpected. Try filling the blanks!"
                       ->React.string
                     </Text>
@@ -95,49 +97,46 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
               | _ =>
                 <>
                   {mapTitleDuration
-                   ->Array.slice(~offset=0, ~len=eventsToShow)
-                   ->Array.map(((title, totalDurationInMin)) => {
+                   ->Array.slice(~offset=0, ~len=activitiesToShow)
+                   ->Array.mapWithIndex((index, (title, totalDurationInMin)) => {
                        let durationString =
                          totalDurationInMin->Date.minToString;
                        let (_, _, colorName, iconName) =
                          settings
-                         ->Calendars.categoryIdFromEventTitle(title)
-                         ->Calendars.Categories.getFromId;
+                         ->Calendars.categoryIdFromActivityTitle(title)
+                         ->ActivityCategories.getFromId;
                        let color =
-                         theme->Calendars.Categories.getColor(colorName);
+                         ActivityCategories.getColor(theme.mode, colorName);
                        <TouchableOpacity
-                         onPress={_ => onActivityPress(title)} key=title>
+                         key=title onPress={_ => onActivityPress(title)}>
                          <View style=Predefined.styles##rowCenter>
                            <Spacer size=S />
                            <SpacedView vertical=XS horizontal=None>
                              <NamedIcon name=iconName fill=color />
                            </SpacedView>
                            <Spacer size=XS />
-                           <View style=Predefined.styles##flexGrow>
+                           <View style=Predefined.styles##flex>
                              <SpacedView
                                vertical=XS
                                horizontal=None
-                               style=Style.(
-                                 list([
-                                   Predefined.styles##rowCenter,
-                                   Predefined.styles##flexShrink,
-                                 ])
-                               )>
+                               style=Predefined.styles##rowCenter>
                                <View style=Predefined.styles##flex>
                                  <Text
-                                   style=themeStyles##textOnBackground
+                                   style=Style.(
+                                     list([
+                                       Theme.text##callout,
+                                       theme.styles##textOnBackground,
+                                     ])
+                                   )
                                    numberOfLines=1>
                                    title->React.string
                                  </Text>
                                  <Spacer size=XXS />
-                                 <Row
-                                   style=Style.(
-                                     viewStyle(~alignItems=`center, ())
-                                   )>
+                                 <Row style=Predefined.styles##alignCenter>
                                    <View
                                      style=Style.(
                                        array([|
-                                         themeStyles##backgroundGray3,
+                                         theme.styles##backgroundGray3,
                                          viewStyle(
                                            // ~backgroundColor=color,
                                            ~width=
@@ -160,7 +159,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                                      style=Style.(
                                        array([|
                                          styles##durationText,
-                                         themeStyles##textVeryLightOnBackground,
+                                         theme.styles##textVeryLightOnBackground,
                                        |])
                                      )
                                      numberOfLines=1
@@ -177,69 +176,71 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                                />
                                <Spacer size=S />
                              </SpacedView>
-                             <Separator
-                               style=themeStyles##separatorOnBackground
-                             />
+                             {index < mapTitleDuration->Array.length
+                              - 1
+                              || shouldShowMore
+                              || shouldShowLess
+                                ? <Separator
+                                    style=theme.styles##separatorOnBackground
+                                  />
+                                : React.null}
                            </View>
                          </View>
                        </TouchableOpacity>;
                      })
                    ->React.array}
-                  {
-                    let showMore =
-                      mapTitleDuration->Array.length > eventsToShow;
-                    let showLess = eventsToShow > numberOfEventsToShow;
-                    showMore || showLess
-                      ? <Row>
-                          <Spacer size=L />
-                          <View
-                            style=Style.(
-                              list([
-                                Predefined.styles##rowSpaceBetween,
-                                Predefined.styles##flexGrow,
-                              ])
-                            )>
-                            {mapTitleDuration->Array.length > eventsToShow
-                               ? <TouchableOpacity
-                                   onPress={_ =>
-                                     setEventsToShow(eventsToShow =>
-                                       eventsToShow + numberOfEventsToShow
-                                     )
-                                   }>
-                                   <SpacedView vertical=XS horizontal=S>
-                                     <Text style=themeStyles##textBlue>
-                                       "Show More"->React.string
-                                     </Text>
-                                   </SpacedView>
-                                 </TouchableOpacity>
-                               : React.null}
-                            <Spacer />
-                            {eventsToShow > numberOfEventsToShow
-                               ? <TouchableOpacity
-                                   onPress={_ =>
-                                     setEventsToShow(eventsToShow =>
-                                       eventsToShow - numberOfEventsToShow
-                                     )
-                                   }>
-                                   <SpacedView vertical=XS horizontal=S>
-                                     <Text style=themeStyles##textBlue>
-                                       "Show Less"->React.string
-                                     </Text>
-                                   </SpacedView>
-                                 </TouchableOpacity>
-                               : React.null}
-                          </View>
-                          <Separator
-                            style=themeStyles##separatorOnBackground
-                          />
-                        </Row>
-                      : React.null;
-                  }
+                  {shouldShowMore || shouldShowLess
+                     ? <Row>
+                         <Spacer size=L />
+                         <View
+                           style=Style.(
+                             list([
+                               Predefined.styles##rowSpaceBetween,
+                               Predefined.styles##flexGrow,
+                             ])
+                           )>
+                           {mapTitleDuration->Array.length > activitiesToShow
+                              ? <TouchableOpacity
+                                  onPress={_ =>
+                                    setActivitiesToShow(activitiesToShow =>
+                                      activitiesToShow
+                                      + numberOfActivitiesToShow
+                                    )
+                                  }>
+                                  <SpacedView vertical=XS horizontal=S>
+                                    <Text style=theme.styles##textBlue>
+                                      "Show More"->React.string
+                                    </Text>
+                                  </SpacedView>
+                                </TouchableOpacity>
+                              : React.null}
+                           <Spacer />
+                           {activitiesToShow > numberOfActivitiesToShow
+                              ? <TouchableOpacity
+                                  onPress={_ =>
+                                    setActivitiesToShow(activitiesToShow =>
+                                      activitiesToShow
+                                      - numberOfActivitiesToShow
+                                    )
+                                  }>
+                                  <SpacedView vertical=XS horizontal=S>
+                                    <Text style=theme.styles##textBlue>
+                                      "Show Less"->React.string
+                                    </Text>
+                                  </SpacedView>
+                                </TouchableOpacity>
+                              : React.null}
+                         </View>
+                         <Separator
+                           style=theme.styles##separatorOnBackground
+                         />
+                       </Row>
+                     : React.null}
                 </>
               }}
-             <Separator style=themeStyles##separatorOnBackground />
-           </>
-         )
+             <Separator style=theme.styles##separatorOnBackground />
+           </>;
+         })
        ->Option.getWithDefault(React.null)}
     </View>
   </>;

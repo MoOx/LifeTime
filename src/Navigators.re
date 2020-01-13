@@ -2,7 +2,7 @@ open ReactNavigation;
 
 module StatsStack =
   Stack.Make({
-    type params = {. "currentActivity": option(string)};
+    type params = {. "currentActivityTitle": option(string)};
   });
 
 module GoalsStack =

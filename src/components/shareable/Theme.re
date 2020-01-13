@@ -45,14 +45,14 @@ module Colors = {
   };
 };
 
-let themedColors = theme => {
+let colors = theme => {
   switch (theme) {
   | `light => Predefined.Colors.Ios.light
   | `dark => Predefined.Colors.Ios.dark
   };
 };
 
-let themedStatusBarStyle = (theme, barStyle) => {
+let statusBarStyle = (theme, barStyle) => {
   switch (theme, barStyle) {
   | (`light, `lightContent) => `lightContent
   | (`light, `darkContent) => `darkContent
@@ -291,34 +291,35 @@ let themeStyles = {
     ->StyleSheet.create,
 };
 
-let useTheme = (): t => {
-  let (settings, _setSettings) = React.useContext(AppSettings.context);
-  let mode = settings##theme->AppSettings.themeStringToTheme;
+type themeData('a) = {
+  mode: t,
+  styles: rnStyleSheet('a),
+  colors: Predefined.Colors.Ios.t,
+};
+
+let useTheme = (acceptedMode): themeData('a) => {
   let autoMode = ReactNativeDarkMode.useDarkMode();
+  let mode =
+    switch (acceptedMode) {
+    | `auto =>
+      switch (autoMode) {
+      | true => `dark
+      | _ => `light
+      }
+    | `light => `light
+    | `dark => `dark
+    };
   switch (mode) {
-  | `auto =>
-    switch (autoMode) {
-    | true => `dark
-    | _ => `light
+  | `light => {
+      mode,
+      styles: themeStyles.light,
+      colors: Predefined.Colors.Ios.light,
     }
-  | `light => `light
-  | `dark => `dark
-  };
-};
-
-let useStyles = (): rnStyleSheet('a) => {
-  let theme = useTheme();
-  switch (theme) {
-  | `light => themeStyles.light
-  | `dark => themeStyles.dark
-  };
-};
-
-let useColors = () => {
-  let theme = useTheme();
-  switch (theme) {
-  | `light => Predefined.Colors.Ios.light
-  | `dark => Predefined.Colors.Ios.dark
+  | `dark => {
+      mode,
+      styles: themeStyles.dark,
+      colors: Predefined.Colors.Ios.dark,
+    }
   };
 };
 

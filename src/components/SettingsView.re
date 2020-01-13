@@ -11,9 +11,8 @@ let title = "Settings";
 [@react.component]
 let make = () => {
   let (settings, setSettings) = React.useContext(AppSettings.context);
-  let themeKey = settings##theme->AppSettings.themeStringToTheme;
-  let themeStyles = Theme.useStyles();
-  let themeColors = Theme.useColors();
+  let themeKey = AppSettings.useTheme();
+  let theme = Theme.useTheme(AppSettings.useTheme());
 
   let handleImport =
     React.useCallback1(
@@ -36,11 +35,11 @@ let make = () => {
   <>
     <SpacedView>
       <TitlePre> " "->React.string </TitlePre>
-      <Title style=themeStyles##textOnBackground> title->React.string </Title>
+      <Title style=theme.styles##textOnBackground> title->React.string </Title>
     </SpacedView>
     <Row> <Spacer size=XS /> <BlockHeading text="Theme" /> </Row>
-    <Separator style=themeStyles##separatorOnBackground />
-    <View style=themeStyles##background>
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
       <TouchableOpacity
         onPress={_ =>
           setSettings(settings =>
@@ -50,7 +49,7 @@ let make = () => {
               "calendarsIdsSkipped": settings##calendarsIdsSkipped,
               "activitiesSkippedFlag": settings##activitiesSkippedFlag,
               "activitiesSkipped": settings##activitiesSkipped,
-              "activitiesCategories": settings##activitiesCategories,
+              "activities": settings##activities,
             }
           )
         }>
@@ -60,24 +59,24 @@ let make = () => {
             <SVGsunoutline
               width={28.->ReactFromSvg.Size.dp}
               height={28.->ReactFromSvg.Size.dp}
-              fill={themeColors.blue}
+              fill={theme.colors.blue}
             />
           </SpacedView>
           <Spacer size=XS />
-          <View style=Predefined.styles##flexGrow>
+          <View style=Predefined.styles##flex>
             <SpacedView vertical=XS horizontal=None>
               <View style=Predefined.styles##row>
                 <View
                   style=Style.(
                     list([
-                      Predefined.styles##flexGrow,
-                      viewStyle(~justifyContent=`center, ()),
+                      Predefined.styles##flex,
+                      Predefined.styles##justifyCenter,
                     ])
                   )>
                   <Text
                     style={Style.list([
                       styles##text,
-                      themeStyles##textOnBackground,
+                      theme.styles##textOnBackground,
                     ])}>
                     "Light"->React.string
                   </Text>
@@ -87,14 +86,14 @@ let make = () => {
                    <SVGcheckmark
                      width={24.->ReactFromSvg.Size.dp}
                      height={24.->ReactFromSvg.Size.dp}
-                     fill={themeColors.blue}
+                     fill={theme.colors.blue}
                    />
                  | _ => React.null
                  }}
                 <Spacer size=S />
               </View>
             </SpacedView>
-            <Separator style=themeStyles##separatorOnBackground />
+            <Separator style=theme.styles##separatorOnBackground />
           </View>
         </View>
       </TouchableOpacity>
@@ -107,7 +106,7 @@ let make = () => {
               "calendarsIdsSkipped": settings##calendarsIdsSkipped,
               "activitiesSkippedFlag": settings##activitiesSkippedFlag,
               "activitiesSkipped": settings##activitiesSkipped,
-              "activitiesCategories": settings##activitiesCategories,
+              "activities": settings##activities,
             }
           )
         }>
@@ -117,24 +116,24 @@ let make = () => {
             <SVGmoonsymbol
               width={28.->ReactFromSvg.Size.dp}
               height={28.->ReactFromSvg.Size.dp}
-              fill={themeColors.indigo}
+              fill={theme.colors.indigo}
             />
           </SpacedView>
           <Spacer size=XS />
-          <View style=Predefined.styles##flexGrow>
+          <View style=Predefined.styles##flex>
             <SpacedView vertical=XS horizontal=None>
               <View style=Predefined.styles##row>
                 <View
                   style=Style.(
                     list([
-                      Predefined.styles##flexGrow,
-                      viewStyle(~justifyContent=`center, ()),
+                      Predefined.styles##flex,
+                      Predefined.styles##justifyCenter,
                     ])
                   )>
                   <Text
                     style={Style.list([
                       styles##text,
-                      themeStyles##textOnBackground,
+                      theme.styles##textOnBackground,
                     ])}>
                     "Dark"->React.string
                   </Text>
@@ -144,14 +143,14 @@ let make = () => {
                    <SVGcheckmark
                      width={24.->ReactFromSvg.Size.dp}
                      height={24.->ReactFromSvg.Size.dp}
-                     fill={themeColors.blue}
+                     fill={theme.colors.blue}
                    />
                  | _ => React.null
                  }}
                 <Spacer size=S />
               </View>
             </SpacedView>
-            <Separator style=themeStyles##separatorOnBackground />
+            <Separator style=theme.styles##separatorOnBackground />
           </View>
         </View>
       </TouchableOpacity>
@@ -164,7 +163,7 @@ let make = () => {
               "calendarsIdsSkipped": settings##calendarsIdsSkipped,
               "activitiesSkippedFlag": settings##activitiesSkippedFlag,
               "activitiesSkipped": settings##activitiesSkipped,
-              "activitiesCategories": settings##activitiesCategories,
+              "activities": settings##activities,
             }
           )
         }>
@@ -174,24 +173,24 @@ let make = () => {
             <SVGmoonshine
               width={28.->ReactFromSvg.Size.dp}
               height={28.->ReactFromSvg.Size.dp}
-              fill={themeColors.purple}
+              fill={theme.colors.purple}
             />
           </SpacedView>
           <Spacer size=XS />
-          <View style=Predefined.styles##flexGrow>
+          <View style=Predefined.styles##flex>
             <SpacedView vertical=XS horizontal=None>
               <View style=Predefined.styles##row>
                 <View
                   style=Style.(
                     list([
-                      Predefined.styles##flexGrow,
-                      viewStyle(~justifyContent=`center, ()),
+                      Predefined.styles##flex,
+                      Predefined.styles##justifyCenter,
                     ])
                   )>
                   <Text
                     style={Style.list([
                       styles##text,
-                      themeStyles##textOnBackground,
+                      theme.styles##textOnBackground,
                     ])}>
                     "Auto"->React.string
                   </Text>
@@ -201,7 +200,7 @@ let make = () => {
                    <SVGcheckmark
                      width={24.->ReactFromSvg.Size.dp}
                      height={24.->ReactFromSvg.Size.dp}
-                     fill={themeColors.blue}
+                     fill={theme.colors.blue}
                    />
                  | _ => React.null
                  }}
@@ -211,8 +210,7 @@ let make = () => {
           </View>
         </View>
       </TouchableOpacity>
-      // <Separator style=themeStyles##separatorOnBackground />
-      <Separator style=themeStyles##separatorOnBackground />
+      <Separator style=theme.styles##separatorOnBackground />
     </View>
     <BlockFootnote>
       "Auto theme will switch between Light & Dark automatically to match your system settings."
@@ -220,33 +218,96 @@ let make = () => {
     </BlockFootnote>
     <Spacer />
     <Row> <Spacer size=XS /> <BlockHeading text="More" /> </Row>
-    <Separator style=themeStyles##separatorOnBackground />
-    <View style=themeStyles##background>
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
+      <TouchableOpacity
+        onPress={_ =>
+          if (Platform.os == Platform.ios) {
+            Linking.openURL("calshow:")->ignore;
+          } else if (Platform.os == Platform.android) {
+            Linking.openURL("content://com.android.calendar/time/")->ignore;
+          }
+        }>
+        <View style=Predefined.styles##rowCenter>
+          <Spacer size=S />
+          <SpacedView vertical=XS horizontal=None>
+            <SVGcalendar
+              width={28.->ReactFromSvg.Size.dp}
+              height={28.->ReactFromSvg.Size.dp}
+              fill={theme.colors.blue}
+            />
+          </SpacedView>
+          <Spacer size=XS />
+          <View style=Predefined.styles##flex>
+            <SpacedView
+              vertical=XS
+              horizontal=None
+              style=Predefined.styles##rowSpaceBetween>
+              <Text
+                style=Style.(
+                  list([
+                    Predefined.styles##flex,
+                    styles##text,
+                    theme.styles##textOnBackground,
+                  ])
+                )>
+                "Calendar App"->React.string
+              </Text>
+              <SVGchevronright
+                width={14.->ReactFromSvg.Size.dp}
+                height={14.->ReactFromSvg.Size.dp}
+                fill={Predefined.Colors.Ios.light.gray4}
+              />
+              <Spacer size=S />
+            </SpacedView>
+            <Separator style=theme.styles##separatorOnBackground />
+          </View>
+        </View>
+      </TouchableOpacity>
       <TouchableOpacity
         onPress={_ => ReactNativePermissions.openSettings()->ignore}>
-        <SpacedView horizontal=S vertical=XS>
-          <View style=Predefined.styles##rowSpaceBetween>
-            <Text
-              style={Style.list([
-                styles##text,
-                themeStyles##textOnBackground,
-              ])}>
-              "App System Settings"->React.string
-            </Text>
-            <SVGchevronright
-              width={14.->ReactFromSvg.Size.dp}
-              height={14.->ReactFromSvg.Size.dp}
-              fill={Predefined.Colors.Ios.light.gray4}
+        <View style=Predefined.styles##rowCenter>
+          <Spacer size=S />
+          <SpacedView vertical=XS horizontal=None>
+            <SVGsettings
+              width={28.->ReactFromSvg.Size.dp}
+              height={28.->ReactFromSvg.Size.dp}
+              fill={theme.colors.blue}
             />
+          </SpacedView>
+          <Spacer size=XS />
+          <View style=Predefined.styles##flex>
+            <SpacedView
+              vertical=XS
+              horizontal=None
+              style=Predefined.styles##rowSpaceBetween>
+              <Text
+                style=Style.(
+                  list([
+                    Predefined.styles##flex,
+                    styles##text,
+                    theme.styles##textOnBackground,
+                  ])
+                )>
+                "App System Settings"->React.string
+              </Text>
+              <SVGchevronright
+                width={14.->ReactFromSvg.Size.dp}
+                height={14.->ReactFromSvg.Size.dp}
+                fill={Predefined.Colors.Ios.light.gray4}
+              />
+              <Spacer size=S />
+            </SpacedView>
           </View>
-        </SpacedView>
+        </View>
       </TouchableOpacity>
     </View>
-    <Separator style=themeStyles##separatorOnBackground />
+    // <Separator style=theme.styles##separatorOnBackground />
+    <Separator style=theme.styles##separatorOnBackground />
     <Spacer size=L />
     <Row> <Spacer size=XS /> <BlockHeading text="Danger Zone" /> </Row>
-    <Separator style=themeStyles##separatorOnBackground />
-    <View style=themeStyles##background>
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
       <TouchableOpacity
         onPress={_ => {
           Clipboard.setString(
@@ -268,24 +329,24 @@ let make = () => {
             <SVGexport
               width={28.->ReactFromSvg.Size.dp}
               height={28.->ReactFromSvg.Size.dp}
-              fill={themeColors.blue}
+              fill={theme.colors.blue}
             />
           </SpacedView>
           <Spacer size=XS />
-          <View style=Predefined.styles##flexGrow>
+          <View style=Predefined.styles##flex>
             <SpacedView vertical=XS horizontal=None>
               <View style=Predefined.styles##row>
                 <View
                   style=Style.(
                     list([
-                      Predefined.styles##flexGrow,
-                      viewStyle(~justifyContent=`center, ()),
+                      Predefined.styles##flex,
+                      Predefined.styles##justifyCenter,
                     ])
                   )>
                   <Text
                     style={Style.list([
                       styles##text,
-                      themeStyles##textOnBackground,
+                      theme.styles##textOnBackground,
                     ])}>
                     "Export Backup"->React.string
                   </Text>
@@ -293,7 +354,7 @@ let make = () => {
                 <Spacer size=S />
               </View>
             </SpacedView>
-            <Separator style=themeStyles##separatorOnBackground />
+            <Separator style=theme.styles##separatorOnBackground />
           </View>
         </View>
       </TouchableOpacity>
@@ -321,24 +382,24 @@ let make = () => {
             <SVGimport
               width={28.->ReactFromSvg.Size.dp}
               height={28.->ReactFromSvg.Size.dp}
-              fill={themeColors.blue}
+              fill={theme.colors.blue}
             />
           </SpacedView>
           <Spacer size=XS />
-          <View style=Predefined.styles##flexGrow>
+          <View style=Predefined.styles##flex>
             <SpacedView vertical=XS horizontal=None>
               <View style=Predefined.styles##row>
                 <View
                   style=Style.(
                     list([
-                      Predefined.styles##flexGrow,
-                      viewStyle(~justifyContent=`center, ()),
+                      Predefined.styles##flex,
+                      Predefined.styles##justifyCenter,
                     ])
                   )>
                   <Text
                     style={Style.list([
                       styles##text,
-                      themeStyles##textOnBackground,
+                      theme.styles##textOnBackground,
                     ])}>
                     "Import Backup"->React.string
                   </Text>
@@ -350,14 +411,14 @@ let make = () => {
         </View>
       </TouchableOpacity>
     </View>
-    <Separator style=themeStyles##separatorOnBackground />
+    <Separator style=theme.styles##separatorOnBackground />
     <BlockFootnote>
       "Export is placing data into your clipboard. Import assume that you have your export in the clipboard."
       ->React.string
     </BlockFootnote>
     <Spacer size=L />
-    <Separator style=themeStyles##separatorOnBackground />
-    <View style=themeStyles##background>
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
       <TouchableOpacity
         onPress={_ =>
           Alert.alert(
@@ -380,14 +441,14 @@ let make = () => {
           vertical=XS horizontal=XS style=Predefined.styles##rowCenter>
           <Text
             style=Style.(
-              list([styles##text, textStyle(~color=themeColors.red, ())])
+              list([styles##text, textStyle(~color=theme.colors.red, ())])
             )>
             "Reset Settings & Erase All Data"->React.string
           </Text>
         </SpacedView>
       </TouchableOpacity>
     </View>
-    <Separator style=themeStyles##separatorOnBackground />
+    <Separator style=theme.styles##separatorOnBackground />
     <BlockFootnote>
       "This is a destructive operation and will delete all application data. All your calendars and events are safe and untouched."
       ->React.string

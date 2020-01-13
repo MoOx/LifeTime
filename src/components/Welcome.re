@@ -44,7 +44,7 @@ let icon = Packager.require("../../public/Icon.png");
 
 [@react.component]
 let make = (~onAboutPrivacyPress, ~onContinuePress) => {
-  let themeStyles = Theme.useStyles();
+  let theme = Theme.useTheme(AppSettings.useTheme());
   let animatedPitchOpacity = React.useRef(Animated.Value.create(0.));
   let animatedPitchScale = React.useRef(Animated.Value.create(0.75));
   let animatedBottomOpacity = React.useRef(Animated.Value.create(0.));
@@ -129,14 +129,14 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
         <Spacer />
         <Text
           style=Style.(
-            array([|styles##title, themeStyles##textOnBackground|])
+            array([|styles##title, theme.styles##textOnBackground|])
           )
           numberOfLines=1
           adjustsFontSizeToFit=true>
           "Welcome to"->React.string
         </Text>
         <Text
-          style=Style.(array([|styles##appName, themeStyles##textMain|]))
+          style=Style.(array([|styles##appName, theme.styles##textMain|]))
           numberOfLines=1
           adjustsFontSizeToFit=true>
           "LifeTime"->React.string
@@ -144,7 +144,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
         <Spacer />
         <Text
           style=Style.(
-            array([|styles##baseline, themeStyles##textOnBackground|])
+            array([|styles##baseline, theme.styles##textOnBackground|])
           )>
           "Your personal coach, helping you to reach your goals and spend your valuable time on things you love."
           ->React.string
@@ -178,7 +178,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
           <View style=styles##bottomText>
             <Text
               style=Style.(
-                array([|styles##permissions, themeStyles##textGray|])
+                array([|styles##permissions, theme.styles##textGray|])
               )>
               "LifeTime needs access to your calendar to show activity reports & suggestions. Your data stay on your device."
               ->React.string
@@ -187,7 +187,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
             <TouchableOpacity onPress=onAboutPrivacyPress>
               <Text
                 style=Style.(
-                  array([|styles##permissionsLink, themeStyles##textMain|])
+                  array([|styles##permissionsLink, theme.styles##textMain|])
                 )>
                 "About LifeTime & Privacy..."->React.string
               </Text>

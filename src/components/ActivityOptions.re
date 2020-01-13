@@ -7,21 +7,20 @@ let styles =
   ->StyleSheet.create;
 
 [@react.component]
-let make = (~activity, ~onIgnoreActivity) => {
+let make = (~activityTitle, ~onSkipActivity) => {
   let (settings, setSettings) = React.useContext(AppSettings.context);
-  let theme = Theme.useTheme();
-  let themeStyles = Theme.useStyles();
-  let themeColors = Theme.useColors();
-  let simplifiedActivityTitle =
-    activity->Calendars.simplifyEventTitleForComparison;
-  let isSkipped = Calendars.isEventSkipped(settings, activity);
+  let themeModeKey = AppSettings.useTheme();
+  let theme = Theme.useTheme(themeModeKey);
+  let isSkipped =
+    settings##activitiesSkipped
+    ->Array.some(skipped => Activities.isSimilar(skipped, activityTitle));
   <SpacedView horizontal=None>
     <Row> <Spacer size=XS /> <BlockHeading text="Category" /> </Row>
-    <Separator style=themeStyles##separatorOnBackground />
-    <View style=themeStyles##background>
-      {Calendars.Categories.defaults
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
+      {ActivityCategories.defaults
        ->List.mapWithIndex((index, (id, name, colorName, iconName)) => {
-           let color = theme->Calendars.Categories.getColor(colorName);
+           let color = ActivityCategories.getColor(theme.mode, colorName);
            <TouchableOpacity
              key=id
              onPress={_ =>
@@ -33,13 +32,18 @@ let make = (~activity, ~onIgnoreActivity) => {
                    "calendarsIdsSkipped": settings##calendarsIdsSkipped,
                    "activitiesSkippedFlag": settings##activitiesSkippedFlag,
                    "activitiesSkipped": settings##activitiesSkipped,
-                   "activitiesCategories":
-                     settings##activitiesCategories
-                     ->Array.keep(((event, _c)) =>
-                         event->Calendars.simplifyEventTitleForComparison
-                         != simplifiedActivityTitle
+                   "activities":
+                     settings##activities
+                     ->Array.keep(acti =>
+                         !Activities.isSimilar(acti##title, activityTitle)
                        )
-                     ->Array.concat([|(simplifiedActivityTitle, id)|]),
+                     ->Array.concat([|
+                         {
+                           "title": activityTitle,
+                           "createdAt": Js.Date.now(),
+                           "categoryId": id,
+                         },
+                       |]),
                  }
                )
              }>
@@ -56,14 +60,14 @@ let make = (~activity, ~onIgnoreActivity) => {
                        <Text
                          style={Style.list([
                            styles##text,
-                           themeStyles##textOnBackground,
+                           theme.styles##textOnBackground,
                          ])}>
                          name->React.string
                        </Text>
                      </View>
                      {if (id
-                          != settings->Calendars.categoryIdFromEventTitle(
-                               activity,
+                          != settings->Calendars.categoryIdFromActivityTitle(
+                               activityTitle,
                              )) {
                         <SVGcircle
                           width={26.->ReactFromSvg.Size.dp}
@@ -80,8 +84,8 @@ let make = (~activity, ~onIgnoreActivity) => {
                      <Spacer size=S />
                    </View>
                  </SpacedView>
-                 {index !== Calendars.Categories.defaults->List.length - 1
-                    ? <Separator style=themeStyles##separatorOnBackground />
+                 {index !== ActivityCategories.defaults->List.length - 1
+                    ? <Separator style=theme.styles##separatorOnBackground />
                     : React.null}
                </View>
              </View>
@@ -90,13 +94,17 @@ let make = (~activity, ~onIgnoreActivity) => {
        //  <View> <Spacer /> </View>
        ->List.toArray
        ->React.array}
-      <Separator style=themeStyles##separatorOnBackground />
+      <Separator style=theme.styles##separatorOnBackground />
     </View>
     <Spacer size=L />
     <TouchableOpacity
       onPress={_ => {
         setSettings(settings => {
-          let isSkipped = Calendars.isEventSkipped(settings, activity);
+          let isSkipped =
+            settings##activitiesSkipped
+            ->Array.some(skipped =>
+                Activities.isSimilar(skipped, activityTitle)
+              );
           {
             "theme": settings##theme,
             "lastUpdated": Js.Date.now(),
@@ -104,28 +112,32 @@ let make = (~activity, ~onIgnoreActivity) => {
             "activitiesSkippedFlag": settings##activitiesSkippedFlag,
             "activitiesSkipped":
               !isSkipped
-                ? settings##activitiesSkipped->Array.concat([|activity|])
-                : settings##activitiesSkipped->Array.keep(e => e != activity),
-            "activitiesCategories": settings##activitiesCategories,
+                ? settings##activitiesSkipped
+                  ->Array.concat([|activityTitle|])
+                : settings##activitiesSkipped
+                  ->Array.keep(alreadySkipped =>
+                      Activities.isSimilar(alreadySkipped, activityTitle)
+                    ),
+            "activities": settings##activities,
           };
         });
-        onIgnoreActivity();
+        onSkipActivity();
       }}>
-      <Separator style=themeStyles##separatorOnBackground />
-      <SpacedView vertical=XS style=themeStyles##background>
+      <Separator style=theme.styles##separatorOnBackground />
+      <SpacedView vertical=XS style=theme.styles##background>
         <Center>
-          <Text style=Style.(textStyle(~color=themeColors.red, ()))>
-            (!isSkipped ? "Ignore" : "Stop Ignore")->React.string
+          <Text style=Style.(textStyle(~color=theme.colors.red, ()))>
+            (!isSkipped ? "Hide Activity" : "Reveal Activity")->React.string
           </Text>
         </Center>
       </SpacedView>
-      <Separator style=themeStyles##separatorOnBackground />
+      <Separator style=theme.styles##separatorOnBackground />
     </TouchableOpacity>
     <BlockFootnote>
       (
         !isSkipped
-          ? "This will hide similar events from all reports."
-          : "This will put back similar events in all reports."
+          ? "This will hide similar activities from all reports."
+          : "This will reveal similar activities in all reports."
       )
       ->React.string
     </BlockFootnote>

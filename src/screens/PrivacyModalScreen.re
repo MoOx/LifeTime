@@ -3,17 +3,15 @@ open ReactMultiversal;
 
 [@react.component]
 let make = (~navigation, ~route as _) => {
-  let theme = Theme.useTheme();
-  let themeStyles = Theme.useStyles();
-  let themeColors = Theme.useColors();
+  let theme = Theme.useTheme(AppSettings.useTheme());
 
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
-    <StatusBar barStyle={theme->Theme.themedStatusBarStyle(`lightContent)} />
+    <StatusBar barStyle={Theme.statusBarStyle(theme.mode, `lightContent)} />
     <Animated.ScrollView
       style={Style.list([
         Predefined.styles##flexGrow,
-        themeStyles##background,
+        theme.styles##background,
       ])}
       showsHorizontalScrollIndicator=false
       showsVerticalScrollIndicator=false
@@ -38,9 +36,9 @@ let make = (~navigation, ~route as _) => {
         safeArea=false
         animateBackgroundOpacity=`yes
         backgroundElement={<StickyHeaderBackground />}
-        color={themeColors.blue}
-        color2={themeColors.blue}
-        textStyle=themeStyles##textOnBackground
+        color={theme.colors.blue}
+        color2={theme.colors.blue}
+        textStyle=theme.styles##textOnBackground
         title=Privacy.title
         right={({color, defaultStyle}) =>
           <TouchableOpacity

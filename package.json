@@ -20,6 +20,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@glennsl/bs-json": "^5.0.1",
     "@react-native-community/async-storage": "^1.7.1",
     "@react-native-community/blur": "^3.4.1",
     "@react-native-community/masked-view": "^0.1.5",
