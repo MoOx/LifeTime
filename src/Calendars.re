@@ -56,7 +56,7 @@ let isCategoryIdValid = cid =>
 
 let categoryIdFromEventTitle = (settings, eventTitle) => {
   let (_, cId) =
-    settings##eventsCategories
+    settings##activitiesCategories
     ->Array.keep(((e, c)) =>
         e->simplifyEventTitleForComparison
         == eventTitle->simplifyEventTitleForComparison
@@ -139,8 +139,8 @@ let filterEvents = (events, settings) =>
                         ->Option.getWithDefault("")
                    )) {
         false;
-      } else if (settings##eventsSkippedOn
-                 && settings##eventsSkipped
+      } else if (settings##activitiesSkippedFlag
+                 && settings##activitiesSkipped
                     ->Array.some(eventName =>
                         eventName->simplifyEventTitleForComparison
                         == e##title->simplifyEventTitleForComparison
@@ -214,8 +214,7 @@ let mapCategoryDuration = (settings, events) => {
 };
 
 let isEventSkipped = (settings, evt) => {
-  Js.log2(settings##eventsSkipped, evt);
-  settings##eventsSkipped
+  settings##activitiesSkipped
   ->Array.some(e =>
       e->simplifyEventTitleForComparison
       == evt->simplifyEventTitleForComparison

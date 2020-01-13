@@ -37,9 +37,9 @@ let make = () => {
                        calendars
                        ->Option.map(cs => cs->Array.map(c => c##id))
                        ->Option.getWithDefault([||]),
-                     "eventsSkippedOn": settings##eventsSkippedOn,
-                     "eventsSkipped": settings##eventsSkipped,
-                     "eventsCategories": settings##eventsCategories,
+                     "activitiesSkippedFlag": settings##activitiesSkippedFlag,
+                     "activitiesSkipped": settings##activitiesSkipped,
+                     "activitiesCategories": settings##activitiesCategories,
                    }
                  )
                }
@@ -53,9 +53,9 @@ let make = () => {
                      "theme": settings##theme,
                      "lastUpdated": Js.Date.now(),
                      "calendarsIdsSkipped": [||],
-                     "eventsSkippedOn": settings##eventsSkippedOn,
-                     "eventsSkipped": settings##eventsSkipped,
-                     "eventsCategories": settings##eventsCategories,
+                     "activitiesSkippedFlag": settings##activitiesSkippedFlag,
+                     "activitiesSkipped": settings##activitiesSkipped,
+                     "activitiesCategories": settings##activitiesCategories,
                    }
                  )
                }
@@ -85,9 +85,10 @@ let make = () => {
                           } else {
                             ids->Array.concat([|calendar##id|]);
                           }},
-                       "eventsSkippedOn": settings##eventsSkippedOn,
-                       "eventsSkipped": settings##eventsSkipped,
-                       "eventsCategories": settings##eventsCategories,
+                       "activitiesSkippedFlag":
+                         settings##activitiesSkippedFlag,
+                       "activitiesSkipped": settings##activitiesSkipped,
+                       "activitiesCategories": settings##activitiesCategories,
                      }
                    )
                  }>

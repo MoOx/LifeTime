@@ -18,7 +18,7 @@ let quickDurations = [|30., 45., 60., 90.|];
 
 [@react.component]
 let make = () => {
-  let (settings, setSettings) = React.useContext(AppSettings.context);
+  let (settings, _setSettings) = React.useContext(AppSettings.context);
   let theme = Theme.useTheme();
   let themeStyles = Theme.useStyles();
   let themeColors = Theme.useColors();
@@ -313,7 +313,7 @@ let make = () => {
            let separator =
              index != Calendars.Categories.defaults->List.length - 1;
            let categoryActivities =
-             settings##eventsCategories->Array.keep(((_e, c)) => c == id);
+             settings##activitiesCategories->Array.keep(((_e, c)) => c == id);
            let selectedCategoryActivities =
              categoryActivities->Array.reduce([||], (selActs, (event, _)) =>
                if (activitiesSelected->Array.some(acti =>

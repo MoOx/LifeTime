@@ -48,9 +48,9 @@ let make = () => {
               "lastUpdated": Js.Date.now(),
               "theme": "light",
               "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-              "eventsSkippedOn": settings##eventsSkippedOn,
-              "eventsSkipped": settings##eventsSkipped,
-              "eventsCategories": settings##eventsCategories,
+              "activitiesSkippedFlag": settings##activitiesSkippedFlag,
+              "activitiesSkipped": settings##activitiesSkipped,
+              "activitiesCategories": settings##activitiesCategories,
             }
           )
         }>
@@ -105,9 +105,9 @@ let make = () => {
               "lastUpdated": Js.Date.now(),
               "theme": "dark",
               "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-              "eventsSkippedOn": settings##eventsSkippedOn,
-              "eventsSkipped": settings##eventsSkipped,
-              "eventsCategories": settings##eventsCategories,
+              "activitiesSkippedFlag": settings##activitiesSkippedFlag,
+              "activitiesSkipped": settings##activitiesSkipped,
+              "activitiesCategories": settings##activitiesCategories,
             }
           )
         }>
@@ -162,9 +162,9 @@ let make = () => {
               "lastUpdated": Js.Date.now(),
               "theme": "auto",
               "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-              "eventsSkippedOn": settings##eventsSkippedOn,
-              "eventsSkipped": settings##eventsSkipped,
-              "eventsCategories": settings##eventsCategories,
+              "activitiesSkippedFlag": settings##activitiesSkippedFlag,
+              "activitiesSkipped": settings##activitiesSkipped,
+              "activitiesCategories": settings##activitiesCategories,
             }
           )
         }>

@@ -31,10 +31,10 @@ let make = (~activity, ~onIgnoreActivity) => {
                    "theme": settings##theme,
                    "lastUpdated": Js.Date.now(),
                    "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-                   "eventsSkippedOn": settings##eventsSkippedOn,
-                   "eventsSkipped": settings##eventsSkipped,
-                   "eventsCategories":
-                     settings##eventsCategories
+                   "activitiesSkippedFlag": settings##activitiesSkippedFlag,
+                   "activitiesSkipped": settings##activitiesSkipped,
+                   "activitiesCategories":
+                     settings##activitiesCategories
                      ->Array.keep(((event, _c)) =>
                          event->Calendars.simplifyEventTitleForComparison
                          != simplifiedActivityTitle
@@ -101,12 +101,12 @@ let make = (~activity, ~onIgnoreActivity) => {
             "theme": settings##theme,
             "lastUpdated": Js.Date.now(),
             "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-            "eventsSkippedOn": settings##eventsSkippedOn,
-            "eventsSkipped":
+            "activitiesSkippedFlag": settings##activitiesSkippedFlag,
+            "activitiesSkipped":
               !isSkipped
-                ? settings##eventsSkipped->Array.concat([|activity|])
-                : settings##eventsSkipped->Array.keep(e => e != activity),
-            "eventsCategories": settings##eventsCategories,
+                ? settings##activitiesSkipped->Array.concat([|activity|])
+                : settings##activitiesSkipped->Array.keep(e => e != activity),
+            "activitiesCategories": settings##activitiesCategories,
           };
         });
         onIgnoreActivity();

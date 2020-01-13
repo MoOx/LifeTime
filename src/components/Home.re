@@ -313,16 +313,16 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
               "theme": settings##theme,
               "lastUpdated": Js.Date.now(),
               "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-              "eventsSkippedOn": !settings##eventsSkippedOn,
-              "eventsSkipped": settings##eventsSkipped,
-              "eventsCategories": settings##eventsCategories,
+              "activitiesSkippedFlag": !settings##activitiesSkippedFlag,
+              "activitiesSkipped": settings##activitiesSkipped,
+              "activitiesCategories": settings##activitiesCategories,
             }
           )
         }>
         <Separator style=themeStyles##separatorOnBackground />
         <SpacedView vertical=XS style=themeStyles##background>
           <Center>
-            {settings##eventsSkippedOn
+            {settings##activitiesSkippedFlag
                ? <Text style=Style.(textStyle(~color=themeColors.blue, ()))>
                    "Show Ignored"->React.string
                  </Text>
