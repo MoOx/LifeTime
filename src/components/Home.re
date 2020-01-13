@@ -291,22 +291,17 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
       onViewableItemsChanged={onViewableItemsChanged->React.Ref.current}
     />
     <Separator style=themeStyles##separatorOnBackground />
-    <SpacedView vertical=XXS horizontal=S style=Predefined.styles##row>
-      <Text
-        style=Style.(
-          list([styles##smallText, themeStyles##textLightOnBackgroundDark])
-        )>
-        {(
-           "Updated "
-           ++ DateFns.formatRelative(today->React.Ref.current, updatedAt)
-         )
-         ->React.string}
-      </Text>
+    <BlockFootnote>
+      {(
+         "Updated "
+         ++ DateFns.formatRelative(today->React.Ref.current, updatedAt)
+       )
+       ->React.string}
       <Spacer size=XS />
       {!refreshing
          ? React.null
          : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
-    </SpacedView>
+    </BlockFootnote>
     <Spacer />
     <TopActivities mapTitleDuration onFiltersPress onActivityPress />
     <Spacer />

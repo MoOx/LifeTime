@@ -214,18 +214,10 @@ let make = () => {
       // <Separator style=themeStyles##separatorOnBackground />
       <Separator style=themeStyles##separatorOnBackground />
     </View>
-    <SpacedView horizontal=S vertical=XXS>
-      <Text
-        style=Style.(
-          list([
-            themeStyles##textLightOnBackgroundDark,
-            textStyle(~fontSize=12., ()),
-          ])
-        )>
-        "Auto theme will switch between Light & Dark automatically to match your system settings."
-        ->React.string
-      </Text>
-    </SpacedView>
+    <BlockFootnote>
+      "Auto theme will switch between Light & Dark automatically to match your system settings."
+      ->React.string
+    </BlockFootnote>
     <Spacer />
     <Row> <Spacer size=XS /> <BlockHeading text="More" /> </Row>
     <Separator style=themeStyles##separatorOnBackground />
@@ -360,18 +352,10 @@ let make = () => {
     </View>
     // <Separator style=themeStyles##separatorOnBackground />
     <Separator style=themeStyles##separatorOnBackground />
-    <SpacedView horizontal=S vertical=XXS>
-      <Text
-        style=Style.(
-          list([
-            themeStyles##textLightOnBackgroundDark,
-            textStyle(~fontSize=12., ()),
-          ])
-        )>
-        "Export is placing data into your clipboard. Import assume that you have your export in the clipboard."
-        ->React.string
-      </Text>
-    </SpacedView>
+    <BlockFootnote>
+      "Export is placing data into your clipboard. Import assume that you have your export in the clipboard."
+      ->React.string
+    </BlockFootnote>
     <Spacer />
   </>;
 };
