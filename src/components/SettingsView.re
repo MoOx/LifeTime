@@ -2,10 +2,6 @@ open Belt;
 open ReactNative;
 open ReactMultiversal;
 
-let styles =
-  Style.{"text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ())}
-  ->StyleSheet.create;
-
 let title = "Settings";
 
 [@react.component]
@@ -40,7 +36,7 @@ let make = () => {
     <Row> <Spacer size=XS /> <BlockHeading text="Theme" /> </Row>
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>
-      <TouchableOpacity
+      <TouchableWithoutFeedback
         onPress={_ =>
           setSettings(settings =>
             {
@@ -75,7 +71,7 @@ let make = () => {
                   )>
                   <Text
                     style={Style.list([
-                      styles##text,
+                      Theme.text##body,
                       theme.styles##textOnBackground,
                     ])}>
                     "Light"->React.string
@@ -96,8 +92,8 @@ let make = () => {
             <Separator style=theme.styles##separatorOnBackground />
           </View>
         </View>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback
         onPress={_ =>
           setSettings(settings =>
             {
@@ -132,7 +128,7 @@ let make = () => {
                   )>
                   <Text
                     style={Style.list([
-                      styles##text,
+                      Theme.text##body,
                       theme.styles##textOnBackground,
                     ])}>
                     "Dark"->React.string
@@ -153,8 +149,8 @@ let make = () => {
             <Separator style=theme.styles##separatorOnBackground />
           </View>
         </View>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback
         onPress={_ =>
           setSettings(settings =>
             {
@@ -189,7 +185,7 @@ let make = () => {
                   )>
                   <Text
                     style={Style.list([
-                      styles##text,
+                      Theme.text##body,
                       theme.styles##textOnBackground,
                     ])}>
                     "Auto"->React.string
@@ -209,7 +205,7 @@ let make = () => {
             </SpacedView>
           </View>
         </View>
-      </TouchableOpacity>
+      </TouchableWithoutFeedback>
       <Separator style=theme.styles##separatorOnBackground />
     </View>
     <BlockFootnote>
@@ -220,7 +216,7 @@ let make = () => {
     <Row> <Spacer size=XS /> <BlockHeading text="More" /> </Row>
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>
-      <TouchableOpacity
+      <TouchableWithoutFeedback
         onPress={_ =>
           if (Platform.os == Platform.ios) {
             Linking.openURL("calshow:")->ignore;
@@ -247,7 +243,7 @@ let make = () => {
                 style=Style.(
                   list([
                     Predefined.styles##flex,
-                    styles##text,
+                    Theme.text##body,
                     theme.styles##textOnBackground,
                   ])
                 )>
@@ -263,8 +259,8 @@ let make = () => {
             <Separator style=theme.styles##separatorOnBackground />
           </View>
         </View>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback
         onPress={_ => ReactNativePermissions.openSettings()->ignore}>
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
@@ -285,7 +281,7 @@ let make = () => {
                 style=Style.(
                   list([
                     Predefined.styles##flex,
-                    styles##text,
+                    Theme.text##body,
                     theme.styles##textOnBackground,
                   ])
                 )>
@@ -300,7 +296,7 @@ let make = () => {
             </SpacedView>
           </View>
         </View>
-      </TouchableOpacity>
+      </TouchableWithoutFeedback>
     </View>
     // <Separator style=theme.styles##separatorOnBackground />
     <Separator style=theme.styles##separatorOnBackground />
@@ -308,7 +304,7 @@ let make = () => {
     <Row> <Spacer size=XS /> <BlockHeading text="Danger Zone" /> </Row>
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>
-      <TouchableOpacity
+      <TouchableWithoutFeedback
         onPress={_ => {
           Clipboard.setString(
             settings
@@ -345,7 +341,7 @@ let make = () => {
                   )>
                   <Text
                     style={Style.list([
-                      styles##text,
+                      Theme.text##body,
                       theme.styles##textOnBackground,
                     ])}>
                     "Export Backup"->React.string
@@ -357,8 +353,8 @@ let make = () => {
             <Separator style=theme.styles##separatorOnBackground />
           </View>
         </View>
-      </TouchableOpacity>
-      <TouchableOpacity
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback
         onPress={_ =>
           Alert.alert(
             ~title="Import Data from Clipboard?",
@@ -398,7 +394,7 @@ let make = () => {
                   )>
                   <Text
                     style={Style.list([
-                      styles##text,
+                      Theme.text##body,
                       theme.styles##textOnBackground,
                     ])}>
                     "Import Backup"->React.string
@@ -409,7 +405,7 @@ let make = () => {
             </SpacedView>
           </View>
         </View>
-      </TouchableOpacity>
+      </TouchableWithoutFeedback>
     </View>
     <Separator style=theme.styles##separatorOnBackground />
     <BlockFootnote>
@@ -419,7 +415,7 @@ let make = () => {
     <Spacer size=L />
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>
-      <TouchableOpacity
+      <TouchableWithoutFeedback
         onPress={_ =>
           Alert.alert(
             ~title="Reset Settings & Erase All Data?",
@@ -437,16 +433,21 @@ let make = () => {
             (),
           )
         }>
+        <View>
         <SpacedView
           vertical=XS horizontal=XS style=Predefined.styles##rowCenter>
           <Text
             style=Style.(
-              list([styles##text, textStyle(~color=theme.colors.red, ())])
+              list([
+                Theme.text##body,
+                textStyle(~color=theme.colors.red, ()),
+              ])
             )>
             "Reset Settings & Erase All Data"->React.string
           </Text>
         </SpacedView>
-      </TouchableOpacity>
+        </View>
+      </TouchableWithoutFeedback>
     </View>
     <Separator style=theme.styles##separatorOnBackground />
     <BlockFootnote>
