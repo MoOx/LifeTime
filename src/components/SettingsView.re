@@ -46,6 +46,7 @@ let make = () => {
               "activitiesSkippedFlag": settings##activitiesSkippedFlag,
               "activitiesSkipped": settings##activitiesSkipped,
               "activities": settings##activities,
+              "goals": settings##goals,
             }
           )
         }>
@@ -103,6 +104,7 @@ let make = () => {
               "activitiesSkippedFlag": settings##activitiesSkippedFlag,
               "activitiesSkipped": settings##activitiesSkipped,
               "activities": settings##activities,
+              "goals": settings##goals,
             }
           )
         }>
@@ -160,6 +162,7 @@ let make = () => {
               "activitiesSkippedFlag": settings##activitiesSkippedFlag,
               "activitiesSkipped": settings##activitiesSkipped,
               "activities": settings##activities,
+              "goals": settings##goals,
             }
           )
         }>
@@ -434,18 +437,18 @@ let make = () => {
           )
         }>
         <View>
-        <SpacedView
-          vertical=XS horizontal=XS style=Predefined.styles##rowCenter>
-          <Text
-            style=Style.(
-              list([
-                Theme.text##body,
-                textStyle(~color=theme.colors.red, ()),
-              ])
-            )>
-            "Reset Settings & Erase All Data"->React.string
-          </Text>
-        </SpacedView>
+          <SpacedView
+            vertical=XS horizontal=XS style=Predefined.styles##rowCenter>
+            <Text
+              style=Style.(
+                list([
+                  Theme.text##body,
+                  textStyle(~color=theme.colors.red, ()),
+                ])
+              )>
+              "Reset Settings & Erase All Data"->React.string
+            </Text>
+          </SpacedView>
         </View>
       </TouchableWithoutFeedback>
     </View>

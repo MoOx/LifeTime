@@ -10,6 +10,7 @@ type t = {
   "activities": array(Activities.t),
   "activitiesSkipped": array(string),
   "activitiesSkippedFlag": bool,
+  "goals": array(Goal.t),
 };
 
 let themeToThemeString =
@@ -32,7 +33,8 @@ let defaultSettings = {
   "calendarsIdsSkipped": [||],
   "activitiesSkippedFlag": true,
   "activitiesSkipped": [||],
-  "activities": [||] // @todo add some defaults?
+  "activities": [||], // @todo add some defaults?
+  "goals": [||],
 };
 
 let decodeJsonSettings = (json: Js.Json.t): t => {
@@ -49,12 +51,44 @@ let decodeJsonSettings = (json: Js.Json.t): t => {
            "activities",
            array(json =>
              {
+               "id":
+                 try (json |> field("id", string)) {
+                 | _ =>
+                   Utils.makeId(
+                     json |> field("title", string),
+                     json |> field("createdAt", Json.Decode.float),
+                   )
+                 },
                "title": json |> field("title", string),
                "createdAt": json |> field("createdAt", Json.Decode.float),
                "categoryId": json |> field("categoryId", string),
              }
            ),
          ),
+    "goals":
+      try (
+        json
+        |> field(
+             "goals",
+             array(json =>
+               {
+                 "id": json |> field("id", string),
+                 "title": json |> field("title", string),
+                 "createdAt": json |> field("createdAt", Json.Decode.float),
+                 "type_": json |> field("type_", int),
+                 "days": json |> field("days", array(bool)),
+                 "durationPerWeek":
+                   json |> field("durationPerWeek", Json.Decode.float),
+                 "categoriesId":
+                   json |> field("categoriesId", array(string)),
+                 "activitiesId":
+                   json |> field("activitiesId", array(string)),
+               }
+             ),
+           )
+      ) {
+      | _ => [||]
+      },
   };
 };
 
@@ -103,12 +137,12 @@ let useSettings = () => {
             ReactNativeAsyncStorage.setItem(storageKey, stringifiedSettings)
           )
         ->ignore;
-        if (ReactNative.Global.__DEV__) {
-          Js.log2(
-            "Settings",
-            settings->Obj.magic->Js.Json.stringifyWithSpace(2),
-          );
-        };
+        // if (ReactNative.Global.__DEV__) {
+        //   Js.log2(
+        //     "Settings",
+        //     settings->Obj.magic->Js.Json.stringifyWithSpace(2),
+        //   );
+        // };
       };
       None;
     },

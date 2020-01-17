@@ -315,6 +315,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
               "activitiesSkippedFlag": !settings##activitiesSkippedFlag,
               "activitiesSkipped": settings##activitiesSkipped,
               "activities": settings##activities,
+              "goals": settings##goals,
             }
           )
         }>

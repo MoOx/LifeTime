@@ -22,5 +22,5 @@ module Tabs =
 
 module RootStack =
   Stack.Make({
-    type params = {.};
+    type params = {. "newGoalType": option(Goal.Type.serializableT)};
   });

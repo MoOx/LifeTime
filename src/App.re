@@ -235,6 +235,7 @@ let app = () => {
   );
 
   let (settings, setSettings) = AppSettings.useSettings();
+
   let isReady = initialStateContainer->Option.isSome;
   <ReactNativeDarkMode.DarkModeProvider>
     <AppSettings.ContextProvider value=(settings, setSettings)>

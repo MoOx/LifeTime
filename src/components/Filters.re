@@ -40,6 +40,7 @@ let make = () => {
                      "activitiesSkippedFlag": settings##activitiesSkippedFlag,
                      "activitiesSkipped": settings##activitiesSkipped,
                      "activities": settings##activities,
+                     "goals": settings##goals,
                    }
                  )
                }
@@ -56,6 +57,7 @@ let make = () => {
                      "activitiesSkippedFlag": settings##activitiesSkippedFlag,
                      "activitiesSkipped": settings##activitiesSkipped,
                      "activities": settings##activities,
+                     "goals": settings##goals,
                    }
                  )
                }
@@ -89,6 +91,7 @@ let make = () => {
                          settings##activitiesSkippedFlag,
                        "activitiesSkipped": settings##activitiesSkipped,
                        "activities": settings##activities,
+                       "goals": settings##goals,
                      }
                    )
                  }>

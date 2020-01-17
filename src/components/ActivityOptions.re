@@ -23,7 +23,8 @@ let make = (~activityTitle, ~onSkipActivity) => {
            let color = ActivityCategories.getColor(theme.mode, colorName);
            <TouchableOpacity
              key=id
-             onPress={_ =>
+             onPress={_ => {
+               let createdAt = Js.Date.now();
                setSettings(settings =>
                  {
                    // ...settings,
@@ -39,14 +40,16 @@ let make = (~activityTitle, ~onSkipActivity) => {
                        )
                      ->Array.concat([|
                          {
+                           "id": Utils.makeId(activityTitle, createdAt),
                            "title": activityTitle,
-                           "createdAt": Js.Date.now(),
+                           "createdAt": createdAt,
                            "categoryId": id,
                          },
                        |]),
+                   "goals": settings##goals,
                  }
-               )
-             }>
+               );
+             }}>
              <View style=Predefined.styles##rowCenter>
                <Spacer size=S />
                <SpacedView vertical=XS horizontal=None>
@@ -119,6 +122,7 @@ let make = (~activityTitle, ~onSkipActivity) => {
                       Activities.isSimilar(alreadySkipped, activityTitle)
                     ),
             "activities": settings##activities,
+            "goals": settings##goals,
           };
         });
         onSkipActivity();

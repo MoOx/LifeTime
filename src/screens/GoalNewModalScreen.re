@@ -1,12 +1,47 @@
+open Belt;
 open ReactNative;
 open ReactMultiversal;
 
 [@react.component]
-let make = (~navigation, ~route as _) => {
+let make = (~navigation, ~route) => {
+  let (_settings, setSettings) = AppSettings.useSettings();
   let theme = Theme.useTheme(AppSettings.useTheme());
-  
+
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeArea();
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
+
+  let (goal, setGoal) = React.useState(_ => None);
+
+  let (isReadyToSave, disabled, onPress) =
+    goal
+    ->Option.map(goal =>
+        (
+          true,
+          false,
+          _ => {
+            Js.log("save");
+            setSettings(settings =>
+              {
+                "theme": settings##theme,
+                "lastUpdated": Js.Date.now(),
+                "calendarsIdsSkipped": settings##calendarsIdsSkipped,
+                "activitiesSkippedFlag": settings##activitiesSkippedFlag,
+                "activitiesSkipped": settings##activitiesSkipped,
+                "activities": settings##activities,
+                "goals": settings##goals->Array.concat([|goal|]),
+              }
+            );
+            navigation->Navigators.RootStack.Navigation.goBack();
+          },
+        )
+      )
+    ->Option.getWithDefault((false, true, _ => ()));
+
+  let type_ =
+    route##params
+    ->Option.flatMap(params =>
+        params##newGoalType->Option.flatMap(t => t->Goal.Type.fromSerialized)
+      );
   <>
     <StatusBar barStyle=`lightContent />
     <Animated.ScrollView
@@ -42,10 +77,8 @@ let make = (~navigation, ~route as _) => {
       )>
       <StickyHeader
         scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
-        // scrollOffsetY=0.
         safeArea=false
         backgroundElement={<StickyHeaderBackground />}
-        // animateBackgroundOpacity=`yes
         color={theme.colors.blue}
         color2={theme.colors.blue}
         textStyle=theme.styles##textOnBackground
@@ -53,23 +86,40 @@ let make = (~navigation, ~route as _) => {
         left={({color, defaultStyle}) =>
           <TouchableOpacity
             onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
-            <Text style=Style.(array([|defaultStyle, style(~color, ())|]))>
+            <Animated.Text
+              style=Style.(
+                array([|
+                  defaultStyle,
+                  textStyle(
+                    ~color,
+                    ~fontWeight=Theme.fontWeights.regular,
+                    (),
+                  ),
+                |])
+              )>
               "Cancel"->React.string
-            </Text>
+            </Animated.Text>
           </TouchableOpacity>
         }
         right={({color, defaultStyle}) =>
-          <TouchableOpacity
-            onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
-            <Text style=Style.(array([|defaultStyle, style(~color, ())|]))>
+          <TouchableOpacity disabled onPress>
+            <Animated.Text
+              style=Style.(
+                array([|
+                  defaultStyle,
+                  textStyle(
+                    ~color=isReadyToSave ? color : theme.colors.gray3,
+                    (),
+                  ),
+                |])
+              )>
               "Add"->React.string
-            </Text>
+            </Animated.Text>
           </TouchableOpacity>
         }
-        // rightAlwaysVisible=true
       />
       <Spacer size=XL />
-      <GoalNew />
+      <GoalNew ?type_ onChange={goal => setGoal(_ => goal)} />
     </Animated.ScrollView>
   </>;
 };

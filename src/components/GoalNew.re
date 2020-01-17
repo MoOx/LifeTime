@@ -2,7 +2,7 @@ open Belt;
 open ReactNative;
 open ReactMultiversal;
 
-let title = "Add a goal";
+let title = "Add a Goal";
 
 let date0 =
   Js.Date.makeWithYMDHM(
@@ -16,12 +16,20 @@ let date0 =
 
 let quickDurations = [|30., 45., 60., 90.|];
 
+[@bs.module "react"]
+external useEffect6:
+  ([@bs.uncurry] (unit => option(unit => unit)), ('a, 'b, 'c, 'd, 'e, 'f)) =>
+  unit =
+  "useEffect";
+
 [@react.component]
-let make = () => {
+let make = (~type_ as initialType=?, ~onChange) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
 
   let theme = Theme.useTheme(AppSettings.useTheme());
 
+  let (title, setTitle) = React.useState(() => "");
+  let (type_, setType) = React.useState(() => initialType);
   let (minutes, setMinutes) = React.useState(() => 60.);
   let (days, setDays) =
     React.useState(() => Array.range(0, 6)->Array.map(_ => true));
@@ -43,6 +51,50 @@ let make = () => {
     )
     ->Date.durationInMs(date0)
     ->Date.msToMin;
+
+  useEffect6(
+    () => {
+      switch (
+        // title,
+        type_,
+        minutes,
+        days,
+        categoriesSelected,
+        activitiesSelected,
+      ) {
+      | (
+          // title,
+          Some(type_),
+          minutes,
+          days,
+          categoriesSelected,
+          activitiesSelected,
+        )
+          when
+            minutes > 0.
+            && days->Array.some(day => day)
+            && (
+              categoriesSelected->Array.length > 0
+              || activitiesSelected->Array.length > 0
+            ) =>
+        onChange(
+          Some(
+            Goal.make(
+              title,
+              type_,
+              minutes,
+              days,
+              categoriesSelected,
+              activitiesSelected,
+            ),
+          ),
+        )
+      | _ => onChange(None)
+      };
+      None;
+    },
+    (title, type_, minutes, days, categoriesSelected, activitiesSelected),
+  );
 
   let dash =
     <View
@@ -103,6 +155,131 @@ let make = () => {
     );
 
   <SpacedView horizontal=None>
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
+      <SpacedView vertical=S>
+        <TextInput
+          autoCapitalize=`words
+          autoComplete=`off
+          autoCorrect=true
+          // autoFocus=true
+          clearButtonMode=`whileEditing
+          keyboardAppearance={
+            switch (theme.mode) {
+            | `light => `light
+            | `dark => `dark
+            }
+          }
+          maxLength=100
+          onChangeText={value => setTitle(_ => value)}
+          placeholder="Title (Optional)"
+          placeholderTextColor={theme.colors.gray3}
+          returnKeyType=`done_
+          value=title
+          style=Style.(
+            list([
+              Predefined.styles##flex,
+              Theme.text##body,
+              theme.styles##textOnBackground,
+              textStyle(
+                ~height=Spacer.space->dp,
+                ~lineHeight=Spacer.space,
+                (),
+              ),
+            ])
+          )
+        />
+      </SpacedView>
+    </View>
+    <Separator style=theme.styles##separatorOnBackground />
+    <Spacer />
+    <Row> <Spacer size=XS /> <BlockHeading text="Type" /> </Row>
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
+      <TouchableWithoutFeedback
+        onPress={_ => setType(_ => Some(Goal.Type.Min))}>
+        <View style=Predefined.styles##rowCenter>
+          <Spacer size=S />
+          <SpacedView vertical=XS horizontal=None>
+            <NamedIcon name=`scope fill={theme.colors.green} />
+          </SpacedView>
+          <Spacer size=XS />
+          <View style=Predefined.styles##flex>
+            <SpacedView vertical=XS horizontal=None>
+              <View style=Predefined.styles##row>
+                <View
+                  style=Style.(
+                    list([
+                      Predefined.styles##flex,
+                      Predefined.styles##justifyCenter,
+                    ])
+                  )>
+                  <Text
+                    style=Style.(
+                      list([Theme.text##body, theme.styles##textOnBackground])
+                    )>
+                    "Goal to Reach"->React.string
+                  </Text>
+                </View>
+                {switch (type_) {
+                 | Some(Min) =>
+                   <SVGcheckmark
+                     width={22.->ReactFromSvg.Size.dp}
+                     height={22.->ReactFromSvg.Size.dp}
+                     fill={theme.colors.blue}
+                   />
+                 | _ => React.null
+                 }}
+                <Spacer size=S />
+              </View>
+            </SpacedView>
+            <Separator style=theme.styles##separatorOnBackground />
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback
+        onPress={_ => setType(_ => Some(Goal.Type.Max))}>
+        <View style=Predefined.styles##rowCenter>
+          <Spacer size=S />
+          <SpacedView vertical=XS horizontal=None>
+            <NamedIcon name=`hourglass fill={theme.colors.orange} />
+          </SpacedView>
+          <Spacer size=XS />
+          <View style=Predefined.styles##flex>
+            <SpacedView vertical=XS horizontal=None>
+              <View style=Predefined.styles##row>
+                <View
+                  style=Style.(
+                    list([
+                      Predefined.styles##flex,
+                      Predefined.styles##justifyCenter,
+                    ])
+                  )>
+                  <Text
+                    style=Style.(
+                      list([Theme.text##body, theme.styles##textOnBackground])
+                    )>
+                    "Limit to Respect"->React.string
+                  </Text>
+                </View>
+                {switch (type_) {
+                 | Some(Max) =>
+                   <SVGcheckmark
+                     width={22.->ReactFromSvg.Size.dp}
+                     height={22.->ReactFromSvg.Size.dp}
+                     fill={theme.colors.blue}
+                   />
+                 | _ => React.null
+                 }}
+                <Spacer size=S />
+              </View>
+            </SpacedView>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+      <Separator style=theme.styles##separatorOnBackground />
+    </View>
+    <Spacer />
     <Row> <Spacer size=XS /> <BlockHeading text="Days" /> </Row>
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>
