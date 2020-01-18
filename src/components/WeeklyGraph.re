@@ -47,12 +47,14 @@ let make =
               date,
               events->Array.reduce(
                 Map.String.empty,
-                (mapPerCategories, e) => {
+                (mapPerCategories, evt) => {
                   let cat =
-                    settings->Calendars.categoryIdFromActivityTitle(e##title);
+                    settings->Calendars.categoryIdFromActivityTitle(
+                      evt.title,
+                    );
                   if (Date.hasOverlap(
-                        e##startDate->Js.Date.fromString,
-                        e##endDate->Js.Date.fromString,
+                        evt.startDate->Js.Date.fromString,
+                        evt.endDate->Js.Date.fromString,
                         date,
                       )) {
                     mapPerCategories->Map.String.set(
@@ -61,10 +63,10 @@ let make =
                       ->Map.String.get(cat)
                       ->Option.getWithDefault(0.)
                       +. Date.durationInMs(
-                           e##startDate
+                           evt.startDate
                            ->Js.Date.fromString
                            ->Date.max(startOfDate),
-                           e##endDate
+                           evt.endDate
                            ->Js.Date.fromString
                            ->Date.min(endOfDate),
                          )

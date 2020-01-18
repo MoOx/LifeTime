@@ -20,7 +20,7 @@ let make = () => {
   let (settings, setSettings) = React.useContext(AppSettings.context);
   let theme = Theme.useTheme(AppSettings.useTheme());
   let calendars = Calendars.useCalendars();
-  let isCalendarButtonHide = settings##calendarsIdsSkipped->Array.length === 0;
+  let isCalendarButtonHide = settings.calendarsIdsSkipped->Array.length === 0;
   <>
     <View style=Predefined.styles##rowSpaceBetween>
       <Row> <Spacer size=XS /> <BlockHeading text="Calendars" /> </Row>
@@ -30,17 +30,12 @@ let make = () => {
                onPress={_ =>
                  setSettings(_settings =>
                    {
-                     // ...settings,
-                     "theme": settings##theme,
-                     "lastUpdated": Js.Date.now(),
-                     "calendarsIdsSkipped":
+                     ...settings,
+                     lastUpdated: Js.Date.now(),
+                     calendarsIdsSkipped:
                        calendars
-                       ->Option.map(cs => cs->Array.map(c => c##id))
+                       ->Option.map(cs => cs->Array.map(c => c.id))
                        ->Option.getWithDefault([||]),
-                     "activitiesSkippedFlag": settings##activitiesSkippedFlag,
-                     "activitiesSkipped": settings##activitiesSkipped,
-                     "activities": settings##activities,
-                     "goals": settings##goals,
                    }
                  )
                }
@@ -50,14 +45,9 @@ let make = () => {
                onPress={_ =>
                  setSettings(_settings =>
                    {
-                     // ...settings,
-                     "theme": settings##theme,
-                     "lastUpdated": Js.Date.now(),
-                     "calendarsIdsSkipped": [||],
-                     "activitiesSkippedFlag": settings##activitiesSkippedFlag,
-                     "activitiesSkipped": settings##activitiesSkipped,
-                     "activities": settings##activities,
-                     "goals": settings##goals,
+                     ...settings,
+                     lastUpdated: Js.Date.now(),
+                     calendarsIdsSkipped: [||],
                    }
                  )
                }
@@ -73,25 +63,20 @@ let make = () => {
            calendars
            ->Array.mapWithIndex((index, calendar) =>
                <TouchableOpacity
-                 key=calendar##id
+                 key={calendar.id}
                  onPress={_ =>
                    setSettings(settings =>
                      {
-                       // ...settings,
-                       "theme": settings##theme,
-                       "lastUpdated": Js.Date.now(),
-                       "calendarsIdsSkipped":
-                         {let ids = settings##calendarsIdsSkipped
-                          if (ids->Array.some(id => id == calendar##id)) {
-                            ids->Array.keep(id => id != calendar##id);
-                          } else {
-                            ids->Array.concat([|calendar##id|]);
-                          }},
-                       "activitiesSkippedFlag":
-                         settings##activitiesSkippedFlag,
-                       "activitiesSkipped": settings##activitiesSkipped,
-                       "activities": settings##activities,
-                       "goals": settings##goals,
+                       ...settings,
+                       lastUpdated: Js.Date.now(),
+                       calendarsIdsSkipped: {
+                         let ids = settings.calendarsIdsSkipped;
+                         if (ids->Array.some(id => id == calendar.id)) {
+                           ids->Array.keep(id => id != calendar.id);
+                         } else {
+                           ids->Array.concat([|calendar.id|]);
+                         };
+                       },
                      }
                    )
                  }>
@@ -108,34 +93,32 @@ let make = () => {
                              styles##text,
                              theme.styles##textOnBackground,
                            ])}>
-                           {calendar##title->React.string}
+                           calendar.title->React.string
                          </Text>
                          <Text
                            style={Style.list([
                              styles##infoText,
                              theme.styles##textGray2,
                            ])}>
-                           {calendar##source->React.string}
+                           calendar.source->React.string
                          </Text>
                        </View>
-                       {
-                         let skipped =
-                           settings##calendarsIdsSkipped
-                           ->Array.some(id => id == calendar##id);
-                         if (skipped) {
-                           <SVGcircle
-                             width={26.->ReactFromSvg.Size.dp}
-                             height={26.->ReactFromSvg.Size.dp}
-                             fill=calendar##color
-                           />;
-                         } else {
-                           <SVGcheckmarkcircle
-                             width={26.->ReactFromSvg.Size.dp}
-                             height={26.->ReactFromSvg.Size.dp}
-                             fill=calendar##color
-                           />;
-                         };
-                       }
+                       {let skipped =
+                          settings.calendarsIdsSkipped
+                          ->Array.some(id => id == calendar.id);
+                        if (skipped) {
+                          <SVGcircle
+                            width={26.->ReactFromSvg.Size.dp}
+                            height={26.->ReactFromSvg.Size.dp}
+                            fill={calendar.color}
+                          />;
+                        } else {
+                          <SVGcheckmarkcircle
+                            width={26.->ReactFromSvg.Size.dp}
+                            height={26.->ReactFromSvg.Size.dp}
+                            fill={calendar.color}
+                          />;
+                        }}
                        <Spacer size=S />
                      </SpacedView>
                      {index !== calendars->Array.length - 1

@@ -51,7 +51,7 @@
     "reason-future": "^2.5.0",
     "reason-react": "^0.7.0",
     "reason-react-native": "^0.61.0",
-    "reason-react-navigation": "https://github.com/reason-react-native/reason-react-navigation#ae00fdb"
+    "reason-react-navigation": "https://github.com/reason-react-native/reason-react-navigation#203b7e4"
   },
   "devDependencies": {
     "@babel/core": "^7.6.3",

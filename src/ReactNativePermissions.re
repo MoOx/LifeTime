@@ -151,12 +151,11 @@ external blocked: permissionStatus = "BLOCKED";
 external check: permission => Js.Promise.t(permissionStatus) = "check";
 
 type requestRationale = {
-  .
-  "title": string,
-  "message": string,
-  "buttonPositive": option(string),
-  "buttonNegative": option(string),
-  "buttonNeutral": option(string),
+  title: string,
+  message: string,
+  buttonPositive: option(string),
+  buttonNegative: option(string),
+  buttonNeutral: option(string),
 };
 
 [@bs.module "react-native-permissions"]
@@ -168,26 +167,24 @@ external requestWithRational:
   "request";
 
 type notificationSettings = {
-  .
   // properties only availables on iOS
   // unavailable settings will not be included in the response object
-  "alert": option(bool),
-  "badge": option(bool),
-  "sound": option(bool),
-  "lockScreen": option(bool),
-  "carPlay": option(bool),
-  "notificationCenter": option(bool),
-  "criticalAlert": option(bool),
+  alert: option(bool),
+  badge: option(bool),
+  sound: option(bool),
+  lockScreen: option(bool),
+  carPlay: option(bool),
+  notificationCenter: option(bool),
+  criticalAlert: option(bool),
+};
+
+type requestNotificationsResult = {
+  status: permissionStatus,
+  settings: notificationSettings,
 };
 
 [@bs.module "react-native-permissions"]
-external checkNotifications:
-  unit =>
-  Js.Promise.t({
-    .
-    "status": permissionStatus,
-    "settings": notificationSettings,
-  }) =
+external checkNotifications: unit => Js.Promise.t(requestNotificationsResult) =
   "checkNotifications";
 
 // only used on iOS
@@ -203,12 +200,7 @@ type notificationOption =
 
 [@bs.module "react-native-permissions"]
 external requestNotifications:
-  array(notificationOption) =>
-  Js.Promise.t({
-    .
-    "status": permissionStatus,
-    "settings": notificationSettings,
-  }) =
+  array(notificationOption) => Js.Promise.t(requestNotificationsResult) =
   "requestNotifications";
 
 [@bs.module "react-native-permissions"]

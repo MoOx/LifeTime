@@ -1,16 +1,13 @@
 open Belt;
 
-// Js.t for easy stringify for AsyncStorage
-
 type t = {
-  .
-  "theme": string,
-  "lastUpdated": float,
-  "calendarsIdsSkipped": array(string),
-  "activities": array(Activities.t),
-  "activitiesSkipped": array(string),
-  "activitiesSkippedFlag": bool,
-  "goals": array(Goal.t),
+  theme: string,
+  lastUpdated: float,
+  calendarsIdsSkipped: array(string),
+  activities: array(Activities.t),
+  activitiesSkipped: array(string),
+  activitiesSkippedFlag: bool,
+  goals: array(Goal.t),
 };
 
 let themeToThemeString =
@@ -28,61 +25,58 @@ let themeStringToTheme =
   | _ => `auto;
 
 let defaultSettings = {
-  "theme": "auto",
-  "lastUpdated": 0.,
-  "calendarsIdsSkipped": [||],
-  "activitiesSkippedFlag": true,
-  "activitiesSkipped": [||],
-  "activities": [||], // @todo add some defaults?
-  "goals": [||],
+  theme: "auto",
+  lastUpdated: 0.,
+  calendarsIdsSkipped: [||],
+  activitiesSkippedFlag: true,
+  activitiesSkipped: [||],
+  activities: [||], // @todo add some defaults?
+  goals: [||],
 };
 
 let decodeJsonSettings = (json: Js.Json.t): t => {
   Json.Decode.{
-    "theme": json |> field("theme", string),
-    "lastUpdated": json |> field("lastUpdated", Json.Decode.float),
-    "calendarsIdsSkipped":
-      json |> field("calendarsIdsSkipped", array(string)),
-    "activitiesSkippedFlag": json |> field("activitiesSkippedFlag", bool),
-    "activitiesSkipped": json |> field("activitiesSkipped", array(string)),
-    "activities":
+    theme: json |> field("theme", string),
+    lastUpdated: json |> field("lastUpdated", Json.Decode.float),
+    calendarsIdsSkipped: json |> field("calendarsIdsSkipped", array(string)),
+    activitiesSkippedFlag: json |> field("activitiesSkippedFlag", bool),
+    activitiesSkipped: json |> field("activitiesSkipped", array(string)),
+    activities:
       json
       |> field(
            "activities",
            array(json =>
-             {
-               "id":
-                 try (json |> field("id", string)) {
+             Activities.{
+               id:
+                 try(json |> field("id", string)) {
                  | _ =>
                    Utils.makeId(
                      json |> field("title", string),
                      json |> field("createdAt", Json.Decode.float),
                    )
                  },
-               "title": json |> field("title", string),
-               "createdAt": json |> field("createdAt", Json.Decode.float),
-               "categoryId": json |> field("categoryId", string),
+               title: json |> field("title", string),
+               createdAt: json |> field("createdAt", Json.Decode.float),
+               categoryId: json |> field("categoryId", string),
              }
            ),
          ),
-    "goals":
-      try (
+    goals:
+      try(
         json
         |> field(
              "goals",
              array(json =>
-               {
-                 "id": json |> field("id", string),
-                 "title": json |> field("title", string),
-                 "createdAt": json |> field("createdAt", Json.Decode.float),
-                 "type_": json |> field("type_", int),
-                 "days": json |> field("days", array(bool)),
-                 "durationPerWeek":
+               Goal.{
+                 id: json |> field("id", string),
+                 title: json |> field("title", string),
+                 createdAt: json |> field("createdAt", Json.Decode.float),
+                 type_: json |> field("type_", int),
+                 days: json |> field("days", array(bool)),
+                 durationPerWeek:
                    json |> field("durationPerWeek", Json.Decode.float),
-                 "categoriesId":
-                   json |> field("categoriesId", array(string)),
-                 "activitiesId":
-                   json |> field("activitiesId", array(string)),
+                 categoriesId: json |> field("categoriesId", array(string)),
+                 activitiesId: json |> field("activitiesId", array(string)),
                }
              ),
            )
@@ -111,7 +105,7 @@ let useSettings = () => {
               res
               ->Js.Null.toOption
               ->Option.map(rawJson =>
-                  try (rawJson->Json.parseOrRaise->decodeJsonSettings) {
+                  try(rawJson->Json.parseOrRaise->decodeJsonSettings) {
                   | _ =>
                     Js.log2(
                       "LifeTime: useSettings: unable to decode valid json",
@@ -165,5 +159,5 @@ module ContextProvider = {
 
 let useTheme = () => {
   let (settings, _setSettings) = React.useContext(context);
-  settings##theme->themeStringToTheme;
+  settings.theme->themeStringToTheme;
 };

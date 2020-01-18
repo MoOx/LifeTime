@@ -39,15 +39,7 @@ let make = () => {
       <TouchableWithoutFeedback
         onPress={_ =>
           setSettings(settings =>
-            {
-              "lastUpdated": Js.Date.now(),
-              "theme": "light",
-              "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-              "activitiesSkippedFlag": settings##activitiesSkippedFlag,
-              "activitiesSkipped": settings##activitiesSkipped,
-              "activities": settings##activities,
-              "goals": settings##goals,
-            }
+            {...settings, lastUpdated: Js.Date.now(), theme: "light"}
           )
         }>
         <View style=Predefined.styles##rowCenter>
@@ -97,15 +89,7 @@ let make = () => {
       <TouchableWithoutFeedback
         onPress={_ =>
           setSettings(settings =>
-            {
-              "lastUpdated": Js.Date.now(),
-              "theme": "dark",
-              "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-              "activitiesSkippedFlag": settings##activitiesSkippedFlag,
-              "activitiesSkipped": settings##activitiesSkipped,
-              "activities": settings##activities,
-              "goals": settings##goals,
-            }
+            {...settings, lastUpdated: Js.Date.now(), theme: "dark"}
           )
         }>
         <View style=Predefined.styles##rowCenter>
@@ -155,15 +139,7 @@ let make = () => {
       <TouchableWithoutFeedback
         onPress={_ =>
           setSettings(settings =>
-            {
-              "lastUpdated": Js.Date.now(),
-              "theme": "auto",
-              "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-              "activitiesSkippedFlag": settings##activitiesSkippedFlag,
-              "activitiesSkipped": settings##activitiesSkipped,
-              "activities": settings##activities,
-              "goals": settings##goals,
-            }
+            {...settings, lastUpdated: Js.Date.now(), theme: "auto"}
           )
         }>
         <View style=Predefined.styles##rowCenter>

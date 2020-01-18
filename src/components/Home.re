@@ -309,20 +309,16 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
         onPress={_ =>
           setSettings(settings =>
             {
-              "theme": settings##theme,
-              "lastUpdated": Js.Date.now(),
-              "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-              "activitiesSkippedFlag": !settings##activitiesSkippedFlag,
-              "activitiesSkipped": settings##activitiesSkipped,
-              "activities": settings##activities,
-              "goals": settings##goals,
+              ...settings,
+              lastUpdated: Js.Date.now(),
+              activitiesSkippedFlag: !settings.activitiesSkippedFlag,
             }
           )
         }>
         <Separator style=theme.styles##separatorOnBackground />
         <SpacedView vertical=XS style=theme.styles##background>
           <Center>
-            {settings##activitiesSkippedFlag
+            {settings.activitiesSkippedFlag
                ? <Text style=Style.(textStyle(~color=theme.colors.blue, ()))>
                    "Reveal Hidden Activities"->React.string
                  </Text>

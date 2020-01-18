@@ -3,7 +3,11 @@ open ReactNative;
 open ReactMultiversal;
 
 [@react.component]
-let make = (~navigation, ~route) => {
+let make =
+    (
+      ~navigation,
+      ~route: ReactNavigation.Core.route(Navigators.RootStack.M.params),
+    ) => {
   let (_settings, setSettings) = AppSettings.useSettings();
   let theme = Theme.useTheme(AppSettings.useTheme());
 
@@ -22,13 +26,9 @@ let make = (~navigation, ~route) => {
             Js.log("save");
             setSettings(settings =>
               {
-                "theme": settings##theme,
-                "lastUpdated": Js.Date.now(),
-                "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-                "activitiesSkippedFlag": settings##activitiesSkippedFlag,
-                "activitiesSkipped": settings##activitiesSkipped,
-                "activities": settings##activities,
-                "goals": settings##goals->Array.concat([|goal|]),
+                ...settings,
+                lastUpdated: Js.Date.now(),
+                goals: settings.goals->Array.concat([|goal|]),
               }
             );
             navigation->Navigators.RootStack.Navigation.goBack();
@@ -38,9 +38,9 @@ let make = (~navigation, ~route) => {
     ->Option.getWithDefault((false, true, _ => ()));
 
   let type_ =
-    route##params
+    route.params
     ->Option.flatMap(params =>
-        params##newGoalType->Option.flatMap(t => t->Goal.Type.fromSerialized)
+        params.newGoalType->Option.flatMap(t => t->Goal.Type.fromSerialized)
       );
   <>
     <StatusBar barStyle=`lightContent />

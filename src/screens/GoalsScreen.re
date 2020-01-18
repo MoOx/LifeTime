@@ -57,7 +57,7 @@ let make = (~navigation, ~route as _) => {
           onNewGoalPress={goalType =>
             navigation->Navigators.RootStack.Navigation.navigateWithParams(
               "GoalNewModalScreen",
-              {"newGoalType": goalType},
+              {newGoalType: goalType},
             )
           }
           // onEditPress={activity =>

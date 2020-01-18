@@ -26,8 +26,8 @@ module StatsStackScreen = {
         options={screenOptions =>
           StatsStack.options(
             ~title=
-              screenOptions##route##params
-              ->Option.flatMap(params => params##currentActivityTitle)
+              screenOptions.route.params
+              ->Option.flatMap(params => params.currentActivityTitle)
               ->Option.getWithDefault("Activity"),
             ~headerBackTitle="Back",
             ~headerTitleContainerStyle=
@@ -106,9 +106,9 @@ module TabsScreen = {
             ~tabBarIcon=
               tabBarIconProps =>
                 <SVGtimeline
-                  width={tabBarIconProps##size->ReactFromSvg.Size.dp}
-                  height={tabBarIconProps##size->ReactFromSvg.Size.dp}
-                  fill=tabBarIconProps##color
+                  width={tabBarIconProps.size->ReactFromSvg.Size.dp}
+                  height={tabBarIconProps.size->ReactFromSvg.Size.dp}
+                  fill={tabBarIconProps.color}
                 />,
             (),
           )
@@ -123,9 +123,9 @@ module TabsScreen = {
             ~tabBarIcon=
               tabBarIconProps =>
                 <SVGpennant
-                  width={tabBarIconProps##size->ReactFromSvg.Size.dp}
-                  height={tabBarIconProps##size->ReactFromSvg.Size.dp}
-                  fill=tabBarIconProps##color
+                  width={tabBarIconProps.size->ReactFromSvg.Size.dp}
+                  height={tabBarIconProps.size->ReactFromSvg.Size.dp}
+                  fill={tabBarIconProps.color}
                 />,
             (),
           )
@@ -140,9 +140,9 @@ module TabsScreen = {
             ~tabBarIcon=
               tabBarIconProps =>
                 <SVGsettings
-                  width={tabBarIconProps##size->ReactFromSvg.Size.dp}
-                  height={tabBarIconProps##size->ReactFromSvg.Size.dp}
-                  fill=tabBarIconProps##color
+                  width={tabBarIconProps.size->ReactFromSvg.Size.dp}
+                  height={tabBarIconProps.size->ReactFromSvg.Size.dp}
+                  fill={tabBarIconProps.color}
                 />,
             (),
           )

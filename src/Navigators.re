@@ -1,26 +1,25 @@
 open ReactNavigation;
 
-module StatsStack =
-  Stack.Make({
-    type params = {. "currentActivityTitle": option(string)};
-  });
+module M = {
+  type params = unit;
+};
 
-module GoalsStack =
-  Stack.Make({
-    type params = {.};
-  });
+module StatsStack = {
+  module M = {
+    type params = {currentActivityTitle: option(string)};
+  };
+  include Stack.Make(M);
+};
 
-module SettingsStack =
-  Stack.Make({
-    type params = {.};
-  });
+module GoalsStack = Stack.Make(M);
 
-module Tabs =
-  BottomTabs.Make({
-    type params = {.};
-  });
+module SettingsStack = Stack.Make(M);
 
-module RootStack =
-  Stack.Make({
-    type params = {. "newGoalType": option(Goal.Type.serializableT)};
-  });
+module Tabs = BottomTabs.Make(M);
+
+module RootStack = {
+  module M = {
+    type params = {newGoalType: option(Goal.Type.serializableT)};
+  };
+  include Stack.Make(M);
+};

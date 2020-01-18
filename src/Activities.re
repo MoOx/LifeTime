@@ -7,16 +7,15 @@ let isSimilar = (a, b) => {
 type id = string;
 
 type t = {
-  .
-  "id": id,
-  "title": string,
-  "createdAt": float,
-  "categoryId": ActivityCategories.id,
+  id,
+  title: string,
+  createdAt: float,
+  categoryId: ActivityCategories.id,
 };
 
 let unknown: t = {
-  "id": "unknown-0",
-  "title": "",
-  "createdAt": 0.,
-  "categoryId": ActivityCategories.unknown,
+  id: "unknown-0",
+  title: "",
+  createdAt: 0.,
+  categoryId: ActivityCategories.unknown,
 };

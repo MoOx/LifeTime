@@ -25,28 +25,27 @@ module Type = {
 };
 
 type t = {
-  .
-  "id": id,
-  "title": string,
-  "createdAt": float,
-  "type_": Type.serializableT,
-  "days": array(bool),
-  "durationPerWeek": float,
-  "categoriesId": array(ActivityCategories.id),
-  "activitiesId": array(Activities.id),
+  id,
+  title: string,
+  createdAt: float,
+  type_: Type.serializableT,
+  days: array(bool),
+  durationPerWeek: float,
+  categoriesId: array(ActivityCategories.id),
+  activitiesId: array(Activities.id),
 };
 
 let make =
     (title, type_: Type.t, durationPerWeek, days, categoriesId, activitiesId) => {
   let createdAt = Js.Date.now();
   {
-    "id": Utils.makeId(title, createdAt),
-    "title": title,
-    "type_": type_->Type.toSerialized,
-    "createdAt": createdAt,
-    "days": days,
-    "durationPerWeek": durationPerWeek,
-    "categoriesId": categoriesId,
-    "activitiesId": activitiesId,
+    id: Utils.makeId(title, createdAt),
+    title,
+    type_: type_->Type.toSerialized,
+    createdAt,
+    days,
+    durationPerWeek,
+    categoriesId,
+    activitiesId,
   };
 };

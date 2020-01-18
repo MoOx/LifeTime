@@ -1,16 +1,18 @@
 open Belt;
+open ReactNativeCalendarEvents;
 
-let sort = calendars =>
+let sort = (calendars: array(calendar)) =>
   calendars->SortArray.stableSortBy((a, b) =>
-    a##title > b##title ? 1 : a##title < b##title ? (-1) : 0
+    a.title > b.title ? 1 : a.title < b.title ? (-1) : 0
   );
 
-let availableCalendars = (calendars, settings: AppSettings.t) =>
+let availableCalendars =
+    (calendars: array(calendar), settings: AppSettings.t) =>
   calendars
   ->Array.keep(c =>
-      !settings##calendarsIdsSkipped->Array.some(cs => cs == c##id)
+      !settings.calendarsIdsSkipped->Array.some(cs => cs == c.id)
     )
-  ->Array.map(c => c##id);
+  ->Array.map(c => c.id);
 
 let useCalendars = updater => {
   let (value, set) = React.useState(() => None);
@@ -63,24 +65,24 @@ let filterEvents =
       events: array(ReactNativeCalendarEvents.calendarEventReadable),
       settings: AppSettings.t,
     ) =>
-  events->Array.keep(e
+  events->Array.keep(evt
     // filters out all day events
     =>
-      if (e##allDay->Option.getWithDefault(false)) {
+      if (evt.allDay->Option.getWithDefault(false)) {
         false;
              // filters selected calendars
-      } else if (settings##calendarsIdsSkipped
+      } else if (settings.calendarsIdsSkipped
                  ->Array.some(cid =>
                      cid
-                     == e##calendar
-                        ->Option.map(c => c##id)
+                     == evt.calendar
+                        ->Option.map(c => c.id)
                         ->Option.getWithDefault("")
                    )) {
         false;
-      } else if (settings##activitiesSkippedFlag
-                 && settings##activitiesSkipped
+      } else if (settings.activitiesSkippedFlag
+                 && settings.activitiesSkipped
                     ->Array.some(skipped =>
-                        Activities.isSimilar(skipped, e##title)
+                        Activities.isSimilar(skipped, evt.title)
                       )) {
         false;
       } else {
@@ -91,22 +93,22 @@ let filterEvents =
 let mapToSortedArrayPerDuration = map =>
   map
   ->Map.String.toArray
-  ->Array.map(((_key, evts)) => {
+  ->Array.map(((_key, evts: array(calendarEventReadable))) => {
       let totalDurationInMin =
         evts->Array.reduce(
           0.,
-          (totalDurationInMin, e) => {
+          (totalDurationInMin, evt) => {
             let durationInMs =
               Date.durationInMs(
-                e##endDate->Js.Date.fromString,
-                e##startDate->Js.Date.fromString,
+                evt.endDate->Js.Date.fromString,
+                evt.startDate->Js.Date.fromString,
               );
             totalDurationInMin
             +. durationInMs->Js.Date.fromFloat->Js.Date.valueOf->Date.msToMin;
           },
         );
       (
-        evts[0]->Option.map(e => e##title)->Option.getWithDefault(""),
+        evts[0]->Option.map(evt => evt.title)->Option.getWithDefault(""),
         totalDurationInMin,
       );
     })
@@ -114,47 +116,48 @@ let mapToSortedArrayPerDuration = map =>
       minA > minB ? (-1) : minA < minB ? 1 : 0
     );
 
-let mapTitleDuration = events => {
+let mapTitleDuration = (events: array(calendarEventReadable)) => {
   events
   ->Array.reduce(
       Map.String.empty,
-      (map, e) => {
-        let key = e##title->Activities.minifyName;
+      (map, evt) => {
+        let key = evt.title->Activities.minifyName;
         map->Map.String.set(
           key,
           map
           ->Map.String.get(key)
           ->Option.getWithDefault([||])
-          ->Array.concat([|e|]),
+          ->Array.concat([|evt|]),
         );
       },
     )
   ->mapToSortedArrayPerDuration;
 };
 
-let categoryIdFromActivityTitle = (settings, activityName) => {
+let categoryIdFromActivityTitle = (settings: AppSettings.t, activityName) => {
   let activity =
-    settings##activities
+    settings.activities
     ->Array.keep(acti =>
-        Activities.isSimilar(acti##title, activityName)
-        && acti##categoryId->ActivityCategories.isIdValid
+        Activities.isSimilar(acti.title, activityName)
+        && acti.categoryId->ActivityCategories.isIdValid
       )[0]
     ->Option.getWithDefault(Activities.unknown);
-  activity##categoryId;
+  activity.categoryId;
 };
 
-let mapCategoryDuration = (settings, events) => {
+let mapCategoryDuration =
+    (settings: AppSettings.t, events: array(calendarEventReadable)) => {
   events
   ->Array.reduce(
       Map.String.empty,
-      (map, e) => {
-        let key = settings->categoryIdFromActivityTitle(e##title);
+      (map, evt) => {
+        let key = settings->categoryIdFromActivityTitle(evt.title);
         map->Map.String.set(
           key,
           map
           ->Map.String.get(key)
           ->Option.getWithDefault([||])
-          ->Array.concat([|e|]),
+          ->Array.concat([|evt|]),
         );
       },
     )

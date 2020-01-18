@@ -12,7 +12,7 @@ let make = (~activityTitle, ~onSkipActivity) => {
   let themeModeKey = AppSettings.useTheme();
   let theme = Theme.useTheme(themeModeKey);
   let isSkipped =
-    settings##activitiesSkipped
+    settings.activitiesSkipped
     ->Array.some(skipped => Activities.isSimilar(skipped, activityTitle));
   <SpacedView horizontal=None>
     <Row> <Spacer size=XS /> <BlockHeading text="Category" /> </Row>
@@ -27,26 +27,21 @@ let make = (~activityTitle, ~onSkipActivity) => {
                let createdAt = Js.Date.now();
                setSettings(settings =>
                  {
-                   // ...settings,
-                   "theme": settings##theme,
-                   "lastUpdated": Js.Date.now(),
-                   "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-                   "activitiesSkippedFlag": settings##activitiesSkippedFlag,
-                   "activitiesSkipped": settings##activitiesSkipped,
-                   "activities":
-                     settings##activities
+                   ...settings,
+                   lastUpdated: Js.Date.now(),
+                   activities:
+                     settings.activities
                      ->Array.keep(acti =>
-                         !Activities.isSimilar(acti##title, activityTitle)
+                         !Activities.isSimilar(acti.title, activityTitle)
                        )
                      ->Array.concat([|
                          {
-                           "id": Utils.makeId(activityTitle, createdAt),
-                           "title": activityTitle,
-                           "createdAt": createdAt,
-                           "categoryId": id,
+                           id: Utils.makeId(activityTitle, createdAt),
+                           title: activityTitle,
+                           createdAt,
+                           categoryId: id,
                          },
                        |]),
-                   "goals": settings##goals,
                  }
                );
              }}>
@@ -104,25 +99,20 @@ let make = (~activityTitle, ~onSkipActivity) => {
       onPress={_ => {
         setSettings(settings => {
           let isSkipped =
-            settings##activitiesSkipped
+            settings.activitiesSkipped
             ->Array.some(skipped =>
                 Activities.isSimilar(skipped, activityTitle)
               );
           {
-            "theme": settings##theme,
-            "lastUpdated": Js.Date.now(),
-            "calendarsIdsSkipped": settings##calendarsIdsSkipped,
-            "activitiesSkippedFlag": settings##activitiesSkippedFlag,
-            "activitiesSkipped":
+            ...settings,
+            lastUpdated: Js.Date.now(),
+            activitiesSkipped:
               !isSkipped
-                ? settings##activitiesSkipped
-                  ->Array.concat([|activityTitle|])
-                : settings##activitiesSkipped
+                ? settings.activitiesSkipped->Array.concat([|activityTitle|])
+                : settings.activitiesSkipped
                   ->Array.keep(alreadySkipped =>
                       Activities.isSimilar(alreadySkipped, activityTitle)
                     ),
-            "activities": settings##activities,
-            "goals": settings##goals,
           };
         });
         onSkipActivity();
