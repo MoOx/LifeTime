@@ -1,3 +1,5 @@
+open Belt;
+
 let minifyName = name => name->Js.String.toLowerCase;
 
 let isSimilar = (a, b) => {
@@ -19,3 +21,8 @@ let unknown: t = {
   createdAt: 0.,
   categoryId: ActivityCategories.unknown,
 };
+
+let getFromId: (id, array(t)) => t =
+  (actId, activities) =>
+    activities->Array.keepMap(act => actId == act.id ? Some(act) : None)[0]
+    ->Option.getWithDefault(unknown);

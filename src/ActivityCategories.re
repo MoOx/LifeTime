@@ -22,10 +22,10 @@ let defaults: list(cat) = [
   unknownCat,
 ];
 
-let getColor: (Theme.t, color) => string =
-  theme => {
+let getColor: (color, Theme.t) => string =
+  (color, theme) => {
     let t = Theme.colors(theme);
-    fun
+    switch (color) {
     | "red" => t.red
     | "orange" => t.orange
     | "yellow" => t.yellow
@@ -35,7 +35,8 @@ let getColor: (Theme.t, color) => string =
     | "purple" => t.purple
     | "pink" => t.pink
     | "blue" => t.blue
-    | _ => t.gray4;
+    | _ => t.gray4
+    };
   };
 
 let getFromId: id => cat =

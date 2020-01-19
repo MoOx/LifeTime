@@ -306,9 +306,8 @@ let make =
                                 let (_, _, colorName, _) =
                                   ActivityCategories.getFromId(ecid);
                                 let backgroundColor =
-                                  ActivityCategories.getColor(
+                                  colorName->ActivityCategories.getColor(
                                     theme.mode,
-                                    colorName,
                                   );
                                 key != ecid
                                   ? React.null

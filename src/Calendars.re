@@ -1,6 +1,16 @@
 open Belt;
 open ReactNativeCalendarEvents;
 
+let date0 =
+  Js.Date.makeWithYMDHM(
+    ~year=0.,
+    ~month=0.,
+    ~date=0.,
+    ~hours=0.,
+    ~minutes=0.,
+    (),
+  );
+
 let sort = (calendars: array(calendar)) =>
   calendars->SortArray.stableSortBy((a, b) =>
     a.title > b.title ? 1 : a.title < b.title ? (-1) : 0

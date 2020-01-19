@@ -4,16 +4,6 @@ open ReactMultiversal;
 
 let title = "Add a Goal";
 
-let date0 =
-  Js.Date.makeWithYMDHM(
-    ~year=0.,
-    ~month=0.,
-    ~date=0.,
-    ~hours=0.,
-    ~minutes=0.,
-    (),
-  );
-
 let quickDurations = [|30., 45., 60., 90.|];
 
 [@bs.module "react"]
@@ -49,7 +39,7 @@ let make = (~type_ as initialType=?, ~onChange) => {
       ~minutes=minutes *. numberOfDays,
       (),
     )
-    ->Date.durationInMs(date0)
+    ->Date.durationInMs(Calendars.date0)
     ->Date.msToMin;
 
   useEffect6(
@@ -485,7 +475,7 @@ let make = (~type_ as initialType=?, ~onChange) => {
        ->List.toArray
        ->Array.mapWithIndex((index, category) => {
            let (id, name, colorName, iconName) = category;
-           let color = ActivityCategories.getColor(theme.mode, colorName);
+           let color = colorName->ActivityCategories.getColor(theme.mode);
            let selectedCat =
              categoriesSelected->Array.some(catKey => catKey == id);
            let opened = categoriesOpened->Array.some(catKey => catKey == id);

@@ -106,7 +106,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                          ->Calendars.categoryIdFromActivityTitle(title)
                          ->ActivityCategories.getFromId;
                        let color =
-                         ActivityCategories.getColor(theme.mode, colorName);
+                         colorName->ActivityCategories.getColor(theme.mode);
                        <TouchableOpacity
                          key=title onPress={_ => onActivityPress(title)}>
                          <View style=Predefined.styles##rowCenter>

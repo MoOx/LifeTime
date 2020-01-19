@@ -20,7 +20,7 @@ let make = (~activityTitle, ~onSkipActivity) => {
     <View style=theme.styles##background>
       {ActivityCategories.defaults
        ->List.mapWithIndex((index, (id, name, colorName, iconName)) => {
-           let color = ActivityCategories.getColor(theme.mode, colorName);
+           let color = colorName->ActivityCategories.getColor(theme.mode);
            <TouchableOpacity
              key=id
              onPress={_ => {
