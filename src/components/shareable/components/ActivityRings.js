@@ -58,7 +58,7 @@ const AngularGradient = (
               backgroundColor: 'transparent',
               borderRadius,
             }}
-            source={require('../../public/activity-mask.png')}
+            source={require('./ActivityRings.mask.png')}
           />
         }>
         <View
