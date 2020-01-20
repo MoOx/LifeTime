@@ -295,6 +295,7 @@ type themeData('a) = {
   mode: t,
   styles: rnStyleSheet('a),
   colors: Predefined.Colors.Ios.t,
+  namedColors: colors,
 };
 
 let useTheme = (acceptedMode): themeData('a) => {
@@ -314,11 +315,13 @@ let useTheme = (acceptedMode): themeData('a) => {
       mode,
       styles: themeStyles.light,
       colors: Predefined.Colors.Ios.light,
+      namedColors: Colors.light,
     }
   | `dark => {
       mode,
       styles: themeStyles.dark,
       colors: Predefined.Colors.Ios.dark,
+      namedColors: Colors.dark,
     }
   };
 };

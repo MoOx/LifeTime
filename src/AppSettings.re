@@ -73,8 +73,8 @@ let decodeJsonSettings = (json: Js.Json.t): t => {
                  createdAt: json |> field("createdAt", Json.Decode.float),
                  type_: json |> field("type_", int),
                  days: json |> field("days", array(bool)),
-                 durationPerWeek:
-                   json |> field("durationPerWeek", Json.Decode.float),
+                 durationPerDay:
+                   json |> field("durationPerDay", Json.Decode.float),
                  categoriesId: json |> field("categoriesId", array(string)),
                  activitiesId: json |> field("activitiesId", array(string)),
                }

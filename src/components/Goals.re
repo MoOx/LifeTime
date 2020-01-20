@@ -9,8 +9,12 @@ let make = (~onNewGoalPress) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
   let theme = Theme.useTheme(AppSettings.useTheme());
 
-  // let windowDimensions = Dimensions.useWindowDimensions();
-  // let styleWidth = Style.(style(~width=windowDimensions##width->dp, ()));
+  let today = React.useRef(Date.now());
+  let todayDates =
+    React.useRef(
+      Date.weekDates(~firstDayOfWeekIndex=1, today->React.Ref.current),
+    );
+  let (startOfWeek, endOfWeek) = todayDates->React.Ref.current;
 
   <>
     <SpacedView>
@@ -37,6 +41,23 @@ let make = (~onNewGoalPress) => {
     <SpacedView horizontal=XS>
       {settings.goals
        ->Array.map(goal => {
+           let now = Js.Date.now();
+           let currentTime = 9. *. 60.; // @todo
+           let numberOfDays =
+             goal.days
+             ->Array.reduce(0., (total, dayOn) =>
+                 dayOn ? total +. 1. : total
+               );
+           let durationPerWeek = goal.durationPerDay *. numberOfDays;
+           let durationProgress =
+             (startOfWeek->Js.Date.getTime -. now)
+             /. (startOfWeek->Js.Date.getTime -. endOfWeek->Js.Date.getTime);
+           let proportionalGoal = durationPerWeek *. durationProgress;
+           let progress = currentTime /. proportionalGoal;
+           let remainingMinToDo = durationPerWeek -. currentTime;
+           let remainingMinThisWeek =
+             (endOfWeek->Js.Date.getTime -. now)->Date.msToMin;
+           let canBeDone = remainingMinToDo < remainingMinThisWeek;
            let (backgroundColor, title) =
              switch (goal.categoriesId, goal.activitiesId) {
              | ([|catId|], [||]) =>
@@ -57,6 +78,23 @@ let make = (~onNewGoalPress) => {
                )
              | (_, _) => (theme.colors.gray, "Unknown")
              };
+           let (startColor, endColor) =
+             Goal.Colors.(
+               switch (goal.type_->Goal.Type.fromSerialized) {
+               | Some(_) when !canBeDone => (bad, bad)
+               | Some(Min) when progress <= 0.25 => (bad, bad)
+               | Some(Min) when progress <= 0.5 => (danger, bad)
+               | Some(Min) when progress <= 0.75 => (alert, danger)
+               | Some(Min) when progress < 1. => (ok, alert)
+               | Some(Min) when progress > 1. => (ok, good)
+               //  | Some(Max) when progress <= 0.25 => (ok, good)
+               | Some(Max) when progress <= 0.5 => (ok, good)
+               | Some(Max) when progress <= 0.75 => (ok, alert)
+               | Some(Max) when progress < 1. => (ok, danger)
+               | Some(Max) when progress >= 1. => (danger, bad)
+               | _ => (ok, ok)
+               }
+             );
            <SpacedView key={goal.id} horizontal=XS vertical=XS>
              <SpacedView
                style=Style.(
@@ -71,93 +109,138 @@ let make = (~onNewGoalPress) => {
                vertical=S>
                <View
                  style=Style.(
-                   viewStyle(
-                     ~position=`absolute,
-                     ~bottom=6.->dp,
-                     ~right=6.->dp,
-                     (),
-                   )
-                 )>
-                 {let width = 76.->ReactFromSvg.Size.dp;
-                  let height = 76.->ReactFromSvg.Size.dp;
-                  let fill = "rgba(255,255,255,0.05)";
-                  switch (goal.type_->Goal.Type.fromSerialized) {
-                  | Some(Min) => <SVGscope width height fill />
-                  | Some(Max) => <SVGhourglass width height fill />
-                  | _ => <SVGcheckmark width height fill />
-                  }}
-               </View>
-               <Text
-                 style=Style.(
-                   list([Theme.text##body, theme.styles##textOnBackground])
-                 )>
-                 (
-                   if (goal.title != "") {
-                     goal.title;
-                   } else {
-                     title;
-                   }
-                 )
-                 ->React.string
-               </Text>
-               <Text
-                 style=Style.(
                    list([
-                     Theme.text##footnote,
-                     theme.styles##textLightOnBackground,
+                     StyleSheet.absoluteFill,
+                     Predefined.styles##row,
+                     viewStyle(
+                       ~justifyContent=`flexEnd,
+                       ~alignItems=`center,
+                       (),
+                     ),
                    ])
                  )>
-                 (
-                   switch (goal.type_->Goal.Type.fromSerialized) {
-                   | Some(Min) => "Goal of"
-                   | Some(Max) => "Limit of"
-                   | _ => ""
-                   }
-                 )
-                 ->React.string
-                 " "->React.string
-                 {let numberOfDays =
-                    goal.days
-                    ->Array.reduce(0., (total, dayOn) =>
-                        dayOn ? total +. 1. : total
-                      );
-                  let durationInMinutes =
-                    Js.Date.makeWithYMDHM(
-                      ~year=0.,
-                      ~month=0.,
-                      ~date=0.,
-                      ~hours=0.,
-                      ~minutes=goal.durationPerWeek *. numberOfDays,
-                      (),
-                    )
-                    ->Date.durationInMs(Calendars.date0)
-                    ->Date.msToMin;
-                  (durationInMinutes /. numberOfDays)->Date.minToString}
-                 ->React.string
-                 ", "->React.string
-                 {switch (goal.days) {
-                  | [|true, true, true, true, true, true, true|] => "every day"
-                  | [|false, true, true, true, true, true, false|] => "every weekday"
-                  | [|false, false, true, true, true, true, false|] => "every weekday except monday"
-                  | [|false, true, false, true, true, true, false|] => "every weekday except tuesday"
-                  | [|false, true, true, false, true, true, false|] => "every weekday except wednesday"
-                  | [|false, true, true, true, false, true, false|] => "every weekday except thursday"
-                  | [|false, true, true, true, true, false, false|] => "every weekday except friday"
-                  | [|true, false, false, false, false, false, true|] => "every day of the weekend"
-                  | _ =>
-                    goal.days
-                    ->Array.reduceWithIndex("", (days, day, index) =>
-                        if (day) {
-                          days
-                          ++ Date.dayShortString(index->float)
-                          ++ (index < goal.days->Array.length - 1 ? ", " : "");
-                        } else {
-                          days;
-                        }
-                      )
-                  }}
-                 ->React.string
-               </Text>
+                 <ActivityRings
+                   width=48.
+                   strokeWidth=10.
+                   spaceBetween=0.
+                   backgroundColor
+                   rings=[|
+                     {
+                       startColor,
+                       endColor,
+                       backgroundColor:
+                         BsTinycolor.TinyColor.(
+                           makeFromString(backgroundColor)
+                           ->Option.flatMap(color =>
+                               makeFromString("rgb(153, 255, 0)")
+                               ->Option.flatMap(color2 =>
+                                   mix(color, color2, ~value=20)
+                                   ->Option.map(mixedColor =>
+                                       mixedColor->toRgbString
+                                     )
+                                 )
+                             )
+                           ->Option.getWithDefault(backgroundColor)
+                         ),
+                       progress,
+                     },
+                   |]
+                 />
+                 <Spacer size=S />
+               </View>
+               <View
+                 style=Style.(
+                   list([
+                     Predefined.styles##row,
+                     //  Predefined.styles##alignCenter,
+                   ])
+                 )>
+                 <View>
+                   <Spacer size={Custom(3.)} />
+                   {let width = 24.->ReactFromSvg.Size.dp;
+                    let height = 24.->ReactFromSvg.Size.dp;
+                    let fill = "rgba(255,255,255,0.25)";
+                    switch (goal.type_->Goal.Type.fromSerialized) {
+                    | Some(Min) => <SVGscope width height fill />
+                    | Some(Max) => <SVGhourglass width height fill />
+                    | _ => <SVGcheckmark width height fill />
+                    }}
+                 </View>
+                 <Spacer size=XS />
+                 <View>
+                   <Text
+                     style=Style.(
+                       list([
+                         Theme.text##body,
+                         theme.styles##textOnBackground,
+                       ])
+                     )>
+                     (
+                       if (goal.title != "") {
+                         goal.title;
+                       } else {
+                         title;
+                       }
+                     )
+                     ->React.string
+                   </Text>
+                   <Text
+                     style=Style.(
+                       list([
+                         Theme.text##footnote,
+                         theme.styles##textLightOnBackground,
+                       ])
+                     )>
+                     (
+                       switch (goal.type_->Goal.Type.fromSerialized) {
+                       | Some(Min) => "Goal of"
+                       | Some(Max) => "Limit of"
+                       | _ => ""
+                       }
+                     )
+                     ->React.string
+                     " "->React.string
+                     {let durationInMinutes =
+                        Js.Date.makeWithYMDHM(
+                          ~year=0.,
+                          ~month=0.,
+                          ~date=0.,
+                          ~hours=0.,
+                          ~minutes=durationPerWeek,
+                          (),
+                        )
+                        ->Date.durationInMs(Calendars.date0)
+                        ->Date.msToMin;
+                      (durationInMinutes /. numberOfDays)->Date.minToString}
+                     ->React.string
+                     ", "->React.string
+                     {switch (goal.days) {
+                      | [|true, true, true, true, true, true, true|] => "every day"
+                      | [|false, true, true, true, true, true, false|] => "every weekday"
+                      | [|false, false, true, true, true, true, false|] => "every weekday except monday"
+                      | [|false, true, false, true, true, true, false|] => "every weekday except tuesday"
+                      | [|false, true, true, false, true, true, false|] => "every weekday except wednesday"
+                      | [|false, true, true, true, false, true, false|] => "every weekday except thursday"
+                      | [|false, true, true, true, true, false, false|] => "every weekday except friday"
+                      | [|true, false, false, false, false, false, true|] => "every day of the weekend"
+                      | _ =>
+                        goal.days
+                        ->Array.reduceWithIndex("", (days, day, index) =>
+                            if (day) {
+                              days
+                              ++ Date.dayShortString(index->float)
+                              ++ (
+                                index < goal.days->Array.length - 1 ? ", " : ""
+                              );
+                            } else {
+                              days;
+                            }
+                          )
+                      }}
+                     ->React.string
+                   </Text>
+                 </View>
+               </View>
              </SpacedView>
            </SpacedView>;
          })

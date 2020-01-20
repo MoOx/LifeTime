@@ -26,6 +26,7 @@
     "reason-date-fns",
     "@reason-react-native/safe-area-context",
     "@reason-react-native/async-storage",
-    "@reason-react-native/slider"
+    "@reason-react-native/slider",
+    "bs-tinycolor"
   ]
 }

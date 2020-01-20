@@ -20,6 +20,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@ctrl/tinycolor": "^2.6.0",
     "@glennsl/bs-json": "^5.0.1",
     "@react-native-community/async-storage": "^1.7.1",
     "@react-native-community/blur": "^3.4.1",
@@ -32,6 +33,7 @@
     "@reason-react-native/async-storage": "^1.6.0",
     "@reason-react-native/safe-area-context": "^0.6.0",
     "@reason-react-native/slider": "^2.0.2",
+    "bs-tinycolor": "^2.0.1",
     "date-fns": "^2.8.1",
     "react": "16.11.0",
     "react-dom": "^16.11.0",
@@ -42,7 +44,8 @@
     "react-native-dark-mode": "^0.2.1",
     "react-native-gesture-handler": "^1.5.2",
     "react-native-permissions": "^2.0.8",
-    "react-native-reanimated": "^1.4.0",
+    "react-native-reanimated": "^1.7.0",
+    "react-native-redash": "^9.6.0",
     "react-native-safe-area-context": "^0.6.1",
     "react-native-screens": "^2.0.0-alpha.23",
     "react-native-svg": "^9.13.6",

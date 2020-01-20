@@ -1,5 +1,13 @@
 type id = string;
 
+module Colors = {
+  let good = "rgb(216, 255, 1)";
+  let ok = "rgb(153, 255, 0)";
+  let alert = ReactMultiversal.Predefined.Colors.Ios.light.yellow;
+  let danger = ReactMultiversal.Predefined.Colors.Ios.light.orange;
+  let bad = ReactMultiversal.Predefined.Colors.Ios.light.red;
+};
+
 module Type = {
   type t =
     | Min
@@ -30,13 +38,13 @@ type t = {
   createdAt: float,
   type_: Type.serializableT,
   days: array(bool),
-  durationPerWeek: float,
+  durationPerDay: float,
   categoriesId: array(ActivityCategories.id),
   activitiesId: array(Activities.id),
 };
 
 let make =
-    (title, type_: Type.t, durationPerWeek, days, categoriesId, activitiesId) => {
+    (title, type_: Type.t, durationPerDay, days, categoriesId, activitiesId) => {
   let createdAt = Js.Date.now();
   {
     id: Utils.makeId(title, createdAt),
@@ -44,7 +52,7 @@ let make =
     type_: type_->Type.toSerialized,
     createdAt,
     days,
-    durationPerWeek,
+    durationPerDay,
     categoriesId,
     activitiesId,
   };
