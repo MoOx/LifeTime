@@ -84,7 +84,14 @@ let make = (~navigation, ~route as _) => {
             ),
           ])
         )
-        refreshControl={<RefreshControl refreshing onRefresh />}
+        refreshControl={
+          <RefreshControl
+            refreshing
+            onRefresh
+            tintColor={theme.namedColors.textLightOnBackgroundDark}
+            colors=[|theme.namedColors.textLightOnBackgroundDark|]
+          />
+        }
         showsHorizontalScrollIndicator=false
         showsVerticalScrollIndicator=false
         scrollEventThrottle=16
