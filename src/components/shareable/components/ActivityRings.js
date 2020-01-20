@@ -235,7 +235,7 @@ const Ring = ({strokeWidth, ring, size, theta} /*: RingProps*/) => {
               r="50%"
               id="shadow">
               <Stop offset="0%" stopOpacity={0} />
-              <Stop offset="90%" stopOpacity={0.25} stopColor="black" />
+              <Stop offset="50%" stopOpacity={0.15} stopColor="black" />
               <Stop stopColor="black" stopOpacity={0} offset="100%" />
             </RadialGradient>
           </Defs>
