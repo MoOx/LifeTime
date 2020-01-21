@@ -31,15 +31,16 @@ external useCallback6:
 [@react.component]
 let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
   let (settings, setSettings) = React.useContext(AppSettings.context);
+  let (getEvents, updatedAt, requestUpdate) =
+    React.useContext(Calendars.context);
   let theme = Theme.useTheme(AppSettings.useTheme());
   let windowDimensions = Dimensions.useWindowDimensions();
   let styleWidth = Style.(style(~width=windowDimensions##width->dp, ()));
 
-  let (updatedAt, setUpdatedAt) = React.useState(_ => Date.now());
   React.useEffect1(
     () => {
       if (refreshing) {
-        setUpdatedAt(_ => Date.now());
+        requestUpdate();
         onRefreshDone();
       };
       None;
@@ -51,7 +52,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
     () => {
       let handleAppStateChange = newAppState =>
         if (newAppState == AppState.active) {
-          setUpdatedAt(_ => Date.now());
+          requestUpdate();
         };
 
       AppState.addEventListener(
@@ -64,7 +65,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
           ),
       );
     },
-    [|setUpdatedAt|],
+    [|requestUpdate|],
   );
 
   let today = React.useRef(Date.now());
@@ -82,7 +83,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
 
   let weeks =
     React.useRef(
-      Array.range(0, 51)
+      Array.range(0, 4)
       ->Array.reverse
       ->Array.map(currentWeekReverseIndex =>
           Date.weekDates(
@@ -103,7 +104,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
 
   let endDate = supposedEndDate->Date.min(today->React.Ref.current);
 
-  let events = Calendars.useEvents(startDate, endDate, updatedAt);
+  let events = getEvents(startDate, endDate);
   let mapTitleDuration =
     events->Option.map(es =>
       es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration

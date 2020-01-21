@@ -234,32 +234,36 @@ let app = () => {
     [|initialStateContainer|],
   );
 
-  let (settings, setSettings) = AppSettings.useSettings();
+  let appSettingsContextValue = AppSettings.useSettings();
+  let calendarsContextValue =
+    Calendars.useEvents(Date.weekDates(~firstDayOfWeekIndex=1, Date.now()));
 
   let isReady = initialStateContainer->Option.isSome;
   <ReactNativeDarkMode.DarkModeProvider>
-    <AppSettings.ContextProvider value=(settings, setSettings)>
-      {initialStateContainer
-       ->Option.map(initialState =>
-           <Native.NavigationNativeContainer
-             ?initialState
-             onStateChange={state => {
-               let maybeJsonState = Js.Json.stringifyAny(state);
-               switch (maybeJsonState) {
-               | Some(jsonState) =>
-                 ReactNativeAsyncStorage.setItem(
-                   navigationStateStorageKey,
-                   jsonState,
-                 )
-                 ->ignore
-               | None => Js.log("Unable to stringify navigation state")
-               };
-             }}>
-             <RootNavigator />
-           </Native.NavigationNativeContainer>
-         )
-       ->Option.getWithDefault(React.null)}
-      <Bootsplash isReady />
+    <AppSettings.ContextProvider value=appSettingsContextValue>
+      <Calendars.ContextProvider value=calendarsContextValue>
+        {initialStateContainer
+         ->Option.map(initialState =>
+             <Native.NavigationNativeContainer
+               ?initialState
+               onStateChange={state => {
+                 let maybeJsonState = Js.Json.stringifyAny(state);
+                 switch (maybeJsonState) {
+                 | Some(jsonState) =>
+                   ReactNativeAsyncStorage.setItem(
+                     navigationStateStorageKey,
+                     jsonState,
+                   )
+                   ->ignore
+                 | None => Js.log("Unable to stringify navigation state")
+                 };
+               }}>
+               <RootNavigator />
+             </Native.NavigationNativeContainer>
+           )
+         ->Option.getWithDefault(React.null)}
+        <Bootsplash isReady />
+      </Calendars.ContextProvider>
     </AppSettings.ContextProvider>
   </ReactNativeDarkMode.DarkModeProvider>;
 };

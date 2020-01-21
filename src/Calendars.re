@@ -28,7 +28,7 @@ let useCalendars = updater => {
   let (value, set) = React.useState(() => None);
   React.useEffect2(
     () => {
-      ReactNativeCalendarEvents.findCalendars()
+      findCalendars()
       ->FutureJs.fromPromise(error => {
           // @todo ?
           Js.log(error);
@@ -43,38 +43,87 @@ let useCalendars = updater => {
   value;
 };
 
-let useEvents = (startDate, endDate, updatedAt) => {
-  let (events, setEvents) = React.useState(() => None);
+type events = option(array(calendarEventReadable));
+let defaultContext: (
+  (Js.Date.t, Js.Date.t) => events,
+  Js.Date.t,
+  unit => unit,
+) = (
+  (_, _) => None,
+  Js.Date.make(),
+  _ => (),
+);
+let context = React.createContext(defaultContext);
 
-  React.useEffect4(
-    () => {
-      ReactNativeCalendarEvents.fetchAllEvents(
-        startDate->Js.Date.toISOString,
-        endDate->Js.Date.toISOString,
-        // we filter calendar later cause if you UNSELECT ALL
-        // this `fetchAllEvents` DEFAULT TO ALL
-        None,
-      )
-      ->FutureJs.fromPromise(error => {
-          // @todo ?
-          Js.log(error);
-          error;
-        })
-      ->Future.tapOk(res => setEvents(_ => Some(res)))
-      ->ignore;
-      None;
-    },
-    (startDate, endDate, setEvents, updatedAt),
-  );
+module ContextProvider = {
+  let makeProps = (~value, ~children, ()) => {
+    "value": value,
+    "children": children,
+  };
+  let make = React.Context.provider(context);
+};
 
-  events;
+let useEvents = ((initialStartDate, initialEndDate)) => {
+  let (updatedAt, setUpdatedAt) = React.useState(_ => Date.now());
+  let requestUpdate =
+    React.useCallback1(
+      () => {setUpdatedAt(_ => Date.now())},
+      [|setUpdatedAt|],
+    );
+
+  let (eventsMapByRange, setEventsMapByRange) =
+    React.useState(() => Map.String.empty);
+
+  let requestEvents =
+    React.useCallback1(
+      (startDate, endDate) => {
+        fetchAllEvents(
+          startDate->Js.Date.toISOString,
+          endDate->Js.Date.toISOString,
+          // we filter calendar later cause if you UNSELECT ALL
+          // this `fetchAllEvents` DEFAULT TO ALL
+          None,
+        )
+        ->FutureJs.fromPromise(error => {
+            // @todo ?
+            Js.log(error);
+            error;
+          })
+        ->Future.tapOk(res =>
+            setEventsMapByRange(eventsMapByRange =>
+              eventsMapByRange->Map.String.set(
+                startDate->Js.Date.toISOString ++ endDate->Js.Date.toISOString,
+                res,
+              )
+            )
+          )
+        ->ignore
+      },
+      [|setEventsMapByRange|],
+    );
+
+  let getEvents =
+    React.useCallback((startDate, endDate) => {
+      let res =
+        eventsMapByRange->Map.String.get(
+          startDate->Js.Date.toISOString ++ endDate->Js.Date.toISOString,
+        );
+      if (res->Option.isNone) {
+        requestEvents(startDate, endDate);
+      };
+      res;
+    });
+
+  // React.useEffect4(
+  //   requestEvents,
+  //   (updatedAt),
+  // );
+
+  (getEvents, updatedAt, requestUpdate);
 };
 
 let filterEvents =
-    (
-      events: array(ReactNativeCalendarEvents.calendarEventReadable),
-      settings: AppSettings.t,
-    ) =>
+    (events: array(calendarEventReadable), settings: AppSettings.t) =>
   events->Array.keep(evt
     // filters out all day events
     =>

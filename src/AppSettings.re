@@ -145,8 +145,8 @@ let useSettings = () => {
   (settings, set);
 };
 
-type setSet = t => t;
-let defaultContext: (t, setSet => unit) = (defaultSettings, _ => ());
+type setSettingsT = t => t;
+let defaultContext: (t, setSettingsT => unit) = (defaultSettings, _ => ());
 let context = React.createContext(defaultContext);
 
 module ContextProvider = {
