@@ -2,14 +2,6 @@ open Belt;
 open ReactNative;
 open ReactMultiversal;
 
-let styles =
-  Style.{
-    "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
-    "durationText":
-      textStyle(~fontSize=12., ~lineHeight=12., ~fontWeight=`_700, ()),
-  }
-  ->StyleSheet.create;
-
 let numberOfActivitiesToShow = 8;
 
 [@react.component]
@@ -158,7 +150,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                                    <Text
                                      style=Style.(
                                        array([|
-                                         styles##durationText,
+                                         Theme.text##footnote,
                                          theme.styles##textVeryLightOnBackground,
                                        |])
                                      )
@@ -238,10 +230,14 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                      : React.null}
                 </>
               }}
-             <Separator style=theme.styles##separatorOnBackground />
            </>;
          })
-       ->Option.getWithDefault(React.null)}
+       ->Option.getWithDefault(
+           <SpacedView vertical=XXL>
+             <ActivityIndicator size=ActivityIndicator.Size.small />
+           </SpacedView>,
+         )}
     </View>
+    <Separator style=theme.styles##separatorOnBackground />
   </>;
 };
