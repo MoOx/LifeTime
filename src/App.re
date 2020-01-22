@@ -235,8 +235,7 @@ let app = () => {
   );
 
   let appSettingsContextValue = AppSettings.useSettings();
-  let calendarsContextValue =
-    Calendars.useEvents(Date.weekDates(~firstDayOfWeekIndex=1, Date.now()));
+  let calendarsContextValue = Calendars.useEvents();
 
   let isReady = initialStateContainer->Option.isSome;
   <ReactNativeDarkMode.DarkModeProvider>

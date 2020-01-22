@@ -94,6 +94,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
           )
         ),
     );
+
   let initialScrollIndex = weeks->React.Ref.current->Array.length - 1;
 
   let ((startDate, supposedEndDate), setCurrentDates) =
@@ -103,18 +104,6 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
     );
 
   let endDate = supposedEndDate->Date.min(today->React.Ref.current);
-
-  let events = getEvents(startDate, endDate);
-  let mapTitleDuration =
-    events->Option.map(es =>
-      es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration
-    );
-  let mapCategoryDuration =
-    events->Option.map(es =>
-      settings->Calendars.mapCategoryDuration(
-        es->Calendars.filterEvents(settings),
-      )
-    );
 
   let (todayFirst, _) = todayDates->React.Ref.current;
   let (previousFirst, _) = previousDates->React.Ref.current;
@@ -133,25 +122,36 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
     );
 
   let renderItem =
-    useCallback6(
+    React.useCallback1(
       renderItemProps => {
-        // Js.log2("render", renderItemProps##index);
-        let (firstDay, lastDay) = renderItemProps##item;
+        let (startDate, supposedEndDate) = renderItemProps##item;
+        let endDate = supposedEndDate->Date.min(today->React.Ref.current);
+        let events = getEvents(startDate, endDate);
+        let mapTitleDuration =
+          events->Option.map(es =>
+            es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration
+          );
+        let mapCategoryDuration =
+          events->Option.map(es =>
+            settings->Calendars.mapCategoryDuration(
+              es->Calendars.filterEvents(settings),
+            )
+          );
         <View style=styleWidth>
           <Spacer />
           <SpacedView vertical=None>
             <Text style=theme.styles##textVeryLightOnBackground>
               (
-                if (todayFirst == firstDay) {
+                if (todayFirst == startDate) {
                   "Daily Average";
-                } else if (previousFirst == firstDay) {
+                } else if (previousFirst == startDate) {
                   "Last Week's Average";
                 } else {
-                  firstDay->Js.Date.getDate->Js.Float.toString
+                  startDate->Js.Date.getDate->Js.Float.toString
                   ++ " - "
-                  ++ lastDay->Js.Date.getDate->Js.Float.toString
+                  ++ endDate->Js.Date.getDate->Js.Float.toString
                   ++ " "
-                  ++ lastDay->Date.monthShortString
+                  ++ endDate->Date.monthShortString
                   ++ " Average";
                 }
               )
@@ -212,14 +212,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
           </View>
         </View>;
       },
-      (
-        startDate,
-        endDate,
-        events,
-        supposedEndDate,
-        mapCategoryDuration,
-        mapTitleDuration,
-      ),
+      [|getEvents|],
     );
 
   let onViewableItemsChanged =
@@ -303,7 +296,12 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
          : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
     </BlockFootnote>
     <Spacer />
-    <TopActivities mapTitleDuration onFiltersPress onActivityPress />
+    {let events = getEvents(startDate, endDate);
+     let mapTitleDuration =
+       events->Option.map(es =>
+         es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration
+       );
+     <TopActivities mapTitleDuration onFiltersPress onActivityPress />}
     <Spacer />
     <SpacedView horizontal=None>
       <TouchableOpacity

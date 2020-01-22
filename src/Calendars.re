@@ -63,61 +63,66 @@ module ContextProvider = {
   let make = React.Context.provider(context);
 };
 
-let useEvents = ((initialStartDate, initialEndDate)) => {
-  let (updatedAt, setUpdatedAt) = React.useState(_ => Date.now());
-  let requestUpdate =
-    React.useCallback1(
-      () => {setUpdatedAt(_ => Date.now())},
-      [|setUpdatedAt|],
-    );
+let makeMapKey = (startDate, endDate) =>
+  startDate->Js.Date.toISOString ++ endDate->Js.Date.toISOString;
 
+let useEvents = () => {
+  let (updatedAt, setUpdatedAt) = React.useState(_ => Date.now());
   let (eventsMapByRange, setEventsMapByRange) =
     React.useState(() => Map.String.empty);
 
-  let requestEvents =
+  let requestUpdate =
     React.useCallback1(
-      (startDate, endDate) => {
-        fetchAllEvents(
-          startDate->Js.Date.toISOString,
-          endDate->Js.Date.toISOString,
-          // we filter calendar later cause if you UNSELECT ALL
-          // this `fetchAllEvents` DEFAULT TO ALL
-          None,
-        )
-        ->FutureJs.fromPromise(error => {
-            // @todo ?
-            Js.log(error);
-            error;
-          })
-        ->Future.tapOk(res =>
-            setEventsMapByRange(eventsMapByRange =>
-              eventsMapByRange->Map.String.set(
-                startDate->Js.Date.toISOString ++ endDate->Js.Date.toISOString,
-                res,
-              )
-            )
-          )
-        ->ignore
+      () => {
+        setUpdatedAt(_ => Date.now());
+        setEventsMapByRange(_ => Map.String.empty);
       },
-      [|setEventsMapByRange|],
+      [|setUpdatedAt|],
     );
 
   let getEvents =
-    React.useCallback((startDate, endDate) => {
-      let res =
-        eventsMapByRange->Map.String.get(
-          startDate->Js.Date.toISOString ++ endDate->Js.Date.toISOString,
-        );
-      if (res->Option.isNone) {
-        requestEvents(startDate, endDate);
-      };
-      res;
-    });
-
-  // React.useEffect4(
-  //   requestEvents,
-  //   (updatedAt),
-  // );
+    React.useCallback2(
+      (startDate, endDate) => {
+        let res =
+          eventsMapByRange->Map.String.get(makeMapKey(startDate, endDate));
+        if (res->Option.isNone) {
+          let res =
+            eventsMapByRange->Map.String.get(makeMapKey(startDate, endDate));
+          if (res->Option.isNone) {
+            setEventsMapByRange(eventsMapByRange => {
+              eventsMapByRange->Map.String.set(
+                makeMapKey(startDate, endDate),
+                None,
+              )
+            });
+            fetchAllEvents(
+              startDate->Js.Date.toISOString,
+              endDate->Js.Date.toISOString,
+              // we filter calendar later cause if you UNSELECT ALL
+              // this `fetchAllEvents` DEFAULT TO ALL
+              None,
+            )
+            ->FutureJs.fromPromise(error => {
+                // @todo ?
+                Js.log(error);
+                error;
+              })
+            ->Future.tapOk(res => {
+                setEventsMapByRange(eventsMapByRange =>
+                  eventsMapByRange->Map.String.set(
+                    makeMapKey(startDate, endDate),
+                    Some(res),
+                  )
+                )
+              })
+            ->ignore;
+            ();
+          };
+        };
+        res->Option.flatMap(res => res);
+      },
+      (eventsMapByRange, setEventsMapByRange),
+    );
 
   (getEvents, updatedAt, requestUpdate);
 };
