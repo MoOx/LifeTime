@@ -486,10 +486,10 @@ let make = (~type_ as initialType=?, ~onChange) => {
              ->Array.keep(activity => activity.categoryId == id);
            let selectedCategoryActivities =
              categoryActivities->Array.reduce([||], (selActs, activity) =>
-               if (activitiesSelected->Array.some(acti =>
-                     Activities.isSimilar(acti, activity.title)
+               if (activitiesSelected->Array.some(actiId =>
+                     actiId == activity.id
                    )) {
-                 selActs->Array.concat([|activity.title|]);
+                 selActs->Array.concat([|activity.id|]);
                } else {
                  selActs;
                }
@@ -622,14 +622,14 @@ let make = (~type_ as initialType=?, ~onChange) => {
                       let selected =
                         selectedCat
                         || activitiesSelected->Array.some(key =>
-                             Activities.isSimilar(key, activity.title)
+                             key == activity.id
                            );
                       let separator =
                         separator
                         || index != categoryActivities->Array.length
                         - 1;
                       <View
-                        key={activity.title}
+                        key={activity.id}
                         style=Style.(
                           list([
                             Predefined.styles##rowCenter,
@@ -643,9 +643,7 @@ let make = (~type_ as initialType=?, ~onChange) => {
                         <Spacer size=S />
                         <TouchableWithoutFeedback
                           disabled=selectedCat
-                          onPress={_ =>
-                            handleActivityCheckPress(activity.title)
-                          }>
+                          onPress={_ => handleActivityCheckPress(activity.id)}>
                           <View>
                             <SpacedView vertical=XS horizontal=None>
                               {if (!selected) {
@@ -666,9 +664,7 @@ let make = (~type_ as initialType=?, ~onChange) => {
                         </TouchableWithoutFeedback>
                         <TouchableWithoutFeedback
                           disabled=selectedCat
-                          onPress={_ =>
-                            handleActivityCheckPress(activity.title)
-                          }>
+                          onPress={_ => handleActivityCheckPress(activity.id)}>
                           <View style=Predefined.styles##flex>
                             <View style=Predefined.styles##rowCenter>
                               <SpacedView

@@ -7,6 +7,8 @@ let title = "Goals";
 [@react.component]
 let make = (~onNewGoalPress) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
+  let (getEvents, _updatedAt, _requestUpdate) =
+    React.useContext(Calendars.context);
   let theme = Theme.useTheme(AppSettings.useTheme());
 
   let today = React.useRef(Date.now());
@@ -14,7 +16,20 @@ let make = (~onNewGoalPress) => {
     React.useRef(
       Date.weekDates(~firstDayOfWeekIndex=1, today->React.Ref.current),
     );
-  let (startOfWeek, endOfWeek) = todayDates->React.Ref.current;
+  let (startDate, supposedEndDate) = todayDates->React.Ref.current;
+  let endDate = supposedEndDate->Date.min(today->React.Ref.current);
+
+  let events = getEvents(startDate, endDate, true);
+  let mapTitleDuration =
+    events->Option.map(es =>
+      es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration
+    );
+  let mapCategoryDuration =
+    events->Option.map(es =>
+      es
+      ->Calendars.filterEvents(settings)
+      ->Calendars.mapCategoryDuration(settings)
+    );
 
   <>
     <SpacedView>
@@ -42,7 +57,38 @@ let make = (~onNewGoalPress) => {
       {settings.goals
        ->Array.map(goal => {
            let now = Js.Date.now();
-           let currentTime = 9. *. 60.; // @todo
+           let currentCategoriesTime =
+             mapCategoryDuration
+             ->Option.map(mapCategoryDuration =>
+                 goal.categoriesId
+                 ->Array.map(catId => {
+                     mapCategoryDuration
+                     ->Array.map(((cid, duration)) =>
+                         cid == catId ? duration : 0.
+                       )
+                     ->Array.reduce(0., (total, v) => total +. v)
+                   })
+                 ->Array.reduce(0., (total, v) => total +. v)
+               )
+             ->Option.getWithDefault(0.);
+           let currentActivitiesTime =
+             mapTitleDuration
+             ->Option.map(mapTitleDuration =>
+                 goal.activitiesId
+                 ->Array.map(actId => {
+                     let act =
+                       Activities.getFromId(actId, settings.activities);
+                     mapTitleDuration
+                     ->Array.map(((title, duration)) => {
+                         Activities.isSimilar(title, act.title)
+                           ? duration : 0.
+                       })
+                     ->Array.reduce(0., (total, v) => total +. v);
+                   })
+                 ->Array.reduce(0., (total, v) => total +. v)
+               )
+             ->Option.getWithDefault(0.);
+           let currentTime = currentCategoriesTime +. currentActivitiesTime;
            let numberOfDays =
              goal.days
              ->Array.reduce(0., (total, dayOn) =>
@@ -50,13 +96,15 @@ let make = (~onNewGoalPress) => {
                );
            let durationPerWeek = goal.durationPerDay *. numberOfDays;
            let durationProgress =
-             (startOfWeek->Js.Date.getTime -. now)
-             /. (startOfWeek->Js.Date.getTime -. endOfWeek->Js.Date.getTime);
+             (startDate->Js.Date.getTime -. now)
+             /. (
+               startDate->Js.Date.getTime -. supposedEndDate->Js.Date.getTime
+             );
            let proportionalGoal = durationPerWeek *. durationProgress;
            let progress = currentTime /. proportionalGoal;
            let remainingMinToDo = durationPerWeek -. currentTime;
            let remainingMinThisWeek =
-             (endOfWeek->Js.Date.getTime -. now)->Date.msToMin;
+             (supposedEndDate->Js.Date.getTime -. now)->Date.msToMin;
            let canBeDone = remainingMinToDo < remainingMinThisWeek;
            let (backgroundColor, title) =
              switch (goal.categoriesId, goal.activitiesId) {
@@ -238,6 +286,17 @@ let make = (~onNewGoalPress) => {
                           )
                       }}
                      ->React.string
+                   </Text>
+                   <Text
+                     style=Style.(
+                       list([
+                         Theme.text##footnote,
+                         theme.styles##textLightOnBackground,
+                       ])
+                     )>
+                     {currentTime->Date.minToString->React.string}
+                     " done on "->React.string
+                     {durationPerWeek->Date.minToString->React.string}
                    </Text>
                  </View>
                </View>

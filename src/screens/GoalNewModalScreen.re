@@ -23,7 +23,6 @@ let make =
           true,
           false,
           _ => {
-            Js.log("save");
             setSettings(settings =>
               {
                 ...settings,

@@ -295,21 +295,17 @@ let make =
                    {mapCategoryDuration
                     ->Option.map(mapCategoryDuration =>
                         mapCategoryDuration
-                        ->Array.map(((title, _categoryId)) =>
+                        ->Array.map(((catId, _categoryId)) =>
                             mapPerCategories
                             ->Map.String.toArray
                             ->Array.map(((key, value)) => {
-                                let ecid =
-                                  settings->Calendars.categoryIdFromActivityTitle(
-                                    title,
-                                  );
                                 let (_, _, colorName, _) =
-                                  ActivityCategories.getFromId(ecid);
+                                  ActivityCategories.getFromId(catId);
                                 let backgroundColor =
                                   colorName->ActivityCategories.getColor(
                                     theme.mode,
                                   );
-                                key != ecid
+                                key != catId
                                   ? React.null
                                   : <View
                                       key

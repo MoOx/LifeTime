@@ -26,9 +26,9 @@ let make =
     );
   let mapCategoryDuration =
     events->Option.map(es =>
-      settings->Calendars.mapCategoryDuration(
-        es->Calendars.filterEvents(settings),
-      )
+      es
+      ->Calendars.filterEvents(settings)
+      ->Calendars.mapCategoryDuration(settings)
     );
   <View style>
     <Spacer />

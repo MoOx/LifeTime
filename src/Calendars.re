@@ -154,8 +154,21 @@ let filterEvents =
       }
     );
 
-let mapToSortedArrayPerDuration = map =>
-  map
+let mapTitleDuration = (events: array(calendarEventReadable)) => {
+  events
+  ->Array.reduce(
+      Map.String.empty,
+      (map, evt) => {
+        let key = evt.title->Activities.minifyName;
+        map->Map.String.set(
+          key,
+          map
+          ->Map.String.get(key)
+          ->Option.getWithDefault([||])
+          ->Array.concat([|evt|]),
+        );
+      },
+    )
   ->Map.String.toArray
   ->Array.map(((_key, evts: array(calendarEventReadable))) => {
       let totalDurationInMin =
@@ -179,23 +192,6 @@ let mapToSortedArrayPerDuration = map =>
   ->SortArray.stableSortBy(((_, minA), (_, minB)) =>
       minA > minB ? (-1) : minA < minB ? 1 : 0
     );
-
-let mapTitleDuration = (events: array(calendarEventReadable)) => {
-  events
-  ->Array.reduce(
-      Map.String.empty,
-      (map, evt) => {
-        let key = evt.title->Activities.minifyName;
-        map->Map.String.set(
-          key,
-          map
-          ->Map.String.get(key)
-          ->Option.getWithDefault([||])
-          ->Array.concat([|evt|]),
-        );
-      },
-    )
-  ->mapToSortedArrayPerDuration;
 };
 
 let categoryIdFromActivityTitle = (settings: AppSettings.t, activityName) => {
@@ -210,7 +206,7 @@ let categoryIdFromActivityTitle = (settings: AppSettings.t, activityName) => {
 };
 
 let mapCategoryDuration =
-    (settings: AppSettings.t, events: array(calendarEventReadable)) => {
+    (events: array(calendarEventReadable), settings: AppSettings.t) => {
   events
   ->Array.reduce(
       Map.String.empty,
@@ -225,5 +221,24 @@ let mapCategoryDuration =
         );
       },
     )
-  ->mapToSortedArrayPerDuration;
+  ->Map.String.toArray
+  ->Array.map(((key, evts: array(calendarEventReadable))) => {
+      let totalDurationInMin =
+        evts->Array.reduce(
+          0.,
+          (totalDurationInMin, evt) => {
+            let durationInMs =
+              Date.durationInMs(
+                evt.endDate->Js.Date.fromString,
+                evt.startDate->Js.Date.fromString,
+              );
+            totalDurationInMin
+            +. durationInMs->Js.Date.fromFloat->Js.Date.valueOf->Date.msToMin;
+          },
+        );
+      (key, totalDurationInMin);
+    })
+  ->SortArray.stableSortBy(((_, minA), (_, minB)) =>
+      minA > minB ? (-1) : minA < minB ? 1 : 0
+    );
 };
