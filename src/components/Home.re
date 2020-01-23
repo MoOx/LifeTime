@@ -3,13 +3,6 @@ open ReactNative;
 open ReactMultiversal;
 open ReasonDateFns;
 
-let styles =
-  Style.{
-    "text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ()),
-    "smallText": textStyle(~fontSize=12., ~lineHeight=16. *. 1.4, ()),
-  }
-  ->StyleSheet.create;
-
 let title = "Your LifeTime";
 
 [@bs.module "react"]
@@ -83,8 +76,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
 
   let weeks =
     React.useRef(
-      Array.range(0, 4)
-      ->Array.reverse
+      Array.range(0, 5)
       ->Array.map(currentWeekReverseIndex =>
           Date.weekDates(
             ~firstDayOfWeekIndex=1,
@@ -94,8 +86,6 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
           )
         ),
     );
-
-  let initialScrollIndex = weeks->React.Ref.current->Array.length - 1;
 
   let ((startDate, supposedEndDate), setCurrentDates) =
     React.useState(() =>
@@ -107,6 +97,12 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
 
   let (todayFirst, _) = todayDates->React.Ref.current;
   let (previousFirst, _) = previousDates->React.Ref.current;
+
+  let events = getEvents(startDate, endDate, true);
+  let mapTitleDuration =
+    events->Option.map(es =>
+      es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration
+    );
 
   let flatListRef = React.useRef(Js.Nullable.null);
 
@@ -121,99 +117,21 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
       [|windowDimensions##width|],
     );
 
-  let renderItem =
-    React.useCallback1(
-      renderItemProps => {
-        let (startDate, supposedEndDate) = renderItemProps##item;
-        let endDate = supposedEndDate->Date.min(today->React.Ref.current);
-        let events = getEvents(startDate, endDate);
-        let mapTitleDuration =
-          events->Option.map(es =>
-            es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration
-          );
-        let mapCategoryDuration =
-          events->Option.map(es =>
-            settings->Calendars.mapCategoryDuration(
-              es->Calendars.filterEvents(settings),
-            )
-          );
-        <View style=styleWidth>
-          <Spacer />
-          <SpacedView vertical=None>
-            <Text style=theme.styles##textVeryLightOnBackground>
-              (
-                if (todayFirst == startDate) {
-                  "Daily Average";
-                } else if (previousFirst == startDate) {
-                  "Last Week's Average";
-                } else {
-                  startDate->Js.Date.getDate->Js.Float.toString
-                  ++ " - "
-                  ++ endDate->Js.Date.getDate->Js.Float.toString
-                  ++ " "
-                  ++ endDate->Date.monthShortString
-                  ++ " Average";
-                }
-              )
-              ->React.string
-            </Text>
-          </SpacedView>
-          <Spacer size=S />
-          <SpacedView vertical=None>
-            <WeeklyGraph
-              events
-              mapCategoryDuration
-              mapTitleDuration
-              startDate
-              supposedEndDate
-            />
-          </SpacedView>
-          <Spacer size=S />
-          <View style=Predefined.styles##row>
-            <Spacer size=S />
-            <View style=Predefined.styles##flexGrow>
-              <Separator style=theme.styles##separatorOnBackground />
-              <SpacedView
-                horizontal=None vertical=S style=Predefined.styles##row>
-                <View style=Predefined.styles##flexGrow>
-                  <Text
-                    style=Style.(
-                      list([
-                        Theme.text##callout,
-                        theme.styles##textOnBackground,
-                      ])
-                    )>
-                    "Total Logged Time"->React.string
-                  </Text>
-                </View>
-                <Text>
-                  <Text
-                    style=Style.(
-                      list([
-                        Theme.text##callout,
-                        theme.styles##textLightOnBackground,
-                      ])
-                    )>
-                    {mapTitleDuration
-                     ->Option.map(mapTitleDuration =>
-                         mapTitleDuration->Array.reduce(
-                           0., (total, (_title, duration)) =>
-                           total +. duration
-                         )
-                       )
-                     ->Option.getWithDefault(0.)
-                     ->Date.minToString
-                     ->React.string}
-                  </Text>
-                </Text>
-                <Spacer size=S />
-              </SpacedView>
-            </View>
-          </View>
-        </View>;
-      },
-      [|getEvents|],
-    );
+  let renderItem = renderItemProps => {
+    let (currentStartDate, currentSupposedEndDate) = renderItemProps##item;
+    <WeeklyBarChart
+      today
+      todayFirst
+      previousFirst
+      // isVisible={
+      //   startDate == currentStartDate
+      //   && supposedEndDate == currentSupposedEndDate
+      // }
+      startDate=currentStartDate
+      supposedEndDate=currentSupposedEndDate
+      style=styleWidth
+    />;
+  };
 
   let onViewableItemsChanged =
     React.useRef(itemsChanged =>
@@ -234,7 +152,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
         ->Js.Nullable.toOption
         ->Option.map(flatList =>
             flatList->FlatList.scrollToIndex(
-              FlatList.scrollToIndexParams(~index=initialScrollIndex, ()),
+              FlatList.scrollToIndexParams(~index=0, ()),
             )
           )
         ->ignore,
@@ -274,8 +192,8 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
       horizontal=true
       pagingEnabled=true
       showsHorizontalScrollIndicator=false
-      initialScrollIndex
-      initialNumToRender=2
+      inverted=true
+      initialNumToRender=1
       data={weeks->React.Ref.current}
       style={Style.list([theme.styles##background, styleWidth])}
       getItemLayout
@@ -296,12 +214,7 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
          : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
     </BlockFootnote>
     <Spacer />
-    {let events = getEvents(startDate, endDate);
-     let mapTitleDuration =
-       events->Option.map(es =>
-         es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration
-       );
-     <TopActivities mapTitleDuration onFiltersPress onActivityPress />}
+    <TopActivities mapTitleDuration onFiltersPress onActivityPress />
     <Spacer />
     <SpacedView horizontal=None>
       <TouchableOpacity

@@ -45,11 +45,11 @@ let useCalendars = updater => {
 
 type events = option(array(calendarEventReadable));
 let defaultContext: (
-  (Js.Date.t, Js.Date.t) => events,
+  (Js.Date.t, Js.Date.t, bool) => events,
   Js.Date.t,
   unit => unit,
 ) = (
-  (_, _) => None,
+  (_, _, _) => None,
   Js.Date.make(),
   _ => (),
 );
@@ -82,13 +82,13 @@ let useEvents = () => {
 
   let getEvents =
     React.useCallback2(
-      (startDate, endDate) => {
+      (startDate, endDate, allowFetch) => {
         let res =
           eventsMapByRange->Map.String.get(makeMapKey(startDate, endDate));
         if (res->Option.isNone) {
           let res =
             eventsMapByRange->Map.String.get(makeMapKey(startDate, endDate));
-          if (res->Option.isNone) {
+          if (res->Option.isNone && allowFetch) {
             setEventsMapByRange(eventsMapByRange => {
               eventsMapByRange->Map.String.set(
                 makeMapKey(startDate, endDate),
