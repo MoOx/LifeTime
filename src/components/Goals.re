@@ -101,7 +101,10 @@ let make = (~onNewGoalPress) => {
                startDate->Js.Date.getTime -. supposedEndDate->Js.Date.getTime
              );
            let proportionalGoal = durationPerWeek *. durationProgress;
+           let totalProgress = currentTime /. durationPerWeek;
            let progress = currentTime /. proportionalGoal;
+           let proportionalAverageTime =
+             currentTime /. (numberOfDays *. durationProgress);
            let remainingMinToDo = durationPerWeek -. currentTime;
            let remainingMinThisWeek =
              (supposedEndDate->Js.Date.getTime -. now)->Date.msToMin;
@@ -153,74 +156,50 @@ let make = (~onNewGoalPress) => {
                    (),
                  )
                )
-               horizontal=S
+               horizontal=M
                vertical=S>
-               <View
-                 style=Style.(
-                   list([
-                     StyleSheet.absoluteFill,
-                     Predefined.styles##row,
-                     viewStyle(
-                       ~justifyContent=`flexEnd,
-                       ~alignItems=`center,
-                       (),
-                     ),
-                   ])
-                 )>
-                 <ActivityRings
-                   width=48.
-                   strokeWidth=10.
-                   spaceBetween=0.
-                   backgroundColor
-                   rings=[|
-                     {
-                       startColor,
-                       endColor,
-                       backgroundColor:
-                         BsTinycolor.TinyColor.(
-                           makeFromString(backgroundColor)
-                           ->Option.flatMap(color =>
-                               makeFromString("rgb(153, 255, 0)")
-                               ->Option.flatMap(color2 =>
-                                   mix(color, color2, ~value=20)
-                                   ->Option.map(mixedColor =>
-                                       mixedColor->toRgbString
-                                     )
-                                 )
-                             )
-                           ->Option.getWithDefault(backgroundColor)
-                         ),
-                       progress,
-                     },
+               <View style=Style.(list([StyleSheet.absoluteFill]))>
+                 <LinearGradientView
+                   width="100%"
+                   height="100%"
+                   stops=[|
+                     {offset: "0", stopColor: "#000", stopOpacity: "0"},
+                     {offset: "1", stopColor: "#000", stopOpacity: "0.5"},
                    |]
                  />
-                 <Spacer size=S />
                </View>
                <View
                  style=Style.(
                    list([
-                     Predefined.styles##row,
-                     //  Predefined.styles##alignCenter,
+                     Predefined.styles##rowSpaceBetween,
+                     Predefined.styles##alignStart,
                    ])
                  )>
-                 <View>
-                   <Spacer size={Custom(3.)} />
-                   {let width = 24.->ReactFromSvg.Size.dp;
-                    let height = 24.->ReactFromSvg.Size.dp;
-                    let fill = "rgba(255,255,255,0.25)";
-                    switch (goal.type_->Goal.Type.fromSerialized) {
-                    | Some(Min) => <SVGscope width height fill />
-                    | Some(Max) => <SVGhourglass width height fill />
-                    | _ => <SVGcheckmark width height fill />
-                    }}
-                 </View>
-                 <Spacer size=XS />
                  <View>
                    <Text
                      style=Style.(
                        list([
-                         Theme.text##body,
+                         Theme.text##caption1,
+                         theme.styles##textLightOnBackgroundDark,
+                         textStyle(~fontWeight=Theme.fontWeights.bold, ()),
+                       ])
+                     )>
+                     {(
+                        switch (goal.type_->Goal.Type.fromSerialized) {
+                        | Some(Min) => "Goal"
+                        | Some(Max) => "Limit"
+                        | _ => ""
+                        }
+                      )
+                      ->Js.String.toUpperCase
+                      ->React.string}
+                   </Text>
+                   <Text
+                     style=Style.(
+                       list([
+                         Theme.text##title1,
                          theme.styles##textOnBackground,
+                         textStyle(~fontWeight=Theme.fontWeights.medium, ()),
                        ])
                      )>
                      (
@@ -236,18 +215,9 @@ let make = (~onNewGoalPress) => {
                      style=Style.(
                        list([
                          Theme.text##footnote,
-                         theme.styles##textLightOnBackground,
+                         theme.styles##textLightOnBackgroundDark,
                        ])
                      )>
-                     (
-                       switch (goal.type_->Goal.Type.fromSerialized) {
-                       | Some(Min) => "Goal of"
-                       | Some(Max) => "Limit of"
-                       | _ => ""
-                       }
-                     )
-                     ->React.string
-                     " "->React.string
                      {let durationInMinutes =
                         Js.Date.makeWithYMDHM(
                           ~year=0.,
@@ -287,21 +257,138 @@ let make = (~onNewGoalPress) => {
                       }}
                      ->React.string
                    </Text>
-                   <Text
-                     style=Style.(
-                       list([
-                         Theme.text##footnote,
-                         theme.styles##textLightOnBackground,
-                       ])
-                     )>
-                     {currentTime->Date.minToString->React.string}
-                     " done on "->React.string
-                     {durationPerWeek->Date.minToString->React.string}
-                   </Text>
+                 </View>
+                 <TouchableOpacity
+                   onPress={_ => ()}
+                   style=Style.(
+                     viewStyle(
+                       ~backgroundColor="rgba(255,255,255,0.1)",
+                       ~borderRadius=100.,
+                       ~padding=2.->dp,
+                       (),
+                     )
+                   )>
+                   <SVGmore
+                     width={24.->ReactFromSvg.Size.dp}
+                     height={24.->ReactFromSvg.Size.dp}
+                     fill="rgba(255,255,255,0.75)"
+                   />
+                 </TouchableOpacity>
+               </View>
+               <Spacer />
+               <View
+                 style=Style.(
+                   list([
+                     Predefined.styles##rowSpaceBetween,
+                     Predefined.styles##alignEnd,
+                   ])
+                 )>
+                 <ActivityRings
+                   width=48.
+                   strokeWidth=10.
+                   spaceBetween=0.
+                   backgroundColor
+                   rings=[|
+                     {
+                       startColor,
+                       endColor,
+                       backgroundColor:
+                         BsTinycolor.TinyColor.(
+                           makeFromString(backgroundColor)
+                           ->Option.flatMap(color =>
+                               makeFromString("rgb(153, 255, 0)")
+                               ->Option.flatMap(color2 =>
+                                   mix(color, color2, ~value=20)
+                                   ->Option.map(mixedColor =>
+                                       mixedColor->toRgbString
+                                     )
+                                 )
+                             )
+                           ->Option.getWithDefault(backgroundColor)
+                         ),
+                       progress,
+                     },
+                   |]
+                   //  <View
+                   //    style=Style.(
+                   //      list([
+                   //        StyleSheet.absoluteFill,
+                   //        Predefined.styles##center,
+                   //      ])
+                   //    )>
+                   //    <Text
+                   //      style=Style.(
+                   //        list([
+                   //          Theme.text##caption2,
+                   //          theme.styles##textLightOnBackgroundDark,
+                   //        ])
+                   //      )>
+                   //      {(progress *. 100.)->Js.Float.toFixed->React.string}
+                   //      <Text style=Style.(textStyle(~fontSize=9., ()))>
+                   //        "%"->React.string
+                   //      </Text>
+                   //    </Text>
+                   //  </View>
+                 />
+                 <View
+                   style=Style.(
+                     list([
+                       Predefined.styles##row,
+                       Predefined.styles##alignCenter,
+                     ])
+                   )>
+                   {let width = 36.->ReactFromSvg.Size.dp;
+                    let height = 36.->ReactFromSvg.Size.dp;
+                    let fill = "rgba(255,255,255,0.1)";
+                    switch (goal.type_->Goal.Type.fromSerialized) {
+                    | Some(Min) => <SVGscope width height fill />
+                    | Some(Max) => <SVGhourglass width height fill />
+                    | _ => <SVGcheckmark width height fill />
+                    }}
+                   <Spacer size=XS />
+                   <View>
+                     <Text
+                       style=Style.(
+                         list([
+                           Theme.text##caption1,
+                           theme.styles##textLightOnBackgroundDark,
+                           textStyle(~fontWeight=Theme.fontWeights.light, ()),
+                         ])
+                       )>
+                       "Daily Average"->React.string
+                     </Text>
+                     <Text
+                       style=Style.(
+                         list([
+                           Theme.text##title2,
+                           theme.styles##textOnBackground,
+                           textStyle(~fontWeight=Theme.fontWeights.light, ()),
+                         ])
+                       )>
+                       {switch (proportionalAverageTime) {
+                        | 0. => "-"->React.string
+                        | _ =>
+                          proportionalAverageTime
+                          ->Date.minToString
+                          ->React.string
+                        }}
+                     </Text>
+                   </View>
                  </View>
                </View>
              </SpacedView>
            </SpacedView>;
+           //  <Text
+           //    style=Style.(
+           //      list([
+           //        Theme.text##caption2,
+           //        theme.styles##textLightOnBackgroundDark,
+           //      ])
+           //    )>
+           //    {currentTime->Date.minToString->React.string}
+           //    " / "->React.string
+           //    {durationPerWeek->Date.minToString->React.string}
+           //  </Text>
          })
        ->React.array}
     </SpacedView>
@@ -364,5 +451,6 @@ let make = (~onNewGoalPress) => {
       </TouchableOpacity>
     </View>
     <Separator style=theme.styles##separatorOnBackground />
+    <Spacer size=XL />
   </>;
 };

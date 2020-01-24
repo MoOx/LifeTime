@@ -285,6 +285,7 @@ export default (
     strokeWidth,
     backgroundColor,
     spaceBetween,
+    children,
   } /*: ActivityRingsProps*/,
 ) => {
   const progress = new Value(0);
@@ -340,6 +341,7 @@ export default (
           </View>
         );
       })}
+      {children}
     </View>
   );
 };

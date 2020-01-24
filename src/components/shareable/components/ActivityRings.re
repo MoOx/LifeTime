@@ -12,7 +12,8 @@ external make:
     ~width: float,
     ~strokeWidth: float,
     ~spaceBetween: float,
-    ~backgroundColor: string
+    ~backgroundColor: string,
+    ~children: React.element=?
   ) =>
   React.element =
   "default";
