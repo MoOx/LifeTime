@@ -10,26 +10,26 @@ module Colors = {
 
 module Type = {
   type t =
-    | Min
-    | Max;
+    | Goal
+    | Limit;
   type serializableT = int;
 
-  let serializedMin: serializableT = 0;
-  let serializedMax: serializableT = 1;
+  let serializedGoal: serializableT = 0;
+  let serializedLimit: serializableT = 1;
 
   let fromSerialized = tS =>
-    if (tS == serializedMin) {
-      Some(Min);
-    } else if (tS == serializedMax) {
-      Some(Max);
+    if (tS == serializedGoal) {
+      Some(Goal);
+    } else if (tS == serializedLimit) {
+      Some(Limit);
     } else {
       None;
     };
 
   let toSerialized =
     fun
-    | Min => serializedMin
-    | Max => serializedMax;
+    | Goal => serializedGoal
+    | Limit => serializedLimit;
 };
 
 type t = {

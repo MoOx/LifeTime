@@ -132,17 +132,21 @@ let make = (~onNewGoalPress) => {
            let (startColor, endColor) =
              Goal.Colors.(
                switch (goal.type_->Goal.Type.fromSerialized) {
-               | Some(_) when !canBeDone => (bad, bad)
-               | Some(Min) when progress <= 0.25 => (bad, bad)
-               | Some(Min) when progress <= 0.5 => (danger, bad)
-               | Some(Min) when progress <= 0.75 => (alert, danger)
-               | Some(Min) when progress < 1. => (ok, alert)
-               | Some(Min) when progress > 1. => (ok, good)
-               //  | Some(Max) when progress <= 0.25 => (ok, good)
-               | Some(Max) when progress <= 0.5 => (ok, good)
-               | Some(Max) when progress <= 0.75 => (ok, alert)
-               | Some(Max) when progress < 1. => (ok, danger)
-               | Some(Max) when progress >= 1. => (danger, bad)
+               | Some(_) when !canBeDone && !isAlreadyDone => (danger, bad)
+               | Some(_) when !canBeDone && isAlreadyDone => (ok, good)
+               // Goals
+               | Some(Goal) when progressTonight <= 0.25 => (bad, bad)
+               | Some(Goal) when progressTonight <= 0.5 => (danger, bad)
+               | Some(Goal) when progressTonight <= 0.75 => (alert, danger)
+               | Some(Goal) when progressTonight <= 0.9 => (ok, danger)
+               | Some(Goal) when progressTonight < 1. => (ok, alert)
+               | Some(Goal) when progressTonight > 1. => (ok, good)
+               //  Limits
+               | Some(Limit) when progressTonight <= 0.5 => (ok, good)
+               | Some(Limit) when progressTonight <= 0.75 => (ok, ok)
+               | Some(Limit) when progressTonight <= 0.9 => (ok, alert)
+               | Some(Limit) when progressTonight < 1. => (ok, danger)
+               | Some(Limit) when progressTonight >= 1. => (danger, bad)
                | _ => (ok, ok)
                }
              );
@@ -186,8 +190,8 @@ let make = (~onNewGoalPress) => {
                      )>
                      {(
                         switch (goal.type_->Goal.Type.fromSerialized) {
-                        | Some(Min) => "Goal"
-                        | Some(Max) => "Limit"
+                        | Some(Goal) => "Goal"
+                        | Some(Limit) => "Limit"
                         | _ => ""
                         }
                       )
@@ -341,8 +345,8 @@ let make = (~onNewGoalPress) => {
                     let height = 36.->ReactFromSvg.Size.dp;
                     let fill = "rgba(255,255,255,0.1)";
                     switch (goal.type_->Goal.Type.fromSerialized) {
-                    | Some(Min) => <SVGscope width height fill />
-                    | Some(Max) => <SVGhourglass width height fill />
+                    | Some(Goal) => <SVGscope width height fill />
+                    | Some(Limit) => <SVGhourglass width height fill />
                     | _ => <SVGcheckmark width height fill />
                     }}
                    <Spacer size=XS />
@@ -402,7 +406,7 @@ let make = (~onNewGoalPress) => {
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>
       <TouchableOpacity
-        onPress={_ => onNewGoalPress(Some(Goal.Type.serializedMin))}>
+        onPress={_ => onNewGoalPress(Some(Goal.Type.serializedGoal))}>
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
@@ -432,7 +436,7 @@ let make = (~onNewGoalPress) => {
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>
       <TouchableOpacity
-        onPress={_ => onNewGoalPress(Some(Goal.Type.serializedMax))}>
+        onPress={_ => onNewGoalPress(Some(Goal.Type.serializedLimit))}>
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>

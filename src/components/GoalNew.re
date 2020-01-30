@@ -187,7 +187,7 @@ let make = (~type_ as initialType=?, ~onChange) => {
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>
       <TouchableWithoutFeedback
-        onPress={_ => setType(_ => Some(Goal.Type.Min))}>
+        onPress={_ => setType(_ => Some(Goal.Type.Goal))}>
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
@@ -212,7 +212,7 @@ let make = (~type_ as initialType=?, ~onChange) => {
                   </Text>
                 </View>
                 {switch (type_) {
-                 | Some(Min) =>
+                 | Some(Goal) =>
                    <SVGcheckmark
                      width={22.->ReactFromSvg.Size.dp}
                      height={22.->ReactFromSvg.Size.dp}
@@ -228,7 +228,7 @@ let make = (~type_ as initialType=?, ~onChange) => {
         </View>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback
-        onPress={_ => setType(_ => Some(Goal.Type.Max))}>
+        onPress={_ => setType(_ => Some(Goal.Type.Limit))}>
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
@@ -253,7 +253,7 @@ let make = (~type_ as initialType=?, ~onChange) => {
                   </Text>
                 </View>
                 {switch (type_) {
-                 | Some(Max) =>
+                 | Some(Limit) =>
                    <SVGcheckmark
                      width={22.->ReactFromSvg.Size.dp}
                      height={22.->ReactFromSvg.Size.dp}
