@@ -150,7 +150,7 @@ let make = (~type_ as initialType=?, ~onChange) => {
       <SpacedView vertical=S>
         <TextInput
           autoCapitalize=`words
-          autoComplete=`off
+          autoCompleteType=`off
           autoCorrect=true
           // autoFocus=true
           clearButtonMode=`whileEditing
