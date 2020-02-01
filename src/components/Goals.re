@@ -18,7 +18,10 @@ let make = (~onNewGoalPress) => {
     );
   let (startDate, supposedEndDate) = todayDates->React.Ref.current;
   let endDate = supposedEndDate->Date.min(today->React.Ref.current);
-
+  let endDateTonight = endDate->Date.endOfDay;
+  let remainingMinThisWeek =
+    (supposedEndDate->Js.Date.getTime -. endDate->Js.Date.getTime)
+    ->Date.msToMin;
   let events = getEvents(startDate, endDate, true);
   let mapTitleDuration =
     events->Option.map(es =>
@@ -54,9 +57,21 @@ let make = (~onNewGoalPress) => {
       </Text>
     </SpacedView>
     <SpacedView horizontal=XS>
+      {!Global.__DEV__
+         ? React.null
+         : <Text
+             style=Style.(
+               list([
+                 theme.styles##textLightOnBackgroundDark,
+                 textStyle(~fontSize=7.5, ()),
+               ])
+             )>
+             "remainingMinThisWeek: "->React.string
+             {remainingMinThisWeek->Date.minToString->React.string}
+             "\n"->React.string
+           </Text>}
       {settings.goals
        ->Array.map(goal => {
-           let now = Js.Date.now();
            let currentCategoriesTime =
              mapCategoryDuration
              ->Option.map(mapCategoryDuration =>
@@ -96,26 +111,43 @@ let make = (~onNewGoalPress) => {
                );
            let durationPerWeek = goal.durationPerDay *. numberOfDays;
            let durationProgress =
-             (startDate->Js.Date.getTime -. now)
+             (startDate->Js.Date.getTime -. endDate->Js.Date.getTime)
+             /. (
+               startDate->Js.Date.getTime -. supposedEndDate->Js.Date.getTime
+             );
+           let durationProgressTonight =
+             (startDate->Js.Date.getTime -. endDateTonight->Js.Date.getTime)
              /. (
                startDate->Js.Date.getTime -. supposedEndDate->Js.Date.getTime
              );
            let proportionalGoal = durationPerWeek *. durationProgress;
+           let proportionalGoalTonight =
+             durationPerWeek *. durationProgressTonight;
            let totalProgress = currentTime /. durationPerWeek;
            let progress = currentTime /. proportionalGoal;
+           let progressTonight = currentTime /. proportionalGoalTonight;
            let proportionalAverageTime =
-             currentTime /. (numberOfDays *. durationProgress);
-           let remainingMinToDo = durationPerWeek -. currentTime;
-           let remainingMinThisWeek =
-             (supposedEndDate->Js.Date.getTime -. now)->Date.msToMin;
-           let canBeDone = remainingMinToDo < remainingMinThisWeek;
+             currentTime /. (numberOfDays *. durationProgressTonight);
+           let remainingMinLimit = durationPerWeek -. currentTime;
+           let (isAlreadyDone, canBeDone) =
+             switch (goal.type_->Goal.Type.fromSerialized) {
+             | Some(Goal) => (
+                 totalProgress > 1.,
+                 remainingMinLimit < remainingMinThisWeek,
+               )
+             | Some(Limit) => (
+                 totalProgress < 1.,
+                 remainingMinLimit > remainingMinThisWeek,
+               )
+             | _ => (false, false)
+             };
            let (backgroundColor, title) =
              switch (goal.categoriesId, goal.activitiesId) {
              | ([|catId|], [||]) =>
                ActivityCategories.(
                  {
                    let (_, title, color, _) = catId->getFromId;
-                   (color->getColor(theme.mode), title);
+                   (color->getColor(`dark), title);
                  }
                )
              | ([||], [|actId|]) =>
@@ -124,11 +156,26 @@ let make = (~onNewGoalPress) => {
                    let act = actId->Activities.getFromId(settings.activities);
                    let catId = act.categoryId;
                    let (_, _, color, _) = catId->getFromId;
-                   (color->getColor(theme.mode), act.title);
+                   (color->getColor(`dark), act.title);
                  }
                )
              | (_, _) => (theme.colors.gray, "Unknown")
              };
+           // backgroundColor with some black to approximatively
+           // match the gradient in the background
+           let backgroundColorAlt =
+             BsTinycolor.TinyColor.(
+               makeFromString(backgroundColor)
+               ->Option.flatMap(color =>
+                   makeFromRgb({r: 0, g: 0, b: 0})
+                   ->Option.flatMap(black =>
+                       mix(color, black, ~value=30)
+                       ->Option.map(mixed => mixed->toRgbString)
+                     )
+                 )
+             )
+             ->Option.getWithDefault(backgroundColor);
+
            let (startColor, endColor) =
              Goal.Colors.(
                switch (goal.type_->Goal.Type.fromSerialized) {
@@ -162,6 +209,63 @@ let make = (~onNewGoalPress) => {
                )
                horizontal=M
                vertical=S>
+               {!Global.__DEV__
+                  ? React.null
+                  : <View
+                      style=Style.(
+                        viewStyle(
+                          ~position=`absolute,
+                          ~bottom=5.->dp,
+                          ~left=30.->pct,
+                          (),
+                        )
+                      )>
+                      <Text
+                        style=Style.(
+                          list([
+                            Theme.styleSheets.dark##textLightOnBackgroundDark,
+                            textStyle(~fontSize=7.5, ()),
+                          ])
+                        )>
+                        "currentTime: "->React.string
+                        {currentTime->Date.minToString->React.string}
+                        "\n"->React.string
+                        "remainingMinLimit: "->React.string
+                        {remainingMinLimit->Date.minToString->React.string}
+                        "\n"->React.string
+                        "durationPerWeek: "->React.string
+                        {durationPerWeek->Date.minToString->React.string}
+                        "\n"->React.string
+                        "proportionalGoal: "->React.string
+                        {proportionalGoal->Date.minToString->React.string}
+                        "\n"->React.string
+                        "progress: "->React.string
+                        {progress
+                         ->Js.Float.toFixedWithPrecision(~digits=3)
+                         ->React.string}
+                        "\n"->React.string
+                        "progressTonight: "->React.string
+                        {progressTonight
+                         ->Js.Float.toFixedWithPrecision(~digits=3)
+                         ->React.string}
+                        "\n"->React.string
+                        "totalProgress: "->React.string
+                        {totalProgress
+                         ->Js.Float.toFixedWithPrecision(~digits=3)
+                         ->React.string}
+                        "\n"->React.string
+                        "durationProgressTonight: "->React.string
+                        {durationProgressTonight
+                         ->Js.Float.toFixedWithPrecision(~digits=3)
+                         ->React.string}
+                        "\n"->React.string
+                        "isAlreadyDone: "->React.string
+                        {isAlreadyDone->string_of_bool->React.string}
+                        "\n"->React.string
+                        "canBeDone: "->React.string
+                        {canBeDone->string_of_bool->React.string}
+                      </Text>
+                    </View>}
                <View style=Style.(list([StyleSheet.absoluteFill]))>
                  <LinearGradientView
                    width="100%"
@@ -184,7 +288,7 @@ let make = (~onNewGoalPress) => {
                      style=Style.(
                        list([
                          Theme.text##caption1,
-                         theme.styles##textLightOnBackgroundDark,
+                         Theme.styleSheets.dark##textLightOnBackgroundDark,
                          textStyle(~fontWeight=Theme.fontWeights.bold, ()),
                        ])
                      )>
@@ -202,7 +306,7 @@ let make = (~onNewGoalPress) => {
                      style=Style.(
                        list([
                          Theme.text##title1,
-                         theme.styles##textOnBackground,
+                         Theme.styleSheets.dark##textOnBackground,
                          textStyle(~fontWeight=Theme.fontWeights.medium, ()),
                        ])
                      )>
@@ -219,7 +323,7 @@ let make = (~onNewGoalPress) => {
                      style=Style.(
                        list([
                          Theme.text##footnote,
-                         theme.styles##textLightOnBackgroundDark,
+                         Theme.styleSheets.dark##textLightOnBackgroundDark,
                        ])
                      )>
                      {let durationInMinutes =
@@ -291,16 +395,16 @@ let make = (~onNewGoalPress) => {
                    width=48.
                    strokeWidth=10.
                    spaceBetween=0.
-                   backgroundColor
+                   backgroundColor=backgroundColorAlt
                    rings=[|
                      {
                        startColor,
                        endColor,
                        backgroundColor:
                          BsTinycolor.TinyColor.(
-                           makeFromString(backgroundColor)
+                           makeFromString(backgroundColorAlt)
                            ->Option.flatMap(color =>
-                               makeFromString("rgb(153, 255, 0)")
+                               makeFromString(startColor)
                                ->Option.flatMap(color2 =>
                                    mix(color, color2, ~value=20)
                                    ->Option.map(mixedColor =>
@@ -310,7 +414,7 @@ let make = (~onNewGoalPress) => {
                              )
                            ->Option.getWithDefault(backgroundColor)
                          ),
-                       progress,
+                       progress: progressTonight,
                      },
                    |]
                    //  <View
@@ -324,7 +428,7 @@ let make = (~onNewGoalPress) => {
                    //      style=Style.(
                    //        list([
                    //          Theme.text##caption2,
-                   //          theme.styles##textLightOnBackgroundDark,
+                   //          Theme.styleSheets.dark##textLightOnBackgroundDark,
                    //        ])
                    //      )>
                    //      {(progress *. 100.)->Js.Float.toFixed->React.string}
@@ -355,7 +459,7 @@ let make = (~onNewGoalPress) => {
                        style=Style.(
                          list([
                            Theme.text##caption1,
-                           theme.styles##textLightOnBackgroundDark,
+                           Theme.styleSheets.dark##textLightOnBackgroundDark,
                            textStyle(~fontWeight=Theme.fontWeights.light, ()),
                          ])
                        )>
@@ -365,8 +469,13 @@ let make = (~onNewGoalPress) => {
                        style=Style.(
                          list([
                            Theme.text##title2,
-                           theme.styles##textOnBackground,
-                           textStyle(~fontWeight=Theme.fontWeights.light, ()),
+                           Theme.styleSheets.dark##textOnBackground,
+                           textStyle(
+                             //  ~fontWeight=Theme.fontWeights.light,
+                             ~fontWeight=Theme.fontWeights.medium,
+                             ~textAlign=`right,
+                             (),
+                           ),
                          ])
                        )>
                        {switch (proportionalAverageTime) {
@@ -386,7 +495,7 @@ let make = (~onNewGoalPress) => {
            //    style=Style.(
            //      list([
            //        Theme.text##caption2,
-           //        theme.styles##textLightOnBackgroundDark,
+           //        Theme.styleSheets.dark##textLightOnBackgroundDark,
            //      ])
            //    )>
            //    {currentTime->Date.minToString->React.string}

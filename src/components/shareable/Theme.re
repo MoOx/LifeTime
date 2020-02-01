@@ -5,10 +5,10 @@ open ReactMultiversal;
 type acceptedMode = [ | `light | `dark | `auto];
 type t = [ | `light | `dark];
 
-type rnStyleSheet('a) = Js.t('a);
-type themeStyles('a) = {
-  light: rnStyleSheet('a),
-  dark: rnStyleSheet('a),
+type styleSheet('a) = Js.t('a);
+type styleSheets('a) = {
+  light: styleSheet('a),
+  dark: styleSheet('a),
 };
 
 type colors = {
@@ -25,7 +25,7 @@ type colors = {
 module Colors = {
   let light: colors = {
     background: "#fff",
-    backgroundDark: Predefined.Colors.Ios.light.gray6,
+    backgroundDark: "#f2f2f7",
     textOnBackground: "#111",
     textLightOnBackground: Predefined.Colors.Ios.light.gray,
     textVeryLightOnBackground: Predefined.Colors.Ios.light.gray2,
@@ -35,7 +35,7 @@ module Colors = {
   };
   let dark: colors = {
     background: Predefined.Colors.Ios.dark.gray6,
-    backgroundDark: "#111",
+    backgroundDark: "#000",
     textOnBackground: "rgba(255,255,255,0.98)",
     textLightOnBackground: Predefined.Colors.Ios.light.gray,
     textVeryLightOnBackground: Predefined.Colors.Ios.light.gray2,
@@ -189,20 +189,27 @@ let text =
         ~fontWeight=fontWeights.regular,
         (),
       ),
+    "thin": textStyle(~fontWeight=fontWeights.thin, ()),
+    "ultraLight": textStyle(~fontWeight=fontWeights.ultraLight, ()),
+    "light": textStyle(~fontWeight=fontWeights.light, ()),
+    "regular": textStyle(~fontWeight=fontWeights.regular, ()),
+    "medium": textStyle(~fontWeight=fontWeights.medium, ()),
+    "semiBold": textStyle(~fontWeight=fontWeights.semiBold, ()),
+    "bold": textStyle(~fontWeight=fontWeights.bold, ()),
+    "heavy": textStyle(~fontWeight=fontWeights.heavy, ()),
+    "black": textStyle(~fontWeight=fontWeights.black, ()),
   }
   ->StyleSheet.create;
 
-let themeStyles = {
+let styleSheets = {
   light:
     {
       "backgroundMain": viewStyle(~backgroundColor=Colors.light.main, ()),
       "background": viewStyle(~backgroundColor=Colors.light.background, ()),
       "separatorOnBackground":
-        viewStyle(~backgroundColor=Predefined.Colors.Ios.light.gray4, ()),
+        viewStyle(~backgroundColor=Predefined.Colors.Ios.light.gray3, ()),
       "backgroundDark":
         viewStyle(~backgroundColor=Colors.light.backgroundDark, ()),
-      "separatorOnBackgroundDark":
-        viewStyle(~backgroundColor=Predefined.Colors.Ios.light.gray4, ()),
       "backgroundGray":
         viewStyle(~backgroundColor=Predefined.Colors.Ios.light.gray, ()),
       "backgroundGray2":
@@ -246,11 +253,9 @@ let themeStyles = {
       "backgroundMain": viewStyle(~backgroundColor=Colors.dark.main, ()),
       "background": viewStyle(~backgroundColor=Colors.dark.background, ()),
       "separatorOnBackground":
-        viewStyle(~backgroundColor=Predefined.Colors.Ios.dark.gray3, ()),
+        viewStyle(~backgroundColor=Predefined.Colors.Ios.dark.gray4, ()),
       "backgroundDark":
         viewStyle(~backgroundColor=Colors.dark.backgroundDark, ()),
-      "separatorOnBackgroundDark":
-        viewStyle(~backgroundColor=Predefined.Colors.Ios.dark.gray4, ()),
       "backgroundGray":
         viewStyle(~backgroundColor=Predefined.Colors.Ios.dark.gray, ()),
       "backgroundGray2":
@@ -293,7 +298,7 @@ let themeStyles = {
 
 type themeData('a) = {
   mode: t,
-  styles: rnStyleSheet('a),
+  styles: styleSheet('a),
   colors: Predefined.Colors.Ios.t,
   namedColors: colors,
 };
@@ -313,13 +318,13 @@ let useTheme = (acceptedMode): themeData('a) => {
   switch (mode) {
   | `light => {
       mode,
-      styles: themeStyles.light,
+      styles: styleSheets.light,
       colors: Predefined.Colors.Ios.light,
       namedColors: Colors.light,
     }
   | `dark => {
       mode,
-      styles: themeStyles.dark,
+      styles: styleSheets.dark,
       colors: Predefined.Colors.Ios.dark,
       namedColors: Colors.dark,
     }
