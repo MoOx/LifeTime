@@ -19,7 +19,9 @@
     "build:web": "react-scripts build",
     "test:native": "jest",
     "test:web": "react-scripts test",
-    "lint": "eslint ."
+    "lint": "eslint --ignore-path .gitignore .",
+    "test:bundle": "react-native bundle --entry-file index.js --bundle-output index.bundle.js --platform ios --dev false && rm index.bundle.js",
+    "test": "yarn lint && yarn bs:clean && yarn test:bundle"
   },
   "dependencies": {
     "@ctrl/tinycolor": "^2.6.0",
