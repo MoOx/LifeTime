@@ -63,10 +63,11 @@
   "devDependencies": {
     "@babel/core": "^7.6.3",
     "@babel/runtime": "^7.6.3",
-    "@react-native-community/eslint-config": "^0.0.5",
+    "@react-native-community/eslint-config": "^0.0.7",
     "babel-jest": "^24.9.0",
     "bs-platform": "^7.0.0",
     "eslint": "^6.6.0",
+    "eslint-config-prettier": "^6.10.0",
     "flow-bin": "0.105.1",
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.56.0",
