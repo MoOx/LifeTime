@@ -21,12 +21,24 @@ import {interpolateColor} from 'react-native-redash';
 import {timing, transformOrigin} from 'react-native-redash';
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
   center: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   rings: {
     transform: [{rotate: '-270deg'}],
+  },
+  overflowHidden: {
+    overflow: 'hidden',
+  },
+  transparent: {
+    backgroundColor: 'transparent',
+  },
+  zIndex1: {
+    zIndex: 1,
   },
 });
 
@@ -49,24 +61,28 @@ const AngularGradient = (
         borderRadius,
       }}>
       <MaskedView
-        style={{flex: 1}}
+        style={styles.flex}
         maskElement={
           <Image
-            style={{
-              width: size,
-              height: size,
-              backgroundColor: 'transparent',
-              borderRadius,
-            }}
+            style={[
+              styles.transparent,
+              {
+                width: size,
+                height: size,
+                borderRadius,
+              },
+            ]}
             source={require('./ActivityRings.mask.png')}
           />
         }>
         <View
-          style={{
-            flex: 1,
-            backgroundColor: end,
-            borderRadius,
-          }}
+          style={[
+            styles.flex,
+            {
+              backgroundColor: end,
+              borderRadius,
+            },
+          ]}
         />
       </MaskedView>
     </View>
@@ -83,18 +99,22 @@ type HalfCircleProps = {|
 const HalfCircle = ({children, radius} /*: HalfCircleProps*/) => {
   return (
     <View
-      style={{
-        width: radius * 2,
-        height: radius,
-        overflow: 'hidden',
-      }}>
-      <View
-        style={{
+      style={[
+        styles.overflowHidden,
+        {
           width: radius * 2,
-          height: radius * 2,
-          borderRadius: radius,
-          overflow: 'hidden',
-        }}>
+          height: radius,
+        },
+      ]}>
+      <View
+        style={[
+          styles.overflowHidden,
+          {
+            width: radius * 2,
+            height: radius * 2,
+            borderRadius: radius,
+          },
+        ]}>
         {children}
       </View>
     </View>
@@ -121,7 +141,7 @@ const CircularProgress = (
   });
   return (
     <Animated.View style={style}>
-      <View style={{zIndex: 1}}>
+      <View style={styles.zIndex1}>
         <HalfCircle radius={radius}>
           <View style={{transform: [{rotate: '180deg'}]}}>{foreground}</View>
         </HalfCircle>
@@ -162,7 +182,7 @@ type ring = {|
   backgroundColor: string,
   progress: number,
 |};
-  
+
 type RingProps ={|
   size: number,
   strokeWidth: number,
@@ -191,7 +211,9 @@ const Ring = ({strokeWidth, ring, size, theta} /*: RingProps*/) => {
           />
         }
         background={
-          <View style={{backgroundColor: ring.backgroundColor, flex: 1}} />
+          <View
+            style={[styles.flex, {backgroundColor: ring.backgroundColor}]}
+          />
         }
         radius={radius}
       />
@@ -275,8 +297,11 @@ type ActivityRingsProps = {|
   strokeWidth: number,
   backgroundColor: string,
   spaceBetween: number,
+  children?: React.Node,
 |};
 */
+
+const easing = Easing.bezier(0.32, 0.12, -0.1, 1);
 
 export default (
   {
@@ -295,7 +320,7 @@ export default (
         progress,
         timing({
           duration: 1500,
-          easing: Easing.bezier(0.32, 0.12, -0.1, 1),
+          easing,
         }),
       ),
     [progress],
