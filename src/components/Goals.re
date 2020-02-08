@@ -136,8 +136,8 @@ let make = (~onNewGoalPress) => {
                  remainingMinLimit < remainingMinThisWeek,
                )
              | Some(Limit) => (
-                 totalProgress < 1.,
                  remainingMinLimit > remainingMinThisWeek,
+                 totalProgress < 1.,
                )
              | _ => (false, false)
              };
@@ -189,11 +189,11 @@ let make = (~onNewGoalPress) => {
                | Some(Goal) when progressTonight < 1. => (ok, alert)
                | Some(Goal) when progressTonight > 1. => (ok, good)
                //  Limits
-               | Some(Limit) when progressTonight <= 0.5 => (ok, good)
-               | Some(Limit) when progressTonight <= 0.75 => (ok, ok)
-               | Some(Limit) when progressTonight <= 0.9 => (ok, alert)
-               | Some(Limit) when progressTonight < 1. => (ok, danger)
-               | Some(Limit) when progressTonight >= 1. => (danger, bad)
+               | Some(Limit) when progressTonight <= 0.75 => (ok, good)
+               | Some(Limit) when progressTonight <= 0.9 => (alert, ok)
+               | Some(Limit) when progressTonight < 1. => (danger, ok)
+               | Some(Limit) when progressTonight >= 1.15 => (alert, bad)
+               | Some(Limit) when progressTonight >= 1. => (alert, danger)
                | _ => (ok, ok)
                }
              );
@@ -414,7 +414,16 @@ let make = (~onNewGoalPress) => {
                              )
                            ->Option.getWithDefault(backgroundColor)
                          ),
-                       progress: progressTonight,
+                       progress:
+                         switch (goal.type_->Goal.Type.fromSerialized) {
+                         | Some(Goal) => progressTonight
+                         //  | Some(Limit) when progressTonight < 1. =>
+                         //    1. -. progressTonight
+                         //  | Some(Limit) => -. progressTonight
+                         //  | Some(Limit) => -. (1. -. progressTonight)
+                         | Some(Limit) => progressTonight
+                         | _ => 0.
+                         },
                      },
                    |]
                    //  <View
