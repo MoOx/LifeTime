@@ -9,8 +9,9 @@ import Animated, {
   Extrapolate,
   interpolate,
   lessThan,
+  abs,
+  cond,
   max,
-  min,
   multiply,
   set,
   sub,
@@ -18,7 +19,12 @@ import Animated, {
   Value,
 } from 'react-native-reanimated';
 import {interpolateColor} from 'react-native-redash';
-import {timing, transformOrigin} from 'react-native-redash';
+import {timing} from 'react-native-redash';
+
+const _180deg = Math.PI;
+const _360deg = _180deg * 2;
+const rotate90 = {rotate: '90deg'};
+const rotate180 = {rotate: '180deg'};
 
 const styles = StyleSheet.create({
   flex: {
@@ -27,9 +33,6 @@ const styles = StyleSheet.create({
   center: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  rings: {
-    transform: [{rotate: '-270deg'}],
   },
   overflowHidden: {
     overflow: 'hidden',
@@ -92,86 +95,32 @@ const AngularGradient = (
 /*::
 type HalfCircleProps = {|
   children: React.Node,
-  radius: number,
+  size: number,
 |}
 */
 
-const HalfCircle = ({children, radius} /*: HalfCircleProps*/) => {
+const HalfCircle = ({children, size} /*: HalfCircleProps*/) => {
   return (
     <View
       style={[
         styles.overflowHidden,
         {
-          width: radius * 2,
-          height: radius,
+          width: size,
+          height: size / 2,
         },
       ]}>
       <View
         style={[
           styles.overflowHidden,
           {
-            width: radius * 2,
-            height: radius * 2,
-            borderRadius: radius,
+            width: size,
+            height: size,
+            borderRadius: size / 2,
           },
         ]}>
         {children}
       </View>
     </View>
-  );
-};
-
-/*::
-type CircularProgressProps = {|
-  style: any,
-  theta: Animated.Node<number>,
-  background: React.Node,
-  foreground: React.Node,
-  radius: number,
-|};
-*/
-const CircularProgress = (
-  {style, theta, background, foreground, radius} /*: CircularProgressProps*/,
-) => {
-  const opacity = lessThan(theta, Math.PI);
-  const rotate = interpolate(theta, {
-    inputRange: [Math.PI, 2 * Math.PI],
-    outputRange: [0, Math.PI],
-    extrapolate: Extrapolate.CLAMP,
-  });
-  return (
-    <Animated.View style={style}>
-      <View style={styles.zIndex1}>
-        <HalfCircle radius={radius}>
-          <View style={{transform: [{rotate: '180deg'}]}}>{foreground}</View>
-        </HalfCircle>
-        <Animated.View
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              transform: transformOrigin(
-                {x: 0, y: radius / 2},
-                {rotate: theta},
-              ),
-              opacity,
-            },
-          ]}>
-          <HalfCircle radius={radius}>{background}</HalfCircle>
-        </Animated.View>
-      </View>
-      <View style={{transform: [{rotate: '180deg'}]}}>
-        <HalfCircle radius={radius}>{foreground}</HalfCircle>
-        <Animated.View
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              transform: transformOrigin({x: 0, y: radius / 2}, {rotate}),
-            },
-          ]}>
-          <HalfCircle radius={radius}>{background}</HalfCircle>
-        </Animated.View>
-      </View>
-    </Animated.View>
   );
 };
 
@@ -191,62 +140,103 @@ type RingProps ={|
 |}
 */
 const Ring = ({strokeWidth, ring, size, theta} /*: RingProps*/) => {
+  const absTheta = abs(theta);
+  const scaleX = cond(lessThan(theta, 0), -1, 1);
   const strokeWidthBy2 = strokeWidth / 2;
-  const radius = PixelRatio.roundToNearestPixel(size / 2);
-  const rotate = max(0, sub(theta, Math.PI * 2));
-  const opacity = lessThan(theta, Math.PI * 2);
-  const backgroundColor = interpolateColor(theta, {
-    inputRange: [0, Math.PI * 2],
-    outputRange: [ring.startColor, ring.endColor],
-  });
+  const offset = PixelRatio.roundToNearestPixel(size / 2) - strokeWidthBy2;
+  const rotateStartingPoint = max(0, sub(absTheta, _360deg));
+  const circleStyle = [
+    StyleSheet.absoluteFill,
+    {
+      width: strokeWidth,
+      height: strokeWidth,
+      borderRadius: strokeWidthBy2,
+      top: offset,
+    },
+  ];
+  const circleEndStyle = {
+    transform: [
+      {translateX: offset},
+      {rotate: absTheta},
+      {translateX: -offset},
+    ],
+  };
+  const foreground = (
+    <AngularGradient colors={[ring.startColor, ring.endColor]} size={size} />
+  );
+  const background = (
+    <View style={[styles.flex, {backgroundColor: ring.backgroundColor}]} />
+  );
   return (
-    <View>
-      <CircularProgress
-        style={{transform: [{rotate}]}}
-        theta={min(theta, Math.PI * 2)}
-        foreground={
-          <AngularGradient
-            colors={[ring.startColor, ring.endColor]}
-            size={size}
-          />
-        }
-        background={
-          <View
-            style={[styles.flex, {backgroundColor: ring.backgroundColor}]}
-          />
-        }
-        radius={radius}
-      />
+    <Animated.View
+      style={[
+        styles.center,
+        {
+          transform: [{scaleX}, rotate90],
+        },
+      ]}>
+      {/* circle */}
+      <Animated.View
+        style={{
+          width: size,
+          height: size,
+          transform: [{rotate: rotateStartingPoint}],
+        }}>
+        <View style={styles.zIndex1}>
+          <HalfCircle size={size}>
+            <View style={{transform: [rotate180]}}>{foreground}</View>
+          </HalfCircle>
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                transform: [
+                  {translateY: size / 4},
+                  {rotate: absTheta},
+                  {translateY: -size / 4},
+                ],
+                opacity: lessThan(absTheta, _180deg),
+              },
+            ]}>
+            <HalfCircle size={size}>{background}</HalfCircle>
+          </Animated.View>
+        </View>
+        <View style={{transform: [rotate180]}}>
+          <HalfCircle size={size}>{foreground}</HalfCircle>
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                transform: [
+                  {translateY: size / 4},
+                  {
+                    rotate: interpolate(absTheta, {
+                      inputRange: [_180deg, _360deg],
+                      outputRange: [0, _180deg],
+                      extrapolate: Extrapolate.CLAMP,
+                    }),
+                  },
+                  {translateY: -size / 4},
+                ],
+              },
+            ]}>
+            <HalfCircle size={size}>{background}</HalfCircle>
+          </Animated.View>
+        </View>
+      </Animated.View>
+      {/* circle start point */}
       <Animated.View
         style={[
-          {transform: [{rotate}]},
-          StyleSheet.absoluteFill,
+          circleStyle,
           {
-            width: strokeWidth,
-            height: strokeWidth,
-            borderRadius: strokeWidthBy2,
-            opacity,
+            transform: [{rotate: rotateStartingPoint}],
+            opacity: lessThan(absTheta, _360deg),
             backgroundColor: ring.startColor,
-            top: radius - strokeWidthBy2,
           },
         ]}
       />
-      <Animated.View
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            width: strokeWidth,
-            height: strokeWidth,
-            borderRadius: strokeWidthBy2,
-            top: radius - strokeWidthBy2,
-            transform: [
-              {translateX: radius - strokeWidthBy2},
-              {rotate: theta},
-              {translateX: -(radius - strokeWidthBy2)},
-              {translateY: -4},
-            ],
-          },
-        ]}>
+      {/* circle end  point shadow */}
+      <Animated.View style={[circleStyle, circleEndStyle]}>
         <Svg width={strokeWidth} height={strokeWidth}>
           <Defs>
             <RadialGradient
@@ -256,9 +246,9 @@ const Ring = ({strokeWidth, ring, size, theta} /*: RingProps*/) => {
               fy="50%"
               r="50%"
               id="shadow">
-              <Stop offset="0%" stopOpacity={0} />
-              <Stop offset="50%" stopOpacity={0.15} stopColor="black" />
-              <Stop stopColor="black" stopOpacity={0} offset="100%" />
+              <Stop offset="0%" stopOpacity={0} stopColor="#000" />
+              <Stop offset="50%" stopOpacity={0.15} stopColor="#000" />
+              <Stop offset="100%" stopOpacity={0} stopColor="#000" />
             </RadialGradient>
           </Defs>
           <Circle
@@ -269,24 +259,20 @@ const Ring = ({strokeWidth, ring, size, theta} /*: RingProps*/) => {
           />
         </Svg>
       </Animated.View>
+      {/* circle end point*/}
       <Animated.View
         style={[
-          StyleSheet.absoluteFill,
+          circleStyle,
+          circleEndStyle,
           {
-            width: strokeWidth,
-            height: strokeWidth,
-            borderRadius: strokeWidthBy2,
-            backgroundColor,
-            top: radius - strokeWidthBy2,
-            transform: [
-              {translateX: radius - strokeWidthBy2},
-              {rotate: theta},
-              {translateX: -(radius - strokeWidthBy2)},
-            ],
+            backgroundColor: interpolateColor(absTheta, {
+              inputRange: [0, _360deg],
+              outputRange: [ring.startColor, ring.endColor],
+            }),
           },
         ]}
       />
-    </View>
+    </Animated.View>
   );
 };
 
@@ -342,15 +328,12 @@ export default (
                 left: (width - size) / 2,
               },
             ]}>
-            <View
-              style={[StyleSheet.absoluteFill, styles.rings, styles.center]}>
-              <Ring
-                theta={multiply(ring.progress * Math.PI * 2, progress)}
-                ring={ring}
-                size={size}
-                strokeWidth={strokeWidth}
-              />
-            </View>
+            <Ring
+              theta={multiply(ring.progress * _360deg, progress)}
+              ring={ring}
+              size={size}
+              strokeWidth={strokeWidth}
+            />
             <View style={[StyleSheet.absoluteFill, styles.center]}>
               <View
                 style={[
