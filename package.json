@@ -20,7 +20,7 @@
     "test:native": "jest",
     "test:web": "react-scripts test",
     "lint": "eslint --ignore-path .gitignore .",
-    "test:bundle": "react-native bundle --entry-file index.js --bundle-output index.bundle.js --platform ios --dev false && rm index.bundle.js",
+    "test:bundle": "react-native bundle --max-workers 1 --platform ios --dev false --minify false --entry-file index.js --bundle-output index.bundle.js && rm index.bundle.js",
     "test": "yarn lint && yarn bs:clean && yarn test:bundle"
   },
   "dependencies": {
