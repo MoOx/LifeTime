@@ -1,0 +1,5 @@
+name: 'Update fs.inotify.max_user_watches'
+description: 'fs.inotify.max_user_watches=524288'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
