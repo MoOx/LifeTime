@@ -6,9 +6,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    container:
-      image: ubuntu:latest
-      options: --privileged
+    # container:
+    #   image: ubuntu:latest
+    #   options: --privileged
 
     strategy:
       matrix:
