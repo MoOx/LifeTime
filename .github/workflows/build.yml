@@ -4,6 +4,10 @@ on: [push, pull_request]
 
 jobs:
   build:
+    container:
+      image: alpine:3.10
+      options: --privileged
+
     runs-on: ubuntu-latest
 
     strategy:
@@ -12,8 +16,10 @@ jobs:
           - 12.x
 
     steps:
+      - run: fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
+
       - uses: actions/checkout@v1
-      - uses: ./.github/actions/action
+      # - uses: ./.github/actions/action
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
