@@ -5,10 +5,10 @@ on: [push, pull_request]
 jobs:
   build:
     container:
-      image: alpine:3.10
+      image: ubuntu:latest
       options: --privileged
 
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
 
     strategy:
       matrix:
