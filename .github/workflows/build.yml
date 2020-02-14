@@ -1,28 +1,17 @@
 name: Build
-
 on: [push, pull_request]
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version:
-          - 12.x
-
+    container:
+      image: node:lts
+      options: --privileged
     steps:
-      - uses: actions/checkout@v1
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install
-        run: |
-          yarn install \
-            --non-interactive \
-            --frozen-lockfile
-      - name: Test
-        run: yarn test
+      - uses: actions/checkout@v2
+      - run: yarn install --non-interactive --frozen-lockfile
+      # update fs.inotify.max_user_watches to avoid "Error: ENOSPC: System limit for number of file watchers reached"
+      # that pop during react-native bundle
+      - run: echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
+      - run: yarn test
         env:
           CI: true
