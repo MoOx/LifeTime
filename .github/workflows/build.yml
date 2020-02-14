@@ -4,11 +4,11 @@ on: [push, pull_request]
 
 jobs:
   build:
+    runs-on: ubuntu-latest
+
     container:
       image: ubuntu:latest
       options: --privileged
-
-    # runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -16,7 +16,7 @@ jobs:
           - 12.x
 
     steps:
-      - run: fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
+      - run: echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
 
       - uses: actions/checkout@v1
       # - uses: ./.github/actions/action
