@@ -6,30 +6,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    # container:
-    #   image: ubuntu:latest
-    #   options: --privileged
-
-    strategy:
-      matrix:
-        node-version:
-          - 12.x
+    container:
+      image: node:lts
+      options: --privileged
 
     steps:
       - run: echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
-
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       # - uses: ./.github/actions/action
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install
-        run: |
+      - run: |
           yarn install \
             --non-interactive \
             --frozen-lockfile
-      - name: Test
-        run: yarn test
+      - run: yarn test
         env:
           CI: true
