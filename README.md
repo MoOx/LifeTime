@@ -1,5 +1,7 @@
 # LifeTime
 
+[![Build Status](https://github.com/MoOx/LifeTime/workflows/Build/badge.svg)](https://github.com/MoOx/LifeTime/actions)
+
 ## Installation
 
 Before installing the project, you have to verify that you have on you machine
