@@ -5,7 +5,7 @@ open ReactMultiversal;
 let title = "Settings";
 
 [@react.component]
-let make = () => {
+let make = (~navigation) => {
   let (settings, setSettings) = React.useContext(AppSettings.context);
   let themeKey = AppSettings.useTheme();
   let theme = Theme.useTheme(AppSettings.useTheme());
@@ -265,6 +265,48 @@ let make = () => {
                   ])
                 )>
                 "App System Settings"->React.string
+              </Text>
+              <SVGchevronright
+                width={14.->ReactFromSvg.Size.dp}
+                height={14.->ReactFromSvg.Size.dp}
+                fill={Predefined.Colors.Ios.light.gray4}
+              />
+              <Spacer size=S />
+            </SpacedView>
+            <Separator style=theme.styles##separatorOnBackground />
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback
+        onPress={_ =>
+          navigation->Navigators.RootStack.Navigation.navigate(
+            "WelcomeModalScreen",
+          )
+        }>
+        <View style=Predefined.styles##rowCenter>
+          <Spacer size=S />
+          <SpacedView vertical=XS horizontal=None>
+            <SVGplaycircle
+              width={28.->ReactFromSvg.Size.dp}
+              height={28.->ReactFromSvg.Size.dp}
+              fill={theme.colors.blue}
+            />
+          </SpacedView>
+          <Spacer size=XS />
+          <View style=Predefined.styles##flex>
+            <SpacedView
+              vertical=XS
+              horizontal=None
+              style=Predefined.styles##rowSpaceBetween>
+              <Text
+                style=Style.(
+                  list([
+                    Predefined.styles##flex,
+                    Theme.text##body,
+                    theme.styles##textOnBackground,
+                  ])
+                )>
+                "Welcome Screen"->React.string
               </Text>
               <SVGchevronright
                 width={14.->ReactFromSvg.Size.dp}

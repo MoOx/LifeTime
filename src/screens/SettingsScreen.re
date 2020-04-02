@@ -2,7 +2,7 @@ open ReactNative;
 open ReactMultiversal;
 
 [@react.component]
-let make = (~navigation as _, ~route as _) => {
+let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme(AppSettings.useTheme());
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeArea();
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
@@ -52,7 +52,7 @@ let make = (~navigation as _, ~route as _) => {
             eventOptions(~useNativeDriver=true, ()),
           )
         )>
-        <SettingsView />
+        <SettingsView navigation />
       </Animated.ScrollView>
     </View>
   </>;
