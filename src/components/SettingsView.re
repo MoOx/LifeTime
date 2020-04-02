@@ -197,6 +197,90 @@ let make = (~navigation) => {
     <View style=theme.styles##background>
       <TouchableWithoutFeedback
         onPress={_ =>
+          navigation->Navigators.RootStack.Navigation.navigate(
+            "HelpModalScreen",
+          )
+        }>
+        <View style=Predefined.styles##rowCenter>
+          <Spacer size=S />
+          <SpacedView vertical=XS horizontal=None>
+            <SVGinfo
+              width={28.->ReactFromSvg.Size.dp}
+              height={28.->ReactFromSvg.Size.dp}
+              fill={theme.colors.blue}
+            />
+          </SpacedView>
+          <Spacer size=XS />
+          <View style=Predefined.styles##flex>
+            <SpacedView
+              vertical=XS
+              horizontal=None
+              style=Predefined.styles##rowSpaceBetween>
+              <Text
+                style=Style.(
+                  list([
+                    Predefined.styles##flex,
+                    Theme.text##body,
+                    theme.styles##textOnBackground,
+                  ])
+                )>
+                "Help"->React.string
+              </Text>
+              <SVGchevronright
+                width={14.->ReactFromSvg.Size.dp}
+                height={14.->ReactFromSvg.Size.dp}
+                fill={Predefined.Colors.Ios.light.gray4}
+              />
+              <Spacer size=S />
+            </SpacedView>
+            <Separator style=theme.styles##separatorOnBackground />
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback
+        onPress={_ =>
+          navigation->Navigators.RootStack.Navigation.navigate(
+            "WelcomeModalScreen",
+          )
+        }>
+        <View style=Predefined.styles##rowCenter>
+          <Spacer size=S />
+          <SpacedView vertical=XS horizontal=None>
+            <SVGplaycircle
+              width={28.->ReactFromSvg.Size.dp}
+              height={28.->ReactFromSvg.Size.dp}
+              fill={theme.colors.blue}
+            />
+          </SpacedView>
+          <Spacer size=XS />
+          <View style=Predefined.styles##flex>
+            <SpacedView
+              vertical=XS
+              horizontal=None
+              style=Predefined.styles##rowSpaceBetween>
+              <Text
+                style=Style.(
+                  list([
+                    Predefined.styles##flex,
+                    Theme.text##body,
+                    theme.styles##textOnBackground,
+                  ])
+                )>
+                "Welcome Screen"->React.string
+              </Text>
+              <SVGchevronright
+                width={14.->ReactFromSvg.Size.dp}
+                height={14.->ReactFromSvg.Size.dp}
+                fill={Predefined.Colors.Ios.light.gray4}
+              />
+              <Spacer size=S />
+            </SpacedView>
+            <Separator style=theme.styles##separatorOnBackground />
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback
+        onPress={_ =>
           if (Platform.os == Platform.ios) {
             Linking.openURL("calshow:")->ignore;
           } else if (Platform.os == Platform.android) {
@@ -265,48 +349,6 @@ let make = (~navigation) => {
                   ])
                 )>
                 "App System Settings"->React.string
-              </Text>
-              <SVGchevronright
-                width={14.->ReactFromSvg.Size.dp}
-                height={14.->ReactFromSvg.Size.dp}
-                fill={Predefined.Colors.Ios.light.gray4}
-              />
-              <Spacer size=S />
-            </SpacedView>
-            <Separator style=theme.styles##separatorOnBackground />
-          </View>
-        </View>
-      </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback
-        onPress={_ =>
-          navigation->Navigators.RootStack.Navigation.navigate(
-            "WelcomeModalScreen",
-          )
-        }>
-        <View style=Predefined.styles##rowCenter>
-          <Spacer size=S />
-          <SpacedView vertical=XS horizontal=None>
-            <SVGplaycircle
-              width={28.->ReactFromSvg.Size.dp}
-              height={28.->ReactFromSvg.Size.dp}
-              fill={theme.colors.blue}
-            />
-          </SpacedView>
-          <Spacer size=XS />
-          <View style=Predefined.styles##flex>
-            <SpacedView
-              vertical=XS
-              horizontal=None
-              style=Predefined.styles##rowSpaceBetween>
-              <Text
-                style=Style.(
-                  list([
-                    Predefined.styles##flex,
-                    Theme.text##body,
-                    theme.styles##textOnBackground,
-                  ])
-                )>
-                "Welcome Screen"->React.string
               </Text>
               <SVGchevronright
                 width={14.->ReactFromSvg.Size.dp}
