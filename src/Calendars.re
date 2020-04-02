@@ -127,32 +127,70 @@ let useEvents = () => {
   (getEvents, updatedAt, requestUpdate);
 };
 
+let isAllDayEvent = (evt: calendarEventReadable) =>
+  evt.allDay->Option.getWithDefault(false);
+
+let isEventInSkippedCalendar =
+    (evt: calendarEventReadable, settings: AppSettings.t) =>
+  settings.calendarsIdsSkipped
+  ->Array.some(cid =>
+      cid == evt.calendar->Option.map(c => c.id)->Option.getWithDefault("")
+    );
+
+let isEventSkippedActivity =
+    (evt: calendarEventReadable, settings: AppSettings.t) =>
+  settings.activitiesSkippedFlag
+  && settings.activitiesSkipped
+     ->Array.some(skipped => Activities.isSimilar(skipped, evt.title));
+
+let filterAllDayEvents = (events: array(calendarEventReadable)) =>
+  events->Array.keep(evt => !evt->isAllDayEvent);
+
+let filterEventsByCalendars =
+    (events: array(calendarEventReadable), settings: AppSettings.t) =>
+  events->Array.keep(evt => !evt->isEventInSkippedCalendar(settings));
+
+let filterEventsByActivities =
+    (events: array(calendarEventReadable), settings: AppSettings.t) =>
+  events->Array.keep(evt => !evt->isEventSkippedActivity(settings));
+
 let filterEvents =
     (events: array(calendarEventReadable), settings: AppSettings.t) =>
-  events->Array.keep(evt
-    // filters out all day events
-    =>
-      if (evt.allDay->Option.getWithDefault(false)) {
-        false;
-             // filters selected calendars
-      } else if (settings.calendarsIdsSkipped
-                 ->Array.some(cid =>
-                     cid
-                     == evt.calendar
-                        ->Option.map(c => c.id)
-                        ->Option.getWithDefault("")
-                   )) {
-        false;
-      } else if (settings.activitiesSkippedFlag
-                 && settings.activitiesSkipped
-                    ->Array.some(skipped =>
-                        Activities.isSimilar(skipped, evt.title)
-                      )) {
-        false;
+  events->Array.keep(evt =>
+    !evt->isAllDayEvent
+    && !evt->isEventInSkippedCalendar(settings)
+    && !evt->isEventSkippedActivity(settings)
+  );
+
+type noEvents =
+  | None
+  | OnlyAllDays
+  | OnlySkippedCalendars
+  | OnlySkippedActivities
+  | Some;
+let noEvents =
+    (events: array(calendarEventReadable), settings: AppSettings.t) =>
+  switch (events) {
+  | [||] => None
+  | evts =>
+    let evtsWoAllDay = evts->filterAllDayEvents;
+    if (evtsWoAllDay == [||]) {
+      OnlyAllDays;
+    } else {
+      let evtsWoCalendars = evtsWoAllDay->filterEventsByCalendars(settings);
+      if (evtsWoCalendars == [||]) {
+        OnlySkippedCalendars;
       } else {
-        true;
-      }
-    );
+        let evtsWoActivities =
+          evtsWoCalendars->filterEventsByActivities(settings);
+        if (evtsWoActivities == [||]) {
+          OnlySkippedActivities;
+        } else {
+          Some;
+        };
+      };
+    };
+  };
 
 let mapTitleDuration = (events: array(calendarEventReadable)) => {
   events

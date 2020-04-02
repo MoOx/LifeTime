@@ -27,9 +27,7 @@ let make = (~navigation, ~route as _) => {
             ->Future.tapOk(status =>
                 switch (status) {
                 | "authorized" =>
-                  navigation->Navigators.RootStack.Navigation.navigate(
-                    "HomeScreen",
-                  )
+                  navigation->Navigators.RootStack.Navigation.goBack()
                 | "denied"
                 | "restricted"
                 | "undetermined"

@@ -93,3 +93,5 @@ yarn-error.log*
 
 # react-from-svg artifacts
 src/SVGs/components
+# markdown-to-json compiled json
+src/md/*.json

@@ -112,6 +112,11 @@ let make = (~navigation, ~route as _) => {
         <Home
           refreshing
           onRefreshDone
+          onGetStarted={() =>
+            navigation->Navigators.RootStack.Navigation.navigate(
+              "HelpModalScreen",
+            )
+          }
           onFiltersPress={() =>
             navigation->Navigators.RootStack.Navigation.navigate(
               "FiltersModalScreen",

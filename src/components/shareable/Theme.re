@@ -333,4 +333,5 @@ let useTheme = (acceptedMode): themeData('a) => {
 
 module Radius = {
   let button = 10.;
+  let card = 6.;
 };

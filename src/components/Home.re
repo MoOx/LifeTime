@@ -22,7 +22,14 @@ external useCallback6:
   "useCallback";
 
 [@react.component]
-let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
+let make =
+    (
+      ~onGetStarted,
+      ~refreshing,
+      ~onRefreshDone,
+      ~onFiltersPress,
+      ~onActivityPress,
+    ) => {
   let (settings, setSettings) = React.useContext(AppSettings.context);
   let (getEvents, updatedAt, requestUpdate) =
     React.useContext(Calendars.context);
@@ -159,6 +166,82 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
       (setCurrentDates, todayDates, flatListRef),
     );
 
+  let (startDate1, supposedEndDate1) =
+    weeks->React.Ref.current[weeks->React.Ref.current->Array.length - 1]
+    ->Option.getWithDefault(todayDates->React.Ref.current);
+  let endDate1 = supposedEndDate1->Date.min(today->React.Ref.current);
+  let (startDate2, supposedEndDate2) =
+    weeks->React.Ref.current[weeks->React.Ref.current->Array.length - 2]
+    ->Option.getWithDefault(todayDates->React.Ref.current);
+  let endDate2 = supposedEndDate2->Date.min(today->React.Ref.current);
+
+  let events1 = getEvents(startDate1, endDate1, true);
+  let events2 = getEvents(startDate2, endDate2, true);
+
+  let (noEventDuringThisWeek, set_noEventDuringThisWeek) =
+    React.useState(() => None);
+  React.useEffect1(
+    () => {
+      switch (events1) {
+      | Some(evts1) =>
+        set_noEventDuringThisWeek(_ =>
+          Some(Calendars.noEvents(evts1, settings))
+        )
+      | _ => ()
+      };
+      None;
+    },
+    [|events1|],
+  );
+  let (noEventDuringLastWeeks, set_noEventDuringLastWeeks) =
+    React.useState(() => None);
+  React.useEffect2(
+    () => {
+      switch (events1, events2) {
+      | (Some(evts1), Some(evts2)) =>
+        set_noEventDuringLastWeeks(_ =>
+          Some(Calendars.noEvents(Array.concat(evts1, evts2), settings))
+        )
+      | _ => ()
+      };
+      None;
+    },
+    (events1, events2),
+  );
+
+  let longNoEventsExplanation =
+    "LifeTime can help you to understand how you use your time and rely on calendar events to learn how you use it. "
+    ++ "By saving events into your calendars, you will be able to visualize reports so you can take more informed decisions about how to use your valuable time.";
+
+  let messagesNoEvents =
+    switch (noEventDuringThisWeek, noEventDuringLastWeeks) {
+    | (Some(None), Some(None)) =>
+      Some((
+        "LifeTime could not find any events on the last two weeks. "
+        ++ longNoEventsExplanation,
+        "Get Started",
+      ))
+    | (Some(OnlyAllDays), Some(OnlyAllDays)) =>
+      Some((
+        "LifeTime could not find any relevent events on the last two weeks. All day events are not suitable for time tracking.",
+        "Get Started",
+      ))
+    | (Some(OnlySkippedCalendars), Some(OnlySkippedCalendars)) =>
+      Some((
+        "LifeTime could not find any recent events that aren't part of skipped calendars.",
+        "Help me customize settings",
+      ))
+    | (Some(OnlySkippedActivities), Some(OnlySkippedActivities))
+        when settings.activitiesSkippedFlag =>
+      Some((
+        "LifeTime could not find any recent events that aren't part of skipped activities",
+        "Help me customize settings",
+      ))
+    // | (Some(Some), Some(Some)) => None
+    // | (None, None) => None
+    | _ => None
+    };
+
   <>
     <SpacedView>
       <TitlePre style=theme.styles##textLightOnBackgroundDark>
@@ -174,6 +257,88 @@ let make = (~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
       </TitlePre>
       <Title style=theme.styles##textOnBackground> title->React.string </Title>
     </SpacedView>
+    {messagesNoEvents
+     ->Option.map(((messageNoEvents, messageNoEventsButton)) =>
+         <SpacedView>
+           <View
+             style=Style.(
+               viewStyle(
+                 ~shadowColor="#000",
+                 ~shadowOffset=offset(~height=3., ~width=1.),
+                 ~shadowOpacity=0.1,
+                 ~shadowRadius=6.,
+                 (),
+               )
+             )>
+             <SpacedView
+               horizontal=XS
+               vertical=XXS
+               style=Style.(
+                 array([|
+                   Predefined.styles##rowSpaceBetween,
+                   theme.styles##backgroundMain,
+                   viewStyle(
+                     ~borderTopLeftRadius=Theme.Radius.card,
+                     ~borderTopRightRadius=Theme.Radius.card,
+                     (),
+                   ),
+                 |])
+               )>
+               <Text style=Style.(textStyle(~color="#fff", ()))>
+                 "No Events Available"->React.string
+               </Text>
+               <SVGxmark
+                 width={16.->ReactFromSvg.Size.dp}
+                 height={16.->ReactFromSvg.Size.dp}
+                 fill="#fff"
+               />
+             </SpacedView>
+             <SpacedView
+               horizontal=M
+               vertical=XS
+               style=Style.(
+                 array([|
+                   Predefined.styles##alignCenter,
+                   theme.styles##background,
+                   viewStyle(
+                     ~borderBottomLeftRadius=Theme.Radius.card,
+                     ~borderBottomRightRadius=Theme.Radius.card,
+                     (),
+                   ),
+                 |])
+               )>
+               <Spacer size=S />
+               <Text
+                 style=Style.(
+                   array([|
+                     Theme.text##title1,
+                     Theme.text##heavy,
+                     theme.styles##textOnBackground,
+                   |])
+                 )>
+                 "No Events"->React.string
+               </Text>
+               <Spacer size=XS />
+               <Text
+                 style=Style.(
+                   array([|
+                     Theme.text##subhead,
+                     theme.styles##textOnBackground,
+                   |])
+                 )>
+                 messageNoEvents->React.string
+               </Text>
+               <Spacer size=M />
+               <TouchableButton
+                 text=messageNoEventsButton
+                 onPress={_ => {onGetStarted()}}
+               />
+               <Spacer />
+             </SpacedView>
+           </View>
+         </SpacedView>
+       )
+     ->Option.getWithDefault(React.null)}
     <View style=Predefined.styles##rowSpaceBetween>
       <Row> <Spacer size=XS /> <BlockHeading text="Weekly Chart" /> </Row>
       <Row>
