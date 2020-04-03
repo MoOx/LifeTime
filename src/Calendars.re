@@ -1,6 +1,16 @@
 open Belt;
 open ReactNativeCalendarEvents;
 
+let openCalendarApp = () => {
+  ReactNative.(
+    if (Platform.os == Platform.ios) {
+      Linking.openURL("calshow:")->ignore;
+    } else if (Platform.os == Platform.android) {
+      Linking.openURL("content://com.android.calendar/time/")->ignore;
+    }
+  );
+};
+
 let date0 =
   Js.Date.makeWithYMDHM(
     ~year=0.,

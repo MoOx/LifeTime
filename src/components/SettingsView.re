@@ -279,14 +279,7 @@ let make = (~navigation) => {
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback
-        onPress={_ =>
-          if (Platform.os == Platform.ios) {
-            Linking.openURL("calshow:")->ignore;
-          } else if (Platform.os == Platform.android) {
-            Linking.openURL("content://com.android.calendar/time/")->ignore;
-          }
-        }>
+      <TouchableWithoutFeedback onPress={_ => Calendars.openCalendarApp()}>
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
