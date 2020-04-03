@@ -5,22 +5,6 @@ open ReasonDateFns;
 
 let title = "Your LifeTime";
 
-[@bs.module "react"]
-external useCallback4:
-  ([@bs.uncurry] ('input => 'output), ('a, 'b, 'c, 'd)) =>
-  React.callback('input, 'output) =
-  "useCallback";
-[@bs.module "react"]
-external useCallback5:
-  ([@bs.uncurry] ('input => 'output), ('a, 'b, 'c, 'd, 'e)) =>
-  React.callback('input, 'output) =
-  "useCallback";
-[@bs.module "react"]
-external useCallback6:
-  ([@bs.uncurry] ('input => 'output), ('a, 'b, 'c, 'd, 'e, 'f)) =>
-  React.callback('input, 'output) =
-  "useCallback";
-
 [@react.component]
 let make =
     (
