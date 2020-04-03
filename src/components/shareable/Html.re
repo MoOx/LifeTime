@@ -29,7 +29,6 @@ let styles =
 module A = {
   [@react.component]
   let make = (~props=Js.Obj.empty(), ~children) => {
-    Js.log3("A", props, children);
     <Link href=props##href>
       <Text style=Style.(array([|styles##aText|]))> children </Text>
     </Link>;
