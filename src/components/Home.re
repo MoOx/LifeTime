@@ -210,32 +210,95 @@ let make =
   );
 
   let longNoEventsExplanation =
-    "LifeTime can help you to understand how you use your time and rely on calendar events to learn how you use it. "
+    " "
+    ++ "LifeTime can help you to understand how you use your time and rely on calendar events to learn how you use it. "
     ++ "By saving events into your calendars, you will be able to visualize reports so you can take more informed decisions about how to use your valuable time.";
 
   let messagesNoEvents =
     switch (noEventDuringThisWeek, noEventDuringLastWeeks) {
     | (Some(None), Some(None)) =>
       Some((
-        "LifeTime could not find any events on the last two weeks. "
+        "LifeTime could not find any events on the last two weeks."
         ++ longNoEventsExplanation,
-        "Get Started",
+        [|
+          <TouchableButton
+            key="getStarted"
+            text="Get Started"
+            onPress={_ => onGetStarted()}
+          />,
+          <TouchableButton
+            key="openCalendar"
+            text="Open Calendar"
+            onPress={_ => Calendars.openCalendarApp()}
+            mode=TouchableButton.Simple
+          />,
+        |],
       ))
     | (Some(OnlyAllDays), Some(OnlyAllDays)) =>
       Some((
         "LifeTime could not find any relevent events on the last two weeks. All day events are not suitable for time tracking.",
-        "Get Started",
+        [|
+          <TouchableButton
+            key="getStarted"
+            text="Get Started"
+            onPress={_ => onGetStarted()}
+          />,
+          <TouchableButton
+            key="openCalendar"
+            text="Open Calendar"
+            onPress={_ => Calendars.openCalendarApp()}
+            mode=TouchableButton.Simple
+          />,
+        |],
       ))
     | (Some(OnlySkippedCalendars), Some(OnlySkippedCalendars)) =>
       Some((
         "LifeTime could not find any recent events that aren't part of skipped calendars.",
-        "Help me customize settings",
+        [|
+          <TouchableButton
+            key="helpSkipCal"
+            text="Help me customize settings"
+            onPress={_ => onFiltersPress()}
+          />,
+          <TouchableButton
+            key="openCalendar"
+            text="Open Calendar"
+            onPress={_ => Calendars.openCalendarApp()}
+            mode=TouchableButton.Simple
+          />,
+        |],
       ))
     | (Some(OnlySkippedActivities), Some(OnlySkippedActivities))
         when settings.activitiesSkippedFlag =>
       Some((
-        "LifeTime could not find any recent events that aren't part of skipped activities",
-        "Help me customize settings",
+        "LifeTime could not find any recent events that aren't part of skipped activities.",
+        [|
+          <TouchableButton
+            key="helpSkipAct"
+            text="Help me customize settings"
+            onPress={_ => onFiltersPress()}
+          />,
+          <TouchableButton
+            key="openCalendar"
+            text="Toggle Hidden Activities"
+            onPress={_ =>
+              setSettings(settings =>
+                {
+                  ...settings,
+                  lastUpdated: Js.Date.now(),
+                  activitiesSkippedFlag: !settings.activitiesSkippedFlag,
+                }
+              )
+            }
+            mode=TouchableButton.Simple
+          />,
+          <TouchableButton
+            key="openCalendar"
+            text="Open Calendar"
+            onPress={_ => Calendars.openCalendarApp()}
+            mode=TouchableButton.Simple
+          />,
+        |],
       ))
     // | (Some(Some), Some(Some)) => None
     // | (None, None) => None
@@ -318,7 +381,7 @@ let make =
       <Title style=theme.styles##textOnBackground> title->React.string </Title>
     </SpacedView>
     {messagesNoEvents
-     ->Option.map(((messageNoEvents, messageNoEventsButton)) =>
+     ->Option.map(((messageNoEvents, messageNoEventsButtons)) =>
          <Animated.View
            onLayout=onMessageNoEventsLayout
            style=Style.(
@@ -415,11 +478,8 @@ let make =
                    messageNoEvents->React.string
                  </Text>
                  <Spacer size=M />
-                 <TouchableButton
-                   text=messageNoEventsButton
-                   onPress={_ => {onGetStarted()}}
-                 />
-                 <Spacer />
+                 messageNoEventsButtons->React.array
+                 <Spacer size=S />
                </SpacedView>
              </View>
            </SpacedView>
