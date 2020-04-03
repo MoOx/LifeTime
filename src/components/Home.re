@@ -436,11 +436,35 @@ let make =
                  <Text style=Style.(textStyle(~color="#fff", ()))>
                    "No Events Available"->React.string
                  </Text>
-                 <SVGxmark
-                   width={16.->ReactFromSvg.Size.dp}
-                   height={16.->ReactFromSvg.Size.dp}
-                   fill="#fff"
-                 />
+                 <TouchableOpacity
+                   hitSlop={View.edgeInsets(
+                     ~top=10.,
+                     ~bottom=10.,
+                     ~left=10.,
+                     ~right=10.,
+                     (),
+                   )}
+                   onPress={_ => {
+                     Alert.(
+                       alert(
+                         ~title="Don't try to escape",
+                         ~message=
+                           "LifeTime is here to help you move foward and will reminds you what you should do."
+                           ++ "\n"
+                           ++ "To stop seeing this message, try to fill your calendar with events or adjust settings to reveal some that are currently hidden.",
+                         ~buttons=[|
+                           button(~text="Got it", ~style=`cancel, ()),
+                         |],
+                         (),
+                       )
+                     )
+                   }}>
+                   <SVGxmark
+                     width={16.->ReactFromSvg.Size.dp}
+                     height={16.->ReactFromSvg.Size.dp}
+                     fill="#fff"
+                   />
+                 </TouchableOpacity>
                </SpacedView>
                <SpacedView
                  horizontal=M
