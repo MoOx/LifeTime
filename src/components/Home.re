@@ -242,6 +242,66 @@ let make =
     | _ => None
     };
 
+  let (onMessageNoEventsHeight, setOnMessageNoEventsHeight) =
+    React.useState(() => None);
+  let onMessageNoEventsLayout =
+    React.useCallback0((layoutEvent: Event.layoutEvent) => {
+      let height = layoutEvent##nativeEvent##layout##height;
+      setOnMessageNoEventsHeight(_ => Some(height));
+    });
+  let animatedMessageNoEventsHeight =
+    React.useRef(Animated.Value.create(0.));
+  let animatedMessageNoEventsOpacity =
+    React.useRef(Animated.Value.create(0.));
+  let animatedMessageNoEventsScale = React.useRef(Animated.Value.create(0.));
+  React.useEffect1(
+    () => {
+      onMessageNoEventsHeight
+      ->Option.map(height => {
+          Animated.(
+            parallel(
+              [|
+                spring(
+                  animatedMessageNoEventsHeight->React.Ref.current,
+                  Value.Spring.config(
+                    ~useNativeDriver=true,
+                    ~toValue=height->Value.Spring.fromRawValue,
+                    ~tension=1.,
+                    (),
+                  ),
+                ),
+                spring(
+                  animatedMessageNoEventsScale->React.Ref.current,
+                  Value.Spring.config(
+                    ~useNativeDriver=true,
+                    ~toValue=1.->Value.Spring.fromRawValue,
+                    ~tension=1.,
+                    // ~delay=1.,
+                    (),
+                  ),
+                ),
+                timing(
+                  animatedMessageNoEventsOpacity->React.Ref.current,
+                  Value.Timing.config(
+                    ~useNativeDriver=true,
+                    ~toValue=1.->Value.Timing.fromRawValue,
+                    ~duration=1200.,
+                    // ~delay=1.,
+                    (),
+                  ),
+                ),
+              |],
+              {"stopTogether": false},
+            )
+            ->Animation.start()
+          )
+        })
+      ->ignore;
+      None;
+    },
+    [|onMessageNoEventsHeight|],
+  );
+
   <>
     <SpacedView>
       <TitlePre style=theme.styles##textLightOnBackgroundDark>
@@ -259,154 +319,211 @@ let make =
     </SpacedView>
     {messagesNoEvents
      ->Option.map(((messageNoEvents, messageNoEventsButton)) =>
-         <SpacedView>
-           <View
-             style=Style.(
-               viewStyle(
-                 ~shadowColor="#000",
-                 ~shadowOffset=offset(~height=3., ~width=1.),
-                 ~shadowOpacity=0.1,
-                 ~shadowRadius=6.,
-                 (),
-               )
-             )>
-             <SpacedView
-               horizontal=XS
-               vertical=XXS
+         <Animated.View
+           onLayout=onMessageNoEventsLayout
+           style=Style.(
+             style(
+               // this is what allow to compute height
+               // we put this container in absolute + opacity 0
+               // then we get height via onLayout, then we switch this to relative
+               // and animate the rest
+               ~position=
+                 onMessageNoEventsHeight->Option.isNone
+                   ? `absolute : `relative,
+               ~opacity=
+                 animatedMessageNoEventsOpacity
+                 ->React.Ref.current
+                 ->Animated.StyleProp.float,
+               ~transform=[|
+                 scale(
+                   ~scale=
+                     animatedMessageNoEventsScale
+                     ->React.Ref.current
+                     ->Animated.StyleProp.float,
+                 ),
+               |],
+               (),
+             )
+           )>
+           <SpacedView>
+             <View
                style=Style.(
-                 array([|
-                   Predefined.styles##rowSpaceBetween,
-                   theme.styles##backgroundMain,
-                   viewStyle(
-                     ~borderTopLeftRadius=Theme.Radius.card,
-                     ~borderTopRightRadius=Theme.Radius.card,
-                     (),
-                   ),
-                 |])
+                 viewStyle(
+                   ~shadowColor="#000",
+                   ~shadowOffset=offset(~height=3., ~width=1.),
+                   ~shadowOpacity=0.1,
+                   ~shadowRadius=6.,
+                   (),
+                 )
                )>
-               <Text style=Style.(textStyle(~color="#fff", ()))>
-                 "No Events Available"->React.string
-               </Text>
-               <SVGxmark
-                 width={16.->ReactFromSvg.Size.dp}
-                 height={16.->ReactFromSvg.Size.dp}
-                 fill="#fff"
-               />
-             </SpacedView>
-             <SpacedView
-               horizontal=M
-               vertical=XS
-               style=Style.(
-                 array([|
-                   Predefined.styles##alignCenter,
-                   theme.styles##background,
-                   viewStyle(
-                     ~borderBottomLeftRadius=Theme.Radius.card,
-                     ~borderBottomRightRadius=Theme.Radius.card,
-                     (),
-                   ),
-                 |])
-               )>
-               <Spacer size=S />
-               <Text
+               <SpacedView
+                 horizontal=XS
+                 vertical=XXS
                  style=Style.(
                    array([|
-                     Theme.text##title1,
-                     Theme.text##heavy,
-                     theme.styles##textOnBackground,
+                     Predefined.styles##rowSpaceBetween,
+                     theme.styles##backgroundMain,
+                     viewStyle(
+                       ~borderTopLeftRadius=Theme.Radius.card,
+                       ~borderTopRightRadius=Theme.Radius.card,
+                       (),
+                     ),
                    |])
                  )>
-                 "No Events"->React.string
-               </Text>
-               <Spacer size=XS />
-               <Text
+                 <Text style=Style.(textStyle(~color="#fff", ()))>
+                   "No Events Available"->React.string
+                 </Text>
+                 <SVGxmark
+                   width={16.->ReactFromSvg.Size.dp}
+                   height={16.->ReactFromSvg.Size.dp}
+                   fill="#fff"
+                 />
+               </SpacedView>
+               <SpacedView
+                 horizontal=M
+                 vertical=XS
                  style=Style.(
                    array([|
-                     Theme.text##subhead,
-                     theme.styles##textOnBackground,
+                     Predefined.styles##alignCenter,
+                     theme.styles##background,
+                     viewStyle(
+                       ~borderBottomLeftRadius=Theme.Radius.card,
+                       ~borderBottomRightRadius=Theme.Radius.card,
+                       (),
+                     ),
                    |])
                  )>
-                 messageNoEvents->React.string
-               </Text>
-               <Spacer size=M />
-               <TouchableButton
-                 text=messageNoEventsButton
-                 onPress={_ => {onGetStarted()}}
-               />
-               <Spacer />
-             </SpacedView>
-           </View>
-         </SpacedView>
+                 <Spacer size=S />
+                 <Text
+                   style=Style.(
+                     array([|
+                       Theme.text##title1,
+                       Theme.text##heavy,
+                       theme.styles##textOnBackground,
+                     |])
+                   )>
+                   "No Events"->React.string
+                 </Text>
+                 <Spacer size=XS />
+                 <Text
+                   style=Style.(
+                     array([|
+                       Theme.text##subhead,
+                       theme.styles##textOnBackground,
+                     |])
+                   )>
+                   messageNoEvents->React.string
+                 </Text>
+                 <Spacer size=M />
+                 <TouchableButton
+                   text=messageNoEventsButton
+                   onPress={_ => {onGetStarted()}}
+                 />
+                 <Spacer />
+               </SpacedView>
+             </View>
+           </SpacedView>
+         </Animated.View>
        )
      ->Option.getWithDefault(React.null)}
-    <View style=Predefined.styles##rowSpaceBetween>
-      <Row> <Spacer size=XS /> <BlockHeading text="Weekly Chart" /> </Row>
-      <Row>
-        {todayFirst == startDate
-           ? React.null
-           : <BlockHeadingTouchable
-               onPress=onShowThisWeek
-               text="Show This Week"
-             />}
+    <Animated.View
+      style=Style.(
+        arrayOption([|
+          onMessageNoEventsHeight->Option.map(height =>
+            style(
+              ~transform=[|
+                translateY(
+                  ~translateY=
+                    Animated.Interpolation.(
+                      animatedMessageNoEventsHeight
+                      ->React.Ref.current
+                      ->interpolate(
+                          config(
+                            ~inputRange=[|0., height|],
+                            ~outputRange=[|-. height, 0.|]->fromFloatArray,
+                            (),
+                          ),
+                        )
+                    )
+                    ->Animated.StyleProp.float,
+                ),
+              |],
+              (),
+            )
+          ),
+        |])
+      )>
+      <View style=Predefined.styles##rowSpaceBetween>
+        <Row> <Spacer size=XS /> <BlockHeading text="Weekly Chart" /> </Row>
+        <Row>
+          {todayFirst == startDate
+             ? React.null
+             : <BlockHeadingTouchable
+                 onPress=onShowThisWeek
+                 text="Show This Week"
+               />}
+          <Spacer size=XS />
+        </Row>
+      </View>
+      <Separator style=theme.styles##separatorOnBackground />
+      <FlatList
+        ref=flatListRef
+        horizontal=true
+        pagingEnabled=true
+        showsHorizontalScrollIndicator=false
+        inverted=true
+        initialNumToRender=1
+        data={weeks->React.Ref.current}
+        style={Style.list([theme.styles##background, styleWidth])}
+        getItemLayout
+        keyExtractor={((first, _), _index) => first->Js.Date.toString}
+        renderItem
+        onViewableItemsChanged={onViewableItemsChanged->React.Ref.current}
+      />
+      <Separator style=theme.styles##separatorOnBackground />
+      <BlockFootnote>
+        {(
+           "Updated "
+           ++ DateFns.formatRelative(today->React.Ref.current, updatedAt)
+         )
+         ->React.string}
         <Spacer size=XS />
-      </Row>
-    </View>
-    <Separator style=theme.styles##separatorOnBackground />
-    <FlatList
-      ref=flatListRef
-      horizontal=true
-      pagingEnabled=true
-      showsHorizontalScrollIndicator=false
-      inverted=true
-      initialNumToRender=1
-      data={weeks->React.Ref.current}
-      style={Style.list([theme.styles##background, styleWidth])}
-      getItemLayout
-      keyExtractor={((first, _), _index) => first->Js.Date.toString}
-      renderItem
-      onViewableItemsChanged={onViewableItemsChanged->React.Ref.current}
-    />
-    <Separator style=theme.styles##separatorOnBackground />
-    <BlockFootnote>
-      {(
-         "Updated "
-         ++ DateFns.formatRelative(today->React.Ref.current, updatedAt)
-       )
-       ->React.string}
-      <Spacer size=XS />
-      {!refreshing
-         ? React.null
-         : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
-    </BlockFootnote>
-    <Spacer />
-    <TopActivities mapTitleDuration onFiltersPress onActivityPress />
-    <Spacer />
-    <SpacedView horizontal=None>
-      <TouchableOpacity
-        onPress={_ =>
-          setSettings(settings =>
-            {
-              ...settings,
-              lastUpdated: Js.Date.now(),
-              activitiesSkippedFlag: !settings.activitiesSkippedFlag,
-            }
-          )
-        }>
-        <Separator style=theme.styles##separatorOnBackground />
-        <SpacedView vertical=XS style=theme.styles##background>
-          <Center>
-            {settings.activitiesSkippedFlag
-               ? <Text style=Style.(textStyle(~color=theme.colors.blue, ()))>
-                   "Reveal Hidden Activities"->React.string
-                 </Text>
-               : <Text style=Style.(textStyle(~color=theme.colors.blue, ()))>
-                   "Mask Hidden Activities"->React.string
-                 </Text>}
-          </Center>
-        </SpacedView>
-        <Separator style=theme.styles##separatorOnBackground />
-      </TouchableOpacity>
-    </SpacedView>
-    <Spacer />
+        {!refreshing
+           ? React.null
+           : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
+      </BlockFootnote>
+      <Spacer />
+      <TopActivities mapTitleDuration onFiltersPress onActivityPress />
+      <Spacer />
+      <SpacedView horizontal=None>
+        <TouchableOpacity
+          onPress={_ =>
+            setSettings(settings =>
+              {
+                ...settings,
+                lastUpdated: Js.Date.now(),
+                activitiesSkippedFlag: !settings.activitiesSkippedFlag,
+              }
+            )
+          }>
+          <Separator style=theme.styles##separatorOnBackground />
+          <SpacedView vertical=XS style=theme.styles##background>
+            <Center>
+              {settings.activitiesSkippedFlag
+                 ? <Text
+                     style=Style.(textStyle(~color=theme.colors.blue, ()))>
+                     "Reveal Hidden Activities"->React.string
+                   </Text>
+                 : <Text
+                     style=Style.(textStyle(~color=theme.colors.blue, ()))>
+                     "Mask Hidden Activities"->React.string
+                   </Text>}
+            </Center>
+          </SpacedView>
+          <Separator style=theme.styles##separatorOnBackground />
+        </TouchableOpacity>
+      </SpacedView>
+      <Spacer />
+    </Animated.View>
   </>;
 };
