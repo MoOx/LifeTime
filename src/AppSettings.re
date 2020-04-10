@@ -1,9 +1,16 @@
 open Belt;
 
+type calendarSkipped = {
+  id: string,
+  title: string,
+  color: string,
+  source: string,
+};
+
 type t = {
   theme: string,
   lastUpdated: float,
-  calendarsIdsSkipped: array(string),
+  calendarsSkipped: array(calendarSkipped),
   activities: array(Activities.t),
   activitiesSkipped: array(string),
   activitiesSkippedFlag: bool,
@@ -27,18 +34,30 @@ let themeStringToTheme =
 let defaultSettings = {
   theme: "auto",
   lastUpdated: 0.,
-  calendarsIdsSkipped: [||],
+  calendarsSkipped: [||],
   activitiesSkippedFlag: true,
   activitiesSkipped: [||],
   activities: [||], // @todo add some defaults?
   goals: [||],
 };
 
-let decodeJsonSettings = (json: Js.Json.t): t => {
+let decodeJsonSettingsOrRaise = (json: Js.Json.t): t =>
   Json.Decode.{
     theme: json |> field("theme", string),
     lastUpdated: json |> field("lastUpdated", Json.Decode.float),
-    calendarsIdsSkipped: json |> field("calendarsIdsSkipped", array(string)),
+    calendarsSkipped:
+      json
+      |> field(
+           "calendarsSkipped",
+           array(json =>
+             {
+               id: json |> field("id", string),
+               title: json |> field("title", string),
+               source: json |> field("source", string),
+               color: json |> field("color", string),
+             }
+           ),
+         ),
     activitiesSkippedFlag: json |> field("activitiesSkippedFlag", bool),
     activitiesSkipped: json |> field("activitiesSkipped", array(string)),
     activities:
@@ -47,14 +66,7 @@ let decodeJsonSettings = (json: Js.Json.t): t => {
            "activities",
            array(json =>
              Activities.{
-               id:
-                 try(json |> field("id", string)) {
-                 | _ =>
-                   Utils.makeId(
-                     json |> field("title", string),
-                     json |> field("createdAt", Json.Decode.float),
-                   )
-                 },
+               id: json |> field("id", string),
                title: json |> field("title", string),
                createdAt: json |> field("createdAt", Json.Decode.float),
                categoryId: json |> field("categoryId", string),
@@ -84,40 +96,70 @@ let decodeJsonSettings = (json: Js.Json.t): t => {
       | _ => [||]
       },
   };
+let decodeJsonSettings = (json: Js.Json.t): Future.t(Result.t(t, string)) => {
+  ReactNativeCalendarEvents.findCalendars()
+  ->FutureJs.fromPromise(error => {
+      // @todo ?
+      Js.log2("ReactNativeCalendarEvents.findCalendars", error);
+      "Unable to retrieve calendars before parsing settings";
+    })
+  ->Future.flatMapOk(calendars => {
+      (
+        try(Ok(json->decodeJsonSettingsOrRaise)) {
+        | Json.Decode.DecodeError(exn) => Error("Unable to parse settings")
+        }
+      )
+      ->Result.map(settings =>
+          {
+            theme: settings.theme,
+            lastUpdated: settings.lastUpdated,
+            // ensure calendars ids are valid and reconciliate otherwise
+            calendarsSkipped: settings.calendarsSkipped, // @todo reconciliate here
+            activities: settings.activities,
+            activitiesSkipped: settings.activitiesSkipped,
+            activitiesSkippedFlag: settings.activitiesSkippedFlag,
+            goals: settings.goals,
+          }
+        )
+      ->Future.value
+    });
 };
 
 let storageKey = "settings";
+
+let getSettings = () => {
+  ReactNativeAsyncStorage.getItem(storageKey)
+  ->FutureJs.fromPromise(error => {
+      // @todo ?
+      Js.log2("LifeTime: useSettings: ", error);
+      "Unable to access settings from device";
+    })
+  ->Future.flatMapOk(res => {
+      res
+      ->Js.Null.toOption
+      ->Option.map(jsonString =>
+          try(jsonString->Json.parseOrRaise->decodeJsonSettings) {
+          | Json.ParseError(_) =>
+            Future.value(Result.Error("Unable to parse json settings"))
+          }
+        )
+      ->Option.getWithDefault(Future.value(Ok(defaultSettings)))
+    })
+  ->Future.map(
+      fun
+      | Ok(settings) => settings
+      | Error(err) => {
+          Js.log(err);
+          defaultSettings;
+        },
+    );
+};
 
 let useSettings = () => {
   let (settings, set) = React.useState(() => defaultSettings);
   React.useEffect1(
     () => {
-      ReactNativeAsyncStorage.getItem(storageKey)
-      ->FutureJs.fromPromise(error => {
-          // @todo ?
-          Js.log2("LifeTime: useSettings: ", error);
-          error;
-        })
-      ->Future.tapOk(res =>
-          set(_
-            // Js.log2(storageKey ++ " raw result", res);
-            =>
-              res
-              ->Js.Null.toOption
-              ->Option.map(rawJson =>
-                  try(rawJson->Json.parseOrRaise->decodeJsonSettings) {
-                  | _ =>
-                    Js.log2(
-                      "LifeTime: useSettings: unable to decode valid json",
-                      rawJson,
-                    );
-                    defaultSettings;
-                  }
-                )
-              ->Option.getWithDefault(defaultSettings)
-            )
-        )
-      ->ignore;
+      getSettings()->Future.tap(settings => set(_ => settings))->ignore;
       None;
     },
     [|set|],

@@ -17,14 +17,33 @@ let make = (~navigation) => {
         ->FutureJs.fromPromise(error => {
             // @todo ?
             Js.log2("LifeTime: import: ", error);
-            error;
+            "Unable to read from clipboard";
           })
-        ->Future.tapOk(res =>
-            setSettings(_ =>
-              res->Js.Json.parseExn->AppSettings.decodeJsonSettings
-            )
-          )
-        ->ignore,
+        ->Future.get(
+            fun
+            | Error(e) => Alert.alert(~title=e, ())
+            | Ok(clip) when clip === "" =>
+              Alert.alert(~title="No data in your clipboard", ())
+            | Ok(clip) => {
+                let rawJson =
+                  try(Some(clip->Json.parseOrRaise)) {
+                  | Json.ParseError(_) =>
+                    Alert.alert(~title="Data doesn't seem to be valid", ());
+                    None;
+                  };
+                rawJson
+                ->Option.map(rawJson => {
+                    rawJson
+                    ->AppSettings.decodeJsonSettings
+                    ->Future.get(
+                        fun
+                        | Error(e) => Alert.alert(~title=e, ())
+                        | Ok(settings) => setSettings(_ => settings),
+                      )
+                  })
+                ->ignore;
+              },
+          ),
       [|setSettings|],
     );
 

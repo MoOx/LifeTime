@@ -8,32 +8,33 @@ let make = (~navigation, ~route as _) => {
 
   React.useEffect1(
     () => {
-      open ReactNativePermissions;
-      check(Ios.calendars)
-      ->FutureJs.fromPromise(error => Js.log(error))
-      ->Future.tapOk(status =>
-          if (status != granted) {
-            // lazy load just a bit to get a nicer visual effect
-            // (otherwise navigation is kind of TOO QUICK)
-            Js.Global.setTimeout(
-              () =>
-                navigation->Navigators.RootStack.Navigation.navigate(
-                  "WelcomeModalScreen",
-                ),
-              100,
-            )
-            ->ignore;
-            ();
-          }
-        )
-      ->Future.tapError(_err =>
-          Alert.alert(
-            ~title="Ooops, something bad happened",
-            ~message=
-              "Please report us this error with informations about your device so we can improve LifeTime.",
-            (),
+      ReactNativePermissions.(
+        check(Ios.calendars)
+        ->FutureJs.fromPromise(error => Js.log(error))
+        ->Future.tapOk(status =>
+            if (status != granted) {
+              // lazy load just a bit to get a nicer visual effect
+              // (otherwise navigation is kind of TOO QUICK)
+              Js.Global.setTimeout(
+                () =>
+                  navigation->Navigators.RootStack.Navigation.navigate(
+                    "WelcomeModalScreen",
+                  ),
+                100,
+              )
+              ->ignore;
+              ();
+            }
           )
-        )
+        ->Future.tapError(_err =>
+            Alert.alert(
+              ~title="Ooops, something bad happened",
+              ~message=
+                "Please report us this error with informations about your device so we can improve LifeTime.",
+              (),
+            )
+          )
+      )
       ->ignore;
       None;
     },

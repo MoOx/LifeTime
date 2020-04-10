@@ -30,7 +30,7 @@ let availableCalendars =
     (calendars: array(calendar), settings: AppSettings.t) =>
   calendars
   ->Array.keep(c =>
-      !settings.calendarsIdsSkipped->Array.some(cs => cs == c.id)
+      !settings.calendarsSkipped->Array.some(cs => cs.id == c.id)
     )
   ->Array.map(c => c.id);
 
@@ -142,9 +142,9 @@ let isAllDayEvent = (evt: calendarEventReadable) =>
 
 let isEventInSkippedCalendar =
     (evt: calendarEventReadable, settings: AppSettings.t) =>
-  settings.calendarsIdsSkipped
-  ->Array.some(cid =>
-      cid == evt.calendar->Option.map(c => c.id)->Option.getWithDefault("")
+  settings.calendarsSkipped
+  ->Array.some(cs =>
+      cs.id == evt.calendar->Option.map(c => c.id)->Option.getWithDefault("")
     );
 
 let isEventSkippedActivity =

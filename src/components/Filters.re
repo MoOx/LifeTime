@@ -20,7 +20,7 @@ let make = () => {
   let (settings, setSettings) = React.useContext(AppSettings.context);
   let theme = Theme.useTheme(AppSettings.useTheme());
   let calendars = Calendars.useCalendars();
-  let isCalendarButtonHide = settings.calendarsIdsSkipped->Array.length === 0;
+  let isCalendarButtonHide = settings.calendarsSkipped->Array.length === 0;
   <>
     <View style=Predefined.styles##rowSpaceBetween>
       <Row> <Spacer size=XS /> <BlockHeading text="Calendars" /> </Row>
@@ -32,9 +32,18 @@ let make = () => {
                    {
                      ...settings,
                      lastUpdated: Js.Date.now(),
-                     calendarsIdsSkipped:
+                     calendarsSkipped:
                        calendars
-                       ->Option.map(cs => cs->Array.map(c => c.id))
+                       ->Option.map(cs =>
+                           cs->Array.map(c =>
+                             AppSettings.{
+                               id: c.id,
+                               title: c.title,
+                               source: c.source,
+                               color: c.color,
+                             }
+                           )
+                         )
                        ->Option.getWithDefault([||]),
                    }
                  )
@@ -47,7 +56,7 @@ let make = () => {
                    {
                      ...settings,
                      lastUpdated: Js.Date.now(),
-                     calendarsIdsSkipped: [||],
+                     calendarsSkipped: [||],
                    }
                  )
                }
@@ -69,14 +78,22 @@ let make = () => {
                      {
                        ...settings,
                        lastUpdated: Js.Date.now(),
-                       calendarsIdsSkipped: {
-                         let ids = settings.calendarsIdsSkipped;
-                         if (ids->Array.some(id => id == calendar.id)) {
-                           ids->Array.keep(id => id != calendar.id);
+                       calendarsSkipped:
+                         if (settings.calendarsSkipped
+                             ->Array.some(c => c.id == calendar.id)) {
+                           settings.calendarsSkipped
+                           ->Array.keep(c => c.id != calendar.id);
                          } else {
-                           ids->Array.concat([|calendar.id|]);
-                         };
-                       },
+                           settings.calendarsSkipped
+                           ->Array.concat([|
+                               AppSettings.{
+                                 id: calendar.id,
+                                 title: calendar.title,
+                                 source: calendar.source,
+                                 color: calendar.color,
+                               },
+                             |]);
+                         },
                      }
                    )
                  }>
@@ -104,8 +121,8 @@ let make = () => {
                          </Text>
                        </View>
                        {let skipped =
-                          settings.calendarsIdsSkipped
-                          ->Array.some(id => id == calendar.id);
+                          settings.calendarsSkipped
+                          ->Array.some(c => c.id == calendar.id);
                         if (skipped) {
                           <SVGcircle
                             width={26.->ReactFromSvg.Size.dp}
