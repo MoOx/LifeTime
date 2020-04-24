@@ -125,8 +125,10 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t(Result.t(t, string)) => {
                       calendars->Array.keep(calendar =>
                         calendar.id === calendarSkipped.id
                         || calendar.title == calendarSkipped.title
-                        && calendar.source == calendarSkipped.source
                         && calendar.color == calendarSkipped.color
+                        // source can have a different name on each device
+                        // (eg a device with multiple icloud account vs a device with one)
+                        // && calendar.source == calendarSkipped.source
                       );
                     calendarsToSkip->Array.concat(calMatches);
                   },
