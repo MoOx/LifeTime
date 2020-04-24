@@ -5,7 +5,7 @@ open ReactMultiversal;
 let title = "Goals";
 
 [@react.component]
-let make = (~onNewGoalPress) => {
+let make = (~onNewGoalPress, ~onEditGoalPress) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context);
   let (getEvents, _updatedAt, _requestUpdate) =
     React.useContext(Calendars.context);
@@ -367,7 +367,7 @@ let make = (~onNewGoalPress) => {
                    </Text>
                  </View>
                  <TouchableOpacity
-                   onPress={_ => ()}
+                   onPress={_ => onEditGoalPress(goal.id)}
                    style=Style.(
                      viewStyle(
                        ~backgroundColor="rgba(255,255,255,0.1)",
@@ -524,7 +524,7 @@ let make = (~onNewGoalPress) => {
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>
       <TouchableOpacity
-        onPress={_ => onNewGoalPress(Some(Goal.Type.serializedGoal))}>
+        onPress={_ => onNewGoalPress(Goal.Type.serializedGoal)}>
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
@@ -554,7 +554,7 @@ let make = (~onNewGoalPress) => {
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>
       <TouchableOpacity
-        onPress={_ => onNewGoalPress(Some(Goal.Type.serializedLimit))}>
+        onPress={_ => onNewGoalPress(Goal.Type.serializedLimit)}>
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>

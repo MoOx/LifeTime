@@ -1,3 +1,5 @@
+open Belt;
+
 type id = string;
 
 module Colors = {
@@ -41,6 +43,17 @@ type t = {
   durationPerDay: float,
   categoriesId: array(ActivityCategories.id),
   activitiesId: array(Activities.id),
+};
+
+let undefined = {
+  id: "",
+  title: "",
+  type_: Type.Goal->Type.toSerialized,
+  createdAt: 0.,
+  days: Array.range(0, 6)->Array.map(_ => true),
+  durationPerDay: 0.,
+  categoriesId: [||],
+  activitiesId: [||],
 };
 
 let make =

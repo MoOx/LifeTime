@@ -185,6 +185,10 @@ module RootNavigator = {
         component=GoalNewModalScreen.make
       />
       <RootStack.Screen
+        name="GoalEditModalScreen"
+        component=GoalEditModalScreen.make
+      />
+      <RootStack.Screen
         name="HelpModalScreen"
         component=HelpModalScreen.make
       />

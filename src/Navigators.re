@@ -19,7 +19,10 @@ module Tabs = BottomTabs.Make(M);
 
 module RootStack = {
   module M = {
-    type params = {newGoalType: option(Goal.Type.serializableT)};
+    type params = {
+      newGoalType: option(Goal.Type.serializableT),
+      goalId: option(Goal.id),
+    };
   };
   include Stack.Make(M);
 };

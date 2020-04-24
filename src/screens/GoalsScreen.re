@@ -57,15 +57,15 @@ let make = (~navigation, ~route as _) => {
           onNewGoalPress={goalType =>
             navigation->Navigators.RootStack.Navigation.navigateWithParams(
               "GoalNewModalScreen",
-              {newGoalType: goalType},
+              {newGoalType: Some(goalType), goalId: None},
             )
           }
-          // onEditPress={activity =>
-          //   navigation->Navigators.StatsStack.Navigation.navigateWithParams(
-          //     "ActivityOptionsScreen",
-          //     {"currentActivityTitle": Some(activity)},
-          //   )
-          // }
+          onEditGoalPress={goalId =>
+            navigation->Navigators.RootStack.Navigation.navigateWithParams(
+              "GoalEditModalScreen",
+              {goalId: Some(goalId), newGoalType: None},
+            )
+          }
         />
       </Animated.ScrollView>
     </View>
