@@ -1654,6 +1654,11 @@
   resolved "https://registry.yarnpkg.com/@reason-react-native/async-storage/-/async-storage-1.6.0.tgz#3c1a2c67cbbf26f23c5b8faca3af9c7d0f6b22cf"
   integrity sha512-vJbzW8nZh1q30YaBhKtX+x6JrAGhpdA+FJu/wP3HIO5c/LK1l+/gPmTCz+7DZnn7zu2dhhckpVVAm7fNYTnzgQ==
 
+"@reason-react-native/permissions@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@reason-react-native/permissions/-/permissions-2.0.0.tgz#0b669f95970fa5fe07cb772c89661caccfe31ded"
+  integrity sha512-kQ/IUkBwLclcJTu0Ypxfwsan4pqKSlsAunRe3eFxW+MtJe56gYQNuC2+3IBg9y0SSAd3tsJrdO4XUQKI9wPpNQ==
+
 "@reason-react-native/safe-area-context@^0.6.0":
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/@reason-react-native/safe-area-context/-/safe-area-context-0.6.0.tgz#11174e4cbab13a6032bc25e002d9647b1fec3654"
