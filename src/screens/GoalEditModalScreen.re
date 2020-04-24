@@ -22,9 +22,6 @@ let make =
   let initialGoal =
     settings.goals->Array.keep(goal => goal.id == goalId)[0]
     ->Option.getWithDefault(Goal.undefined);
-  Js.log2("settings.goals", settings.goals);
-  Js.log2("goalId", goalId);
-  Js.log2("initialGoal", initialGoal);
 
   let (goal, setGoal) = React.useState(_ => None);
 
@@ -130,7 +127,20 @@ let make =
         }
       />
       <Spacer size=XL />
-      <GoalEdit initialGoal onChange={goal => setGoal(_ => goal)} />
+      <GoalEdit
+        initialGoal
+        onChange={goal => setGoal(_ => goal)}
+        onDelete={() => {
+          setSettings(settings =>
+            {
+              ...settings,
+              goals:
+                settings.goals->Array.keep(goal => goal.id != initialGoal.id),
+            }
+          );
+          navigation->Navigators.RootStack.Navigation.goBack();
+        }}
+      />
     </Animated.ScrollView>
   </>;
 };

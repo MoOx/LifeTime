@@ -13,9 +13,9 @@ external useEffect6:
   "useEffect";
 
 [@react.component]
-let make = (~initialGoal: Goal.t, ~onChange) => {
+let make = (~initialGoal: Goal.t, ~onChange, ~onDelete) => {
   Js.log(("initialGoal", initialGoal));
-  let (settings, _setSettings) = React.useContext(AppSettings.context);
+  let (settings, setSettings) = React.useContext(AppSettings.context);
 
   let theme = Theme.useTheme(AppSettings.useTheme());
 
@@ -725,5 +725,43 @@ let make = (~initialGoal: Goal.t, ~onChange) => {
       {j|By selecting a category, all future activities in that category will be included.|j}
       ->React.string
     </BlockFootnote>
+    <Spacer size=L />
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
+      <TouchableWithoutFeedback
+        onPress={_ =>
+          Alert.alert(
+            ~title="Delete This Goal",
+            ~message="You are about to delete this goal.\nAre you sure?",
+            ~buttons=[|
+              Alert.button(~text="Cancel", ~style=`default, ()),
+              Alert.button(
+                ~text="Delete",
+                ~style=`destructive,
+                ~onPress=() => onDelete(),
+                (),
+              ),
+            |],
+            (),
+          )
+        }>
+        <View>
+          <SpacedView
+            vertical=XS horizontal=XS style=Predefined.styles##rowCenter>
+            <Text
+              style=Style.(
+                list([
+                  Theme.text##body,
+                  textStyle(~color=theme.colors.red, ()),
+                ])
+              )>
+              "Delete Goal"->React.string
+            </Text>
+          </SpacedView>
+        </View>
+      </TouchableWithoutFeedback>
+    </View>
+    <Separator style=theme.styles##separatorOnBackground />
+    <Spacer />
   </SpacedView>;
 };
