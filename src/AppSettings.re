@@ -106,7 +106,9 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t(Result.t(t, string)) => {
   ->Future.flatMapOk(calendars => {
       (
         try(Ok(json->decodeJsonSettingsOrRaise)) {
-        | Json.Decode.DecodeError(exn) => Error("Unable to parse settings")
+        | Json.Decode.DecodeError(_exn) =>
+          Js.log(_exn);
+          Error("Ooops! Something went wrong when loading settings");
         }
       )
       ->Result.map(settings =>
@@ -114,7 +116,29 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t(Result.t(t, string)) => {
             theme: settings.theme,
             lastUpdated: settings.lastUpdated,
             // ensure calendars ids are valid and reconciliate otherwise
-            calendarsSkipped: settings.calendarsSkipped, // @todo reconciliate here
+            calendarsSkipped:
+              settings.calendarsSkipped
+              ->Array.reduce(
+                  [||],
+                  (calendarsToSkip, calendarSkipped) => {
+                    let calMatches =
+                      calendars->Array.keep(calendar =>
+                        calendar.id === calendarSkipped.id
+                        || calendar.title == calendarSkipped.title
+                        && calendar.source == calendarSkipped.source
+                        && calendar.color == calendarSkipped.color
+                      );
+                    calendarsToSkip->Array.concat(calMatches);
+                  },
+                )
+              ->Array.map(cal =>
+                  {
+                    id: cal.id,
+                    title: cal.title,
+                    source: cal.source,
+                    color: cal.color,
+                  }
+                ),
             activities: settings.activities,
             activitiesSkipped: settings.activitiesSkipped,
             activitiesSkippedFlag: settings.activitiesSkippedFlag,

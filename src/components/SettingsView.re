@@ -28,7 +28,10 @@ let make = (~navigation) => {
                 let rawJson =
                   try(Some(clip->Json.parseOrRaise)) {
                   | Json.ParseError(_) =>
-                    Alert.alert(~title="Data doesn't seem to be valid", ());
+                    Alert.alert(
+                      ~title="Data don't seem to be a valid Export Backup",
+                      (),
+                    );
                     None;
                   };
                 rawJson
