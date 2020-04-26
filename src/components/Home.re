@@ -577,15 +577,17 @@ let make =
           <Separator style=theme.styles##separatorOnBackground />
           <SpacedView vertical=XS style=theme.styles##background>
             <Center>
-              {settings.activitiesSkippedFlag
-                 ? <Text
-                     style=Style.(textStyle(~color=theme.colors.blue, ()))>
-                     "Reveal Hidden Activities"->React.string
-                   </Text>
-                 : <Text
-                     style=Style.(textStyle(~color=theme.colors.blue, ()))>
-                     "Mask Hidden Activities"->React.string
-                   </Text>}
+              <Text
+                style=Style.(
+                  array([|
+                    Theme.text##callout,
+                    textStyle(~color=theme.colors.blue, ()),
+                  |])
+                )>
+                {settings.activitiesSkippedFlag
+                   ? "Reveal Hidden Activities" : "Mask Hidden Activities"}
+                ->React.string
+              </Text>
             </Center>
           </SpacedView>
           <Separator style=theme.styles##separatorOnBackground />

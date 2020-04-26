@@ -200,7 +200,13 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                                     )
                                   }>
                                   <SpacedView vertical=XS horizontal=S>
-                                    <Text style=theme.styles##textBlue>
+                                    <Text
+                                      style=Style.(
+                                        array([|
+                                          Theme.text##callout,
+                                          theme.styles##textBlue,
+                                        |])
+                                      )>
                                       "Show More"->React.string
                                     </Text>
                                   </SpacedView>
@@ -216,7 +222,13 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                                     )
                                   }>
                                   <SpacedView vertical=XS horizontal=S>
-                                    <Text style=theme.styles##textBlue>
+                                    <Text
+                                      style=Style.(
+                                        array([|
+                                          Theme.text##callout,
+                                          theme.styles##textBlue,
+                                        |])
+                                      )>
                                       "Show Less"->React.string
                                     </Text>
                                   </SpacedView>
