@@ -141,26 +141,59 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                )
              | _ => (false, false)
              };
-           let (backgroundColor, title) =
-             switch (goal.categoriesId, goal.activitiesId) {
-             | ([|catId|], [||]) =>
-               ActivityCategories.(
-                 {
-                   let (_, title, color, _) = catId->getFromId;
-                   (color->getColor(`dark), title);
+           let backgroundColor =
+             goal.categoriesId
+             ->Array.concat(
+                 goal.activitiesId
+                 ->Array.map(actId => {
+                     let act =
+                       actId->Activities.getFromId(settings.activities);
+                     act.categoryId;
+                   }),
+               )
+             ->Array.map(catId => {
+                 let (_, _, color, _) = catId->ActivityCategories.getFromId;
+                 color;
+               })
+             ->Array.reduce(Map.String.empty, (map, color) => {
+                 map->Map.String.set(
+                   color,
+                   map->Map.String.get(color)->Option.getWithDefault(0) + 1,
+                 )
+               })
+             ->Map.String.toArray
+             ->SortArray.stableSortBy(((_, weight), (_, weight2)) =>
+                 if (weight < weight2) {
+                   1;
+                 } else if (weight > weight2) {
+                   (-1);
+                 } else {
+                   0;
                  }
                )
-             | ([||], [|actId|]) =>
-               ActivityCategories.(
-                 {
-                   let act = actId->Activities.getFromId(settings.activities);
-                   let catId = act.categoryId;
-                   let (_, _, color, _) = catId->getFromId;
-                   (color->getColor(`dark), act.title);
-                 }
-               )
-             | (_, _) => (theme.colors.gray, "Unknown")
+             ->Array.get(0)
+             ->Option.map(((c, _)) => c->ActivityCategories.getColor(`dark))
+             ->Option.getWithDefault(theme.colors.gray);
+
+           let goalTitle =
+             if (goal.title != "") {
+               goal.title;
+             } else {
+               goal.activitiesId
+               ->Array.map(actId => {
+                   actId->Activities.getFromId(settings.activities).title
+                 })
+               ->Array.concat(
+                   goal.categoriesId
+                   ->Array.map(catId => {
+                       let (_, title, _, _) =
+                         catId->ActivityCategories.getFromId;
+                       title;
+                     }),
+                 )
+               ->Js.Array2.joinWith(", ");
              };
+
            // backgroundColor with some black to approximatively
            // match the gradient in the background
            let backgroundColorAlt =
@@ -309,15 +342,9 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                          Theme.styleSheets.dark##textOnBackground,
                          textStyle(~fontWeight=Theme.fontWeights.medium, ()),
                        ])
-                     )>
-                     (
-                       if (goal.title != "") {
-                         goal.title;
-                       } else {
-                         title;
-                       }
                      )
-                     ->React.string
+                     numberOfLines=1>
+                     goalTitle->React.string
                    </Text>
                    <Text
                      style=Style.(
