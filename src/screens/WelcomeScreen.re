@@ -25,13 +25,14 @@ let make = (~navigation, ~route as _) => {
                 error;
               })
             ->Future.tapOk(status =>
-                switch (status) {
-                | "authorized" =>
+                switch (
+                  status->ReactNativeCalendarEvents.authorizationStatusFromJs
+                ) {
+                | `authorized =>
                   navigation->Navigators.RootStack.Navigation.goBack()
-                | "denied"
-                | "restricted"
-                | "undetermined"
-                | _ =>
+                | `denied
+                | `restricted
+                | `undetermined =>
                   Alert.alert(
                     ~title=
                       "You need to grant LifeTime access to your calendar in order to work",

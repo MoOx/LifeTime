@@ -67,9 +67,9 @@ let make = (~navigation) => {
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
-            <SVGsunoutline
-              width={28.->ReactFromSvg.Size.dp}
-              height={28.->ReactFromSvg.Size.dp}
+            <SVGSunoutline
+              width={28.->Style.dp}
+              height={28.->Style.dp}
               fill={theme.colors.blue}
             />
           </SpacedView>
@@ -94,9 +94,9 @@ let make = (~navigation) => {
                 </View>
                 {switch (themeKey) {
                  | `light =>
-                   <SVGcheckmark
-                     width={24.->ReactFromSvg.Size.dp}
-                     height={24.->ReactFromSvg.Size.dp}
+                   <SVGCheckmark
+                     width={24.->Style.dp}
+                     height={24.->Style.dp}
                      fill={theme.colors.blue}
                    />
                  | _ => React.null
@@ -117,9 +117,9 @@ let make = (~navigation) => {
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
-            <SVGmoonsymbol
-              width={28.->ReactFromSvg.Size.dp}
-              height={28.->ReactFromSvg.Size.dp}
+            <SVGMoonsymbol
+              width={28.->Style.dp}
+              height={28.->Style.dp}
               fill={theme.colors.indigo}
             />
           </SpacedView>
@@ -144,9 +144,9 @@ let make = (~navigation) => {
                 </View>
                 {switch (themeKey) {
                  | `dark =>
-                   <SVGcheckmark
-                     width={24.->ReactFromSvg.Size.dp}
-                     height={24.->ReactFromSvg.Size.dp}
+                   <SVGCheckmark
+                     width={24.->Style.dp}
+                     height={24.->Style.dp}
                      fill={theme.colors.blue}
                    />
                  | _ => React.null
@@ -167,9 +167,9 @@ let make = (~navigation) => {
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
-            <SVGmoonshine
-              width={28.->ReactFromSvg.Size.dp}
-              height={28.->ReactFromSvg.Size.dp}
+            <SVGMoonshine
+              width={28.->Style.dp}
+              height={28.->Style.dp}
               fill={theme.colors.purple}
             />
           </SpacedView>
@@ -194,9 +194,9 @@ let make = (~navigation) => {
                 </View>
                 {switch (themeKey) {
                  | `auto =>
-                   <SVGcheckmark
-                     width={24.->ReactFromSvg.Size.dp}
-                     height={24.->ReactFromSvg.Size.dp}
+                   <SVGCheckmark
+                     width={24.->Style.dp}
+                     height={24.->Style.dp}
                      fill={theme.colors.blue}
                    />
                  | _ => React.null
@@ -226,9 +226,9 @@ let make = (~navigation) => {
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
-            <SVGinfo
-              width={28.->ReactFromSvg.Size.dp}
-              height={28.->ReactFromSvg.Size.dp}
+            <SVGInfo
+              width={28.->Style.dp}
+              height={28.->Style.dp}
               fill={theme.colors.blue}
             />
           </SpacedView>
@@ -248,9 +248,9 @@ let make = (~navigation) => {
                 )>
                 "Help"->React.string
               </Text>
-              <SVGchevronright
-                width={14.->ReactFromSvg.Size.dp}
-                height={14.->ReactFromSvg.Size.dp}
+              <SVGChevronright
+                width={14.->Style.dp}
+                height={14.->Style.dp}
                 fill={Predefined.Colors.Ios.light.gray4}
               />
               <Spacer size=S />
@@ -268,9 +268,9 @@ let make = (~navigation) => {
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
-            <SVGplaycircle
-              width={28.->ReactFromSvg.Size.dp}
-              height={28.->ReactFromSvg.Size.dp}
+            <SVGPlaycircle
+              width={28.->Style.dp}
+              height={28.->Style.dp}
               fill={theme.colors.blue}
             />
           </SpacedView>
@@ -290,9 +290,9 @@ let make = (~navigation) => {
                 )>
                 "Welcome Screen"->React.string
               </Text>
-              <SVGchevronright
-                width={14.->ReactFromSvg.Size.dp}
-                height={14.->ReactFromSvg.Size.dp}
+              <SVGChevronright
+                width={14.->Style.dp}
+                height={14.->Style.dp}
                 fill={Predefined.Colors.Ios.light.gray4}
               />
               <Spacer size=S />
@@ -305,9 +305,9 @@ let make = (~navigation) => {
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
-            <SVGcalendar
-              width={28.->ReactFromSvg.Size.dp}
-              height={28.->ReactFromSvg.Size.dp}
+            <SVGCalendar
+              width={28.->Style.dp}
+              height={28.->Style.dp}
               fill={theme.colors.blue}
             />
           </SpacedView>
@@ -327,9 +327,9 @@ let make = (~navigation) => {
                 )>
                 "Calendar App"->React.string
               </Text>
-              <SVGchevronright
-                width={14.->ReactFromSvg.Size.dp}
-                height={14.->ReactFromSvg.Size.dp}
+              <SVGChevronright
+                width={14.->Style.dp}
+                height={14.->Style.dp}
                 fill={Predefined.Colors.Ios.light.gray4}
               />
               <Spacer size=S />
@@ -343,9 +343,9 @@ let make = (~navigation) => {
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
-            <SVGsettings
-              width={28.->ReactFromSvg.Size.dp}
-              height={28.->ReactFromSvg.Size.dp}
+            <SVGSettings
+              width={28.->Style.dp}
+              height={28.->Style.dp}
               fill={theme.colors.blue}
             />
           </SpacedView>
@@ -365,9 +365,9 @@ let make = (~navigation) => {
                 )>
                 "App System Settings"->React.string
               </Text>
-              <SVGchevronright
-                width={14.->ReactFromSvg.Size.dp}
-                height={14.->ReactFromSvg.Size.dp}
+              <SVGChevronright
+                width={14.->Style.dp}
+                height={14.->Style.dp}
                 fill={Predefined.Colors.Ios.light.gray4}
               />
               <Spacer size=S />
@@ -400,9 +400,9 @@ let make = (~navigation) => {
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
-            <SVGexport
-              width={28.->ReactFromSvg.Size.dp}
-              height={28.->ReactFromSvg.Size.dp}
+            <SVGExport
+              width={28.->Style.dp}
+              height={28.->Style.dp}
               fill={theme.colors.blue}
             />
           </SpacedView>
@@ -453,9 +453,9 @@ let make = (~navigation) => {
         <View style=Predefined.styles##rowCenter>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
-            <SVGimport
-              width={28.->ReactFromSvg.Size.dp}
-              height={28.->ReactFromSvg.Size.dp}
+            <SVGImport
+              width={28.->Style.dp}
+              height={28.->Style.dp}
               fill={theme.colors.blue}
             />
           </SpacedView>

@@ -22,12 +22,12 @@
     "reason-react-navigation",
     "react-multiversal",
     "reason-future",
-    "react-from-svg",
     "reason-date-fns",
     "@reason-react-native/safe-area-context",
     "@reason-react-native/permissions",
     "@reason-react-native/async-storage",
     "@reason-react-native/slider",
+    "@reason-react-native/svg",
     "bs-tinycolor"
   ]
 }

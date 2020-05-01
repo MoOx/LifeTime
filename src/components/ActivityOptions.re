@@ -67,15 +67,15 @@ let make = (~activityTitle, ~onSkipActivity) => {
                           != settings->Calendars.categoryIdFromActivityTitle(
                                activityTitle,
                              )) {
-                        <SVGcircle
-                          width={26.->ReactFromSvg.Size.dp}
-                          height={26.->ReactFromSvg.Size.dp}
+                        <SVGCircle
+                          width={26.->Style.dp}
+                          height={26.->Style.dp}
                           fill=color
                         />;
                       } else {
-                        <SVGcheckmarkcircle
-                          width={26.->ReactFromSvg.Size.dp}
-                          height={26.->ReactFromSvg.Size.dp}
+                        <SVGCheckmarkcircle
+                          width={26.->Style.dp}
+                          height={26.->Style.dp}
                           fill=color
                         />;
                       }}

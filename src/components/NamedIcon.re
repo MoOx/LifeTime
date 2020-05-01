@@ -48,43 +48,41 @@ let make =
         (),
       )
     )>
-    {
-      open ReactFromSvg.Size;
-      let width = 80.->pct;
-      let height = 80.->pct;
-      let fill = "#fff";
-      switch (name) {
-      | `bookmark => <SVGbookmark width height fill />
-      | `broom => <SVGbroom width height fill />
-      | `cancel => <SVGcancel width height fill />
-      | `carrot => <SVGcarrot width height fill />
-      | `checkmark => <SVGcheckmark width height fill />
-      | `checkmarkcircle => <SVGcheckmarkcircle width height fill />
-      | `chevronright => <SVGchevronright width height fill />
-      | `circle => <SVGcircle width height fill />
-      | `edit => <SVGedit width height fill />
-      | `export => <SVGexport width height fill />
-      | `heart => <SVGheart width height fill />
-      | `heartoutline => <SVGheartoutline width height fill />
-      | `hourglass => <SVGhourglass width height fill />
-      | `import => <SVGimport width height fill />
-      | `info => <SVGinfo width height fill />
-      | `meditation => <SVGmeditation width height fill />
-      | `moonshine => <SVGmoonshine width height fill />
-      | `moonsymbol => <SVGmoonsymbol width height fill />
-      | `ok => <SVGok width height fill />
-      | `pennant => <SVGpennant width height fill />
-      | `round => <SVGround width height fill />
-      | `scope => <SVGscope width height fill />
-      | `settings => <SVGsettings width height fill />
-      | `sharerounded => <SVGsharerounded width height fill />
-      | `social => <SVGsocial width height fill />
-      | `sunoutline => <SVGsunoutline width height fill />
-      | `tag => <SVGtag width height fill />
-      | `theatremask => <SVGtheatremask width height fill />
-      | `timeline => <SVGtimeline width height fill />
-      | `workout => <SVGworkout width height fill />
-      };
-    }
+    {open Style;
+     let width = 80.->pct;
+     let height = 80.->pct;
+     let fill = "#fff";
+     switch (name) {
+     | `bookmark => <SVGBookmark width height fill />
+     | `broom => <SVGBroom width height fill />
+     | `cancel => <SVGCancel width height fill />
+     | `carrot => <SVGCarrot width height fill />
+     | `checkmark => <SVGCheckmark width height fill />
+     | `checkmarkcircle => <SVGCheckmarkcircle width height fill />
+     | `chevronright => <SVGChevronright width height fill />
+     | `circle => <SVGCircle width height fill />
+     | `edit => <SVGEdit width height fill />
+     | `export => <SVGExport width height fill />
+     | `heart => <SVGHeart width height fill />
+     | `heartoutline => <SVGHeartoutline width height fill />
+     | `hourglass => <SVGHourglass width height fill />
+     | `import => <SVGImport width height fill />
+     | `info => <SVGInfo width height fill />
+     | `meditation => <SVGMeditation width height fill />
+     | `moonshine => <SVGMoonshine width height fill />
+     | `moonsymbol => <SVGMoonsymbol width height fill />
+     | `ok => <SVGOk width height fill />
+     | `pennant => <SVGPennant width height fill />
+     | `round => <SVGRound width height fill />
+     | `scope => <SVGScope width height fill />
+     | `settings => <SVGSettings width height fill />
+     | `sharerounded => <SVGSharerounded width height fill />
+     | `social => <SVGSocial width height fill />
+     | `sunoutline => <SVGSunoutline width height fill />
+     | `tag => <SVGTag width height fill />
+     | `theatremask => <SVGTheatremask width height fill />
+     | `timeline => <SVGTimeline width height fill />
+     | `workout => <SVGWorkout width height fill />
+     }}
   </View>;
 };

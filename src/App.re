@@ -105,9 +105,9 @@ module TabsScreen = {
             ~title="Summary",
             ~tabBarIcon=
               tabBarIconProps =>
-                <SVGtimeline
-                  width={tabBarIconProps.size->ReactFromSvg.Size.dp}
-                  height={tabBarIconProps.size->ReactFromSvg.Size.dp}
+                <SVGTimeline
+                  width={tabBarIconProps.size->Style.dp}
+                  height={tabBarIconProps.size->Style.dp}
                   fill={tabBarIconProps.color}
                 />,
             (),
@@ -122,9 +122,9 @@ module TabsScreen = {
             ~title="Goals",
             ~tabBarIcon=
               tabBarIconProps =>
-                <SVGpennant
-                  width={tabBarIconProps.size->ReactFromSvg.Size.dp}
-                  height={tabBarIconProps.size->ReactFromSvg.Size.dp}
+                <SVGPennant
+                  width={tabBarIconProps.size->Style.dp}
+                  height={tabBarIconProps.size->Style.dp}
                   fill={tabBarIconProps.color}
                 />,
             (),
@@ -139,9 +139,9 @@ module TabsScreen = {
             ~title="Settings",
             ~tabBarIcon=
               tabBarIconProps =>
-                <SVGsettings
-                  width={tabBarIconProps.size->ReactFromSvg.Size.dp}
-                  height={tabBarIconProps.size->ReactFromSvg.Size.dp}
+                <SVGSettings
+                  width={tabBarIconProps.size->Style.dp}
+                  height={tabBarIconProps.size->Style.dp}
                   fill={tabBarIconProps.color}
                 />,
             (),

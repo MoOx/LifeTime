@@ -2,14 +2,16 @@
 
 type isoDateString = string;
 
-type authorizationStatus = string;
-// [@bs.string] [ | `denied | `restricted | `authorized | `undetermined];
+[@bs.deriving {jsConverter: newType}]
+type authorizationStatus = [
+  | `denied
+  | `restricted
+  | `authorized
+  | `undetermined
+];
 
-type rawRecurrenceFrequency = string;
-// [@bs.string] [ | `daily | `weekly | `monthly | `yearly];
-
-type recurrenceFrequency =
-  [@bs.string] [ | `daily | `weekly | `monthly | `yearly];
+[@bs.deriving {jsConverter: newType}]
+type recurrenceFrequency = [ | `daily | `weekly | `monthly | `yearly];
 
 type coords = {
   latitude: float,
@@ -93,7 +95,7 @@ type calendarEventReadable = {
   /* Indicates whether the event is an all-day event. */
   allDay: option(bool),
   /* The simple recurrence frequency of the calendar event. */
-  recurrence: option(rawRecurrenceFrequency),
+  recurrence: option(abs_recurrenceFrequency),
   /* The location associated with the calendar event. */
   location: option(string),
   /* iOS ONLY - Indicates whether an event is a detached instance of a repeating event. */
@@ -150,19 +152,20 @@ type calendarEventWritable = {
   alarms: option(array(alarm)),
 };
 
-type calendarEntityTypeiOS = [@bs.string] [ | `event | `reminder];
+[@bs.deriving jsConverter]
+type calendarEntityTypeiOS = [ | `event | `reminder];
 
-type calendarAccessLevelAndroid =
-  [@bs.string] [
-    | `contributor
-    | `editor
-    | `freebusy
-    | `override
-    | `owner
-    | `read
-    | `respond
-    | `root
-  ];
+[@bs.deriving jsConverter]
+type calendarAccessLevelAndroid = [
+  | `contributor
+  | `editor
+  | `freebusy
+  | `override
+  | `owner
+  | `read
+  | `respond
+  | `root
+];
 
 type calendarAccountSourceAndroid = {
   /* The Account name */
@@ -193,12 +196,12 @@ type calendarOptions = {
 
 /* Get calendar authorization status. */
 [@bs.module "react-native-calendar-events"] [@bs.scope "default"]
-external authorizationStatus: unit => Js.Promise.t(authorizationStatus) =
+external authorizationStatus: unit => Js.Promise.t(abs_authorizationStatus) =
   "authorizationStatus";
 
 /* Request calendar authorization. Authorization must be granted before accessing calendar events. */
 [@bs.module "react-native-calendar-events"] [@bs.scope "default"]
-external authorizeEventStore: unit => Js.Promise.t(authorizationStatus) =
+external authorizeEventStore: unit => Js.Promise.t(abs_authorizationStatus) =
   "authorizeEventStore";
 
 /* Finds all the calendars on the device. */

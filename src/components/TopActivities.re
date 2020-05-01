@@ -161,9 +161,9 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                                  </Row>
                                </View>
                                <Spacer size=XS />
-                               <SVGchevronright
-                                 width={14.->ReactFromSvg.Size.dp}
-                                 height={14.->ReactFromSvg.Size.dp}
+                               <SVGChevronright
+                                 width={14.->Style.dp}
+                                 height={14.->Style.dp}
                                  fill={Predefined.Colors.Ios.light.gray4}
                                />
                                <Spacer size=S />

@@ -443,9 +443,9 @@ let make =
                        )
                      )
                    }}>
-                   <SVGxmark
-                     width={16.->ReactFromSvg.Size.dp}
-                     height={16.->ReactFromSvg.Size.dp}
+                   <SVGXmark
+                     width={16.->Style.dp}
+                     height={16.->Style.dp}
                      fill="#fff"
                    />
                  </TouchableOpacity>

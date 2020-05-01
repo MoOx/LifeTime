@@ -124,15 +124,15 @@ let make = () => {
                           settings.calendarsSkipped
                           ->Array.some(c => c.id == calendar.id);
                         if (skipped) {
-                          <SVGcircle
-                            width={26.->ReactFromSvg.Size.dp}
-                            height={26.->ReactFromSvg.Size.dp}
+                          <SVGCircle
+                            width={26.->Style.dp}
+                            height={26.->Style.dp}
                             fill={calendar.color}
                           />;
                         } else {
-                          <SVGcheckmarkcircle
-                            width={26.->ReactFromSvg.Size.dp}
-                            height={26.->ReactFromSvg.Size.dp}
+                          <SVGCheckmarkcircle
+                            width={26.->Style.dp}
+                            height={26.->Style.dp}
                             fill={calendar.color}
                           />;
                         }}

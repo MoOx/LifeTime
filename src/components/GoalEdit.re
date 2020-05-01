@@ -217,9 +217,9 @@ let make = (~initialGoal: Goal.t, ~onChange, ~onDelete) => {
                 </View>
                 {switch (type_) {
                  | Some(Goal) =>
-                   <SVGcheckmark
-                     width={22.->ReactFromSvg.Size.dp}
-                     height={22.->ReactFromSvg.Size.dp}
+                   <SVGCheckmark
+                     width={22.->Style.dp}
+                     height={22.->Style.dp}
                      fill={theme.colors.blue}
                    />
                  | _ => React.null
@@ -258,9 +258,9 @@ let make = (~initialGoal: Goal.t, ~onChange, ~onDelete) => {
                 </View>
                 {switch (type_) {
                  | Some(Limit) =>
-                   <SVGcheckmark
-                     width={22.->ReactFromSvg.Size.dp}
-                     height={22.->ReactFromSvg.Size.dp}
+                   <SVGCheckmark
+                     width={22.->Style.dp}
+                     height={22.->Style.dp}
                      fill={theme.colors.blue}
                    />
                  | _ => React.null
@@ -299,15 +299,15 @@ let make = (~initialGoal: Goal.t, ~onChange, ~onDelete) => {
                  </Text>
                  <Spacer size=XXS />
                  {if (!dayOn) {
-                    <SVGcircle
-                      width={26.->ReactFromSvg.Size.dp}
-                      height={26.->ReactFromSvg.Size.dp}
+                    <SVGCircle
+                      width={26.->Style.dp}
+                      height={26.->Style.dp}
                       fill={theme.colors.gray}
                     />;
                   } else {
-                    <SVGcheckmarkcircle
-                      width={26.->ReactFromSvg.Size.dp}
-                      height={26.->ReactFromSvg.Size.dp}
+                    <SVGCheckmarkcircle
+                      width={26.->Style.dp}
+                      height={26.->Style.dp}
                       fill={theme.colors.blue}
                     />;
                   }}
@@ -511,15 +511,15 @@ let make = (~initialGoal: Goal.t, ~onChange, ~onDelete) => {
                  <View>
                    <SpacedView vertical=XS horizontal=None>
                      {if (!selectedCat) {
-                        <SVGcircle
-                          width={22.->ReactFromSvg.Size.dp}
-                          height={22.->ReactFromSvg.Size.dp}
+                        <SVGCircle
+                          width={22.->Style.dp}
+                          height={22.->Style.dp}
                           fill={theme.colors.gray}
                         />;
                       } else {
-                        <SVGcheckmarkcircle
-                          width={22.->ReactFromSvg.Size.dp}
-                          height={22.->ReactFromSvg.Size.dp}
+                        <SVGCheckmarkcircle
+                          width={22.->Style.dp}
+                          height={22.->Style.dp}
                           fill={theme.colors.blue}
                         />;
                       }}
@@ -600,9 +600,9 @@ let make = (~initialGoal: Goal.t, ~onChange, ~onDelete) => {
                                  (),
                                )
                              )>
-                             <SVGchevronright
-                               width={14.->ReactFromSvg.Size.dp}
-                               height={14.->ReactFromSvg.Size.dp}
+                             <SVGChevronright
+                               width={14.->Style.dp}
+                               height={14.->Style.dp}
                                fill={Predefined.Colors.Ios.light.gray4}
                              />
                            </Animated.View>
@@ -651,15 +651,15 @@ let make = (~initialGoal: Goal.t, ~onChange, ~onDelete) => {
                           <View>
                             <SpacedView vertical=XS horizontal=None>
                               {if (!selected) {
-                                 <SVGcircle
-                                   width={22.->ReactFromSvg.Size.dp}
-                                   height={22.->ReactFromSvg.Size.dp}
+                                 <SVGCircle
+                                   width={22.->Style.dp}
+                                   height={22.->Style.dp}
                                    fill={theme.colors.gray}
                                  />;
                                } else {
-                                 <SVGcheckmarkcircle
-                                   width={22.->ReactFromSvg.Size.dp}
-                                   height={22.->ReactFromSvg.Size.dp}
+                                 <SVGCheckmarkcircle
+                                   width={22.->Style.dp}
+                                   height={22.->Style.dp}
                                    fill={theme.colors.blue}
                                  />;
                                }}

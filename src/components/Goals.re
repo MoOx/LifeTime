@@ -301,11 +301,19 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                     </View>}
                <View style=Style.(list([StyleSheet.absoluteFill]))>
                  <LinearGradientView
-                   width="100%"
-                   height="100%"
+                   width={100.->Style.pct}
+                   height={100.->Style.pct}
                    stops=[|
-                     {offset: "0", stopColor: "#000", stopOpacity: "0"},
-                     {offset: "1", stopColor: "#000", stopOpacity: "0.5"},
+                     {
+                       offset: 0.->Style.dp,
+                       stopColor: "#000",
+                       stopOpacity: 0.->ReactNativeSvg.opacity,
+                     },
+                     {
+                       offset: 1.->Style.dp,
+                       stopColor: "#000",
+                       stopOpacity: 0.5->ReactNativeSvg.opacity,
+                     },
                    |]
                  />
                </View>
@@ -403,9 +411,9 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                        (),
                      )
                    )>
-                   <SVGmore
-                     width={24.->ReactFromSvg.Size.dp}
-                     height={24.->ReactFromSvg.Size.dp}
+                   <SVGMore
+                     width={24.->Style.dp}
+                     height={24.->Style.dp}
                      fill="rgba(255,255,255,0.75)"
                    />
                  </TouchableOpacity>
@@ -481,13 +489,13 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                        Predefined.styles##alignCenter,
                      ])
                    )>
-                   {let width = 36.->ReactFromSvg.Size.dp;
-                    let height = 36.->ReactFromSvg.Size.dp;
+                   {let width = 36.->Style.dp;
+                    let height = 36.->Style.dp;
                     let fill = "rgba(255,255,255,0.1)";
                     switch (goal.type_->Goal.Type.fromSerialized) {
-                    | Some(Goal) => <SVGscope width height fill />
-                    | Some(Limit) => <SVGhourglass width height fill />
-                    | _ => <SVGcheckmark width height fill />
+                    | Some(Goal) => <SVGScope width height fill />
+                    | Some(Limit) => <SVGHourglass width height fill />
+                    | _ => <SVGCheckmark width height fill />
                     }}
                    <Spacer size=XS />
                    <View>
