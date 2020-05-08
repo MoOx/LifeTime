@@ -641,7 +641,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 408021321C30B4A98AE24CE4 /* Pods-LifeTime.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -670,7 +669,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33CDF874EBE9F033F81121DD /* Pods-LifeTime.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
