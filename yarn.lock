@@ -11441,9 +11441,9 @@ reason-future@^2.5.0:
   resolved "https://registry.yarnpkg.com/reason-future/-/reason-future-2.5.0.tgz#52d91a343f65c6d527cd1cca4685bbc097971c68"
   integrity sha512-rzrMQlRfQYlyiryQQJfgj04IEUN1Eau4JLnorlEVSm6Yxp2Kq6no3p+dWCocz5BLR9wIFPnSFMloLNP4ErK6ag==
 
-"reason-react-native@https://github.com/reason-react-native/reason-react-native.git#e91e045":
+"reason-react-native@https://github.com/reason-react-native/reason-react-native.git#053ca66":
   version "0.61.1"
-  resolved "https://github.com/reason-react-native/reason-react-native.git#e91e04571d2ac060d4a373841f4f244444018ad2"
+  resolved "https://github.com/reason-react-native/reason-react-native.git#053ca66ca2e7b25ef53bceb20426fe9e8104d810"
 
 reason-react-navigation@^5.0.0-beta.0:
   version "5.0.0-beta.0"

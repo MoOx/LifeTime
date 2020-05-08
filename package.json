@@ -61,7 +61,7 @@
     "reason-date-fns": "^0.10.4",
     "reason-future": "^2.5.0",
     "reason-react": "^0.7.0",
-    "reason-react-native": "https://github.com/reason-react-native/reason-react-native.git#e91e045",
+    "reason-react-native": "https://github.com/reason-react-native/reason-react-native.git#053ca66",
     "reason-react-navigation": "^5.0.0-beta.0"
   },
   "devDependencies": {

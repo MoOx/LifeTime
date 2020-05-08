@@ -3,6 +3,10 @@ open ReactNative;
 open ReactMultiversal;
 open ReactNavigation;
 
+if (Global.__DEV__) {
+  Global.unstable_enableLogBox();
+};
+
 let styles =
   Style.{"container": viewStyle(~flexGrow=1., ~backgroundColor="#fff", ())}
   ->StyleSheet.create;
