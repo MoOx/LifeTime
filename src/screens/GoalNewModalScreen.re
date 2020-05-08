@@ -77,6 +77,7 @@ let make =
       <StickyHeader
         scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
         safeArea=false
+        animateBackgroundOpacity=False
         backgroundElement={<StickyHeaderBackground />}
         color={theme.colors.blue}
         color2={theme.colors.blue}

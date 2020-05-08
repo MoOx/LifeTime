@@ -34,7 +34,6 @@ let make = (~navigation, ~route as _) => {
         scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
         scrollOffsetY=120.
         safeArea=false
-        animateBackgroundOpacity=`yes
         backgroundElement={<StickyHeaderBackground />}
         color={theme.colors.blue}
         color2={theme.colors.blue}

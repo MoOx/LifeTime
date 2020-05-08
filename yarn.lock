@@ -11085,9 +11085,9 @@ react-is@^16.12.0, react-is@^16.13.0, react-is@^16.8.1, react-is@^16.8.4, react-
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-"react-multiversal@https://github.com/MoOx/react-multiversal#40b4a18":
+"react-multiversal@https://github.com/MoOx/react-multiversal#ce74d2d":
   version "0.0.0"
-  resolved "https://github.com/MoOx/react-multiversal#40b4a1885486cda83bd0e32d2ae6855d514c9778"
+  resolved "https://github.com/MoOx/react-multiversal#ce74d2d1fd0da27ec2479eeb6c5607a069b20369"
   dependencies:
     "@react-native-community/blur" "^3.4.1"
     "@reason-react-native/safe-area-context" "https://github.com/reason-react-native/safe-area-context.git#cd84a5c"

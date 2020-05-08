@@ -17,7 +17,6 @@ let make = (~navigation, ~route as _) => {
         scrollOffsetY=80.
         safeArea=true
         animateTranslateY=false
-        animateBackgroundOpacity=`yes
         backgroundElement={<StickyHeaderBackground />}
         textStyle=theme.styles##textOnBackground
         title=Goals.title

@@ -45,7 +45,7 @@
     "date-fns": "^2.8.1",
     "react": "16.11.0",
     "react-dom": "^16.11.0",
-    "react-multiversal": "https://github.com/MoOx/react-multiversal#40b4a18",
+    "react-multiversal": "https://github.com/MoOx/react-multiversal#ce74d2d",
     "react-native": "^0.62.0",
     "react-native-bootsplash": "^1.0.3",
     "react-native-calendar-events": "^1.7.3",
