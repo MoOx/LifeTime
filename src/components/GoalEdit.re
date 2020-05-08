@@ -15,7 +15,7 @@ external useEffect6:
 [@react.component]
 let make = (~initialGoal: Goal.t, ~onChange, ~onDelete) => {
   Js.log(("initialGoal", initialGoal));
-  let (settings, setSettings) = React.useContext(AppSettings.context);
+  let (settings, _setSettings) = React.useContext(AppSettings.context);
 
   let theme = Theme.useTheme(AppSettings.useTheme());
 

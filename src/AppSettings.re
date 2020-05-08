@@ -64,13 +64,15 @@ let decodeJsonSettingsOrRaise = (json: Js.Json.t): t =>
       json
       |> field(
            "activities",
-           array(json =>
-             Activities.{
-               id: json |> field("id", string),
-               title: json |> field("title", string),
-               createdAt: json |> field("createdAt", Json.Decode.float),
-               categoryId: json |> field("categoryId", string),
-             }
+           array((json) =>
+             (
+               {
+                 id: json |> field("id", string),
+                 title: json |> field("title", string),
+                 createdAt: json |> field("createdAt", Json.Decode.float),
+                 categoryId: json |> field("categoryId", string),
+               }: Activities.t
+             )
            ),
          ),
     goals:
@@ -78,18 +80,22 @@ let decodeJsonSettingsOrRaise = (json: Js.Json.t): t =>
         json
         |> field(
              "goals",
-             array(json =>
-               Goal.{
-                 id: json |> field("id", string),
-                 title: json |> field("title", string),
-                 createdAt: json |> field("createdAt", Json.Decode.float),
-                 type_: json |> field("type_", int),
-                 days: json |> field("days", array(bool)),
-                 durationPerDay:
-                   json |> field("durationPerDay", Json.Decode.float),
-                 categoriesId: json |> field("categoriesId", array(string)),
-                 activitiesId: json |> field("activitiesId", array(string)),
-               }
+             array((json) =>
+               (
+                 {
+                   id: json |> field("id", string),
+                   title: json |> field("title", string),
+                   createdAt: json |> field("createdAt", Json.Decode.float),
+                   type_: json |> field("type_", int),
+                   days: json |> field("days", array(bool)),
+                   durationPerDay:
+                     json |> field("durationPerDay", Json.Decode.float),
+                   categoriesId:
+                     json |> field("categoriesId", array(string)),
+                   activitiesId:
+                     json |> field("activitiesId", array(string)),
+                 }: Goal.t
+               )
              ),
            )
       ) {
@@ -126,10 +132,10 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t(Result.t(t, string)) => {
                         calendar.id === calendarSkipped.id
                         || calendar.title == calendarSkipped.title
                         && calendar.color == calendarSkipped.color
-                        // source can have a different name on each device
-                        // (eg a device with multiple icloud account vs a device with one)
-                        // && calendar.source == calendarSkipped.source
                       );
+                    // source can have a different name on each device
+                    // (eg a device with multiple icloud account vs a device with one)
+                    // && calendar.source == calendarSkipped.source
                     calendarsToSkip->Array.concat(calMatches);
                   },
                 )

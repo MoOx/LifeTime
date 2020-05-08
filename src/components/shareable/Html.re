@@ -41,7 +41,7 @@ module A = {
 
 module H1 = {
   [@react.component]
-  let make = (~props=Js.Obj.empty(), ~children) => {
+  let make = (~props as _=Js.Obj.empty(), ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme());
 
     <View accessibilityRole=`header>
@@ -63,7 +63,7 @@ module H1 = {
 
 module H2 = {
   [@react.component]
-  let make = (~props=Js.Obj.empty(), ~children) => {
+  let make = (~props as _=Js.Obj.empty(), ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme());
 
     <View accessibilityRole=`header>
@@ -85,7 +85,7 @@ module H2 = {
 
 module H3 = {
   [@react.component]
-  let make = (~props=Js.Obj.empty(), ~children) => {
+  let make = (~props as _=Js.Obj.empty(), ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme());
 
     <View accessibilityRole=`header>
@@ -107,7 +107,7 @@ module H3 = {
 
 module H4 = {
   [@react.component]
-  let make = (~props=Js.Obj.empty(), ~children) => {
+  let make = (~props as _=Js.Obj.empty(), ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme());
 
     <View accessibilityRole=`header>
@@ -129,7 +129,7 @@ module H4 = {
 
 module H5 = {
   [@react.component]
-  let make = (~props=Js.Obj.empty(), ~children) => {
+  let make = (~props as _=Js.Obj.empty(), ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme());
 
     <View accessibilityRole=`header>
@@ -151,7 +151,7 @@ module H5 = {
 
 module H6 = {
   [@react.component]
-  let make = (~props=Js.Obj.empty(), ~children) => {
+  let make = (~props as _=Js.Obj.empty(), ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme());
 
     <View accessibilityRole=`header>
@@ -172,7 +172,7 @@ module H6 = {
 
 module P = {
   [@react.component]
-  let make = (~props=Js.Obj.empty(), ~children) => {
+  let make = (~props as _=Js.Obj.empty(), ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme());
 
     <View>
@@ -189,7 +189,7 @@ module P = {
 
 module TextNode = {
   [@react.component]
-  let make = (~props=Js.Obj.empty(), ~children) => {
+  let make = (~props as _=Js.Obj.empty(), ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme());
 
     <Text
@@ -215,14 +215,14 @@ module Image = {
 
 module Ul = {
   [@react.component]
-  let make = (~props=Js.Obj.empty(), ~children) => {
+  let make = (~props as _=Js.Obj.empty(), ~children) => {
     <View> children <Spacer /> </View>;
   };
 };
 
 module Li = {
   [@react.component]
-  let make = (~props=Js.Obj.empty(), ~bullet={j|•|j}, ~children) => {
+  let make = (~props as _=Js.Obj.empty(), ~bullet={j|•|j}, ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme());
     <View style=styles##liWrapper>
       <Text
@@ -247,18 +247,18 @@ module Br = {
   /* Platform.OS */
   /* let make = _children => {...component, render: _self => <View />}; */
   [@react.component]
-  let make = (~props=Js.Obj.empty()) =>
+  let make = (~props as _=Js.Obj.empty()) =>
     <Text style=Theme.text##body> "\n"->React.string </Text>;
 };
 
 module Hr = {
   [@react.component]
-  let make = (~props=Js.Obj.empty()) => <View style=styles##hr />;
+  let make = (~props as _=Js.Obj.empty()) => <View style=styles##hr />;
 };
 
 module Details = {
   [@react.component]
-  let make = (~props=Js.Obj.empty(), ~summary, ~children) => {
+  let make = (~props as _=Js.Obj.empty(), ~summary, ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme());
 
     let (isExpanded, setIsExpanded) = React.useState(() => false);
