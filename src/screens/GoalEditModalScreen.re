@@ -11,7 +11,7 @@ let make =
   let (settings, setSettings) = React.useContext(AppSettings.context);
   let theme = Theme.useTheme(AppSettings.useTheme());
 
-  let safeAreaInsets = ReactNativeSafeAreaContext.useSafeArea();
+  let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets();
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
 
   let goalId =
@@ -59,10 +59,10 @@ let make =
       contentContainerStyle=Style.(
         viewStyle(
           // no top, handled by modal
-          // ~paddingTop=safeAreaInsets##top->dp,
-          ~paddingBottom=safeAreaInsets##bottom->dp,
-          ~paddingLeft=safeAreaInsets##left->dp,
-          ~paddingRight=safeAreaInsets##right->dp,
+          // ~paddingTop=safeAreaInsets.top->dp,
+          ~paddingBottom=safeAreaInsets.bottom->dp,
+          ~paddingLeft=safeAreaInsets.left->dp,
+          ~paddingRight=safeAreaInsets.right->dp,
           (),
         )
       )

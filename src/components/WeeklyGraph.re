@@ -101,7 +101,7 @@ let make =
   let (width, setWidth) = React.useState(() => 0.);
   let onLayout =
     React.useCallback0((layoutEvent: Event.layoutEvent) => {
-      let width = layoutEvent##nativeEvent##layout##width;
+      let width = layoutEvent##nativeEvent.layout.width;
       setWidth(_ => width);
     });
 

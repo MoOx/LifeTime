@@ -14,7 +14,7 @@ let make =
   let (layout, setLayout) = React.useState(() => None);
   let onLayout =
     React.useCallback0((layoutEvent: Event.layoutEvent) => {
-      let layout = layoutEvent##nativeEvent##layout;
+      let layout = layoutEvent##nativeEvent.layout;
       setLayout(_ => Some(layout));
     });
 
@@ -28,7 +28,7 @@ let make =
 
   let length =
     switch (layout) {
-    | Some(layout) => isRow ? layout##width : layout##height
+    | Some(layout) => isRow ? layout.width : layout.height
     | None => 0.
     };
   let n = ceil(length /. (dashGap +. dashLength))->int_of_float;

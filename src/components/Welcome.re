@@ -95,7 +95,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
             ),
           ),
         |],
-        {"stopTogether": false},
+        {stopTogether: false},
       )
       ->Animation.start()
     );

@@ -4,7 +4,7 @@ open ReactMultiversal;
 [@react.component]
 let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme(AppSettings.useTheme());
-  let safeAreaInsets = ReactNativeSafeAreaContext.useSafeArea();
+  let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets();
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
     <StatusBar barStyle={Theme.statusBarStyle(theme.mode, `darkContent)} />
@@ -27,10 +27,10 @@ let make = (~navigation, ~route as _) => {
           list([
             Predefined.styles##flexGrow,
             viewStyle(
-              ~marginTop=safeAreaInsets##top->dp,
+              ~marginTop=safeAreaInsets.top->dp,
               // no bottom, handled by bottom tabs
-              ~paddingLeft=safeAreaInsets##left->dp,
-              ~paddingRight=safeAreaInsets##right->dp,
+              ~paddingLeft=safeAreaInsets.left->dp,
+              ~paddingRight=safeAreaInsets.right->dp,
               (),
             ),
           ])

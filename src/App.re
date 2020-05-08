@@ -11,7 +11,7 @@ module StatsStackScreen = {
   open Navigators;
 
   [@react.component]
-  let make = (~navigation as _) => {
+  let make = (~navigation as _, ~route as _) => {
     let theme = Theme.useTheme(AppSettings.useTheme());
     <StatsStack.Navigator
       screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
@@ -49,7 +49,7 @@ module GoalsStackScreen = {
   open Navigators;
 
   [@react.component]
-  let make = (~navigation as _) => {
+  let make = (~navigation as _, ~route as _) => {
     <GoalsStack.Navigator
       screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
       <GoalsStack.Screen
@@ -65,7 +65,7 @@ module SettingsStackScreen = {
   open Navigators;
 
   [@react.component]
-  let make = (~navigation as _) => {
+  let make = (~navigation as _, ~route as _) => {
     <SettingsStack.Navigator
       screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
       <SettingsStack.Screen
@@ -251,7 +251,7 @@ let app = () => {
       <Calendars.ContextProvider value=calendarsContextValue>
         {initialStateContainer
          ->Option.map(initialState =>
-             <Native.NavigationNativeContainer
+             <Native.NavigationContainer
                ?initialState
                onStateChange={state => {
                  let maybeJsonState = Js.Json.stringifyAny(state);
@@ -266,7 +266,7 @@ let app = () => {
                  };
                }}>
                <RootNavigator />
-             </Native.NavigationNativeContainer>
+             </Native.NavigationContainer>
            )
          ->Option.getWithDefault(React.null)}
         <Bootsplash isReady />

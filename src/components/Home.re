@@ -2,6 +2,7 @@ open Belt;
 open ReactNative;
 open ReactMultiversal;
 open ReasonDateFns;
+open VirtualizedList;
 
 let title = "Your LifeTime";
 
@@ -19,7 +20,7 @@ let make =
     React.useContext(Calendars.context);
   let theme = Theme.useTheme(AppSettings.useTheme());
   let windowDimensions = Dimensions.useWindowDimensions();
-  let styleWidth = Style.(style(~width=windowDimensions##width->dp, ()));
+  let styleWidth = Style.(style(~width=windowDimensions.width->dp, ()));
 
   React.useEffect1(
     () => {
@@ -101,15 +102,15 @@ let make =
     React.useMemo1(
       ((), _items, index) =>
         {
-          "length": windowDimensions##width,
-          "offset": windowDimensions##width *. index->float,
-          "index": index,
+          length: windowDimensions.width,
+          offset: windowDimensions.width *. index->float,
+          index,
         },
-      [|windowDimensions##width|],
+      [|windowDimensions.width|],
     );
 
-  let renderItem = renderItemProps => {
-    let (currentStartDate, currentSupposedEndDate) = renderItemProps##item;
+  let renderItem = (renderItemProps: renderItemProps('a)) => {
+    let (currentStartDate, currentSupposedEndDate) = renderItemProps.item;
     <WeeklyBarChart
       today
       todayFirst
@@ -126,9 +127,9 @@ let make =
 
   let onViewableItemsChanged =
     React.useRef(itemsChanged =>
-      if (itemsChanged##viewableItems->Array.length == 1) {
-        itemsChanged##viewableItems[0]
-        ->Option.map(wrapper => setCurrentDates(_ => wrapper##item))
+      if (itemsChanged.viewableItems->Array.length == 1) {
+        itemsChanged.viewableItems[0]
+        ->Option.map(wrapper => setCurrentDates(_ => wrapper.item))
         ->ignore;
       }
     );
@@ -293,7 +294,7 @@ let make =
     React.useState(() => None);
   let onMessageNoEventsLayout =
     React.useCallback0((layoutEvent: Event.layoutEvent) => {
-      let height = layoutEvent##nativeEvent##layout##height;
+      let height = layoutEvent##nativeEvent.layout.height;
       setOnMessageNoEventsHeight(_ => Some(height));
     });
   let animatedMessageNoEventsHeight =
@@ -338,7 +339,7 @@ let make =
                   ),
                 ),
               |],
-              {"stopTogether": false},
+              {stopTogether: false},
             )
             ->Animation.start()
           )
@@ -535,7 +536,7 @@ let make =
       </View>
       <Separator style=theme.styles##separatorOnBackground />
       <FlatList
-        ref=flatListRef
+        ref={flatListRef->Ref.value}
         horizontal=true
         pagingEnabled=true
         showsHorizontalScrollIndicator=false
