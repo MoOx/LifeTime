@@ -278,8 +278,11 @@ let make = (~initialGoal: Goal.t, ~onChange, ~onDelete) => {
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>
       <SpacedView style=Predefined.styles##rowSpaceBetween>
-        {days
-         ->Array.mapWithIndex((index, dayOn) =>
+        {let firstDayOfWeek = Date.firstDayOfWeek();
+         days
+         ->Array.sliceToEnd(firstDayOfWeek)
+         ->Array.concat(days->Array.slice(~offset=0, ~len=firstDayOfWeek))
+         ->Array.mapWithIndex((index, dayOn) => {
              <TouchableWithoutFeedback
                key={index->string_of_int}
                onPress={_ =>
@@ -295,7 +298,10 @@ let make = (~initialGoal: Goal.t, ~onChange, ~onDelete) => {
                      Theme.text##caption1,
                      theme.styles##textVeryLightOnBackground,
                    ])}>
-                   {index->float->Date.dayShortString->React.string}
+                   {((index + firstDayOfWeek) mod 7)
+                    ->float
+                    ->Date.dayShortString
+                    ->React.string}
                  </Text>
                  <Spacer size=XXS />
                  {if (!dayOn) {
@@ -313,7 +319,7 @@ let make = (~initialGoal: Goal.t, ~onChange, ~onDelete) => {
                   }}
                </View>
              </TouchableWithoutFeedback>
-           )
+           })
          ->React.array}
       </SpacedView>
     </View>

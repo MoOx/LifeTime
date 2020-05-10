@@ -54,16 +54,10 @@ let make =
   );
 
   let today = React.useRef(Date.now());
-  let todayDates =
-    React.useRef(
-      Date.weekDates(~firstDayOfWeekIndex=1, today->React.Ref.current),
-    );
+  let todayDates = React.useRef(Date.weekDates(today->React.Ref.current));
   let previousDates =
     React.useRef(
-      Date.weekDates(
-        ~firstDayOfWeekIndex=1,
-        today->React.Ref.current->Date.addDays(-7),
-      ),
+      Date.weekDates(today->React.Ref.current->Date.addDays(-7)),
     );
 
   let weeks =
@@ -71,7 +65,6 @@ let make =
       Array.range(0, 5)
       ->Array.map(currentWeekReverseIndex =>
           Date.weekDates(
-            ~firstDayOfWeekIndex=1,
             today
             ->React.Ref.current
             ->Date.addDays(- currentWeekReverseIndex * 7),

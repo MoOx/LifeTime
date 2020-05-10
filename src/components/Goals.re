@@ -12,10 +12,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
   let theme = Theme.useTheme(AppSettings.useTheme());
 
   let today = React.useRef(Date.now());
-  let todayDates =
-    React.useRef(
-      Date.weekDates(~firstDayOfWeekIndex=1, today->React.Ref.current),
-    );
+  let todayDates = React.useRef(Date.weekDates(today->React.Ref.current));
   let (startDate, supposedEndDate) = todayDates->React.Ref.current;
   let endDate = supposedEndDate->Date.min(today->React.Ref.current);
   let endDateTonight = endDate->Date.endOfDay;

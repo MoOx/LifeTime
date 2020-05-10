@@ -51,6 +51,7 @@
     "react-native-calendar-events": "^1.7.3",
     "react-native-dark-mode": "^0.2.1",
     "react-native-gesture-handler": "^1.6.0",
+    "react-native-localize": "^1.4.0",
     "react-native-permissions": "^2.0.8",
     "react-native-reanimated": "^1.8.0",
     "react-native-redash": "^9.6.0",

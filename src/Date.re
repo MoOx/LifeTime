@@ -126,23 +126,199 @@ let addDays = (date, numberOfDays) => {
   d;
 };
 
-let firstDayOfWeek = (~firstDayOfWeekIndex: int=1, givenDate: t) => {
-  let dayOfWeek = givenDate->getDay->int_of_float;
-  let firstDayOfWeek = givenDate->copy;
-  let diff =
-    dayOfWeek >= firstDayOfWeekIndex
-      ? dayOfWeek - firstDayOfWeekIndex : 6 - dayOfWeek;
+// https://github.com/react-native-community/react-native-localize/issues/88
+let startsOnFriday = [|"MV"|];
+let startsOnSaturday = [|
+  "AE",
+  "AF",
+  "BH",
+  "DJ",
+  "DZ",
+  "EG",
+  "IQ",
+  "IR",
+  "JO",
+  "KW",
+  "LY",
+  "OM",
+  "QA",
+  "SD",
+  "SY",
+|];
 
-  firstDayOfWeek->setDate(givenDate->getDate -. diff->float)->ignore;
-  firstDayOfWeek
+let startsOnSunday = [|
+  "AG",
+  "AS",
+  "AU",
+  "BD",
+  "BR",
+  "BS",
+  "BT",
+  "BW",
+  "BZ",
+  "CA",
+  "CN",
+  "CO",
+  "DM",
+  "DO",
+  "ET",
+  "GB",
+  "GT",
+  "GU",
+  "HK",
+  "HN",
+  "ID",
+  "IL",
+  "IN",
+  "JM",
+  "JP",
+  "KE",
+  "KH",
+  "KR",
+  "LA",
+  "MH",
+  "MM",
+  "MO",
+  "MT",
+  "MX",
+  "MZ",
+  "NI",
+  "NP",
+  "PA",
+  "PE",
+  "PH",
+  "PK",
+  "PR",
+  "PT",
+  "PY",
+  "SA",
+  "SG",
+  "SV",
+  "TH",
+  "TT",
+  "TW",
+  "UM",
+  "US",
+  "VE",
+  "VI",
+  "WS",
+  "YE",
+  "ZA",
+  "ZW",
+|];
+
+// not needed as this becomes the default
+/*
+ let startsOnMonday = [|
+   "AD",
+   "AI",
+   "AL",
+   "AM",
+   "AN",
+   "AR",
+   "AT",
+   "AX",
+   "AZ",
+   "BA",
+   "BE",
+   "BG",
+   "BM",
+   "BN",
+   "BY",
+   "CH",
+   "CL",
+   "CM",
+   "CR",
+   "CY",
+   "CZ",
+   "DE",
+   "DK",
+   "EC",
+   "EE",
+   "ES",
+   "FI",
+   "FJ",
+   "FO",
+   "FR",
+   "GB",
+   "GE",
+   "GF",
+   "GP",
+   "GR",
+   "HR",
+   "HU",
+   "IE",
+   "IS",
+   "IT",
+   "KG",
+   "KZ",
+   "LB",
+   "LI",
+   "LK",
+   "LT",
+   "LU",
+   "LV",
+   "MC",
+   "MD",
+   "ME",
+   "MK",
+   "MN",
+   "MQ",
+   "MY",
+   "NL",
+   "NO",
+   "NZ",
+   "PL",
+   "RE",
+   "RO",
+   "RS",
+   "RU",
+   "SE",
+   "SI",
+   "SK",
+   "SM",
+   "TJ",
+   "TM",
+   "TR",
+   "UA",
+   "UY",
+   "UZ",
+   "VA",
+   "VN",
+   "XK",
+ |];
+ */
+let firstDayOfWeek = () => {
+  open Js.Array2;
+  let country = ReactNativeLocalize.getCountry();
+  if (startsOnFriday->includes(country)) {
+    5;
+  } else if (startsOnSaturday->includes(country)) {
+    6;
+  } else if (startsOnSunday->includes(country)) {
+    0;
+  } else {
+    1;
+  };
+};
+
+let firstDayOfWeekDate = (givenDate: t) => {
+  let dayOfWeek = givenDate->getDay->int_of_float;
+  let firstDayOfWeekDate = givenDate->copy;
+  let firstDayOfWeek = firstDayOfWeek();
+  let diff =
+    dayOfWeek >= firstDayOfWeek ? dayOfWeek - firstDayOfWeek : 6 - dayOfWeek;
+
+  firstDayOfWeekDate->setDate(givenDate->getDate -. diff->float)->ignore;
+  firstDayOfWeekDate
   ->setHoursMSMs(~hours=0., ~minutes=0., ~seconds=0., ~milliseconds=0., ())
   ->ignore;
 
-  firstDayOfWeek;
+  firstDayOfWeekDate;
 };
 
-let lastDayOfWeek = (~firstDayOfWeekIndex: int=1, givenDate: t) => {
-  let fdow = firstDayOfWeek(~firstDayOfWeekIndex, givenDate);
+let lastDayOfWeekDate = (givenDate: t) => {
+  let fdow = firstDayOfWeekDate(givenDate);
   makeWithYMDHMS(
     ~year=fdow->getFullYear,
     ~month=fdow->getMonth,
@@ -184,11 +360,8 @@ let max = (d1, d2) =>
     d2;
   };
 
-let weekDates = (~firstDayOfWeekIndex: int=1, date) => {
-  (
-    firstDayOfWeek(~firstDayOfWeekIndex, date),
-    lastDayOfWeek(~firstDayOfWeekIndex, date),
-  );
+let weekDates = date => {
+  (firstDayOfWeekDate(date), lastDayOfWeekDate(date));
 };
 
 let startOfDay = date => {
