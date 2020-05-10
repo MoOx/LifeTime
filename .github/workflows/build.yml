@@ -2,16 +2,16 @@ name: Build
 on: [push, pull_request]
 jobs:
   build:
-    runs-on: ubuntu-latest
-    container:
-      image: node:lts
-      options: --privileged
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6
       - run: yarn install --non-interactive --frozen-lockfile
-      # update fs.inotify.max_user_watches to avoid "Error: ENOSPC: System limit for number of file watchers reached"
-      # that pop during react-native bundle
-      - run: echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
       - run: yarn test
         env:
           CI: true
