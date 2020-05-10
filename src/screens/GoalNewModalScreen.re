@@ -38,9 +38,8 @@ let make =
 
   let type_ =
     route.params
-    ->Option.flatMap(params =>
-        params.newGoalType->Option.flatMap(t => t->Goal.Type.fromSerialized)
-      );
+    ->Option.flatMap(params => params.newGoalType)
+    ->Option.getWithDefault(Goal.Type.Goal->Goal.Type.toSerialized);
   <>
     <StatusBar barStyle=`lightContent />
     <Animated.ScrollView
@@ -82,7 +81,7 @@ let make =
         color={theme.colors.blue}
         color2={theme.colors.blue}
         textStyle=theme.styles##textOnBackground
-        title=GoalNew.title
+        title="New Goal"
         left={({color, defaultStyle}) =>
           <TouchableOpacity
             onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
@@ -119,7 +118,10 @@ let make =
         }
       />
       <Spacer size=XL />
-      <GoalNew ?type_ onChange={goal => setGoal(_ => goal)} />
+      <GoalEdit
+        initialGoal={...Goal.undefined, type_}
+        onChange={goal => setGoal(_ => goal)}
+      />
     </Animated.ScrollView>
   </>;
 };
