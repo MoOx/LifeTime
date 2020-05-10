@@ -309,12 +309,13 @@ let make =
          ->Array.sliceToEnd(firstDayOfWeek)
          ->Array.concat(days->Array.slice(~offset=0, ~len=firstDayOfWeek))
          ->Array.mapWithIndex((index, dayOn) => {
+             let day = (index + firstDayOfWeek) mod 7;
              <TouchableWithoutFeedback
                key={index->string_of_int}
                onPress={_ =>
                  setDays(days => {
                    let cp = days->Array.copy;
-                   cp->Array.set(index, !dayOn)->ignore;
+                   cp->Array.set(day, !dayOn)->ignore;
                    cp;
                  })
                }>
@@ -324,10 +325,7 @@ let make =
                      Theme.text##caption1,
                      theme.styles##textVeryLightOnBackground,
                    ])}>
-                   {((index + firstDayOfWeek) mod 7)
-                    ->float
-                    ->Date.dayShortString
-                    ->React.string}
+                   {day->float->Date.dayShortString->React.string}
                  </Text>
                  <Spacer size=XXS />
                  {if (!dayOn) {
@@ -344,7 +342,7 @@ let make =
                     />;
                   }}
                </View>
-             </TouchableWithoutFeedback>
+             </TouchableWithoutFeedback>;
            })
          ->React.array}
       </SpacedView>
