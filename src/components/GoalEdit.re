@@ -20,7 +20,6 @@ let make =
       ~onChange,
       ~onDelete=?,
     ) => {
-  Js.log(("initialGoal", initialGoal));
   let (settings, _setSettings) = React.useContext(AppSettings.context);
 
   let theme = Theme.useTheme(AppSettings.useTheme());
@@ -29,7 +28,6 @@ let make =
     React.useState(() =>
       initialGoal->Option.map(g => g.title)->Option.getWithDefault("")
     );
-  Js.log(("title", title));
   let (type_, setType) =
     React.useState(() =>
       initialGoal
