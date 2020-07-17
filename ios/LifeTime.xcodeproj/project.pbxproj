@@ -10,7 +10,6 @@
 		00E356F31AD99517003FC87E /* LifeTimeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* LifeTimeTests.m */; };
 		11767EAB2FC3382CFF5DBC0C /* libPods-LifeTime-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E2C72916AEA2FC273730B9A /* libPods-LifeTime-tvOSTests.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
-		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		22AA6D95A2FA8B149FD99C4F /* libPods-LifeTime-LifeTimeTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7400B171A26F61BB093FE1DF /* libPods-LifeTime-LifeTimeTests.a */; };
@@ -20,12 +19,9 @@
 		2DCD954D1E0B4F2C00145EB5 /* LifeTimeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* LifeTimeTests.m */; };
 		3E553368A17D8B5C9CED4ED7 /* libPods-LifeTime-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A8B711944F2FBF952527E3F4 /* libPods-LifeTime-tvOS.a */; };
 		64AA001D65274E86C70727D4 /* libPods-LifeTime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CF9C661A53A1D74910D3874 /* libPods-LifeTime.a */; };
-		7E71DFDB24C19E48005D6EE1 /* LifeTime.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 7E71DFDA24C19E48005D6EE1 /* LifeTime.xcconfig */; };
-		7E71DFDC24C19E48005D6EE1 /* LifeTime.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 7E71DFDA24C19E48005D6EE1 /* LifeTime.xcconfig */; };
-		7E71DFDD24C19E48005D6EE1 /* LifeTime.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 7E71DFDA24C19E48005D6EE1 /* LifeTime.xcconfig */; };
-		7E71DFDE24C19E48005D6EE1 /* LifeTime.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 7E71DFDA24C19E48005D6EE1 /* LifeTime.xcconfig */; };
+		7E44D65F24C1D4990052B1A3 /* Gradient.png in Resources */ = {isa = PBXBuildFile; fileRef = 7E44D65D24C1D4990052B1A3 /* Gradient.png */; };
+		7E44D66124C1D5470052B1A3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E44D66024C1D5470052B1A3 /* LaunchScreen.storyboard */; };
 		7EF095F423A2D5CE0030AFF6 /* Icon-transparent.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EF095F323A2D5CE0030AFF6 /* Icon-transparent.png */; };
-		7EF095F623A2D5E60030AFF6 /* Gradient.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EF095F523A2D5E60030AFF6 /* Gradient.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +52,6 @@
 		13B07F961A680F5B00A75B9A /* LifeTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LifeTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = LifeTime/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = LifeTime/AppDelegate.m; sourceTree = "<group>"; };
-		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = LifeTime/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = LifeTime/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = LifeTime/main.m; sourceTree = "<group>"; };
@@ -68,10 +63,11 @@
 		459F4DC83EFF62E731BB0B1B /* Pods-LifeTime-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-LifeTime-tvOSTests/Pods-LifeTime-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		6E96C932B3892BA8B27D96D4 /* Pods-LifeTime-LifeTimeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-LifeTimeTests.debug.xcconfig"; path = "Target Support Files/Pods-LifeTime-LifeTimeTests/Pods-LifeTime-LifeTimeTests.debug.xcconfig"; sourceTree = "<group>"; };
 		7400B171A26F61BB093FE1DF /* libPods-LifeTime-LifeTimeTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LifeTime-LifeTimeTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E44D65D24C1D4990052B1A3 /* Gradient.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Gradient.png; path = LifeTime/Gradient.png; sourceTree = "<group>"; };
+		7E44D66024C1D5470052B1A3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = LifeTime/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7E4A430B245C81460005A203 /* LifeTime-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LifeTime-Bridging-Header.h"; sourceTree = "<group>"; };
 		7E71DFDA24C19E48005D6EE1 /* LifeTime.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = LifeTime.xcconfig; sourceTree = "<group>"; };
-		7EF095F323A2D5CE0030AFF6 /* Icon-transparent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-transparent.png"; path = "../public/Icon-transparent.png"; sourceTree = "<group>"; };
-		7EF095F523A2D5E60030AFF6 /* Gradient.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Gradient.png; path = ../public/Gradient.png; sourceTree = "<group>"; };
+		7EF095F323A2D5CE0030AFF6 /* Icon-transparent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-transparent.png"; path = "LifeTime/Icon-transparent.png"; sourceTree = "<group>"; };
 		9A9B67576FA914BBC7BC494A /* Pods-LifeTime-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-LifeTime-tvOSTests/Pods-LifeTime-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9CF9C661A53A1D74910D3874 /* libPods-LifeTime.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LifeTime.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8B711944F2FBF952527E3F4 /* libPods-LifeTime-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LifeTime-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -137,9 +133,9 @@
 		13B07FAE1A68108700A75B9A /* LifeTime */ = {
 			isa = PBXGroup;
 			children = (
-				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
+				7E44D66024C1D5470052B1A3 /* LaunchScreen.storyboard */,
+				7E44D65D24C1D4990052B1A3 /* Gradient.png */,
 				7EF095F323A2D5CE0030AFF6 /* Icon-transparent.png */,
-				7EF095F523A2D5E60030AFF6 /* Gradient.png */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -302,7 +298,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1150;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
@@ -354,7 +350,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E71DFDC24C19E48005D6EE1 /* LifeTime.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,11 +357,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E71DFDB24C19E48005D6EE1 /* LifeTime.xcconfig in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				7EF095F623A2D5E60030AFF6 /* Gradient.png in Resources */,
+				7E44D65F24C1D4990052B1A3 /* Gradient.png in Resources */,
+				7E44D66124C1D5470052B1A3 /* LaunchScreen.storyboard in Resources */,
 				7EF095F423A2D5CE0030AFF6 /* Icon-transparent.png in Resources */,
-				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -375,7 +369,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */,
-				7E71DFDD24C19E48005D6EE1 /* LifeTime.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,7 +376,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E71DFDE24C19E48005D6EE1 /* LifeTime.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -596,23 +588,12 @@
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXVariantGroup section */
-		13B07FB11A68108700A75B9A /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				13B07FB21A68108700A75B9A /* Base */,
-			);
-			name = LaunchScreen.xib;
-			path = LifeTime;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 6E96C932B3892BA8B27D96D4 /* Pods-LifeTime-LifeTimeTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -636,6 +617,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0AB51CF5FBECD9FE437A79FE /* Pods-LifeTime-LifeTimeTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = LifeTimeTests/Info.plist;

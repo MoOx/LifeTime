@@ -45,7 +45,8 @@ static void InitializeFlipper(UIApplication *application) {
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
-  [RNBootSplash show:@"LaunchScreen" inView:rootView];
+
+  [RNBootSplash initWithStoryboard:@"LaunchScreen" rootView:rootView];
   return YES;
 }
 
