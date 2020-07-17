@@ -212,6 +212,8 @@ let make =
           />,
         |],
       ))
+    | (Some(OnlyAllDays), Some(None))
+    | (Some(None), Some(OnlyAllDays))
     | (Some(OnlyAllDays), Some(OnlyAllDays)) =>
       Some((
         "LifeTime could not find any relevent events on the last two weeks. All day events are not suitable for time tracking.",
@@ -229,6 +231,8 @@ let make =
           />,
         |],
       ))
+    | (Some(OnlySkippedCalendars), Some(None))
+    | (Some(None), Some(OnlySkippedCalendars))
     | (Some(OnlySkippedCalendars), Some(OnlySkippedCalendars)) =>
       Some((
         "LifeTime could not find any recent events that aren't part of skipped calendars.",
@@ -246,6 +250,8 @@ let make =
           />,
         |],
       ))
+    | (Some(OnlySkippedActivities), Some(None))
+    | (Some(None), Some(OnlySkippedActivities))
     | (Some(OnlySkippedActivities), Some(OnlySkippedActivities))
         when settings.activitiesSkippedFlag =>
       Some((
