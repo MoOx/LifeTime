@@ -31,10 +31,27 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
       ->Calendars.mapCategoryDuration(settings)
     );
 
+  let (debug, setDebug) = React.useState(() => false);
+
   <>
     <SpacedView>
       <TitlePre> " "->React.string </TitlePre>
-      <Title style=theme.styles##textOnBackground> title->React.string </Title>
+      <View style=Predefined.styles##rowSpaceBetween>
+        <Title style=theme.styles##textOnBackground>
+          title->React.string
+        </Title>
+        {Global.__DEV__
+           ? <TouchableOpacity onPress={_ => setDebug(debug => !debug)}>
+               <View style={Style.style(~opacity=0.25, ())}>
+                 <SVGScope
+                   width={24.->Style.dp}
+                   height={24.->Style.dp}
+                   fill="#f00"
+                 />
+               </View>
+             </TouchableOpacity>
+           : React.null}
+      </View>
     </SpacedView>
     <SpacedView vertical=None horizontal=S>
       <Text
@@ -54,7 +71,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
       </Text>
     </SpacedView>
     <SpacedView horizontal=XS>
-      {!Global.__DEV__
+      {!debug
          ? React.null
          : <Text
              style=Style.(
@@ -239,7 +256,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                )
                horizontal=M
                vertical=S>
-               {!Global.__DEV__
+               {!debug
                   ? React.null
                   : <View
                       style=Style.(
