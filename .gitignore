@@ -95,3 +95,12 @@ yarn-error.log*
 src/SVGs/components
 # markdown-to-json compiled json
 src/md/*.json
+
+# sensitive information
+ios/*.xcconfig
+fastlane/AppFile
+fastlane/MatchFile
+# useless
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
