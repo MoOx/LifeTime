@@ -41,6 +41,7 @@
     "@reason-react-native/permissions": "^2.0.0",
     "@reason-react-native/safe-area-context": "https://github.com/reason-react-native/safe-area-context.git#cd84a5c",
     "@reason-react-native/slider": "https://github.com/reason-react-native/slider#3789031",
+    "@sentry/react-native": "^1.6.2",
     "bs-tinycolor": "^2.0.1",
     "date-fns": "^2.8.1",
     "react": "16.11.0",

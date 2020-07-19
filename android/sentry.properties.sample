@@ -1,0 +1,4 @@
+defaults.url=https://sentry.io/
+defaults.org=moox
+defaults.project=lifetime
+auth.token=12345679
