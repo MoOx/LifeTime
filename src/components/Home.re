@@ -293,7 +293,7 @@ let make =
     React.useState(() => None);
   let onMessageNoEventsLayout =
     React.useCallback0((layoutEvent: Event.layoutEvent) => {
-      let height = layoutEvent##nativeEvent.layout.height;
+      let height = layoutEvent.nativeEvent.layout.height;
       setOnMessageNoEventsHeight(_ => Some(height));
     });
   let animatedMessageNoEventsHeight =

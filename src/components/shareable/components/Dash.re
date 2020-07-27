@@ -14,7 +14,7 @@ let make =
   let (layout, setLayout) = React.useState(() => None);
   let onLayout =
     React.useCallback0((layoutEvent: Event.layoutEvent) => {
-      let layout = layoutEvent##nativeEvent.layout;
+      let layout = layoutEvent.nativeEvent.layout;
       setLayout(_ => Some(layout));
     });
 

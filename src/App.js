@@ -1,3 +1,5 @@
+import 'react-native-gesture-handler';
+
 import * as Sentry from '@sentry/react-native';
 
 Sentry.init({

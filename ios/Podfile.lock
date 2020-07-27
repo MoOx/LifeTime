@@ -239,7 +239,7 @@ PODS:
     - React
   - react-native-calendar-events (1.7.3):
     - React
-  - react-native-safe-area-context (1.0.0-beta.2):
+  - react-native-safe-area-context (3.1.1):
     - React
   - react-native-slider (2.0.9):
     - React
@@ -316,9 +316,9 @@ PODS:
     - React
   - RNPermissions (2.1.4):
     - React
-  - RNReanimated (1.8.0):
+  - RNReanimated (1.9.0):
     - React
-  - RNScreens (2.7.0):
+  - RNScreens (2.9.0):
     - React
   - RNSentry (1.6.2):
     - React
@@ -526,7 +526,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
   react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
   react-native-calendar-events: eaa63134881d97488feb21ea114158f712894018
-  react-native-safe-area-context: d480295e19c27f5bc211bf5e31d4ef4fdac2f0e2
+  react-native-safe-area-context: 344b969c45af3d8464d36e8dea264942992ef033
   react-native-slider: e51492f1264d882a8815b71c5870f8978e52887d
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
@@ -545,8 +545,8 @@ SPEC CHECKSUMS:
   RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
   RNLocalize: b6df30cc25ae736d37874f9bce13351db2f56796
   RNPermissions: 3635b407c15f2fe591bd2101c8f20aa0912caba8
-  RNReanimated: 955cf4068714003d2f1a6e2bae3fb1118f359aff
-  RNScreens: cf198f915f8a2bf163de94ca9f5bfc8d326c3706
+  RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
+  RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
   RNSentry: 9d68f0ce79608e90e10ac320c409321efc114b8f
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   Sentry: 81f7f2bd3cb041137ea7efcde3aa5ad0d5a67632
