@@ -40,7 +40,7 @@ let useCalendars = updater => {
     () => {
       findCalendars()
       ->FutureJs.fromPromise(error => {
-          // @todo ?
+          // @todo error!
           Js.log(error);
           error;
         })
@@ -113,7 +113,7 @@ let useEvents = () => {
               None,
             )
             ->FutureJs.fromPromise(error => {
-                // @todo ?
+                // @todo error!
                 Js.log(error);
                 error;
               })

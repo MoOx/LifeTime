@@ -211,7 +211,7 @@ let app = () => {
       if (initialStateContainer->Option.isNone) {
         ReactNativeAsyncStorage.getItem(navigationStateStorageKey)
         ->FutureJs.fromPromise(error => {
-            // @todo ?
+            // @todo error
             Js.log2("Restoring Navigation State: ", error);
             error;
           })

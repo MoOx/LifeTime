@@ -105,7 +105,7 @@ let decodeJsonSettingsOrRaise = (json: Js.Json.t): t =>
 let decodeJsonSettings = (json: Js.Json.t): Future.t(Result.t(t, string)) => {
   ReactNativeCalendarEvents.findCalendars()
   ->FutureJs.fromPromise(error => {
-      // @todo ?
+      // @todo error
       Js.log2("ReactNativeCalendarEvents.findCalendars", error);
       "Unable to retrieve calendars before parsing settings";
     })
@@ -162,7 +162,7 @@ let storageKey = "settings";
 let getSettings = () => {
   ReactNativeAsyncStorage.getItem(storageKey)
   ->FutureJs.fromPromise(error => {
-      // @todo ?
+      // @todo error
       Js.log2("LifeTime: useSettings: ", error);
       "Unable to access settings from device";
     })

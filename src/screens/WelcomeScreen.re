@@ -20,7 +20,7 @@ let make = (~navigation, ~route as _) => {
           onContinuePress={_ => {
             ReactNativeCalendarEvents.authorizeEventStore()
             ->FutureJs.fromPromise(error => {
-                // @todo ?
+                // @todo error!
                 Js.log(error);
                 error;
               })

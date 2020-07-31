@@ -15,7 +15,7 @@ let make = (~navigation) => {
       () =>
         Clipboard.getString()
         ->FutureJs.fromPromise(error => {
-            // @todo ?
+            // @todo error!
             Js.log2("LifeTime: import: ", error);
             "Unable to read from clipboard";
           })
