@@ -97,7 +97,6 @@ src/SVGs/components
 src/md/*.json
 
 # sensitive information
-ios/*.xcconfig
 sentry.properties
 fastlane/AppFile
 fastlane/MatchFile
