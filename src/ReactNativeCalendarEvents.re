@@ -21,7 +21,7 @@ type coords = {
 /* iOS ONLY - GeoFenced alarm location */
 type alarmStructuredLocation = {
   /* The title of the location. */
-  title: string,
+  title: option(string),
   /* A value indicating how a location-based alarm is triggered. */
   proximity: string, // [@bs.string] [ | `enter | `leave | `none],
   /* A minimum distance from the core location that would trigger the calendar event's alarm. */
@@ -39,7 +39,7 @@ type options = {
 
 type alarm = {
   /* When saving an event, if a Date is given, an alarm will be set with an absolute date. If a float is given, an alarm will be set with a relative offset (in minutes) from the start date. When reading an event this will always be an ISO Date string */
-  date: isoDateString,
+  date: option(isoDateString),
   /* iOS ONLY - The location to trigger an alarm. */
   structuredLocation: option(alarmStructuredLocation),
 };
