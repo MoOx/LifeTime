@@ -11246,9 +11246,10 @@ react-native-bootsplash@^2.0.0:
     jimp "0.14.0"
     prompts "2.3.2"
 
-"react-native-calendar-events@https://github.com/wmcmahan/react-native-calendar-events.git#504ccff":
+react-native-calendar-events@^2.0.0:
   version "2.0.0"
-  resolved "https://github.com/wmcmahan/react-native-calendar-events.git#504ccff10dd40f460137ee00b2c9ae38a12aa177"
+  resolved "https://registry.yarnpkg.com/react-native-calendar-events/-/react-native-calendar-events-2.0.0.tgz#908670877e263d3703566e7bfef68ee0f6b96806"
+  integrity sha512-bN8CpJfSk2ii2mxTmdqqqQ+UYovLThdlSuzxIYSznUGv+B0n09SP90IU59rgBPhPWdYQjzuY3USgpsbhObmScQ==
 
 react-native-dark-mode@^0.2.1:
   version "0.2.2"

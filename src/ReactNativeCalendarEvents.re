@@ -196,13 +196,13 @@ type calendarOptions = {
 
 /* Get calendar authorization status. */
 [@bs.module "react-native-calendar-events"] [@bs.scope "default"]
-external authorizationStatus: unit => Js.Promise.t(abs_authorizationStatus) =
-  "authorizationStatus";
+external checkPermissions: unit => Js.Promise.t(abs_authorizationStatus) =
+  "checkPermissions";
 
 /* Request calendar authorization. Authorization must be granted before accessing calendar events. */
 [@bs.module "react-native-calendar-events"] [@bs.scope "default"]
-external authorizeEventStore: unit => Js.Promise.t(abs_authorizationStatus) =
-  "authorizeEventStore";
+external requestPermissions: unit => Js.Promise.t(abs_authorizationStatus) =
+  "requestPermissions";
 
 /* Finds all the calendars on the device. */
 [@bs.module "react-native-calendar-events"] [@bs.scope "default"]

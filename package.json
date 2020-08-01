@@ -48,7 +48,7 @@
     "react-multiversal": "https://github.com/MoOx/react-multiversal#bf0f30f",
     "react-native": "^0.62.0",
     "react-native-bootsplash": "^2.0.0",
-    "react-native-calendar-events": "https://github.com/wmcmahan/react-native-calendar-events.git#504ccff",
+    "react-native-calendar-events": "^2.0.0",
     "react-native-dark-mode": "^0.2.1",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-localize": "^1.4.0",
