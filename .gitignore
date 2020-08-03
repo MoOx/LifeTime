@@ -60,13 +60,6 @@ buck-out/
 # CocoaPods
 /ios/Pods/
 
-# Ocaml / Reason / BuckleScript artifacts
-*.bs.js
-.bsb.lock
-**/lib/bs
-**/lib/ocaml
-**/.merlin
-
 ## React Web
 
 # dependencies
@@ -91,8 +84,18 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+## Custom
+
+# Ocaml / Reason / BuckleScript artifacts
+*.bs.js
+.bsb.lock
+**/lib/bs
+**/lib/ocaml
+**/.merlin
+
 # react-from-svg artifacts
 src/SVGs/components
+
 # markdown-to-json compiled json
 src/md/*.json
 
@@ -100,7 +103,11 @@ src/md/*.json
 sentry.properties
 fastlane/AppFile
 fastlane/MatchFile
+
 # useless
 fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots
+
+# iOS Build artifacts (fastlane)
+*.app.dSYM.zip
