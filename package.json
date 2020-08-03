@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "lifetime-app",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "scripts": {
     "ruby:bundle": "bundle install",
     "cocoapods:install": "cd ios && bundle exec pod install --repo-update",
@@ -24,7 +24,11 @@
     "test:bundle:ios": "react-native bundle --platform ios --dev false --minify false --entry-file index.js --bundle-output index.bundle.js && rm index.bundle.js",
     "test:bundle:android": "react-native bundle --platform android --dev false --minify false --entry-file index.js --bundle-output index.bundle.js && rm index.bundle.js",
     "test:bundle": "yarn test:bundle:ios && yarn test:bundle:android",
-    "test": "yarn lint && yarn bs:clean && yarn test:bundle"
+    "test": "yarn lint && yarn bs:clean && yarn test:bundle",
+    "release:bump:patch": "yarn version --patch --no-git-tag-version && bundle exec fastlane versionBump",
+    "release:bump:minor": "yarn version --minor --no-git-tag-version && bundle exec fastlane versionBump",
+    "release:bump:major": "yarn version --major --no-git-tag-version && bundle exec fastlane versionBump",
+    "release:tag": "VERSION=`node -e \"console.log(require('./package.json').version)\"`; git commit --all -m $VERSION; git tag -am $VERSION v$VERSION"
   },
   "dependencies": {
     "@ctrl/tinycolor": "^2.6.0",

@@ -15,16 +15,41 @@
 
 #default_platform(:ios)
 
+package = load_json(json_path: "./package.json")
+version = package["version"]
+app = load_json(json_path: "./app.json")
+appName = app["name"]
+xcodeproj = "./ios/" + appName +".xcodeproj"
+workspace = "./ios/" + appName +".xcworkspace"
+
 platform :ios do
-  desc "Push a new beta build to TestFlight"
+  desc "iOS: Push a new beta build to TestFlight"
   lane :beta do
-    increment_build_number(
-      xcodeproj: "./ios/LifeTime.xcodeproj"
+    increment_build_number_in_xcodeproj(
+      xcodeproj: xcodeproj,
+      target: appName,
     )
+    ENV["DEVELOPER_DIR"] = "/Applications/Xcode.app"
     build_app(
-      workspace: "./ios/LifeTime.xcworkspace",
-      scheme: "LifeTime",
+      workspace: workspace,
+      scheme: appName,
     )
+    # using macOS 11 beta requires to upload using xcode 12 beta
+    ENV["DEVELOPER_DIR"] = "/Applications/Xcode-12.app"
     upload_to_testflight
   end
+end
+
+desc "iOS: Bump version"
+private_lane :iosVersionBump do
+  increment_version_number_in_xcodeproj(
+    version_number: version,
+    xcodeproj: xcodeproj,
+    target: appName,
+  )
+end
+
+desc "Bump version"
+lane :versionBump do
+  iosVersionBump
 end
