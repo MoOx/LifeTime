@@ -109,7 +109,7 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t(Result.t(t, string)) => {
       Js.log2("ReactNativeCalendarEvents.findCalendars", error);
       "Unable to retrieve calendars before parsing settings";
     })
-  ->Future.flatMapOk(calendars => {
+  ->Future.flatMap(calendarsResult => {
       (
         try(Ok(json->decodeJsonSettingsOrRaise)) {
         | Json.Decode.DecodeError(_exn) =>
@@ -121,32 +121,40 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t(Result.t(t, string)) => {
           {
             theme: settings.theme,
             lastUpdated: settings.lastUpdated,
-            // ensure calendars ids are valid and reconciliate otherwise
             calendarsSkipped:
-              settings.calendarsSkipped
-              ->Array.reduce(
-                  [||],
-                  (calendarsToSkip, calendarSkipped) => {
-                    let calMatches =
-                      calendars->Array.keep(calendar =>
-                        calendar.id === calendarSkipped.id
-                        || calendar.title == calendarSkipped.title
-                        && calendar.color == calendarSkipped.color
-                      );
-                    // source can have a different name on each device
-                    // (eg a device with multiple icloud account vs a device with one)
-                    // && calendar.source == calendarSkipped.source
-                    calendarsToSkip->Array.concat(calMatches);
-                  },
-                )
-              ->Array.map(cal =>
-                  {
-                    id: cal.id,
-                    title: cal.title,
-                    source: cal.source,
-                    color: cal.color,
-                  }
-                ),
+              switch (calendarsResult) {
+              // in case we cannot read calendar (eg: permission removed?)
+              // we just pass the value along
+              | Error(err) =>
+                Js.Console.error(err);
+                settings.calendarsSkipped;
+              // ensure calendars ids are valid and reconciliate otherwise
+              | Ok(calendars) =>
+                settings.calendarsSkipped
+                ->Array.reduce(
+                    [||],
+                    (calendarsToSkip, calendarSkipped) => {
+                      let calMatches =
+                        calendars->Array.keep(calendar =>
+                          calendar.id === calendarSkipped.id
+                          || calendar.title == calendarSkipped.title
+                          && calendar.color == calendarSkipped.color
+                        );
+                      // source can have a different name on each device
+                      // (eg a device with multiple icloud account vs a device with one)
+                      // && calendar.source == calendarSkipped.source
+                      calendarsToSkip->Array.concat(calMatches);
+                    },
+                  )
+                ->Array.map(cal =>
+                    {
+                      id: cal.id,
+                      title: cal.title,
+                      source: cal.source,
+                      color: cal.color,
+                    }
+                  )
+              },
             activities: settings.activities,
             activitiesSkipped: settings.activitiesSkipped,
             activitiesSkippedFlag: settings.activitiesSkippedFlag,
