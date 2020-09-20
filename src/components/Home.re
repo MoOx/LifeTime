@@ -431,9 +431,9 @@ let make =
                    onPress={_ => {
                      Alert.(
                        alert(
-                         ~title="Don't try to escape",
+                         ~title="Let's stay motivated!",
                          ~message=
-                           "LifeTime is here to help you move foward and will reminds you what you should do."
+                           "LifeTime is here to help you move foward and can give you advices & motivate you to achieve your personal goals."
                            ++ "\n"
                            ++ "To stop seeing this message, try to fill your calendar with events or adjust settings to reveal some that are currently hidden.",
                          ~buttons=[|
