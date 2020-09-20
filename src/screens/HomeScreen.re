@@ -6,6 +6,7 @@ let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme(AppSettings.useTheme());
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets();
 
+  let (hasCalendarAccess, hasCalendarAccess_set) = React.useState(() => true);
   React.useEffect1(
     () => {
       ReactNativePermissions.(
@@ -13,17 +14,7 @@ let make = (~navigation, ~route as _) => {
         ->FutureJs.fromPromise(error => Js.log(error))
         ->Future.tapOk(status =>
             if (status != granted) {
-              // lazy load just a bit to get a nicer visual effect
-              // (otherwise navigation is kind of TOO QUICK)
-              Js.Global.setTimeout(
-                () =>
-                  navigation->Navigators.RootStack.Navigation.navigate(
-                    "WelcomeModalScreen",
-                  ),
-                100,
-              )
-              ->ignore;
-              ();
+              hasCalendarAccess_set(_ => false);
             }
           )
         ->Future.tapError(_err =>
@@ -131,5 +122,79 @@ let make = (~navigation, ~route as _) => {
         />
       </Animated.ScrollView>
     </View>
+    {hasCalendarAccess == false
+       ? <View
+           style=Style.(
+             style(
+               ~position=`absolute,
+               ~top=0.->dp,
+               ~bottom=0.->dp,
+               ~left=0.->dp,
+               ~right=0.->dp,
+               ~backgroundColor="rgba(0,0,0,0.2)",
+               ~justifyContent=`flexEnd,
+               (),
+             )
+           )>
+           <SpacedView>
+             <CalendarsPermissions
+               onAboutPrivacyPress={_ =>
+                 navigation->Navigators.RootStack.Navigation.navigate(
+                   "PrivacyModalScreen",
+                 )
+               }
+               onContinuePress={_ => {
+                 ReactNativeCalendarEvents.requestPermissions()
+                 ->FutureJs.fromPromise(error => {
+                     // @todo error!
+                     Js.log(error);
+                     error;
+                   })
+                 ->Future.tapOk(status =>
+                     switch (
+                       status->ReactNativeCalendarEvents.authorizationStatusFromJs
+                     ) {
+                     | `authorized => hasCalendarAccess_set(_ => true)
+                     | `denied
+                     | `restricted
+                     | `undetermined =>
+                       Alert.alert(
+                         ~title=
+                           "You need to allow LifeTime to access your calendars",
+                         ~message=
+                           "LifeTime app cannot work without any source of activities. Please adjust app Settings & allow calendars access.",
+                         ~buttons=[|
+                           Alert.button(
+                             ~text="Cancel",
+                             ~style=`destructive,
+                             (),
+                           ),
+                           Alert.button(
+                             ~text="Open Settings",
+                             ~style=`default,
+                             ~onPress=
+                               () =>
+                                 ReactNativePermissions.openSettings()->ignore,
+                             (),
+                           ),
+                         |],
+                         (),
+                       )
+                     }
+                   )
+                 ->Future.tapError(_err =>
+                     Alert.alert(
+                       ~title="Ooops, something bad happened",
+                       ~message=
+                         "Please report us this error with informations about your device so we can improve LifeTime.",
+                       (),
+                     )
+                   )
+                 ->ignore
+               }}
+             />
+           </SpacedView>
+         </View>
+       : React.null}
   </>;
 };
