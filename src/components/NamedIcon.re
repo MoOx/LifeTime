@@ -21,7 +21,6 @@ type t = [
   | `moonsymbol
   | `ok
   | `pennant
-  | `round
   | `scope
   | `settings
   | `sharerounded
@@ -73,7 +72,6 @@ let make =
      | `moonsymbol => <SVGMoonsymbol width height fill />
      | `ok => <SVGOk width height fill />
      | `pennant => <SVGPennant width height fill />
-     | `round => <SVGRound width height fill />
      | `scope => <SVGScope width height fill />
      | `settings => <SVGSettings width height fill />
      | `sharerounded => <SVGSharerounded width height fill />
