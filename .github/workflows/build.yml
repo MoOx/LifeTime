@@ -11,6 +11,8 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.6
+      # avoid some yarn timeout https://github.com/date-fns/date-fns/issues/1004
+      - run: yarn config set network-timeout 300000
       - run: yarn install --non-interactive --frozen-lockfile
       - run: yarn test
         env:
