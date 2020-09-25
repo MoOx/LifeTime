@@ -7,6 +7,23 @@ if (Global.__DEV__) {
   Global.unstable_enableLogBox();
 };
 
+ReactNativePushNotification.(
+  configure(
+    configureOptions(
+      ~requestPermissions=false,
+      ~popInitialNotification=true,
+      // ~onNotification=
+      //   notification => {
+      //     Js.log(("NOTIFICATION onNotification", notification));
+      //     notification.finish(
+      //       ReactNativePushNotificationIOS.FetchResult.noData,
+      //     );
+      //   },
+      (),
+    ),
+  )
+);
+
 let styles =
   Style.{"container": viewStyle(~flexGrow=1., ~backgroundColor="#fff", ())}
   ->StyleSheet.create;

@@ -1,3 +1,6 @@
 <resources>
+    <!-- @todo i18n -->
     <string name="app_name">LifeTime</string>
+    <string name="notification_channel_name">Reminders</string>
+    <string name="notification_channel_description">Notifications to coach you</string>
 </resources>

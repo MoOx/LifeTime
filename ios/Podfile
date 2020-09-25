@@ -80,7 +80,11 @@ target 'LifeTime' do
   # https://github.com/react-native-community/react-native-permissions
   permissions_path = '../node_modules/react-native-permissions/ios'
   pod 'Permission-Calendars', :path => "#{permissions_path}/Calendars.podspec"
+  pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications.podspec"
 
+  # https://github.com/zo0r/react-native-push-notification/issues/1168
+  pod 'RNCPushNotificationIOS', :path => '../node_modules/@react-native-community/push-notification-ios'
+  
   target 'LifeTimeTests' do
     inherit! :complete
     # Pods for testing

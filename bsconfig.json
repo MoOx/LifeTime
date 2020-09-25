@@ -28,6 +28,7 @@
     "@reason-react-native/async-storage",
     "@reason-react-native/slider",
     "@reason-react-native/svg",
+    "@reason-react-native/push-notification-ios",
     "bs-tinycolor"
   ]
 }

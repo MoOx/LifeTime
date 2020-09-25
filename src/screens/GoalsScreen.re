@@ -3,6 +3,7 @@ open ReactMultiversal;
 
 [@react.component]
 let make = (~navigation, ~route as _) => {
+  let (settings, _setSettings) = React.useContext(AppSettings.context);
   let theme = Theme.useTheme(AppSettings.useTheme());
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets();
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
@@ -67,6 +68,8 @@ let make = (~navigation, ~route as _) => {
           }
         />
       </Animated.ScrollView>
+      {settings.notificationsPermissionsDismissed === 0.
+         ? <NotificationsPermissionsPopin /> : React.null}
     </View>
   </>;
 };

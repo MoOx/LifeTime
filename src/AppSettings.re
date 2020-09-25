@@ -10,6 +10,7 @@ type calendarSkipped = {
 type t = {
   theme: string,
   lastUpdated: float,
+  notificationsPermissionsDismissed: float,
   calendarsSkipped: array(calendarSkipped),
   activities: array(Activities.t),
   activitiesSkipped: array(string),
@@ -34,6 +35,7 @@ let themeStringToTheme =
 let defaultSettings = {
   theme: "auto",
   lastUpdated: 0.,
+  notificationsPermissionsDismissed: 0.,
   calendarsSkipped: [||],
   activitiesSkippedFlag: true,
   activitiesSkipped: [||],
@@ -45,6 +47,8 @@ let decodeJsonSettingsOrRaise = (json: Js.Json.t): t =>
   Json.Decode.{
     theme: json |> field("theme", string),
     lastUpdated: json |> field("lastUpdated", Json.Decode.float),
+    notificationsPermissionsDismissed:
+      json |> field("notificationsPermissionsDismissed", Json.Decode.float),
     calendarsSkipped:
       json
       |> field(
@@ -121,6 +125,8 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t(Result.t(t, string)) => {
           {
             theme: settings.theme,
             lastUpdated: settings.lastUpdated,
+            notificationsPermissionsDismissed:
+              settings.notificationsPermissionsDismissed,
             calendarsSkipped:
               switch (calendarsResult) {
               // in case we cannot read calendar (eg: permission removed?)
