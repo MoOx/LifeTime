@@ -55,7 +55,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
       parallel(
         [|
           spring(
-            animatedPitchScale->React.Ref.current,
+            animatedPitchScale.current,
             Value.Spring.config(
               ~useNativeDriver=true,
               ~toValue=1.->Value.Spring.fromRawValue,
@@ -65,7 +65,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
             ),
           ),
           timing(
-            animatedPitchOpacity->React.Ref.current,
+            animatedPitchOpacity.current,
             Value.Timing.config(
               ~useNativeDriver=true,
               ~toValue=1.->Value.Timing.fromRawValue,
@@ -75,7 +75,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
             ),
           ),
           spring(
-            animatedBottomTranslateY->React.Ref.current,
+            animatedBottomTranslateY.current,
             Value.Spring.config(
               ~useNativeDriver=true,
               ~toValue=1.->Value.Spring.fromRawValue,
@@ -85,7 +85,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
             ),
           ),
           timing(
-            animatedBottomOpacity->React.Ref.current,
+            animatedBottomOpacity.current,
             Value.Timing.config(
               ~useNativeDriver=true,
               ~toValue=1.->Value.Timing.fromRawValue,
@@ -109,16 +109,10 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
           array([|
             styles##pitch,
             style(
-              ~opacity=
-                animatedPitchOpacity
-                ->React.Ref.current
-                ->Animated.StyleProp.float,
+              ~opacity=animatedPitchOpacity.current->Animated.StyleProp.float,
               ~transform=[|
                 scale(
-                  ~scale=
-                    animatedPitchScale
-                    ->React.Ref.current
-                    ->Animated.StyleProp.float,
+                  ~scale=animatedPitchScale.current->Animated.StyleProp.float,
                 ),
               |],
               (),
@@ -156,16 +150,11 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
           array([|
             styles##bottom,
             style(
-              ~opacity=
-                animatedBottomOpacity
-                ->React.Ref.current
-                ->Animated.StyleProp.float,
+              ~opacity=animatedBottomOpacity.current->Animated.StyleProp.float,
               ~transform=[|
                 translateY(
                   ~translateY=
-                    animatedBottomTranslateY
-                    ->React.Ref.current
-                    ->Animated.StyleProp.float,
+                    animatedBottomTranslateY.current->Animated.StyleProp.float,
                 ),
               |],
               (),

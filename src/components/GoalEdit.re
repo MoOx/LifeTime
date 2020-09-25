@@ -195,7 +195,7 @@ let make =
           returnKeyType=`done_
           value=title
           style=Style.(
-            list([
+            array([|
               Predefined.styles##flex,
               Theme.text##body,
               theme.styles##textOnBackground,
@@ -204,7 +204,7 @@ let make =
                 ~lineHeight=Spacer.space,
                 (),
               ),
-            ])
+            |])
           )
         />
       </SpacedView>
@@ -227,14 +227,17 @@ let make =
               <View style=Predefined.styles##row>
                 <View
                   style=Style.(
-                    list([
+                    array([|
                       Predefined.styles##flex,
                       Predefined.styles##justifyCenter,
-                    ])
+                    |])
                   )>
                   <Text
                     style=Style.(
-                      list([Theme.text##body, theme.styles##textOnBackground])
+                      array([|
+                        Theme.text##body,
+                        theme.styles##textOnBackground,
+                      |])
                     )>
                     "Goal to Reach"->React.string
                   </Text>
@@ -268,14 +271,17 @@ let make =
               <View style=Predefined.styles##row>
                 <View
                   style=Style.(
-                    list([
+                    array([|
                       Predefined.styles##flex,
                       Predefined.styles##justifyCenter,
-                    ])
+                    |])
                   )>
                   <Text
                     style=Style.(
-                      list([Theme.text##body, theme.styles##textOnBackground])
+                      array([|
+                        Theme.text##body,
+                        theme.styles##textOnBackground,
+                      |])
                     )>
                     "Limit to Respect"->React.string
                   </Text>
@@ -319,10 +325,10 @@ let make =
                }>
                <View>
                  <Text
-                   style={Style.list([
+                   style={Style.array([|
                      Theme.text##caption1,
                      theme.styles##textVeryLightOnBackground,
-                   ])}>
+                   |])}>
                    {day->float->Date.dayShortString->React.string}
                  </Text>
                  <Spacer size=XXS />
@@ -365,14 +371,14 @@ let make =
                <SpacedView vertical=XS horizontal=XS>
                  <Text
                    style=Style.(
-                     list([
+                     array([|
                        Theme.text##subhead,
                        textStyle(
                          ~color=theme.colors.blue,
                          ~fontWeight=Theme.fontWeights.semiBold,
                          (),
                        ),
-                     ])
+                     |])
                    )>
                    {(quickDuration->Js.Float.toFixed ++ "min")->React.string}
                  </Text>
@@ -385,21 +391,21 @@ let make =
       <SpacedView vertical=XS>
         <View style=Predefined.styles##rowCenter>
           <Text
-            style={Style.list([
+            style={Style.array([|
               Theme.text##caption1,
               theme.styles##textVeryLightOnBackground,
-            ])}>
+            |])}>
             "0"->React.string
           </Text>
           <Spacer size=XS />
           <View style=Predefined.styles##flex>
             <View
               style=Style.(
-                list([
+                array([|
                   StyleSheet.absoluteFill,
                   viewStyle(~marginHorizontal=15.->dp, ()),
                   Predefined.styles##rowSpaceBetween,
-                ])
+                |])
               )>
               dash
               dash
@@ -418,10 +424,10 @@ let make =
           </View>
           <Spacer size=XS />
           <Text
-            style={Style.list([
+            style={Style.array([|
               Theme.text##caption1,
               theme.styles##textVeryLightOnBackground,
-            ])}>
+            |])}>
             "24"->React.string
           </Text>
         </View>
@@ -433,20 +439,20 @@ let make =
           <SpacedView horizontal=None vertical=S style=Predefined.styles##row>
             <Text
               style=Style.(
-                list([
+                array([|
                   Predefined.styles##flex,
                   Theme.text##callout,
                   theme.styles##textOnBackground,
-                ])
+                |])
               )>
               "Average Time per Day"->React.string
             </Text>
             <Text
               style=Style.(
-                list([
+                array([|
                   Theme.text##callout,
                   theme.styles##textLightOnBackground,
-                ])
+                |])
               )
               numberOfLines=1
               adjustsFontSizeToFit=true>
@@ -465,22 +471,22 @@ let make =
           <SpacedView horizontal=None vertical=S style=Predefined.styles##row>
             <Text
               style=Style.(
-                list([
+                array([|
                   Predefined.styles##flex,
                   Theme.text##callout,
                   theme.styles##textOnBackground,
                   textStyle(~fontWeight=Theme.fontWeights.medium, ()),
-                ])
+                |])
               )>
               "Weekly Goal"->React.string
             </Text>
             <Text
               style=Style.(
-                list([
+                array([|
                   Theme.text##callout,
                   theme.styles##textLightOnBackground,
                   textStyle(~fontWeight=Theme.fontWeights.semiBold, ()),
-                ])
+                |])
               )
               numberOfLines=1
               adjustsFontSizeToFit=true>
@@ -572,18 +578,18 @@ let make =
                          vertical=XS
                          horizontal=None
                          style=Style.(
-                           list([
+                           array([|
                              Predefined.styles##flex,
                              Predefined.styles##center,
-                           ])
+                           |])
                          )>
                          <View style=Predefined.styles##rowCenter>
                            <View style=Predefined.styles##flex>
                              <Text
-                               style={Style.list([
+                               style={Style.array([|
                                  Theme.text##body,
                                  theme.styles##textOnBackground,
-                               ])}>
+                               |])}>
                                name->React.string
                              </Text>
                            </View>
@@ -591,10 +597,10 @@ let make =
                             || selectedCategoryActivities->Array.length > 0
                               ? <>
                                   <Text
-                                    style={Style.list([
+                                    style={Style.array([|
                                       Theme.text##subhead,
                                       theme.styles##textVeryLightOnBackground,
-                                    ])}>
+                                    |])}>
                                     (
                                       selectedCat
                                         ? "All"
@@ -663,14 +669,14 @@ let make =
                       <View
                         key={activity.id}
                         style=Style.(
-                          list([
+                          array([|
                             Predefined.styles##rowCenter,
                             viewStyle(
                               ~backgroundColor="rgba(125,125,125,0.03)",
                               ~opacity=selectedCat ? 0.5 : 1.,
                               (),
                             ),
-                          ])
+                          |])
                         )>
                         <Spacer size=S />
                         <TouchableWithoutFeedback
@@ -716,11 +722,11 @@ let make =
                                     <View style=Predefined.styles##flex>
                                       <Text
                                         style=Style.(
-                                          list([
+                                          array([|
                                             Predefined.styles##flex,
                                             Theme.text##body,
                                             theme.styles##textOnBackground,
-                                          ])
+                                          |])
                                         )
                                         numberOfLines=1>
                                         activity.title->React.string
@@ -784,10 +790,10 @@ let make =
                    style=Predefined.styles##rowCenter>
                    <Text
                      style=Style.(
-                       list([
+                       array([|
                          Theme.text##body,
                          textStyle(~color=theme.colors.red, ()),
-                       ])
+                       |])
                      )>
                      "Delete Goal"->React.string
                    </Text>

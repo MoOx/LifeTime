@@ -12,9 +12,9 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
   let theme = Theme.useTheme(AppSettings.useTheme());
 
   let today = React.useRef(Date.now());
-  let todayDates = React.useRef(Date.weekDates(today->React.Ref.current));
-  let (startDate, supposedEndDate) = todayDates->React.Ref.current;
-  let endDate = supposedEndDate->Date.min(today->React.Ref.current);
+  let todayDates = React.useRef(Date.weekDates(today.current));
+  let (startDate, supposedEndDate) = todayDates.current;
+  let endDate = supposedEndDate->Date.min(today.current);
   let endDateTonight = endDate->Date.endOfDay;
   let remainingMinThisWeek =
     (supposedEndDate->Js.Date.getTime -. endDate->Js.Date.getTime)
@@ -87,10 +87,10 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
            <SpacedView vertical=None horizontal=S>
              <Text
                style=Style.(
-                 list([
+                 array([|
                    Theme.text##subhead,
                    theme.styles##textLightOnBackgroundDark,
-                 ])
+                 |])
                )>
                {j|LifeTime lets you visualize the time you spend on everything. This allows you to take more informed decisions about how to use your valuable time.|j}
                ->React.string
@@ -98,10 +98,10 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
              <Spacer size=XS />
              <Text
                style=Style.(
-                 list([
+                 array([|
                    Theme.text##subhead,
                    theme.styles##textLightOnBackgroundDark,
-                 ])
+                 |])
                )>
                {j|You can help yourself by adding goals & limits you would like to respect. LifeTime will try to remind you when you successfully achieve your goals & respect your limits and can help your to improve your self-discipline if needed.|j}
                ->React.string
@@ -128,10 +128,10 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                  <View style=Predefined.styles##flexGrow>
                    <Text
                      style=Style.(
-                       list([
+                       array([|
                          Theme.text##body,
                          theme.styles##textOnBackground,
-                       ])
+                       |])
                      )>
                      "Add a Goal"->React.string
                    </Text>
@@ -161,10 +161,10 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                  <View style=Predefined.styles##flexGrow>
                    <Text
                      style=Style.(
-                       list([
+                       array([|
                          Theme.text##body,
                          theme.styles##textOnBackground,
-                       ])
+                       |])
                      )>
                      "Add a Limit"->React.string
                    </Text>
@@ -179,10 +179,10 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
          ? React.null
          : <Text
              style=Style.(
-               list([
+               array([|
                  theme.styles##textLightOnBackgroundDark,
                  textStyle(~fontSize=7.5, ()),
-               ])
+               |])
              )>
              "remainingMinThisWeek: "->React.string
              {remainingMinThisWeek->Date.minToString->React.string}
@@ -393,10 +393,10 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                           )>
                           <Text
                             style=Style.(
-                              list([
+                              array([|
                                 Theme.styleSheets.dark##textLightOnBackgroundDark,
                                 textStyle(~fontSize=7.5, ()),
-                              ])
+                              |])
                             )>
                             "currentTime: "->React.string
                             {currentTime->Date.minToString->React.string}
@@ -437,7 +437,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                             {canBeDone->string_of_bool->React.string}
                           </Text>
                         </View>}
-                   <View style=Style.(list([StyleSheet.absoluteFill]))>
+                   <View style=Style.(array([|StyleSheet.absoluteFill|]))>
                      <LinearGradientView
                        width={100.->Style.pct}
                        height={100.->Style.pct}
@@ -457,22 +457,22 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                    </View>
                    <View
                      style=Style.(
-                       list([
+                       array([|
                          Predefined.styles##rowSpaceBetween,
                          Predefined.styles##alignStart,
-                       ])
+                       |])
                      )>
                      <View>
                        <Text
                          style=Style.(
-                           list([
+                           array([|
                              Theme.text##caption1,
                              Theme.styleSheets.dark##textLightOnBackgroundDark,
                              textStyle(
                                ~fontWeight=Theme.fontWeights.bold,
                                (),
                              ),
-                           ])
+                           |])
                          )>
                          {(
                             switch (goal.type_->Goal.Type.fromSerialized) {
@@ -486,24 +486,24 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                        </Text>
                        <Text
                          style=Style.(
-                           list([
+                           array([|
                              Theme.text##title1,
                              Theme.styleSheets.dark##textOnBackground,
                              textStyle(
                                ~fontWeight=Theme.fontWeights.medium,
                                (),
                              ),
-                           ])
+                           |])
                          )
                          numberOfLines=1>
                          goalTitle->React.string
                        </Text>
                        <Text
                          style=Style.(
-                           list([
+                           array([|
                              Theme.text##footnote,
                              Theme.styleSheets.dark##textLightOnBackgroundDark,
-                           ])
+                           |])
                          )>
                          {let durationInMinutes =
                             Js.Date.makeWithYMDHM(
@@ -566,10 +566,10 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                    <Spacer />
                    <View
                      style=Style.(
-                       list([
+                       array([|
                          Predefined.styles##rowSpaceBetween,
                          Predefined.styles##alignEnd,
-                       ])
+                       |])
                      )>
                      <ActivityRings
                        width=48.
@@ -608,17 +608,17 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                        |]
                        //  <View
                        //    style=Style.(
-                       //      list([
+                       //      array([|
                        //        StyleSheet.absoluteFill,
                        //        Predefined.styles##center,
-                       //      ])
+                       //      |])
                        //    )>
                        //    <Text
                        //      style=Style.(
-                       //        list([
+                       //        array([|
                        //          Theme.text##caption2,
                        //          Theme.styleSheets.dark##textLightOnBackgroundDark,
-                       //        ])
+                       //        |])
                        //      )>
                        //      {(progress *. 100.)->Js.Float.toFixed->React.string}
                        //      <Text style=Style.(textStyle(~fontSize=9., ()))>
@@ -629,10 +629,10 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                      />
                      <View
                        style=Style.(
-                         list([
+                         array([|
                            Predefined.styles##row,
                            Predefined.styles##alignCenter,
-                         ])
+                         |])
                        )>
                        {let width = 36.->Style.dp;
                         let height = 36.->Style.dp;
@@ -646,20 +646,20 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                        <View>
                          <Text
                            style=Style.(
-                             list([
+                             array([|
                                Theme.text##caption1,
                                Theme.styleSheets.dark##textLightOnBackgroundDark,
                                textStyle(
                                  ~fontWeight=Theme.fontWeights.light,
                                  (),
                                ),
-                             ])
+                             |])
                            )>
                            "Daily Average"->React.string
                          </Text>
                          <Text
                            style=Style.(
-                             list([
+                             array([|
                                Theme.text##title2,
                                Theme.styleSheets.dark##textOnBackground,
                                textStyle(
@@ -668,7 +668,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                                  ~textAlign=`right,
                                  (),
                                ),
-                             ])
+                             |])
                            )>
                            {switch (proportionalAverageTime) {
                             | 0. => "-"->React.string
@@ -685,10 +685,10 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                </SpacedView>;
                //  <Text
                //    style=Style.(
-               //      list([
+               //      array([|
                //        Theme.text##caption2,
                //        Theme.styleSheets.dark##textLightOnBackgroundDark,
-               //      ])
+               //      |])
                //    )>
                //    {currentTime->Date.minToString->React.string}
                //    " / "->React.string

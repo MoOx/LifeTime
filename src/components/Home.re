@@ -54,34 +54,30 @@ let make =
   );
 
   let today = React.useRef(Date.now());
-  let todayDates = React.useRef(Date.weekDates(today->React.Ref.current));
+  let todayDates = React.useRef(Date.weekDates(today.current));
   let previousDates =
-    React.useRef(
-      Date.weekDates(today->React.Ref.current->Date.addDays(-7)),
-    );
+    React.useRef(Date.weekDates(today.current->Date.addDays(-7)));
 
   let weeks =
     React.useRef(
       Array.range(0, 5)
       ->Array.map(currentWeekReverseIndex =>
           Date.weekDates(
-            today
-            ->React.Ref.current
-            ->Date.addDays(- currentWeekReverseIndex * 7),
+            today.current->Date.addDays(- currentWeekReverseIndex * 7),
           )
         ),
     );
 
   let ((startDate, supposedEndDate), setCurrentDates) =
     React.useState(() =>
-      weeks->React.Ref.current[weeks->React.Ref.current->Array.length - 1]
-      ->Option.getWithDefault(todayDates->React.Ref.current)
+      weeks.current[weeks.current->Array.length - 1]
+      ->Option.getWithDefault(todayDates.current)
     );
 
-  let endDate = supposedEndDate->Date.min(today->React.Ref.current);
+  let endDate = supposedEndDate->Date.min(today.current);
 
-  let (todayFirst, _) = todayDates->React.Ref.current;
-  let (previousFirst, _) = previousDates->React.Ref.current;
+  let (todayFirst, _) = todayDates.current;
+  let (previousFirst, _) = previousDates.current;
 
   let events = getEvents(startDate, endDate, true);
   let mapTitleDuration =
@@ -131,9 +127,8 @@ let make =
     React.useCallback3(
       _ =>
         // scrollToIndexParams triggers the setCurrentDates
-        // setCurrentDates(_ => todayDates->React.Ref.current);
-        flatListRef
-        ->React.Ref.current
+        // setCurrentDates(_ => todayDates.current);
+        flatListRef.current
         ->Js.Nullable.toOption
         ->Option.map(flatList =>
             flatList->FlatList.scrollToIndex(
@@ -145,13 +140,13 @@ let make =
     );
 
   let (startDate1, supposedEndDate1) =
-    weeks->React.Ref.current[weeks->React.Ref.current->Array.length - 1]
-    ->Option.getWithDefault(todayDates->React.Ref.current);
-  let endDate1 = supposedEndDate1->Date.min(today->React.Ref.current);
+    weeks.current[weeks.current->Array.length - 1]
+    ->Option.getWithDefault(todayDates.current);
+  let endDate1 = supposedEndDate1->Date.min(today.current);
   let (startDate2, supposedEndDate2) =
-    weeks->React.Ref.current[weeks->React.Ref.current->Array.length - 2]
-    ->Option.getWithDefault(todayDates->React.Ref.current);
-  let endDate2 = supposedEndDate2->Date.min(today->React.Ref.current);
+    weeks.current[weeks.current->Array.length - 2]
+    ->Option.getWithDefault(todayDates.current);
+  let endDate2 = supposedEndDate2->Date.min(today.current);
 
   let events1 = getEvents(startDate1, endDate1, true);
   let events2 = getEvents(startDate2, endDate2, true);
@@ -309,7 +304,7 @@ let make =
             parallel(
               [|
                 spring(
-                  animatedMessageNoEventsHeight->React.Ref.current,
+                  animatedMessageNoEventsHeight.current,
                   Value.Spring.config(
                     ~useNativeDriver=true,
                     ~toValue=height->Value.Spring.fromRawValue,
@@ -318,7 +313,7 @@ let make =
                   ),
                 ),
                 spring(
-                  animatedMessageNoEventsScale->React.Ref.current,
+                  animatedMessageNoEventsScale.current,
                   Value.Spring.config(
                     ~useNativeDriver=true,
                     ~toValue=1.->Value.Spring.fromRawValue,
@@ -328,7 +323,7 @@ let make =
                   ),
                 ),
                 timing(
-                  animatedMessageNoEventsOpacity->React.Ref.current,
+                  animatedMessageNoEventsOpacity.current,
                   Value.Timing.config(
                     ~useNativeDriver=true,
                     ~toValue=1.->Value.Timing.fromRawValue,
@@ -353,11 +348,11 @@ let make =
     <SpacedView>
       <TitlePre style=theme.styles##textLightOnBackgroundDark>
         {Date.(
-           today->React.Ref.current->Js.Date.getDay->dayLongString
+           today.current->Js.Date.getDay->dayLongString
            ++ " "
-           ++ today->React.Ref.current->dateString
+           ++ today.current->dateString
            ++ " "
-           ++ today->React.Ref.current->monthLongString
+           ++ today.current->monthLongString
          )
          ->Js.String.toUpperCase
          ->React.string}
@@ -378,14 +373,12 @@ let make =
                  onMessageNoEventsHeight->Option.isNone
                    ? `absolute : `relative,
                ~opacity=
-                 animatedMessageNoEventsOpacity
-                 ->React.Ref.current
+                 animatedMessageNoEventsOpacity.current
                  ->Animated.StyleProp.float,
                ~transform=[|
                  scale(
                    ~scale=
-                     animatedMessageNoEventsScale
-                     ->React.Ref.current
+                     animatedMessageNoEventsScale.current
                      ->Animated.StyleProp.float,
                  ),
                |],
@@ -503,8 +496,7 @@ let make =
                 translateY(
                   ~translateY=
                     Animated.Interpolation.(
-                      animatedMessageNoEventsHeight
-                      ->React.Ref.current
+                      animatedMessageNoEventsHeight.current
                       ->interpolate(
                           config(
                             ~inputRange=[|0., height|],
@@ -541,19 +533,16 @@ let make =
         showsHorizontalScrollIndicator=false
         inverted=true
         initialNumToRender=1
-        data={weeks->React.Ref.current}
-        style={Style.list([theme.styles##background, styleWidth])}
+        data={weeks.current}
+        style={Style.array([|theme.styles##background, styleWidth|])}
         getItemLayout
         keyExtractor={((first, _), _index) => first->Js.Date.toString}
         renderItem
-        onViewableItemsChanged={onViewableItemsChanged->React.Ref.current}
+        onViewableItemsChanged={onViewableItemsChanged.current}
       />
       <Separator style=theme.styles##separatorOnBackground />
       <BlockFootnote>
-        {(
-           "Updated "
-           ++ DateFns.formatRelative(today->React.Ref.current, updatedAt)
-         )
+        {("Updated " ++ DateFns.formatRelative(today.current, updatedAt))
          ->React.string}
         <Spacer size=XS />
         {!refreshing

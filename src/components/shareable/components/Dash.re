@@ -33,7 +33,8 @@ let make =
     };
   let n = ceil(length /. (dashGap +. dashLength))->int_of_float;
 
-  <View onLayout style=Style.(list([s, style(~flexDirection=rowStyle, ())]))>
+  <View
+    onLayout style=Style.(array([|s, style(~flexDirection=rowStyle, ())|]))>
     {Array.range(0, n - 1)
      ->Array.map(i =>
          <View

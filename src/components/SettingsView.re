@@ -79,16 +79,16 @@ let make = (~navigation) => {
               <View style=Predefined.styles##row>
                 <View
                   style=Style.(
-                    list([
+                    array([|
                       Predefined.styles##flex,
                       Predefined.styles##justifyCenter,
-                    ])
+                    |])
                   )>
                   <Text
-                    style={Style.list([
+                    style={Style.array([|
                       Theme.text##body,
                       theme.styles##textOnBackground,
-                    ])}>
+                    |])}>
                     "Light"->React.string
                   </Text>
                 </View>
@@ -129,16 +129,16 @@ let make = (~navigation) => {
               <View style=Predefined.styles##row>
                 <View
                   style=Style.(
-                    list([
+                    array([|
                       Predefined.styles##flex,
                       Predefined.styles##justifyCenter,
-                    ])
+                    |])
                   )>
                   <Text
-                    style={Style.list([
+                    style={Style.array([|
                       Theme.text##body,
                       theme.styles##textOnBackground,
-                    ])}>
+                    |])}>
                     "Dark"->React.string
                   </Text>
                 </View>
@@ -179,16 +179,16 @@ let make = (~navigation) => {
               <View style=Predefined.styles##row>
                 <View
                   style=Style.(
-                    list([
+                    array([|
                       Predefined.styles##flex,
                       Predefined.styles##justifyCenter,
-                    ])
+                    |])
                   )>
                   <Text
-                    style={Style.list([
+                    style={Style.array([|
                       Theme.text##body,
                       theme.styles##textOnBackground,
-                    ])}>
+                    |])}>
                     "Auto"->React.string
                   </Text>
                 </View>
@@ -240,11 +240,11 @@ let make = (~navigation) => {
               style=Predefined.styles##rowSpaceBetween>
               <Text
                 style=Style.(
-                  list([
+                  array([|
                     Predefined.styles##flex,
                     Theme.text##body,
                     theme.styles##textOnBackground,
-                  ])
+                  |])
                 )>
                 "Help"->React.string
               </Text>
@@ -282,11 +282,11 @@ let make = (~navigation) => {
               style=Predefined.styles##rowSpaceBetween>
               <Text
                 style=Style.(
-                  list([
+                  array([|
                     Predefined.styles##flex,
                     Theme.text##body,
                     theme.styles##textOnBackground,
-                  ])
+                  |])
                 )>
                 "Welcome Screen"->React.string
               </Text>
@@ -319,11 +319,11 @@ let make = (~navigation) => {
               style=Predefined.styles##rowSpaceBetween>
               <Text
                 style=Style.(
-                  list([
+                  array([|
                     Predefined.styles##flex,
                     Theme.text##body,
                     theme.styles##textOnBackground,
-                  ])
+                  |])
                 )>
                 "Calendar App"->React.string
               </Text>
@@ -357,11 +357,11 @@ let make = (~navigation) => {
               style=Predefined.styles##rowSpaceBetween>
               <Text
                 style=Style.(
-                  list([
+                  array([|
                     Predefined.styles##flex,
                     Theme.text##body,
                     theme.styles##textOnBackground,
-                  ])
+                  |])
                 )>
                 "App System Settings"->React.string
               </Text>
@@ -412,16 +412,16 @@ let make = (~navigation) => {
               <View style=Predefined.styles##row>
                 <View
                   style=Style.(
-                    list([
+                    array([|
                       Predefined.styles##flex,
                       Predefined.styles##justifyCenter,
-                    ])
+                    |])
                   )>
                   <Text
-                    style={Style.list([
+                    style={Style.array([|
                       Theme.text##body,
                       theme.styles##textOnBackground,
-                    ])}>
+                    |])}>
                     "Export Backup"->React.string
                   </Text>
                 </View>
@@ -465,16 +465,16 @@ let make = (~navigation) => {
               <View style=Predefined.styles##row>
                 <View
                   style=Style.(
-                    list([
+                    array([|
                       Predefined.styles##flex,
                       Predefined.styles##justifyCenter,
-                    ])
+                    |])
                   )>
                   <Text
-                    style={Style.list([
+                    style={Style.array([|
                       Theme.text##body,
                       theme.styles##textOnBackground,
-                    ])}>
+                    |])}>
                     "Import Backup"->React.string
                   </Text>
                 </View>
@@ -516,10 +516,10 @@ let make = (~navigation) => {
             vertical=XS horizontal=XS style=Predefined.styles##rowCenter>
             <Text
               style=Style.(
-                list([
+                array([|
                   Theme.text##body,
                   textStyle(~color=theme.colors.red, ()),
-                ])
+                |])
               )>
               "Reset Settings & Erase All Data"->React.string
             </Text>

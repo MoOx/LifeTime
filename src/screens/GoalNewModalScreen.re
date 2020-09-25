@@ -44,7 +44,7 @@ let make =
     <StatusBar barStyle=`lightContent />
     <Animated.ScrollView
       style=Style.(
-        list([Predefined.styles##flexGrow, theme.styles##backgroundDark])
+        array([|Predefined.styles##flexGrow, theme.styles##backgroundDark|])
       )
       contentContainerStyle=Style.(
         viewStyle(
@@ -65,7 +65,7 @@ let make =
             {
               "nativeEvent": {
                 "contentOffset": {
-                  y: scrollYAnimatedValue->React.Ref.current,
+                  y: scrollYAnimatedValue.current,
                 },
               },
             },
@@ -74,7 +74,7 @@ let make =
         )
       )>
       <StickyHeader
-        scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
+        scrollYAnimatedValue={scrollYAnimatedValue.current}
         safeArea=false
         animateBackgroundOpacity=False
         backgroundElement={<StickyHeaderBackground />}

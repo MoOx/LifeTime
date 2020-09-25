@@ -7,11 +7,11 @@ let make = () => {
   <>
     <View
       style=Style.(
-        list([
+        array([|
           StyleSheet.absoluteFill,
           theme.styles##background,
           style(~opacity=0.8, ()),
-        ])
+        |])
       )
     />
     <BlurView

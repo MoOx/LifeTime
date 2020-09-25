@@ -5,7 +5,7 @@ open ReactMultiversal;
 [@react.component]
 let make =
     (
-      ~today,
+      ~today: React.ref(Js.Date.t),
       ~todayFirst,
       ~previousFirst,
       ~startDate,
@@ -18,7 +18,7 @@ let make =
     React.useContext(Calendars.context);
   let theme = Theme.useTheme(AppSettings.useTheme());
 
-  let endDate = supposedEndDate->Date.min(today->React.Ref.current);
+  let endDate = supposedEndDate->Date.min(today.current);
   let events = getEvents(startDate, endDate, false);
   let mapTitleDuration =
     events->Option.map(es =>
@@ -70,7 +70,7 @@ let make =
           <View style=Predefined.styles##flexGrow>
             <Text
               style=Style.(
-                list([Theme.text##callout, theme.styles##textOnBackground])
+                array([|Theme.text##callout, theme.styles##textOnBackground|])
               )>
               "Total Logged Time"->React.string
             </Text>
@@ -78,10 +78,10 @@ let make =
           <Text>
             <Text
               style=Style.(
-                list([
+                array([|
                   Theme.text##callout,
                   theme.styles##textLightOnBackground,
-                ])
+                |])
               )>
               {mapTitleDuration
                ->Option.map(mapTitleDuration =>

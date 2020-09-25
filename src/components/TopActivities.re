@@ -115,10 +115,10 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                                <View style=Predefined.styles##flex>
                                  <Text
                                    style=Style.(
-                                     list([
+                                     array([|
                                        Theme.text##callout,
                                        theme.styles##textOnBackground,
-                                     ])
+                                     |])
                                    )
                                    numberOfLines=1>
                                    title->React.string
@@ -186,10 +186,10 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                          <Spacer size=L />
                          <View
                            style=Style.(
-                             list([
+                             array([|
                                Predefined.styles##rowSpaceBetween,
                                Predefined.styles##flexGrow,
-                             ])
+                             |])
                            )>
                            {mapTitleDuration->Array.length > activitiesToShow
                               ? <TouchableOpacity

@@ -11,10 +11,10 @@ let make = (~navigation, ~route as _) => {
     <StatusBar barStyle={Theme.statusBarStyle(theme.mode, `darkContent)} />
     <View
       style=Style.(
-        list([Predefined.styles##flexGrow, theme.styles##backgroundDark])
+        array([|Predefined.styles##flexGrow, theme.styles##backgroundDark|])
       )>
       <StickyHeader
-        scrollYAnimatedValue={scrollYAnimatedValue->React.Ref.current}
+        scrollYAnimatedValue={scrollYAnimatedValue.current}
         scrollOffsetY=80.
         safeArea=true
         animateTranslateY=false
@@ -24,7 +24,7 @@ let make = (~navigation, ~route as _) => {
       />
       <Animated.ScrollView
         style=Style.(
-          list([
+          array([|
             Predefined.styles##flexGrow,
             viewStyle(
               ~marginTop=safeAreaInsets.top->dp,
@@ -34,7 +34,7 @@ let make = (~navigation, ~route as _) => {
               ~paddingRight=safeAreaInsets.right->dp,
               (),
             ),
-          ])
+          |])
         )
         showsHorizontalScrollIndicator=false
         showsVerticalScrollIndicator=false
@@ -45,7 +45,7 @@ let make = (~navigation, ~route as _) => {
               {
                 "nativeEvent": {
                   "contentOffset": {
-                    y: scrollYAnimatedValue->React.Ref.current,
+                    y: scrollYAnimatedValue.current,
                   },
                 },
               },

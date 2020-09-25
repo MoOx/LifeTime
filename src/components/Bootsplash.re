@@ -27,7 +27,7 @@ let make = (~isReady) => {
         ReactNativeBootsplash.hide(None);
         Animated.(
           timing(
-            animatedOpacity->React.Ref.current,
+            animatedOpacity.current,
             Value.Timing.config(
               ~useNativeDriver=true,
               ~toValue=0.->Value.Timing.fromRawValue,
@@ -53,8 +53,7 @@ let make = (~isReady) => {
             StyleSheet.absoluteFill,
             styles##bootsplash,
             style(
-              ~opacity=
-                animatedOpacity->React.Ref.current->Animated.StyleProp.float,
+              ~opacity=animatedOpacity.current->Animated.StyleProp.float,
               (),
             ),
           |])
@@ -77,9 +76,7 @@ let make = (~isReady) => {
                 ~transform=[|
                   translateY(
                     ~translateY=
-                      animatedTranslateY
-                      ->React.Ref.current
-                      ->Animated.StyleProp.float,
+                      animatedTranslateY.current->Animated.StyleProp.float,
                   ),
                 |],
                 (),

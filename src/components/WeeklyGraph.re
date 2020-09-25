@@ -120,18 +120,18 @@ let make =
     <View onLayout style=Predefined.styles##flexGrow>
       <View
         style=Style.(
-          list([
+          array([|
             StyleSheet.absoluteFill,
             Predefined.styles##rowSpaceBetween,
             boxStyle,
-          ])
+          |])
         )>
         {Array.range(0, supposedNumberOfDays->int_of_float)
          ->Array.map(i =>
              <React.Fragment key={i->string_of_int}>
                <Dash
                  style=Style.(
-                   list([
+                   array([|
                      styles##dash,
                      viewStyle(
                        ~position=`absolute,
@@ -140,7 +140,7 @@ let make =
                        ~left=(100. /. supposedNumberOfDays *. i->float)->pct,
                        (),
                      ),
-                   ])
+                   |])
                  )
                  dashColor={theme.colors.gray4}
                />
@@ -158,10 +158,10 @@ let make =
                  )>
                  <Text
                    style=Style.(
-                     list([
+                     array([|
                        theme.styles##textVeryLightOnBackground,
                        textStyle(~fontSize=10., ()),
-                     ])
+                     |])
                    )>
                    {startDate
                     ->Date.addDays(i)
@@ -175,7 +175,7 @@ let make =
          ->React.array}
         <Dash
           style=Style.(
-            list([
+            array([|
               styles##dash,
               viewStyle(
                 ~position=`absolute,
@@ -184,7 +184,7 @@ let make =
                 ~left=100.->pct,
                 (),
               ),
-            ])
+            |])
           )
           dashColor={theme.colors.gray4}
         />
@@ -194,12 +194,12 @@ let make =
            let maxHours = maxDuration /. 60.;
            <View
              style=Style.(
-               list([
+               array([|
                  StyleSheet.absoluteFill,
                  Predefined.styles##colSpaceBetween,
                  boxStyle,
                  viewStyle(~height=graphHeight->dp, ()),
-               ])
+               |])
              )>
              {Array.range(1, slices - 1)
               ->Array.reverse
@@ -207,7 +207,7 @@ let make =
                   <React.Fragment key={i->string_of_int}>
                     <View
                       style=Style.(
-                        list([
+                        array([|
                           styles##dash,
                           viewStyle(
                             ~position=`absolute,
@@ -218,7 +218,7 @@ let make =
                             ~backgroundColor=theme.colors.gray5,
                             (),
                           ),
-                        ])
+                        |])
                       )
                     />
                     <SpacedView
@@ -234,7 +234,7 @@ let make =
                       )>
                       <Text
                         style=Style.(
-                          list([
+                          array([|
                             textStyle(
                               ~position=`absolute,
                               ~top=(-5.)->dp,
@@ -243,7 +243,7 @@ let make =
                             ),
                             theme.styles##textVeryLightOnBackground,
                             textStyle(~fontSize=10., ~lineHeight=10., ()),
-                          ])
+                          |])
                         )>
                         {(maxHours /. slices->float *. i->float)
                          ->Js.Float.toString
@@ -256,7 +256,7 @@ let make =
               ->React.array}
              <View
                style=Style.(
-                 list([
+                 array([|
                    styles##dash,
                    viewStyle(
                      ~position=`absolute,
@@ -267,7 +267,7 @@ let make =
                      ~backgroundColor=theme.colors.gray5,
                      (),
                    ),
-                 ])
+                 |])
                )
              />
            </View>;

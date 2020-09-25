@@ -111,10 +111,10 @@ module TabsScreen = {
         ~inactiveTintColor=theme.colors.gray,
         ~style=
           Style.(
-            list([
+            array([|
               theme.styles##background,
               viewStyle(~borderTopColor=theme.colors.gray4, ()),
-            ])
+            |])
           ),
         (),
       )}>

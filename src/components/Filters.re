@@ -106,17 +106,17 @@ let make = () => {
                        style=Predefined.styles##rowCenter>
                        <View style=Predefined.styles##flexGrow>
                          <Text
-                           style={Style.list([
+                           style={Style.array([|
                              styles##text,
                              theme.styles##textOnBackground,
-                           ])}>
+                           |])}>
                            calendar.title->React.string
                          </Text>
                          <Text
-                           style={Style.list([
+                           style={Style.array([|
                              styles##infoText,
                              theme.styles##textGray2,
-                           ])}>
+                           |])}>
                            calendar.source->React.string
                          </Text>
                        </View>

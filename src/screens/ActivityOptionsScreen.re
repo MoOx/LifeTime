@@ -6,19 +6,16 @@ open ReactMultiversal;
 let make =
     (
       ~navigation,
-      ~route:
-         ReactNavigation.Core.route(
-           Navigators.StatsStack.M.params,
-         ),
+      ~route: ReactNavigation.Core.route(Navigators.StatsStack.M.params),
     ) => {
   let theme = Theme.useTheme(AppSettings.useTheme());
   <>
     <StatusBar barStyle={Theme.statusBarStyle(theme.mode, `darkContent)} />
     <Animated.ScrollView
-      style={Style.list([
+      style={Style.array([|
         Predefined.styles##flexGrow,
         theme.styles##backgroundDark,
-      ])}
+      |])}
       showsHorizontalScrollIndicator=false
       showsVerticalScrollIndicator=false>
       {route.params

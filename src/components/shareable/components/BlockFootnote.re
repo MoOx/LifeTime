@@ -6,7 +6,10 @@ let make = (~children) => {
   <BlockFootnoteContainer>
     <Text
       style=Style.(
-        list([Theme.text##footnote, theme.styles##textLightOnBackgroundDark])
+        array([|
+          Theme.text##footnote,
+          theme.styles##textLightOnBackgroundDark,
+        |])
       )>
       children
     </Text>

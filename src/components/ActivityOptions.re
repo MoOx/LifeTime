@@ -56,10 +56,10 @@ let make = (~activityTitle, ~onSkipActivity) => {
                    <View style=Predefined.styles##row>
                      <View style=Predefined.styles##flexGrow>
                        <Text
-                         style={Style.list([
+                         style={Style.array([|
                            styles##text,
                            theme.styles##textOnBackground,
-                         ])}>
+                         |])}>
                          name->React.string
                        </Text>
                      </View>
