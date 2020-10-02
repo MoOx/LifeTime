@@ -69,7 +69,7 @@
     "reason-future": "^2.5.0",
     "reason-react": "^0.8.0",
     "reason-react-native": "^0.62.0",
-    "reason-react-navigation": "^5.0.0-beta.0"
+    "reason-react-navigation": "^5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.3",

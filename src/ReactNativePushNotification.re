@@ -8,15 +8,16 @@ external permissions:
   (~alert: bool=?, ~badge: bool=?, ~sound: bool=?) => permissions;
 
 type notification('data, 'alert) = {
-  foreground: bool,
-  userInteraction: bool,
-  message: string,
-  data: 'data,
-  subText: option(string),
-  badge: int,
   alert: 'alert,
-  sound: string,
+  badge: option(int),
+  data: 'data,
   finish: ReactNativePushNotificationIOS.FetchResult.t => unit,
+  foreground: bool,
+  id: option(string),
+  message: string,
+  soundName: option(string),
+  title: string,
+  userInteraction: bool,
 };
 
 type tokenData = {
@@ -47,7 +48,7 @@ type localNotificationOptions;
 // if you edit any of this below, please report to localNotificationScheduleOptions
 external localNotificationOptions:
   (
-    ~id: float=?,
+    ~id: string=?, // int as string
     ~message: string,
     ~number: int=?,
     ~playSound: bool=?,
@@ -109,7 +110,7 @@ external localNotificationScheduleOptions:
   (
     ~date: Js.Date.t,
     // copy of localNotificationOptions below
-    ~id: float=?,
+    ~id: string=?, // int as string
     ~message: string,
     ~number: int=?,
     ~playSound: bool=?,
@@ -250,10 +251,12 @@ external clearAllNotifications: unit => unit = "clearAllNotifications";
 // [@bs.module "react-native-push-notification"] external presentLocalNotification:(notification: PushNotificationObject)=> unit = "presentLocalNotification";
 // [@bs.module "react-native-push-notification"] external scheduleLocalNotification:(notification: PushNotificationScheduleObject)=> unit = "scheduleLocalNotification";
 
-// [@bs.module "react-native-push-notification"] external setApplicationIconBadgeNumber:(badgeCount: number)=> unit = "setApplicationIconBadgeNumber";
-// [@bs.module "react-native-push-notification"] external getApplicationIconBadgeNumber:(
-//     callback: (badgeCount: number) => unit
-// )=> unit ="getApplicationIconBadgeNumber";
+[@bs.module "react-native-push-notification"]
+external setApplicationIconBadgeNumber: int => unit =
+  "setApplicationIconBadgeNumber";
+[@bs.module "react-native-push-notification"]
+external getApplicationIconBadgeNumber: (int => unit) => unit =
+  "getApplicationIconBadgeNumber";
 
 // [@bs.module "react-native-push-notification"] external abandonPermissions:unit => unit = "abandonPermissions";
 // [@bs.module "react-native-push-notification"] external checkPermissions:(

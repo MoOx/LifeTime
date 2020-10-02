@@ -7,18 +7,25 @@ if (Global.__DEV__) {
   Global.unstable_enableLogBox();
 };
 
+let navigatorEmitter = EventEmitter.make();
+
 ReactNativePushNotification.(
   configure(
     configureOptions(
       ~requestPermissions=false,
       ~popInitialNotification=true,
-      // ~onNotification=
-      //   notification => {
-      //     Js.log(("NOTIFICATION onNotification", notification));
-      //     notification.finish(
-      //       ReactNativePushNotificationIOS.FetchResult.noData,
-      //     );
-      //   },
+      ~onNotification=
+        notification => {
+          Js.log(("NOTIFICATION", notification));
+          switch (notification.id) {
+          | Some(id) when id == Notifications.Ids.reminderCheckGoals =>
+            navigatorEmitter->EventEmitter.emit("navigate", "GoalsScreen")
+          | _ => ()
+          };
+          notification.finish(
+            ReactNativePushNotificationIOS.FetchResult.noData,
+          );
+        },
       (),
     ),
   )
@@ -266,6 +273,81 @@ let app = () => {
   let appSettingsContextValue = AppSettings.useSettings();
   let calendarsContextValue = Calendars.useEvents();
 
+  // let (settings, _setSettings) = appSettingsContextValue;
+
+  // clean badges when app is active
+  let appState = ReactNativeHooks.useAppState();
+  React.useEffect1(
+    () => {
+      if (appState === AppState.active) {
+        ReactNativePushNotification.setApplicationIconBadgeNumber(0);
+      };
+      None;
+    },
+    [|appState|],
+  );
+
+  // update daily notification when opening the app
+  let (notificationStatus, _notificationStatus_set) =
+    Notifications.useNotificationStatus();
+  React.useEffect1(
+    () => {
+      if (notificationStatus === Some(ReactNativePermissions.granted)) {
+        open ReactNativePushNotification;
+        cancelLocalNotifications({
+          "id": Notifications.Ids.reminderCheckGoals,
+        });
+        open Js.Date;
+        let tomorrowMorningHour = 9.;
+        let tomorrowMorning = date => {
+          makeWithYMDHMS(
+            ~year=date->getFullYear,
+            ~month=date->getMonth,
+            ~date=date->getDate +. 1.,
+            ~hours=tomorrowMorningHour,
+            ~minutes=0.,
+            ~seconds=0.,
+            (),
+          );
+        };
+        localNotificationScheduleOptions(
+          ~id=Notifications.Ids.reminderCheckGoals,
+          ~userInfo={"id": Notifications.Ids.reminderCheckGoals},
+          ~date=Js.Date.now()->Js.Date.fromFloat->tomorrowMorning,
+          ~message="Check at your goals progress",
+          ~repeatType=`day,
+          ~number=1,
+          ~priority=`low,
+          ~importance=`default,
+          ~ignoreInForeground=true,
+          (),
+        )
+        ->localNotificationSchedule;
+      };
+      None;
+    },
+    [|notificationStatus|],
+  );
+
+  let navigationRef = React.useRef(None);
+  React.useEffect1(
+    () => {
+      navigatorEmitter->EventEmitter.on("navigate", navigateTo => {
+        switch (navigationRef.current) {
+        | Some(navigation) when navigateTo == "GoalsScreen" =>
+          navigation->Navigators.RootStack.Navigation.navigateWithParams(
+            "GoalsStack",
+            Navigators.RootStack.M.params(~screen="GoalsScreen", ()),
+          )
+
+        | _ => ()
+        }
+      });
+      None;
+    },
+    [||],
+  );
+
   let isReady = initialStateContainer->Option.isSome;
   <ReactNativeDarkMode.DarkModeProvider>
     <AppSettings.ContextProvider value=appSettingsContextValue>
@@ -273,6 +355,7 @@ let app = () => {
         {initialStateContainer
          ->Option.map(initialState =>
              <Native.NavigationContainer
+               ref={navigationRef->Obj.magic}
                ?initialState
                onStateChange={state => {
                  let maybeJsonState = Js.Json.stringifyAny(state);

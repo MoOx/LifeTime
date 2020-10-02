@@ -8,19 +8,7 @@ let make = () => {
   let theme = Theme.useTheme(AppSettings.useTheme());
 
   let (notificationStatus, notificationStatus_set) =
-    React.useState(() => None);
-  React.useEffect1(
-    () => {
-      ReactNativePermissions.(
-        checkNotifications()
-        ->FutureJs.fromPromise(error => {Js.Console.error(error)})
-        ->Future.tapOk(res => {notificationStatus_set(_ => Some(res.status))})
-        ->ignore
-      );
-      None;
-    },
-    [||],
-  );
+    Notifications.useNotificationStatus();
   let requestNotificationPermission =
     React.useCallback(() => {
       ReactNativePermissions.(
