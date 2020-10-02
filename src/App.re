@@ -99,7 +99,20 @@ module SettingsStackScreen = {
       <SettingsStack.Screen
         name="SettingsScreen"
         component=SettingsScreen.make
-        options={_ => StatsStack.options(~headerShown=false, ())}
+        options={_ =>
+          StatsStack.options(
+            ~headerShown=false,
+            ~title=SettingsScreen.title,
+            (),
+          )
+        }
+      />
+      <SettingsStack.Screen
+        name="SettingsDangerZoneScreen"
+        component=SettingsDangerZoneScreen.make
+        options={_ =>
+          StatsStack.options(~title=SettingsDangerZoneScreen.title, ())
+        }
       />
     </SettingsStack.Navigator>;
   };
@@ -164,7 +177,7 @@ module TabsScreen = {
         component=SettingsStackScreen.make
         options={_props =>
           Tabs.options(
-            ~title="Settings",
+            ~title=SettingsScreen.title,
             ~tabBarIcon=
               tabBarIconProps =>
                 <SVGSettings

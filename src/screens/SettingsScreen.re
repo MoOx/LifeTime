@@ -1,6 +1,8 @@
 open ReactNative;
 open ReactMultiversal;
 
+let title = "Settings";
+
 [@react.component]
 let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme(AppSettings.useTheme());
