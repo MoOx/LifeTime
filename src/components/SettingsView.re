@@ -14,6 +14,52 @@ let make = (~navigation) => {
       <TitlePre> " "->React.string </TitlePre>
       <Title style=theme.styles##textOnBackground> title->React.string </Title>
     </SpacedView>
+    <Separator style=theme.styles##separatorOnBackground />
+    <View style=theme.styles##background>
+      <TouchableWithoutFeedback
+        onPress={_ =>
+          navigation->Navigators.RootStack.Navigation.navigate(
+            "SettingsNotificationsScreen",
+          )
+        }>
+        <View style=Predefined.styles##rowCenter>
+          <Spacer size=S />
+          <SpacedView vertical=XS horizontal=None>
+            <SVGAppBadge
+              width={28.->Style.dp}
+              height={28.->Style.dp}
+              fill={theme.colors.blue}
+            />
+          </SpacedView>
+          <Spacer size=XS />
+          <View style=Predefined.styles##flex>
+            <SpacedView
+              vertical=XS
+              horizontal=None
+              style=Predefined.styles##rowSpaceBetween>
+              <Text
+                style=Style.(
+                  array([|
+                    Predefined.styles##flex,
+                    Theme.text##body,
+                    theme.styles##textOnBackground,
+                  |])
+                )>
+                SettingsNotificationsScreen.title->React.string
+              </Text>
+              <SVGChevronright
+                width={14.->Style.dp}
+                height={14.->Style.dp}
+                fill={Predefined.Colors.Ios.light.gray4}
+              />
+              <Spacer size=S />
+            </SpacedView>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </View>
+    <Separator style=theme.styles##separatorOnBackground />
+    <Spacer />
     <Row> <Spacer size=XS /> <BlockHeading text="Theme" /> </Row>
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>

@@ -18,7 +18,7 @@ ReactNativePushNotification.(
         notification => {
           Js.log(("NOTIFICATION", notification));
           switch (notification.id) {
-          | Some(id) when id == Notifications.Ids.reminderCheckGoals =>
+          | Some(id) when id == Notifications.Ids.reminderDailyCheck =>
             navigatorEmitter->EventEmitter.emit("navigate", "GoalsScreen")
           | _ => ()
           };
@@ -62,9 +62,9 @@ module StatsStackScreen = {
               Style.(
                 viewStyle(~paddingHorizontal=(Spacer.space *. 3.)->dp, ())
               ),
-            ~headerStyle=theme.styles##stackHeader,
-            ~headerTitleStyle=theme.styles##textOnBackground,
             ~headerTintColor=theme.colors.blue,
+            ~headerTitleStyle=theme.styles##textOnBackground,
+            ~headerStyle=theme.styles##stackHeader,
             (),
           )
         }
@@ -94,6 +94,7 @@ module SettingsStackScreen = {
 
   [@react.component]
   let make = (~navigation as _, ~route as _) => {
+    let theme = Theme.useTheme(AppSettings.useTheme());
     <SettingsStack.Navigator
       screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
       <SettingsStack.Screen
@@ -112,6 +113,21 @@ module SettingsStackScreen = {
         component=SettingsDangerZoneScreen.make
         options={_ =>
           StatsStack.options(~title=SettingsDangerZoneScreen.title, ())
+        }
+      />
+      <SettingsStack.Screen
+        name="SettingsNotificationsScreen"
+        component=SettingsNotificationsScreen.make
+        options={_ =>
+          StatsStack.(
+            options(
+              ~title=SettingsNotificationsScreen.title,
+              ~headerTintColor=theme.colors.blue,
+              ~headerTitleStyle=theme.styles##textOnBackground,
+              ~headerStyle=theme.styles##stackHeader,
+              (),
+            )
+          )
         }
       />
     </SettingsStack.Navigator>;
@@ -284,9 +300,7 @@ let app = () => {
   );
 
   let appSettingsContextValue = AppSettings.useSettings();
-  let calendarsContextValue = Calendars.useEvents();
-
-  // let (settings, _setSettings) = appSettingsContextValue;
+  let (settings, _setSettings) = appSettingsContextValue;
 
   // clean badges when app is active
   let appState = ReactNativeHooks.useAppState();
@@ -301,41 +315,65 @@ let app = () => {
   );
 
   // update daily notification when opening the app
-  let (notificationStatus, _notificationStatus_set) =
+  let (notificationStatus, _requestNotificationPermission) =
     Notifications.useNotificationStatus();
   React.useEffect1(
     () => {
       if (notificationStatus === Some(ReactNativePermissions.granted)) {
-        open ReactNativePushNotification;
-        cancelLocalNotifications({
-          "id": Notifications.Ids.reminderCheckGoals,
+        ReactNativePushNotification.cancelLocalNotifications({
+          "id": Notifications.Ids.reminderDailyCheck,
         });
-        open Js.Date;
-        let tomorrowMorningHour = 9.;
-        let tomorrowMorning = date => {
-          makeWithYMDHMS(
-            ~year=date->getFullYear,
-            ~month=date->getMonth,
-            ~date=date->getDate +. 1.,
-            ~hours=tomorrowMorningHour,
-            ~minutes=0.,
-            ~seconds=0.,
-            (),
+
+        if (settings.notificationsDailyRemindersState) {
+          open Js.Date;
+          let minutesGapToAvoidTooCloseNotif = 30.;
+          let appropriateHour = 9.;
+          let todayOrTomorrowAppropriateTime = date => {
+            // date + 1j if...
+            let adjustedDate =
+              if (date->getHours >= appropriateHour
+                  // you open the app 30min before the notification
+                  // (weg: you open at 8:30+ => delay to avoid a notification poping at 9:00)
+                  || date->getHours == appropriateHour
+                  -. 1.
+                  && date->getMinutes > minutesGapToAvoidTooCloseNotif) {
+                // you open the app after the notification hour
+                (date->Js.Date.getTime +. 1000. *. 60. *. 60. *. 24.)
+                ->Js.Date.fromFloat;
+                // if we open the app after midnight, we still want notif in the morning
+              } else {
+                // date+0j
+                date;
+              };
+            makeWithYMDHMS(
+              ~year=adjustedDate->getFullYear,
+              ~month=adjustedDate->getMonth,
+              ~date=adjustedDate->getDate,
+              ~hours=appropriateHour,
+              ~minutes=0.,
+              ~seconds=0.,
+              (),
+            );
+          };
+          ReactNativePushNotification.(
+            localNotificationScheduleOptions(
+              ~id=Notifications.Ids.reminderDailyCheck,
+              ~userInfo={"id": Notifications.Ids.reminderDailyCheck},
+              ~date=
+                Js.Date.now()
+                ->Js.Date.fromFloat
+                ->todayOrTomorrowAppropriateTime,
+              ~message="Check at your goals progress",
+              ~repeatType=`day,
+              ~number=1,
+              ~priority=`low,
+              ~importance=`default,
+              ~ignoreInForeground=true,
+              (),
+            )
+            ->localNotificationSchedule
           );
         };
-        localNotificationScheduleOptions(
-          ~id=Notifications.Ids.reminderCheckGoals,
-          ~userInfo={"id": Notifications.Ids.reminderCheckGoals},
-          ~date=Js.Date.now()->Js.Date.fromFloat->tomorrowMorning,
-          ~message="Check at your goals progress",
-          ~repeatType=`day,
-          ~number=1,
-          ~priority=`low,
-          ~importance=`default,
-          ~ignoreInForeground=true,
-          (),
-        )
-        ->localNotificationSchedule;
       };
       None;
     },
@@ -361,7 +399,9 @@ let app = () => {
     [||],
   );
 
+  let calendarsContextValue = Calendars.useEvents();
   let isReady = initialStateContainer->Option.isSome;
+
   <ReactNativeDarkMode.DarkModeProvider>
     <AppSettings.ContextProvider value=appSettingsContextValue>
       <Calendars.ContextProvider value=calendarsContextValue>

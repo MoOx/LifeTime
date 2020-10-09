@@ -7,17 +7,8 @@ let make = () => {
   let (_settings, setSettings) = React.useContext(AppSettings.context);
   let theme = Theme.useTheme(AppSettings.useTheme());
 
-  let (notificationStatus, notificationStatus_set) =
+  let (notificationStatus, requestNotificationPermission) =
     Notifications.useNotificationStatus();
-  let requestNotificationPermission =
-    React.useCallback(() => {
-      ReactNativePermissions.(
-        requestNotifications([|"alert", "badge", "sound"|])
-        ->FutureJs.fromPromise(error => {Js.Console.error(error)})
-        ->Future.tapOk(res => {notificationStatus_set(_ => Some(res.status))})
-        ->ignore
-      )
-    });
 
   let (onNotificationPopinHeight, setOnNotificationPopinHeight) =
     React.useState(() => None);

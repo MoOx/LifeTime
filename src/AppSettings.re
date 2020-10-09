@@ -11,6 +11,7 @@ type t = {
   theme: string,
   lastUpdated: float,
   notificationsPermissionsDismissed: float,
+  notificationsDailyRemindersState: bool,
   calendarsSkipped: array(calendarSkipped),
   activities: array(Activities.t),
   activitiesSkipped: array(string),
@@ -36,6 +37,7 @@ let defaultSettings = {
   theme: "auto",
   lastUpdated: 0.,
   notificationsPermissionsDismissed: 0.,
+  notificationsDailyRemindersState: true,
   calendarsSkipped: [||],
   activitiesSkippedFlag: true,
   activitiesSkipped: [||],
@@ -49,6 +51,10 @@ let decodeJsonSettingsOrRaise = (json: Js.Json.t): t =>
     lastUpdated: json |> field("lastUpdated", Json.Decode.float),
     notificationsPermissionsDismissed:
       json |> field("notificationsPermissionsDismissed", Json.Decode.float),
+    notificationsDailyRemindersState:
+      try(json |> field("notificationsDailyRemindersState", bool)) {
+      | _ => defaultSettings.notificationsDailyRemindersState
+      },
     calendarsSkipped:
       json
       |> field(
@@ -123,10 +129,7 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t(Result.t(t, string)) => {
       )
       ->Result.map(settings =>
           {
-            theme: settings.theme,
-            lastUpdated: settings.lastUpdated,
-            notificationsPermissionsDismissed:
-              settings.notificationsPermissionsDismissed,
+            ...settings,
             calendarsSkipped:
               switch (calendarsResult) {
               // in case we cannot read calendar (eg: permission removed?)
@@ -161,10 +164,6 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t(Result.t(t, string)) => {
                     }
                   )
               },
-            activities: settings.activities,
-            activitiesSkipped: settings.activitiesSkipped,
-            activitiesSkippedFlag: settings.activitiesSkippedFlag,
-            goals: settings.goals,
           }
         )
       ->Future.value

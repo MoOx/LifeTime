@@ -1,7 +1,7 @@
 open ReactNative;
 open ReactMultiversal;
 
-let title = "Reset";
+let title = "Notifications";
 
 [@react.component]
 let make = (~navigation as _, ~route as _) => {
@@ -10,6 +10,6 @@ let make = (~navigation as _, ~route as _) => {
     style=Style.(
       array([|Predefined.styles##flexGrow, theme.styles##backgroundDark|])
     )>
-    <SettingsDangerZone />
+    <SettingsNotifications />
   </ScrollView>;
 };
