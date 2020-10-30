@@ -149,7 +149,7 @@ let make = (~navigation, ~route as _) => {
                (),
              )
            )>
-           <SpacedView>
+           <SpacedView vertical=S horizontal=S>
              <CalendarsPermissions
                onAboutPrivacyPress={_ =>
                  navigation->Navigators.RootStack.Navigation.navigate(

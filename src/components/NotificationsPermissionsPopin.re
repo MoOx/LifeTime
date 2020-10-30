@@ -70,13 +70,13 @@ let make = () => {
                 (),
               )
             )>
-            <SpacedView vertical=None>
+            <SpacedView vertical=S horizontal=S>
               <View
                 style=Style.(
                   viewStyle(
                     ~shadowColor="#000",
                     ~shadowOffset=offset(~height=3., ~width=1.),
-                    ~shadowOpacity=0.1,
+                    ~shadowOpacity=0.25,
                     ~shadowRadius=6.,
                     (),
                   )
@@ -192,7 +192,6 @@ let make = () => {
                   <Spacer size=XS />
                 </SpacedView>
               </View>
-              <Spacer />
             </SpacedView>
           </Animated.View>
     )
