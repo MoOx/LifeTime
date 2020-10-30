@@ -69,6 +69,7 @@ let make = (~navigation, ~route as _) => {
         />
       </Animated.ScrollView>
       {settings.notificationsPermissionsDismissed === 0.
+       && settings.goals->Array.length > 0
          ? <NotificationsPermissionsPopin /> : React.null}
     </View>
   </>;
