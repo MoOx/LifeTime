@@ -3,6 +3,7 @@ open ReactMultiversal;
 
 [@react.component]
 let make = (~navigation, ~route as _) => {
+  let (settings, _setSettings) = React.useContext(AppSettings.context);
   let theme = Theme.useTheme(AppSettings.useTheme());
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets();
 
@@ -15,6 +16,18 @@ let make = (~navigation, ~route as _) => {
         ->Future.tapOk(status =>
             if (status != granted) {
               hasCalendarAccess_set(_ => false);
+              if (settings.lastUpdated === 0.) {
+                // lazy load just a bit to get a nicer visual effect
+                // (otherwise navigation is kind of TOO QUICK)
+                Js.Global.setTimeout(
+                  () =>
+                    navigation->Navigators.RootStack.Navigation.navigate(
+                      "WelcomeModalScreen",
+                    ),
+                  100,
+                )
+                ->ignore;
+              };
             }
           )
         ->Future.tapError(_err =>
