@@ -24,6 +24,11 @@ Bump version
 ----
 
 ## iOS
+### ios sync_code_signing_update
+```
+fastlane ios sync_code_signing_update
+```
+
 ### ios beta
 ```
 fastlane ios beta
