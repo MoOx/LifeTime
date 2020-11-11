@@ -76,7 +76,13 @@ module SettingsStackScreen = {
         name="SettingsDangerZoneScreen"
         component=SettingsDangerZoneScreen.make
         options={_ =>
-          StatsStack.options(~title=SettingsDangerZoneScreen.title, ())
+          StatsStack.options(
+            ~title=SettingsDangerZoneScreen.title,
+            ~headerTintColor=theme.colors.blue,
+            ~headerTitleStyle=theme.styles##textOnBackground,
+            ~headerStyle=theme.styles##stackHeader,
+            (),
+          )
         }
       />
       <SettingsStack.Screen
