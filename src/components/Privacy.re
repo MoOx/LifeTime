@@ -21,16 +21,16 @@ let make = () => {
       )>
       {j|LifeTime is designed to protect your information. It only runs computation on your device and does not share your information anywhere.
 
-The calendars access we need to run our computation is read-only. All the informations retrieved from your calendars are only used on your device, to generate reports & offers you suggestions.
+The calendars access we need to run our computation is mostly read-only. All the informations retrieved from your calendars are only used on your device, to generate reports & offers you suggestions.
 We don't collect anything. We don't track you with any kind of third-party services.
 
-The settings of the application are stored on device, which includes:
+The settings of the application are stored on device, which includes things like:
 
 - Names of activities that are assigned to categories,
 - Categories of activities,
 - Names of calendars skipped
-- Goals information
-- Application color theme
+- Goals informations
+- Application settings like color theme & notifications preferences
 
 This mean, unless you backup your data, you cannot recover your personal settings if you remove the application.
 
