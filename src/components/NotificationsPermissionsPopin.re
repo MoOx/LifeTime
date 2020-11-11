@@ -8,7 +8,7 @@ let make = () => {
   let theme = Theme.useTheme(AppSettings.useTheme());
 
   let (notificationStatus, requestNotificationPermission) =
-    Notifications.useNotificationStatus();
+    NotificationsHooks.useNotificationStatus();
 
   let (onNotificationPopinHeight, setOnNotificationPopinHeight) =
     React.useState(() => None);

@@ -11,7 +11,10 @@ type t = {
   theme: string,
   lastUpdated: float,
   notificationsPermissionsDismissed: float,
-  notificationsDailyRemindersState: bool,
+  notificationsRecurrentRemindersOn: bool,
+  // https://stackoverflow.com/questions/1548031/data-structure-for-storing-recurring-events
+  // array of reminders that are an array of int (for now, minutes and hours)
+  notificationsRecurrentReminders: array(array(option(int))),
   calendarsSkipped: array(calendarSkipped),
   activities: array(Activities.t),
   activitiesSkipped: array(string),
@@ -37,7 +40,8 @@ let defaultSettings = {
   theme: "auto",
   lastUpdated: 0.,
   notificationsPermissionsDismissed: 0.,
-  notificationsDailyRemindersState: true,
+  notificationsRecurrentRemindersOn: true,
+  notificationsRecurrentReminders: [|[|Some(0), Some(9)|]|],
   calendarsSkipped: [||],
   activitiesSkippedFlag: true,
   activitiesSkipped: [||],
@@ -50,10 +54,24 @@ let decodeJsonSettingsOrRaise = (json: Js.Json.t): t =>
     theme: json |> field("theme", string),
     lastUpdated: json |> field("lastUpdated", Json.Decode.float),
     notificationsPermissionsDismissed:
-      json |> field("notificationsPermissionsDismissed", Json.Decode.float),
-    notificationsDailyRemindersState:
-      try(json |> field("notificationsDailyRemindersState", bool)) {
-      | _ => defaultSettings.notificationsDailyRemindersState
+      try(
+        json |> field("notificationsPermissionsDismissed", Json.Decode.float)
+      ) {
+      | _ => defaultSettings.notificationsPermissionsDismissed
+      },
+    notificationsRecurrentRemindersOn:
+      try(json |> field("notificationsRecurrentRemindersOn", bool)) {
+      | _ => defaultSettings.notificationsRecurrentRemindersOn
+      },
+    notificationsRecurrentReminders:
+      try(
+        json
+        |> field(
+             "notificationsRecurrentReminders",
+             array(array(optional(int))),
+           )
+      ) {
+      | _ => defaultSettings.notificationsRecurrentReminders
       },
     calendarsSkipped:
       json
@@ -200,37 +218,22 @@ let getSettings = () => {
     );
 };
 
-let useSettings = () => {
-  let (settings, set) = React.useState(() => defaultSettings);
-  React.useEffect1(
-    () => {
-      getSettings()->Future.tap(settings => set(_ => settings))->ignore;
-      None;
-    },
-    [|set|],
-  );
-  React.useEffect1(
-    () => {
-      if (settings != defaultSettings) {
-        settings
-        ->Js.Json.stringifyAny
-        ->Option.map(stringifiedSettings =>
-            ReactNativeAsyncStorage.setItem(storageKey, stringifiedSettings)
-          )
-        ->ignore;
-        // if (ReactNative.Global.__DEV__) {
-        //   Js.log2(
-        //     "Settings",
-        //     settings->Obj.magic->Js.Json.stringifyWithSpace(2),
-        //   );
-        // };
-      };
-      None;
-    },
-    [|settings|],
-  );
-  (settings, set);
-};
+let setSettings = settings =>
+  if (settings != defaultSettings) {
+    settings
+    ->Js.Json.stringifyAny
+    ->Option.map(stringifiedSettings =>
+        ReactNativeAsyncStorage.setItem(storageKey, stringifiedSettings)
+      )
+    ->ignore;
+    // if (ReactNative.Global.__DEV__) {
+    //   Js.log((
+    //     "Settings set to",
+    //     settings,
+    //     settings->Obj.magic->Js.Json.stringifyWithSpace(2),
+    //   ));
+    // };
+  };
 
 type setSettingsT = t => t;
 let defaultContext: (t, setSettingsT => unit) = (defaultSettings, _ => ());

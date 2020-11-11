@@ -9,7 +9,7 @@ let make = () => {
   let theme = Theme.useTheme(AppSettings.useTheme());
 
   let (notificationStatus, requestNotificationPermission) =
-    Notifications.useNotificationStatus();
+    NotificationsHooks.useNotificationStatus();
   let notificationsGranted =
     notificationStatus === Some(ReactNativePermissions.granted);
 
@@ -79,12 +79,16 @@ let make = () => {
               </View>
               <Switch
                 disabled={!notificationsGranted}
-                value={settings.notificationsDailyRemindersState}
-                onValueChange={notificationsDailyRemindersState => {
+                value={settings.notificationsRecurrentRemindersOn}
+                onValueChange={notificationsRecurrentRemindersOn => {
                   setSettings(settings =>
-                    {...settings, notificationsDailyRemindersState}
+                    {
+                      ...settings,
+                      lastUpdated: Js.Date.now(),
+                      notificationsRecurrentRemindersOn,
+                    }
                   );
-                  if (!notificationsDailyRemindersState) {
+                  if (!notificationsRecurrentRemindersOn) {
                     ReactNativePushNotification.cancelLocalNotifications({
                       "id": Notifications.Ids.reminderDailyCheck,
                     });

@@ -24,7 +24,7 @@
     "test:bundle:ios": "react-native bundle --platform ios --dev false --minify false --entry-file index.js --bundle-output index.bundle.js && rm index.bundle.js",
     "test:bundle:android": "react-native bundle --platform android --dev false --minify false --entry-file index.js --bundle-output index.bundle.js && rm index.bundle.js",
     "test:bundle": "yarn test:bundle:ios && yarn test:bundle:android",
-    "test": "yarn lint && yarn bs:clean && yarn test:bundle",
+    "test": "yarn lint && yarn bs:clean && yarn test:native && yarn test:bundle",
     "release:bump:patch": "yarn version --patch --no-git-tag-version && bundle exec fastlane versionBump",
     "release:bump:minor": "yarn version --minor --no-git-tag-version && bundle exec fastlane versionBump",
     "release:bump:major": "yarn version --major --no-git-tag-version && bundle exec fastlane versionBump",
@@ -92,7 +92,11 @@
     "trash-cli": "^3.0.0"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+    "testRegex": "Test\\.js$",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(jest-)?react-native|react-(native|universal|navigation)-(.*)|@react-native-community/(.*)|@react-navigation/(.*)|bs-platform|(@[a-zA-Z]+/)?(bs|reason|rescript)-(.*)+)"
+    ]
   },
   "browserslist": {
     "production": [
