@@ -1,12 +1,10 @@
-open ReactNative;
-
 let useNotificationStatus = () => {
   let (notificationStatus, notificationStatus_set) =
     React.useState(() => None);
   let appState = ReactNativeHooks.useAppState();
   React.useEffect1(
     () => {
-      if (appState === AppState.active) {
+      if (appState === `active) {
         ReactNativePermissions.(
           checkNotifications()
           ->FutureJs.fromPromise(error => {Js.Console.error(error)})

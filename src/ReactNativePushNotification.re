@@ -52,7 +52,7 @@ external localNotificationOptions:
     ~message: string,
     ~number: int=?,
     ~playSound: bool=?,
-    ~repeatType: [@bs.string] [ | `week | `day | `hour | `minute | `time]=?,
+    ~repeatType: [ | `week | `day | `hour | `minute | `time]=?,
     ~soundName: string=?,
     ~title: string=?,
     ~userInfo: 'userInfo=?,
@@ -66,7 +66,7 @@ external localNotificationOptions:
     ~group: string=?,
     ~groupSummary: bool=?,
     ~ignoreInForeground: bool=?,
-    ~importance: [@bs.string] [
+    ~importance: [
                    | `default
                    | `max
                    | `high
@@ -82,7 +82,7 @@ external localNotificationOptions:
     ~messageId: string=?,
     ~ongoing: bool=?,
     ~onlyAlertOnce: bool=?,
-    ~priority: [@bs.string] [ | `max | `high | `low | `min | `default]=?,
+    ~priority: [ | `max | `high | `low | `min | `default]=?,
     ~repeatTime: float=?,
     ~shortcutId: string=?,
     ~showWhen: bool=?,
@@ -92,7 +92,7 @@ external localNotificationOptions:
     ~ticker: string=?,
     ~vibrate: bool=?,
     ~vibration: float=?,
-    ~visibility: [@bs.string] [ | `private | `public | `secret]=?,
+    ~visibility: [ | `private | `public | `secret]=?,
     /* iOS only properties */
     ~alertAction: string=?,
     ~category: string=?,
@@ -114,7 +114,7 @@ external localNotificationScheduleOptions:
     ~message: string,
     ~number: int=?,
     ~playSound: bool=?,
-    ~repeatType: [@bs.string] [ | `week | `day | `hour | `minute | `time]=?,
+    ~repeatType: [ | `week | `day | `hour | `minute | `time]=?,
     ~soundName: string=?,
     ~title: string=?,
     ~userInfo: 'userInfo=?,
@@ -128,7 +128,7 @@ external localNotificationScheduleOptions:
     ~group: string=?,
     ~groupSummary: bool=?,
     ~ignoreInForeground: bool=?,
-    ~importance: [@bs.string] [
+    ~importance: [
                    | `default
                    | `max
                    | `high
@@ -144,7 +144,7 @@ external localNotificationScheduleOptions:
     ~messageId: string=?,
     ~ongoing: bool=?,
     ~onlyAlertOnce: bool=?,
-    ~priority: [@bs.string] [ | `max | `high | `low | `min | `default]=?,
+    ~priority: [ | `max | `high | `low | `min | `default]=?,
     ~repeatTime: float=?,
     ~shortcutId: string=?,
     ~showWhen: bool=?,
@@ -154,7 +154,7 @@ external localNotificationScheduleOptions:
     ~ticker: string=?,
     ~vibrate: bool=?,
     ~vibration: float=?,
-    ~visibility: [@bs.string] [ | `private | `public | `secret]=?,
+    ~visibility: [ | `private | `public | `secret]=?,
     /* iOS only properties */
     ~alertAction: string=?,
     ~category: string=?,
@@ -170,30 +170,40 @@ external localNotificationSchedule: localNotificationScheduleOptions => unit =
 external popInitialNotification: notification('data, 'alert) => unit =
   "popInitialNotification";
 
-// export class ChannelObject {
-// channelId: string,
-// channelName: string,
-// channelDescription?: string,
-// soundName?: string,
-// importance?: number,
-// vibrate?: bool,
-// }
-// [@bs.module "react-native-push-notification"] external getChannels:(
-//     callback: (channel_ids: string[]) => unit
-// )=> unit ="getChannels";
-// [@bs.module "react-native-push-notification"] external channelExists:(
-//     channel_id: string,
-//     callback: (exists: bool) => unit
-// )=> unit ="channelExists";
-// [@bs.module "react-native-push-notification"] external createChannel:(
-//     channel: ChannelObject,
-//     callback: (created: bool) => unit
-// )=> unit="createChannel";
-// [@bs.module "react-native-push-notification"] external channelBlocked:(
-//     channel_id: string,
-//     callback: (blocked: bool) => unit
-// )=> unit="channelBlocked";
-// [@bs.module "react-native-push-notification"] external deleteChannel:(channel_id: string)=> unit="deleteChannel";
+type channel = {
+  channelId: string,
+  channelName: string,
+  channelDescription: option(string),
+  soundName: option(string),
+  importance: option(int),
+  vibrate: option(bool),
+};
+
+[@bs.obj]
+external channel:
+  (
+    ~channelId: string,
+    ~channelName: string,
+    ~channelDescription: string=?,
+    ~soundName: string=?,
+    ~importance: int=?,
+    ~vibrate: bool=?,
+    unit
+  ) =>
+  channel;
+
+[@bs.module "react-native-push-notification"]
+external getChannels: (array(string) => unit) => unit = "getChannels";
+[@bs.module "react-native-push-notification"]
+external channelExists: (string, bool => unit) => unit = "channelExists";
+[@bs.module "react-native-push-notification"]
+external createChannel: channel => unit = "createChannel";
+external createChannelWithCallback: (channel, bool => unit) => unit =
+  "createChannel";
+[@bs.module "react-native-push-notification"]
+external channelBlocked: (string, bool => unit) => unit = "channelBlocked";
+[@bs.module "react-native-push-notification"]
+external deleteChannel: string => unit = "deleteChannel";
 
 [@bs.module "react-native-push-notification"]
 external cancelAllLocalNotifications: unit => unit =

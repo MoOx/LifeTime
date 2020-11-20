@@ -1,14 +1,10 @@
 open Belt;
-open ReactNative;
 open ReactNavigation;
-
-if (Global.__DEV__) {
-  Global.unstable_enableLogBox();
-};
 
 let navigatorEmitter = EventEmitter.make();
 
-ReactNativePushNotification.(
+{
+  open ReactNativePushNotification;
   configure(
     configureOptions(
       ~requestPermissions=false,
@@ -27,8 +23,16 @@ ReactNativePushNotification.(
         },
       (),
     ),
-  )
-);
+  );
+  createChannel(
+    channel(
+      ~channelId="reminders",
+      ~channelName="Reminders",
+      ~channelDescription="Reminders for your goals",
+      (),
+    ),
+  );
+};
 
 type navigationState;
 let navigationStateStorageKey = "react-navigation:state";

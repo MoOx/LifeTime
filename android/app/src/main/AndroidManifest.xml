@@ -42,19 +42,7 @@
       
       <!-- react-native-push-notification -->
       <meta-data
-        android:name="com.dieam.reactnativepushnotification.notification_channel_name"
-        android:value="@string/notification_channel_name"
-      />
-      <meta-data
-        android:name="com.dieam.reactnativepushnotification.notification_channel_description"
-        android:value="@string/notification_channel_description"
-      />
-      <meta-data
         android:name="com.dieam.reactnativepushnotification.notification_foreground"
-        android:value="true"
-      />
-      <meta-data
-        android:name="com.dieam.reactnativepushnotification.channel_create_default"
         android:value="true"
       />
       <meta-data

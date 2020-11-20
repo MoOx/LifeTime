@@ -36,7 +36,7 @@ let make =
   React.useEffect1(
     () => {
       let handleAppStateChange = newAppState =>
-        if (newAppState == AppState.active) {
+        if (newAppState == `active) {
           requestUpdate();
         };
 

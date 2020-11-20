@@ -23,7 +23,7 @@ type alarmStructuredLocation = {
   /* The title of the location. */
   title: option(string),
   /* A value indicating how a location-based alarm is triggered. */
-  proximity: string, // [@bs.string] [ | `enter | `leave | `none],
+  proximity: string, // [ | `enter | `leave | `none],
   /* A minimum distance from the core location that would trigger the calendar event's alarm. */
   radius: float,
   /* The geolocation coordinates, as an object with latitude and longitude properties. */

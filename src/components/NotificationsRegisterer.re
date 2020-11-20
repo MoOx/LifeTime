@@ -7,7 +7,7 @@ let make = () => {
   let appState = ReactNativeHooks.useAppState();
   React.useEffect1(
     () => {
-      if (appState === AppState.active) {
+      if (appState === `active) {
         ReactNativePushNotification.setApplicationIconBadgeNumber(0);
       };
       None;
@@ -31,6 +31,7 @@ let make = () => {
           ->Array.forEach(notifTime => {
               ReactNativePushNotification.(
                 localNotificationScheduleOptions(
+                  ~channelId="reminders",
                   ~id=Notifications.Ids.reminderDailyCheck,
                   ~userInfo={"id": Notifications.Ids.reminderDailyCheck},
                   ~date=
