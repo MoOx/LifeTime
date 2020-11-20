@@ -99,12 +99,6 @@ let useEvents = () => {
           let res =
             eventsMapByRange->Map.String.get(makeMapKey(startDate, endDate));
           if (res->Option.isNone && allowFetch) {
-            setEventsMapByRange(eventsMapByRange => {
-              eventsMapByRange->Map.String.set(
-                makeMapKey(startDate, endDate),
-                None,
-              )
-            });
             fetchAllEvents(
               startDate->Js.Date.toISOString,
               endDate->Js.Date.toISOString,
@@ -115,6 +109,12 @@ let useEvents = () => {
             ->FutureJs.fromPromise(error => {
                 // @todo error!
                 Js.log(error);
+                // setEventsMapByRange(eventsMapByRange => {
+                //   eventsMapByRange->Map.String.set(
+                //     makeMapKey(startDate, endDate),
+                //     None,
+                //   )
+                // });
                 error;
               })
             ->Future.tapOk(res => {
