@@ -357,7 +357,28 @@ let make =
          ->Js.String.toUpperCase
          ->React.string}
       </TitlePre>
-      <Title style=theme.styles##textOnBackground> title->React.string </Title>
+      <View style=Predefined.styles##rowSpaceBetween>
+        <Title style=theme.styles##textOnBackground>
+          title->React.string
+        </Title>
+        <View style=Predefined.styles##row>
+          {Global.__DEV__
+             ? <>
+                 {Global.hermesInternal != None
+                    ? <Text
+                        style=Style.(
+                          array([|
+                            theme.styles##textLightOnBackgroundDark,
+                            Theme.text##caption2,
+                          |])
+                        )>
+                        "Hermes on"->React.string
+                      </Text>
+                    : React.null}
+               </>
+             : React.null}
+        </View>
+      </View>
     </SpacedView>
     {messagesNoEvents
      ->Option.map(((messageNoEvents, messageNoEventsButtons)) =>
