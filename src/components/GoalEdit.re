@@ -414,7 +414,12 @@ let make =
               dash
             </View>
             <ReactNativeSlider
-              style=Predefined.styles##flex
+              style=Style.(
+                array([|
+                  Predefined.styles##flexGrow,
+                  style(~minHeight=40.->dp, ()),
+                |])
+              )
               minimumValue=0.
               maximumValue={24. *. 60.}
               step=15.
