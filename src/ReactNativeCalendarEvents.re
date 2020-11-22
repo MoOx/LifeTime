@@ -2,7 +2,6 @@
 
 type isoDateString = string;
 
-[@bs.deriving {jsConverter: newType}]
 type authorizationStatus = [
   | `denied
   | `restricted
@@ -196,12 +195,12 @@ type calendarOptions = {
 
 /* Get calendar authorization status. */
 [@bs.module "react-native-calendar-events"] [@bs.scope "default"]
-external checkPermissions: unit => Js.Promise.t(abs_authorizationStatus) =
+external checkPermissions: bool => Js.Promise.t(authorizationStatus) =
   "checkPermissions";
 
 /* Request calendar authorization. Authorization must be granted before accessing calendar events. */
 [@bs.module "react-native-calendar-events"] [@bs.scope "default"]
-external requestPermissions: unit => Js.Promise.t(abs_authorizationStatus) =
+external requestPermissions: unit => Js.Promise.t(authorizationStatus) =
   "requestPermissions";
 
 /* Finds all the calendars on the device. */

@@ -10,11 +10,12 @@ let make = (~navigation, ~route as _) => {
   let (hasCalendarAccess, hasCalendarAccess_set) = React.useState(() => true);
   React.useEffect1(
     () => {
-      ReactNativePermissions.(
-        check(Ios.calendars)
+      ReactNativeCalendarEvents.(
+        checkPermissions(true)
         ->FutureJs.fromPromise(error => Js.log(error))
-        ->Future.tapOk(status =>
-            if (status != granted) {
+        ->Future.tapOk(status => {
+            Js.log(("status", status));
+            if (status != `authorized) {
               hasCalendarAccess_set(_ => false);
               if (settings.lastUpdated === 0.) {
                 // lazy load just a bit to get a nicer visual effect
@@ -28,8 +29,8 @@ let make = (~navigation, ~route as _) => {
                 )
                 ->ignore;
               };
-            }
-          )
+            };
+          })
         ->Future.tapError(_err =>
             Alert.alert(
               ~title="Ooops, something bad happened",
@@ -163,10 +164,9 @@ let make = (~navigation, ~route as _) => {
                      Js.log(error);
                      error;
                    })
-                 ->Future.tapOk(status =>
-                     switch (
-                       status->ReactNativeCalendarEvents.authorizationStatusFromJs
-                     ) {
+                 ->Future.tapOk(status => {
+                     Js.log(("new status", status));
+                     switch (status) {
                      | `authorized => hasCalendarAccess_set(_ => true)
                      | `denied
                      | `restricted
@@ -193,8 +193,8 @@ let make = (~navigation, ~route as _) => {
                          |],
                          (),
                        )
-                     }
-                   )
+                     };
+                   })
                  ->Future.tapError(_err =>
                      Alert.alert(
                        ~title="Ooops, something bad happened",
