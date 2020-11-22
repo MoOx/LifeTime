@@ -361,14 +361,16 @@ let make =
     <Separator style=theme.styles##separatorOnBackground />
     <View style=theme.styles##background>
       <Spacer size=S />
-      <View style=Predefined.styles##rowSpaceBetween>
-        <Spacer />
+      <View style=Predefined.styles##row>
+        <Spacer size=S />
         {quickDurations
          ->Array.map(quickDuration =>
              <TouchableOpacity
                key={quickDuration->Js.Float.toString}
-               onPress={_ => setMinutes(_ => quickDuration)}>
-               <SpacedView vertical=XS horizontal=XS>
+               onPress={_ => setMinutes(_ => quickDuration)}
+               style=Predefined.styles##flexGrow>
+               <SpacedView
+                 vertical=XS horizontal=XS style=Predefined.styles##center>
                  <Text
                    style=Style.(
                      array([|
@@ -379,14 +381,16 @@ let make =
                          (),
                        ),
                      |])
-                   )>
+                   )
+                   numberOfLines=1
+                   adjustsFontSizeToFit=true>
                    {(quickDuration->Js.Float.toFixed ++ "min")->React.string}
                  </Text>
                </SpacedView>
              </TouchableOpacity>
            )
          ->React.array}
-        <Spacer />
+        <Spacer size=S />
       </View>
       <SpacedView vertical=XS>
         <View style=Predefined.styles##rowCenter>
