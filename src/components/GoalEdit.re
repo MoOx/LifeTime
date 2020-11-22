@@ -330,7 +330,14 @@ let make =
                    cp->Array.set(day, !dayOn)->ignore;
                    cp;
                  })
-               }>
+               }
+               hitSlop={View.edgeInsets(
+                 ~top=20.,
+                 ~bottom=20.,
+                 ~left=20.,
+                 ~right=20.,
+                 (),
+               )}>
                <View>
                  <Text
                    style={Style.array([|
