@@ -48,6 +48,18 @@ let make =
       ->Option.map(g => g.durationPerDay)
       ->Option.getWithDefault(60.)
     );
+  let throttleMinutesTimer = React.useRef(None);
+  let handleSliderMinutesChange =
+    React.useCallback1(
+      value => {
+        throttleMinutesTimer.current
+        ->Option.map(Js.Global.clearTimeout)
+        ->ignore;
+        throttleMinutesTimer.current =
+          Some(Js.Global.setTimeout(() => {setMinutes(_ => value)}, 100));
+      },
+      [||],
+    );
   let (categoriesSelected, setCategoriesSelected) =
     React.useState(() =>
       initialGoal->Option.map(g => g.categoriesId)->Option.getWithDefault([||])
@@ -424,7 +436,7 @@ let make =
               maximumValue={24. *. 60.}
               step=15.
               value=minutes
-              onValueChange={value => setMinutes(_ => value)}
+              onValueChange=handleSliderMinutesChange
             />
           </View>
           <Spacer size=XS />
