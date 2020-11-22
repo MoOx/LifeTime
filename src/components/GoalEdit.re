@@ -199,11 +199,7 @@ let make =
               Predefined.styles##flex,
               Theme.text##body,
               theme.styles##textOnBackground,
-              textStyle(
-                ~height=Spacer.space->dp,
-                ~lineHeight=Spacer.space,
-                (),
-              ),
+              textStyle(~padding=0.->dp, ()),
             |])
           )
         />
