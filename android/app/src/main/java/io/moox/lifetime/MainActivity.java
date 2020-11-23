@@ -1,4 +1,4 @@
-package com.lifetime;
+package io.moox.lifetime;
 
 import android.os.Bundle;
 import android.os.Build;
@@ -8,7 +8,7 @@ import com.facebook.react.ReactActivity;
 import com.zoontek.rnbootsplash.RNBootSplash;
 
 public class MainActivity extends ReactActivity {
-  
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

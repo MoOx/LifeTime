@@ -1,4 +1,4 @@
-package com.lifetime;
+package io.moox.lifetime;
 
 import android.app.Application;
 import android.content.Context;

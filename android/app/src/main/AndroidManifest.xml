@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.lifetime">
+  package="io.moox.lifetime">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- https://github.com/react-native-community/react-native-permissions -->
