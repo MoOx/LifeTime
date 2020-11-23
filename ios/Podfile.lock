@@ -242,8 +242,8 @@ PODS:
   - React-jsinspector (0.63.3)
   - react-native-blur (0.8.0):
     - React
-  - react-native-safe-area-context (3.1.1):
-    - React
+  - react-native-safe-area-context (3.1.9):
+    - React-Core
   - react-native-slider (2.0.9):
     - React
   - React-RCTActionSheet (0.63.3):
@@ -318,16 +318,16 @@ PODS:
     - React
   - RNCPushNotificationIOS (1.7.3):
     - React-Core
-  - RNGestureHandler (1.6.1):
+  - RNGestureHandler (1.8.0):
     - React
   - RNLocalize (1.4.0):
     - React
   - RNPermissions (2.2.2):
     - React-Core
-  - RNReanimated (1.9.0):
-    - React
-  - RNScreens (2.9.0):
-    - React
+  - RNReanimated (1.13.2):
+    - React-Core
+  - RNScreens (2.15.0):
+    - React-Core
   - RNSentry (1.6.2):
     - React
     - Sentry (~> 5.1.8)
@@ -543,7 +543,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: b56c03e61c0dd5f5801255f2160a815f4a53d451
   React-jsinspector: 8e68ffbfe23880d3ee9bafa8be2777f60b25cbe2
   react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
-  react-native-safe-area-context: 344b969c45af3d8464d36e8dea264942992ef033
+  react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
   react-native-slider: e51492f1264d882a8815b71c5870f8978e52887d
   React-RCTActionSheet: 53ea72699698b0b47a6421cb1c8b4ab215a774aa
   React-RCTAnimation: 1befece0b5183c22ae01b966f5583f42e69a83c2
@@ -561,11 +561,11 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 6d99641f8e6f15d169d695d8ef184bf187903f11
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNCPushNotificationIOS: edeeea93b7210d2f918fc0e46e1a2a189b5fdacc
-  RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
+  RNGestureHandler: 7a5833d0f788dbd107fbb913e09aa0c1ff333c39
   RNLocalize: b6df30cc25ae736d37874f9bce13351db2f56796
   RNPermissions: 5df468064df661a4c8c017e2791ce90d7695eea5
-  RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
-  RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
+  RNReanimated: e03f7425cb7a38dcf1b644d680d1bfc91c3337ad
+  RNScreens: 2ad555d4d9fa10b91bb765ca07fe9b29d59573f0
   RNSentry: 9d68f0ce79608e90e10ac320c409321efc114b8f
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   Sentry: 8715e88b813bde9ad37aead365d5b04ac7302153
