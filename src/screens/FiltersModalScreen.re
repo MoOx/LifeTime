@@ -7,7 +7,11 @@ let make = (~navigation, ~route as _) => {
 
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
-    <StatusBar barStyle=`lightContent />
+    <StatusBar
+      barStyle=`lightContent
+      backgroundColor={Theme.Colors.dark.backgroundDark}
+    />
+    <NavigationBar backgroundColor={theme.namedColors.backgroundDark} />
     <Animated.ScrollView
       style={Style.array([|
         Predefined.styles##flexGrow,
@@ -33,6 +37,7 @@ let make = (~navigation, ~route as _) => {
       <StickyHeader
         scrollYAnimatedValue={scrollYAnimatedValue.current}
         safeArea=false
+        animateBackgroundOpacity=False
         backgroundElement={<StickyHeaderBackground />}
         color={theme.colors.blue}
         color2={theme.colors.blue}

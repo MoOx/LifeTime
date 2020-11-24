@@ -5,7 +5,10 @@ open ReactMultiversal;
 let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme(AppSettings.useTheme());
   <>
-    <StatusBar barStyle={Theme.statusBarStyle(theme.mode, `darkContent)} />
+    <StatusBar
+      barStyle=`lightContent
+      backgroundColor={Theme.Colors.dark.backgroundDark}
+    />
     <ScrollView
       style=theme.styles##background
       contentContainerStyle=Predefined.styles##flexGrow>

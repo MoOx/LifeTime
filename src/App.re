@@ -35,7 +35,9 @@ let navigatorEmitter = EventEmitter.make();
 };
 
 type navigationState;
-let navigationStateStorageKey = "react-navigation:state";
+let navigationStateStorageKey = "react-navigation:state:2";
+// remove old entries
+ReactNativeAsyncStorage.removeItem("react-navigation:state");
 
 [@react.component]
 let app = () => {

@@ -51,7 +51,11 @@ let make =
     ->Option.getWithDefault((false, true, _ => ()));
 
   <>
-    <StatusBar barStyle=`lightContent />
+    <StatusBar
+      barStyle=`lightContent
+      backgroundColor={Theme.Colors.dark.backgroundDark}
+    />
+    <NavigationBar backgroundColor={theme.namedColors.backgroundDark} />
     <Animated.ScrollView
       style=Style.(
         array([|Predefined.styles##flexGrow, theme.styles##backgroundDark|])

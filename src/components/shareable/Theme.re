@@ -61,6 +61,15 @@ let statusBarStyle = (theme, barStyle) => {
   };
 };
 
+let statusBarColor = (theme, barStyle) => {
+  switch (theme, barStyle) {
+  | (`light, `lightContent) => Colors.dark.backgroundDark
+  | (`light, `darkContent) => Colors.light.backgroundDark
+  | (`dark, `darkContent) => Colors.dark.backgroundDark
+  | (`dark, `lightContent) => Colors.dark.backgroundDark
+  };
+};
+
 type fontWeightNumeric = [
   | `bold
   | `normal

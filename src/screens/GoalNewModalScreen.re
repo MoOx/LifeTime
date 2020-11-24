@@ -41,7 +41,11 @@ let make =
     ->Option.flatMap(params => params.newGoalType)
     ->Option.getWithDefault(Goal.Type.Goal->Goal.Type.toSerialized);
   <>
-    <StatusBar barStyle=`lightContent />
+    <StatusBar
+      barStyle=`lightContent
+      backgroundColor={Theme.Colors.dark.backgroundDark}
+    />
+    <NavigationBar backgroundColor={theme.namedColors.backgroundDark} />
     <Animated.ScrollView
       style=Style.(
         array([|Predefined.styles##flexGrow, theme.styles##backgroundDark|])

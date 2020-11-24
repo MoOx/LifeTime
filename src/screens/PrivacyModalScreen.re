@@ -7,7 +7,11 @@ let make = (~navigation, ~route as _) => {
 
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.));
   <>
-    <StatusBar barStyle={Theme.statusBarStyle(theme.mode, `lightContent)} />
+    <StatusBar
+      barStyle=`lightContent
+      backgroundColor={Theme.Colors.dark.backgroundDark}
+    />
+    <NavigationBar backgroundColor={theme.namedColors.background} />
     <Animated.ScrollView
       style={Style.array([|
         Predefined.styles##flexGrow,
