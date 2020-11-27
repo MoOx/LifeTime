@@ -79,7 +79,7 @@
     "@babel/runtime": "^7.8.4",
     "@react-native-community/eslint-config": "^1.1.0",
     "babel-jest": "^25.1.0",
-    "bs-platform": "^8.2.0",
+    "bs-platform": "^8.3.3",
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.10.0",
     "flow-bin": "^0.122.0",
