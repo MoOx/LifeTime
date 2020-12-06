@@ -247,39 +247,36 @@ let make = (
     <Separator style={theme.styles["separatorOnBackground"]} />
     <View style={theme.styles["background"]}>
       <SpacedView style={Predefined.styles["rowSpaceBetween"]}>
-        {
-          let firstDayOfWeek = Date.firstDayOfWeek()
-          days
-          ->Array.sliceToEnd(firstDayOfWeek)
-          ->Array.concat(days->Array.slice(~offset=0, ~len=firstDayOfWeek))
-          ->Array.mapWithIndex((index, dayOn) => {
-            let day = mod(index + firstDayOfWeek, 7)
-            <TouchableWithoutFeedback key={index->string_of_int} onPress={_ => setDays(days => {
-                  let cp = days->Array.copy
-                  cp->Array.set(day, !dayOn)->ignore
-                  cp
-                })} hitSlop={View.edgeInsets(~top=20., ~bottom=20., ~left=20., ~right=20., ())}>
-              <View>
-                <Text
-                  style={Style.array([
-                    Theme.text["caption1"],
-                    theme.styles["textVeryLightOnBackground"],
-                  ])}>
-                  {day->float->Date.dayShortString->React.string}
-                </Text>
-                <Spacer size=XXS />
-                {if !dayOn {
-                  <SVGCircle width={26.->Style.dp} height={26.->Style.dp} fill=theme.colors.gray />
-                } else {
-                  <SVGCheckmarkcircle
-                    width={26.->Style.dp} height={26.->Style.dp} fill=theme.colors.blue
-                  />
-                }}
-              </View>
-            </TouchableWithoutFeedback>
-          })
-          ->React.array
-        }
+        {days
+        ->Array.sliceToEnd(Date.weekStartsOn)
+        ->Array.concat(days->Array.slice(~offset=0, ~len=Date.weekStartsOn))
+        ->Array.mapWithIndex((index, dayOn) => {
+          let day = mod(index + Date.weekStartsOn, 7)
+          <TouchableWithoutFeedback key={index->string_of_int} onPress={_ => setDays(days => {
+                let cp = days->Array.copy
+                cp->Array.set(day, !dayOn)->ignore
+                cp
+              })} hitSlop={View.edgeInsets(~top=20., ~bottom=20., ~left=20., ~right=20., ())}>
+            <View>
+              <Text
+                style={Style.array([
+                  Theme.text["caption1"],
+                  theme.styles["textVeryLightOnBackground"],
+                ])}>
+                {day->float->Date.dayShortString->React.string}
+              </Text>
+              <Spacer size=XXS />
+              {if !dayOn {
+                <SVGCircle width={26.->Style.dp} height={26.->Style.dp} fill=theme.colors.gray />
+              } else {
+                <SVGCheckmarkcircle
+                  width={26.->Style.dp} height={26.->Style.dp} fill=theme.colors.blue
+                />
+              }}
+            </View>
+          </TouchableWithoutFeedback>
+        })
+        ->React.array}
       </SpacedView>
     </View>
     <Separator style={theme.styles["separatorOnBackground"]} />

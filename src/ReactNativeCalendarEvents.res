@@ -115,7 +115,7 @@ type calendarEventReadable = {
   alarms: option<array<alarm>>,
 }
 
-type calendarEventWritable = {
+type writableEvent = {
   // base
   /* The start date of the calendar event in ISO format */
   startDate: isoDateString,
@@ -146,20 +146,23 @@ type calendarEventWritable = {
   alarms: option<array<alarm>>,
 }
 
-@bs.deriving(jsConverter)
-type calendarEntityTypeiOS = [#event | #reminder]
-
-@bs.deriving(jsConverter)
-type calendarAccessLevelAndroid = [
-  | #contributor
-  | #editor
-  | #freebusy
-  | #override
-  | #owner
-  | #read
-  | #respond
-  | #root
-]
+@bs.obj
+external writableEvent: (
+  ~alarms: array<alarm>=?,
+  ~allDay: bool=?,
+  ~calendarId: string=?,
+  ~description: string=?,
+  ~endDate: float,
+  ~id: string=?,
+  ~isDetached: bool=?,
+  ~location: string=?,
+  ~notes: string=?,
+  ~recurrence: recurrenceFrequency=?,
+  ~recurrenceRule: recurrenceRule=?,
+  ~startDate: float,
+  ~url: string=?,
+  unit,
+) => writableEvent = ""
 
 type calendarAccountSourceAndroid = {
   /* The Account name */
@@ -177,11 +180,11 @@ type calendarOptions = {
   /* The calendar color */
   color: string,
   /* iOS ONLY - Entity type for the calendar */
-  entityType: calendarEntityTypeiOS,
+  entityType: [#event | #reminder],
   /* Android ONLY - The calendar name */
   name: string,
   /* Android ONLY - Defines how the event shows up for others when the calendar is shared */
-  accessLevel: calendarAccessLevelAndroid,
+  accessLevel: [#contributor | #editor | #freebusy | #override | #owner | #read | #respond | #root],
   /* Android ONLY - The owner account for this calendar, based on the calendar feed */
   ownerAccount: string,
   /* Android ONLY - The calendar Account source */
@@ -200,11 +203,21 @@ external requestPermissions: unit => Js.Promise.t<authorizationStatus> = "reques
 @bs.module("react-native-calendar-events") @bs.scope("default")
 external findCalendars: unit => Js.Promise.t<array<calendar>> = "findCalendars"
 
-/* Create a calendar.
+@ocaml.doc("
+ * Create a calendar.
  * @param calendar - Calendar to create
- */
-@bs.module("react-native-calendar-events") @bs.scope("default")
+ ")
+@bs.module("react-native-calendar-events")
+@bs.scope("default")
 external saveCalendar: calendarOptions => Js.Promise.t<string> = "saveCalendar"
+
+@ocaml.doc("
+ * Remove a calendar.
+ * @param id - Id of the calendar to remove
+ ")
+@bs.module("react-native-calendar-events")
+@bs.scope("default")
+external removeCalendar: string => Js.Promise.t<bool> = "removeCalendar"
 
 @ocaml.doc("
  * Find calendar event by id.
@@ -242,8 +255,7 @@ external fetchAllEvents: (
 )
 @bs.module("react-native-calendar-events")
 @bs.scope("default")
-external saveEvent: (string, calendarEventWritable, option<options>) => Js.Promise.t<string> =
-  "saveEvent"
+external saveEvent: (string, writableEvent, option<options>) => Js.Promise.t<string> = "saveEvent"
 
 @ocaml.doc(
   "

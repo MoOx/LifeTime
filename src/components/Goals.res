@@ -19,10 +19,14 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
     (supposedEndDate->Js.Date.getTime -. endDate->Js.Date.getTime)->Date.msToMin
   let events = getEvents(startDate, endDate, true)
   let mapTitleDuration =
-    events->Option.map(es => es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration)
+    events->Option.map(es =>
+      es->Calendars.filterEvents(settings)->Calendars.makeMapTitleDuration(startDate, endDate)
+    )
   let mapCategoryDuration =
     events->Option.map(es =>
-      es->Calendars.filterEvents(settings)->Calendars.mapCategoryDuration(settings)
+      es
+      ->Calendars.filterEvents(settings)
+      ->Calendars.makeMapCategoryDuration(settings, startDate, endDate)
     )
 
   let (debug, debug_set) = React.useState(() => false)

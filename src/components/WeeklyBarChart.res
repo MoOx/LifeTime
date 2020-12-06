@@ -19,10 +19,14 @@ let make = (
   let endDate = supposedEndDate->Date.min(today.current)
   let events = getEvents(startDate, endDate, false)
   let mapTitleDuration =
-    events->Option.map(es => es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration)
+    events->Option.map(es =>
+      es->Calendars.filterEvents(settings)->Calendars.makeMapTitleDuration(startDate, endDate)
+    )
   let mapCategoryDuration =
     events->Option.map(es =>
-      es->Calendars.filterEvents(settings)->Calendars.mapCategoryDuration(settings)
+      es
+      ->Calendars.filterEvents(settings)
+      ->Calendars.makeMapCategoryDuration(settings, startDate, endDate)
     )
   <View style>
     <Spacer />
@@ -43,7 +47,7 @@ let make = (
     </SpacedView>
     <Spacer size=S />
     <SpacedView vertical=None>
-      <WeeklyGraph events mapCategoryDuration mapTitleDuration startDate supposedEndDate />
+      <WeeklyGraph events mapCategoryDuration startDate supposedEndDate />
     </SpacedView>
     <Spacer size=S />
     <View style={Predefined.styles["row"]}>

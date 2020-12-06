@@ -1,7 +1,6 @@
 open Belt
 open ReactNative
 open ReactMultiversal
-open ReasonDateFns
 open VirtualizedList
 
 let title = "Your LifeTime"
@@ -37,16 +36,16 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
 
   let today = React.useRef(Date.now())
   let todayDates = React.useRef(Date.weekDates(today.current))
-  let previousDates = React.useRef(Date.weekDates(today.current->Date.addDays(-7)))
+  let previousDates = React.useRef(Date.weekDates(today.current->DateFns.addDays(-7.)))
 
-  let weeks = React.useRef(
+  let last5Weeks = React.useRef(
     Array.range(0, 5)->Array.map(currentWeekReverseIndex =>
-      Date.weekDates(today.current->Date.addDays(-currentWeekReverseIndex * 7))
+      Date.weekDates(today.current->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
     ),
   )
 
   let ((startDate, supposedEndDate), setCurrentDates) = React.useState(() =>
-    weeks.current[weeks.current->Array.length - 1]->Option.getWithDefault(todayDates.current)
+    last5Weeks.current[0]->Option.getWithDefault(todayDates.current)
   )
 
   let endDate = supposedEndDate->Date.min(today.current)
@@ -56,7 +55,9 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
 
   let events = getEvents(startDate, endDate, true)
   let mapTitleDuration =
-    events->Option.map(es => es->Calendars.filterEvents(settings)->Calendars.mapTitleDuration)
+    events->Option.map(es =>
+      es->Calendars.filterEvents(settings)->Calendars.makeMapTitleDuration(startDate, endDate)
+    )
 
   let flatListRef = React.useRef(Js.Nullable.null)
 
@@ -72,11 +73,11 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
       today
       todayFirst
       previousFirst
-      startDate=// isVisible={
+      startDate=currentStartDate
+      // isVisible={
       //   startDate == currentStartDate
       //   && supposedEndDate == currentSupposedEndDate
       // }
-      currentStartDate
       supposedEndDate=currentSupposedEndDate
       style=styleWidth
     />
@@ -102,10 +103,10 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
   , (setCurrentDates, todayDates, flatListRef))
 
   let (startDate1, supposedEndDate1) =
-    weeks.current[weeks.current->Array.length - 1]->Option.getWithDefault(todayDates.current)
+    last5Weeks.current[0]->Option.getWithDefault(todayDates.current)
   let endDate1 = supposedEndDate1->Date.min(today.current)
   let (startDate2, supposedEndDate2) =
-    weeks.current[weeks.current->Array.length - 2]->Option.getWithDefault(todayDates.current)
+    last5Weeks.current[1]->Option.getWithDefault(todayDates.current)
   let endDate2 = supposedEndDate2->Date.min(today.current)
 
   let events1 = getEvents(startDate1, endDate1, true)
@@ -444,7 +445,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
         showsHorizontalScrollIndicator=false
         inverted=true
         initialNumToRender=1
-        data=weeks.current
+        data=last5Weeks.current
         style={Style.array([theme.styles["background"], styleWidth])}
         getItemLayout
         keyExtractor={((first, _), _index) => first->Js.Date.toString}
@@ -453,7 +454,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
       />
       <Separator style={theme.styles["separatorOnBackground"]} />
       <BlockFootnote>
-        {("Updated " ++ DateFns.formatRelative(today.current, updatedAt))->React.string}
+        {("Updated " ++ Date.formatRelative(updatedAt, today.current))->React.string}
         <Spacer size=XS />
         {!refreshing ? React.null : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
       </BlockFootnote>

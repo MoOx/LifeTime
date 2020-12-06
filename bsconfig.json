@@ -22,7 +22,6 @@
     "reason-react-navigation",
     "react-multiversal",
     "reason-future",
-    "reason-date-fns",
     "@reason-react-native/safe-area-context",
     "@reason-react-native/permissions",
     "@reason-react-native/async-storage",

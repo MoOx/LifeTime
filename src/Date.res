@@ -1,4 +1,5 @@
 open Js.Date
+open DateFns
 
 let now = () => fromFloat(now())
 
@@ -111,11 +112,19 @@ let minToString = min => {
 
 let copy = date => date->valueOf->fromFloat
 
-let addDays = (date, numberOfDays) => {
-  let d = date->copy
-  d->setDate(d->getDate +. numberOfDays->float)->ignore
-  d
-}
+let min = (d1, d2) =>
+  if d1->getTime < d2->getTime {
+    d1
+  } else {
+    d2
+  }
+
+let max = (d1, d2) =>
+  if d1->getTime > d2->getTime {
+    d1
+  } else {
+    d2
+  }
 
 // https://github.com/react-native-community/react-native-localize/issues/88
 let startsOnFriday = ["MV"]
@@ -200,7 +209,7 @@ let startsOnSunday = [
 
 // not needed as this becomes the default
 /*
- let startsOnMonday = [|
+ let startsOnMonday = [
    "AD",
    "AI",
    "AL",
@@ -277,9 +286,9 @@ let startsOnSunday = [
    "VA",
    "VN",
    "XK",
- |];
+ ];
  */
-let firstDayOfWeek = () => {
+let weekStartsOn = {
   open Js.Array2
   let country = ReactNativeLocalize.getCountry()
   if startsOnFriday->includes(country) {
@@ -292,85 +301,20 @@ let firstDayOfWeek = () => {
     1
   }
 }
+let localeOptions = Some({locale: None, weekStartsOn: Some(weekStartsOn)})
 
-let firstDayOfWeekDate = (givenDate: t) => {
-  let dayOfWeek = givenDate->getDay->int_of_float
-  let firstDayOfWeekDate = givenDate->copy
-  let firstDayOfWeek = firstDayOfWeek()
-  let diff = dayOfWeek >= firstDayOfWeek ? dayOfWeek - firstDayOfWeek : 6 - dayOfWeek
+// DateFns shortcuts
+let formatRelative = (date, baseDate) => date->DateFns.formatRelative(baseDate, localeOptions)
+let startOfDay = date => date->DateFns.startOfDay(localeOptions)
+let endOfDay = date => date->DateFns.endOfDay(localeOptions)
+let startOfWeek = date => date->DateFns.startOfWeek(localeOptions)
+let endOfWeek = date => date->DateFns.endOfWeek(localeOptions)
+let startOfMonth = date => date->DateFns.startOfMonth(localeOptions)
+let endOfMonth = date => date->DateFns.endOfMonth(localeOptions)
+let formatISO = date => date->DateFns.formatISO(localeOptions)
+let formatRFC3339 = date => date->DateFns.formatRFC3339(localeOptions)
 
-  firstDayOfWeekDate->setDate(givenDate->getDate -. diff->float)->ignore
-  firstDayOfWeekDate
-  ->setHoursMSMs(~hours=0., ~minutes=0., ~seconds=0., ~milliseconds=0., ())
-  ->ignore
-
-  firstDayOfWeekDate
-}
-
-let lastDayOfWeekDate = (givenDate: t) => {
-  let fdow = firstDayOfWeekDate(givenDate)
-  makeWithYMDHMS(
-    ~year=fdow->getFullYear,
-    ~month=fdow->getMonth,
-    ~date=fdow->getDate +. 6.,
-    ~hours=23.,
-    ~minutes=59.,
-    ~seconds=59.,
-    (),
-  )
-}
-
-let firstDayOfMonth = date =>
-  makeWithYMD(~year=date->getFullYear, ~month=date->getMonth, ~date=1., ())
-
-let lastDayOfMonth = date =>
-  makeWithYMDHMS(
-    ~year=date->getFullYear,
-    ~month=date->getMonth +. 1.,
-    ~date=0.,
-    ~hours=23.,
-    ~minutes=59.,
-    ~seconds=59.,
-    (),
-  )
-
-let min = (d1, d2) =>
-  if d1->getTime < d2->getTime {
-    d1
-  } else {
-    d2
-  }
-
-let max = (d1, d2) =>
-  if d1->getTime > d2->getTime {
-    d1
-  } else {
-    d2
-  }
-
-let weekDates = date => (firstDayOfWeekDate(date), lastDayOfWeekDate(date))
-
-let startOfDay = date =>
-  makeWithYMDHMS(
-    ~year=date->getFullYear,
-    ~month=date->getMonth,
-    ~date=date->getDate,
-    ~hours=0.,
-    ~minutes=0.,
-    ~seconds=0.,
-    (),
-  )
-
-let endOfDay = date =>
-  makeWithYMDHMS(
-    ~year=date->getFullYear,
-    ~month=date->getMonth,
-    ~date=date->getDate,
-    ~hours=23.,
-    ~minutes=59.,
-    ~seconds=59.,
-    (),
-  )
+let weekDates = date => (date->startOfWeek, date->endOfWeek)
 
 let hasOverlap = (startA, endA, dateB) => {
   let startB = dateB->startOfDay

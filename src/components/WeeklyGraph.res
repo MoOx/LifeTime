@@ -16,20 +16,16 @@ let graphHeight = 140.
 let graphLetterHeight = 16.
 
 @react.component
-let make = (
-  ~events,
-  ~mapCategoryDuration,
-  ~mapTitleDuration as _,
-  ~startDate,
-  ~supposedEndDate,
-) => {
+let make = (~events, ~mapCategoryDuration, ~startDate, ~supposedEndDate) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context)
 
   let theme = Theme.useTheme(AppSettings.useTheme())
 
   let supposedNumberOfDays = Date.durationInMs(startDate, supposedEndDate)->Date.msToDays
   let dates =
-    Array.range(0, supposedNumberOfDays->int_of_float)->Array.map(n => startDate->Date.addDays(n))
+    Array.range(0, supposedNumberOfDays->int_of_float)->Array.map(n =>
+      startDate->DateFns.addDays(n->Js.Int.toFloat)
+    )
 
   let durationPerDate = React.useMemo2(() => events->Option.map(evts => {
       let events = evts->Calendars.filterEvents(settings)
@@ -141,7 +137,11 @@ let make = (
                   open Style
                   array([theme.styles["textVeryLightOnBackground"], textStyle(~fontSize=10., ())])
                 }>
-                {startDate->Date.addDays(i)->Js.Date.getDay->Date.dayLetterString->React.string}
+                {startDate
+                ->DateFns.addDays(i->Js.Int.toFloat)
+                ->Js.Date.getDay
+                ->Date.dayLetterString
+                ->React.string}
               </Text>
             </SpacedView>
           </React.Fragment>

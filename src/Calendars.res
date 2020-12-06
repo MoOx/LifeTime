@@ -161,8 +161,11 @@ let noEvents = (events: array<calendarEventReadable>, settings: AppSettings.t) =
     }
   }
 
-let mapTitleDuration = (events: array<calendarEventReadable>) =>
-  events->Array.reduce(Map.String.empty, (map, evt) => {
+let makeMapTitleDuration = (
+  events: array<calendarEventReadable>,
+  startDate: Js.Date.t,
+  endDate: Js.Date.t,
+) => events->Array.reduce(Map.String.empty, (map, evt) => {
     let key = evt.title->Activities.minifyName
     map->Map.String.set(
       key,
@@ -171,10 +174,13 @@ let mapTitleDuration = (events: array<calendarEventReadable>) =>
   })->Map.String.toArray->Array.map(((_key, evts: array<calendarEventReadable>)) => {
     let totalDurationInMin = evts->Array.reduce(0., (totalDurationInMin, evt) => {
       let durationInMs = Date.durationInMs(
-        evt.endDate->Js.Date.fromString,
-        evt.startDate->Js.Date.fromString,
+        evt.endDate > endDate->Js.Date.toISOString ? endDate : evt.endDate->Js.Date.fromString,
+        evt.startDate < startDate->Js.Date.toISOString
+          ? startDate
+          : evt.startDate->Js.Date.fromString,
       )
-      totalDurationInMin +. durationInMs->Js.Date.fromFloat->Js.Date.valueOf->Date.msToMin
+      totalDurationInMin +.
+      durationInMs->Js.Date.fromFloat->Js.Date.valueOf->Date.msToMin->Js.Math.round
     })
     (evts[0]->Option.map(evt => evt.title)->Option.getWithDefault(""), totalDurationInMin)
   })->SortArray.stableSortBy(((_, minA), (_, minB)) =>
@@ -197,8 +203,12 @@ let categoryIdFromActivityTitle = (settings: AppSettings.t, activityName) => {
   activity.categoryId
 }
 
-let mapCategoryDuration = (events: array<calendarEventReadable>, settings: AppSettings.t) =>
-  events->Array.reduce(Map.String.empty, (map, evt) => {
+let makeMapCategoryDuration = (
+  events: array<calendarEventReadable>,
+  settings: AppSettings.t,
+  startDate: Js.Date.t,
+  endDate: Js.Date.t,
+) => events->Array.reduce(Map.String.empty, (map, evt) => {
     let key = settings->categoryIdFromActivityTitle(evt.title)
     map->Map.String.set(
       key,
@@ -207,10 +217,13 @@ let mapCategoryDuration = (events: array<calendarEventReadable>, settings: AppSe
   })->Map.String.toArray->Array.map(((key, evts: array<calendarEventReadable>)) => {
     let totalDurationInMin = evts->Array.reduce(0., (totalDurationInMin, evt) => {
       let durationInMs = Date.durationInMs(
-        evt.endDate->Js.Date.fromString,
-        evt.startDate->Js.Date.fromString,
+        evt.endDate > endDate->Js.Date.toISOString ? endDate : evt.endDate->Js.Date.fromString,
+        evt.startDate < startDate->Js.Date.toISOString
+          ? startDate
+          : evt.startDate->Js.Date.fromString,
       )
-      totalDurationInMin +. durationInMs->Js.Date.fromFloat->Js.Date.valueOf->Date.msToMin
+      totalDurationInMin +.
+      durationInMs->Js.Date.fromFloat->Js.Date.valueOf->Date.msToMin->Js.Math.round
     })
     (key, totalDurationInMin)
   })->SortArray.stableSortBy(((_, minA), (_, minB)) =>
