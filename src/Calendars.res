@@ -63,10 +63,10 @@ let useEvents = () => {
   let (updatedAt, setUpdatedAt) = React.useState(_ => Date.now())
   let (eventsMapByRange, setEventsMapByRange) = React.useState(() => Map.String.empty)
 
-  let requestUpdate = React.useCallback1(() => {
+  let requestUpdate = React.useCallback2(() => {
     setUpdatedAt(_ => Date.now())
     setEventsMapByRange(_ => Map.String.empty)
-  }, [setUpdatedAt])
+  }, (setUpdatedAt, setEventsMapByRange))
 
   let getEvents = React.useCallback2((startDate, endDate, allowFetch) => {
     let res = eventsMapByRange->Map.String.get(makeMapKey(startDate, endDate))
@@ -83,6 +83,7 @@ let useEvents = () => {
         ->FutureJs.fromPromise(error => {
           // @todo error!
           Js.log(error)
+
           // setEventsMapByRange(eventsMapByRange => {
           //   eventsMapByRange->Map.String.set(
           //     makeMapKey(startDate, endDate),

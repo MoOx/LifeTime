@@ -27,7 +27,7 @@ let make = (~events, ~mapCategoryDuration, ~startDate, ~supposedEndDate) => {
       startDate->DateFns.addDays(n->Js.Int.toFloat)
     )
 
-  let durationPerDate = React.useMemo2(() => events->Option.map(evts => {
+  let durationPerDate = React.useMemo3(() => events->Option.map(evts => {
       let events = evts->Calendars.filterEvents(settings)
 
       dates->Array.map(date => {
@@ -55,7 +55,7 @@ let make = (~events, ~mapCategoryDuration, ~startDate, ~supposedEndDate) => {
             }
           }))
       })
-    }), (events, settings))
+    }), (events, settings, dates))
 
   let maxDuration =
     durationPerDate
@@ -78,10 +78,10 @@ let make = (~events, ~mapCategoryDuration, ~startDate, ~supposedEndDate) => {
     ->Option.map(max => (max /. 60. /. 4.)->ceil *. 4. *. 60.)
 
   let (width, setWidth) = React.useState(() => 0.)
-  let onLayout = React.useCallback0((layoutEvent: Event.layoutEvent) => {
+  let onLayout = React.useCallback1((layoutEvent: Event.layoutEvent) => {
     let width = layoutEvent.nativeEvent.layout.width
     setWidth(_ => width)
-  })
+  }, [setWidth])
 
   let boxStyle = {
     open Style

@@ -36,26 +36,29 @@ let navigationStateStorageKey = "react-navigation:state:2"
 // remove old entries
 ReactNativeAsyncStorage.removeItem("react-navigation:state")
 
+let rec navigateToIfPossible = (navigation, navigateTo) =>
+  switch navigation {
+  | Some(navigation) when navigateTo == "GoalsScreen" =>
+    navigation->Navigators.RootStack.Navigation.navigateWithParams(
+      "GoalsStack",
+      Navigators.RootStack.M.params(~screen="GoalsScreen", ()),
+    )
+  | _ => Js.Global.setTimeout(() => navigateToIfPossible(navigation, navigateTo), 250)->ignore
+  }
+
 @react.component
 let app = () => {
   let navigationRef = React.useRef(None)
-  let rec navigateToIfPossible = navigateTo =>
-    switch navigationRef.current {
-    | Some(navigation) when navigateTo == "GoalsScreen" =>
-      navigation->Navigators.RootStack.Navigation.navigateWithParams(
-        "GoalsStack",
-        Navigators.RootStack.M.params(~screen="GoalsScreen", ()),
-      )
-    | _ => Js.Global.setTimeout(() => navigateToIfPossible(navigateTo), 250)->ignore
-    }
   React.useEffect1(() => {
-    navigatorEmitter->EventEmitter.on("navigate", navigateTo => navigateToIfPossible(navigateTo))
+    navigatorEmitter->EventEmitter.on("navigate", navigateTo =>
+      navigateToIfPossible(navigationRef.current, navigateTo)
+    )
     None
   }, [])
 
   let (initialStateContainer, setInitialState) = React.useState(() => None)
 
-  React.useEffect1(() => {
+  React.useEffect2(() => {
     if initialStateContainer->Option.isNone {
       ReactNativeAsyncStorage.getItem(navigationStateStorageKey)->FutureJs.fromPromise(error => {
         // @todo error
@@ -81,7 +84,7 @@ let app = () => {
       )->ignore
     }
     None
-  }, [initialStateContainer])
+  }, (initialStateContainer, setInitialState))
 
   let calendarsContextValue = Calendars.useEvents()
   let isReady = initialStateContainer->Option.isSome
@@ -93,7 +96,7 @@ let app = () => {
     ->Future.tap(settings => optionalSettings_set(_ => Some(settings)))
     ->ignore
     None
-  }, [])
+  }, [optionalSettings_set])
 
   let settings_set = settingsCallback =>
     optionalSettings_set(settings => settings->Option.map(settings => {

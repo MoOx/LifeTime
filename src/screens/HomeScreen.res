@@ -8,41 +8,34 @@ let make = (~navigation, ~route as _) => {
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets()
 
   let (hasCalendarAccess, hasCalendarAccess_set) = React.useState(() => true)
-  React.useEffect1(() => {
-    {
-      open ReactNativeCalendarEvents
-      checkPermissions(true)->FutureJs.fromPromise(error => Js.log(error))->Future.tapOk(status => {
-        Js.log(("status", status))
-        if status != #authorized {
-          hasCalendarAccess_set(_ => false)
-          if settings.lastUpdated === 0. {
-            // lazy load just a bit to get a nicer visual effect
-            // (otherwise navigation is kind of TOO QUICK)
-            Js.Global.setTimeout(
-              () => navigation->Navigators.RootStack.Navigation.navigate("WelcomeModalScreen"),
-              100,
-            )->ignore
-          }
+  React.useEffect3(() => {
+    open ReactNativeCalendarEvents
+    checkPermissions(true)->FutureJs.fromPromise(error => Js.log(error))->Future.tapOk(status => {
+      Js.log(("status", status))
+      if status != #authorized {
+        hasCalendarAccess_set(_ => false)
+        if settings.lastUpdated === 0. {
+          // lazy load just a bit to get a nicer visual effect
+          // (otherwise navigation is kind of TOO QUICK)
+          Js.Global.setTimeout(
+            () => navigation->Navigators.RootStack.Navigation.navigate("WelcomeModalScreen"),
+            100,
+          )->ignore
         }
-      })->Future.tapError(_err =>
-        Alert.alert(
-          ~title="Ooops, something bad happened",
-          ~message="Please report us this error with informations about your device so we can improve LifeTime.",
-          (),
-        )
+      }
+    })->Future.tapError(_err =>
+      Alert.alert(
+        ~title="Ooops, something bad happened",
+        ~message="Please report us this error with informations about your device so we can improve LifeTime.",
+        (),
       )
-    }->ignore
+    )->ignore
     None
-  }, [])
+  }, (hasCalendarAccess_set, navigation, settings.lastUpdated))
 
-  let (refreshing, setRefreshing) = React.useState(() => false)
-
-  let onRefresh = React.useCallback2(() => setRefreshing(_ => true), (refreshing, setRefreshing))
-
-  let onRefreshDone = React.useCallback2(
-    () => setRefreshing(_ => false),
-    (refreshing, setRefreshing),
-  )
+  let (refreshing, refreshing_set) = React.useState(() => false)
+  let onRefresh = React.useCallback1(() => refreshing_set(_ => true), [refreshing_set])
+  let onRefreshDone = React.useCallback1(() => refreshing_set(_ => false), [refreshing_set])
 
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.))
   <>

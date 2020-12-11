@@ -20,7 +20,7 @@ let make = (~isReady) => {
   let animatedTranslateY = React.useRef(Animated.Value.create(0.))
   let animatedOpacity = React.useRef(Animated.Value.create(1.))
 
-  React.useEffect3(() => {
+  React.useEffect4(() => {
     if logoIsLoaded && (backgroundIsLoaded && isReady) {
       ReactNativeBootsplash.hide(None)
       open Animated
@@ -35,7 +35,7 @@ let make = (~isReady) => {
       )->Animation.start(~endCallback=_ => setBootSplashIsVisible(_ => false), ())
     }
     None
-  }, (logoIsLoaded, backgroundIsLoaded, isReady))
+  }, (logoIsLoaded, backgroundIsLoaded, isReady, setBootSplashIsVisible))
   !bootSplashIsVisible
     ? React.null
     : <Animated.View

@@ -4,7 +4,7 @@ open ReactMultiversal
 
 @react.component
 let make = (
-  ~today: React.ref<Js.Date.t>,
+  ~today: Js.Date.t,
   ~todayFirst,
   ~previousFirst,
   ~startDate,
@@ -16,7 +16,7 @@ let make = (
   let (getEvents, _updatedAt, _requestUpdate) = React.useContext(Calendars.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
 
-  let endDate = supposedEndDate->Date.min(today.current)
+  let endDate = supposedEndDate->Date.min(today)
   let events = getEvents(startDate, endDate, false)
   let mapTitleDuration =
     events->Option.map(es =>

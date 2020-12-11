@@ -18,7 +18,7 @@ let make = () => {
     notificationStatus,
     _requestNotificationPermission,
   ) = NotificationsHooks.useNotificationStatus()
-  React.useEffect1(() => {
+  React.useEffect3(() => {
     if notificationStatus === Some(ReactNativePermissions.granted) {
       ReactNativePushNotification.cancelLocalNotifications({
         "id": Notifications.Ids.reminderDailyCheck,
@@ -46,6 +46,10 @@ let make = () => {
       }
     }
     None
-  }, [notificationStatus])
+  }, (
+    notificationStatus,
+    settings.notificationsRecurrentReminders,
+    settings.notificationsRecurrentRemindersOn,
+  ))
   React.null
 }

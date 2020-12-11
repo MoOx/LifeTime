@@ -16,13 +16,13 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
     style(~width=windowDimensions.width->dp, ())
   }
 
-  React.useEffect1(() => {
+  React.useEffect3(() => {
     if refreshing {
       requestUpdate()
       onRefreshDone()
     }
     None
-  }, [refreshing])
+  }, (refreshing, requestUpdate, onRefreshDone))
 
   React.useEffect1(() => {
     let handleAppStateChange = newAppState =>
@@ -34,24 +34,48 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
     Some(() => AppState.removeEventListener(#change(state => handleAppStateChange(state))))
   }, [requestUpdate])
 
-  let today = React.useRef(Date.now())
-  let todayDates = React.useRef(Date.weekDates(today.current))
-  let previousDates = React.useRef(Date.weekDates(today.current->DateFns.addDays(-7.)))
-
-  let last5Weeks = React.useRef(
+  let (today, today_set) = React.useState(() => Date.now())
+  let appState = ReactNativeHooks.useAppState()
+  React.useEffect2(() => {
+    if appState === #active {
+      today_set(_ => Date.now())
+    }
+    None
+  }, (appState, today_set))
+  let (todayDates, todayDates_set) = React.useState(() => Date.weekDates(today))
+  React.useEffect2(() => {
+    todayDates_set(_ => Date.weekDates(today))
+    None
+  }, (today, todayDates_set))
+  let (previousDates, previousDates_set) = React.useState(() =>
+    Date.weekDates(today->DateFns.addDays(-7.))
+  )
+  React.useEffect2(() => {
+    previousDates_set(_ => Date.weekDates(today->DateFns.addDays(-7.)))
+    None
+  }, (today, previousDates_set))
+  let (last5Weeks, last5Weeks_set) = React.useState(() =>
     Array.range(0, 5)->Array.map(currentWeekReverseIndex =>
-      Date.weekDates(today.current->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
-    ),
+      Date.weekDates(today->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
+    )
+  )
+  React.useEffect2(() => {
+    last5Weeks_set(_ =>
+      Array.range(0, 5)->Array.map(currentWeekReverseIndex =>
+        Date.weekDates(today->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
+      )
+    )
+    None
+  }, (today, last5Weeks_set))
+
+  let ((startDate, supposedEndDate), currentDates_set) = React.useState(() =>
+    last5Weeks[0]->Option.getWithDefault(todayDates)
   )
 
-  let ((startDate, supposedEndDate), setCurrentDates) = React.useState(() =>
-    last5Weeks.current[0]->Option.getWithDefault(todayDates.current)
-  )
+  let endDate = supposedEndDate->Date.min(today)
 
-  let endDate = supposedEndDate->Date.min(today.current)
-
-  let (todayFirst, _) = todayDates.current
-  let (previousFirst, _) = previousDates.current
+  let (todayFirst, _) = todayDates
+  let (previousFirst, _) = previousDates
 
   let events = getEvents(startDate, endDate, true)
   let mapTitleDuration =
@@ -83,45 +107,43 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
     />
   }
 
-  let onViewableItemsChanged = React.useRef(itemsChanged =>
+  let onViewableItemsChanged = React.useCallback1(itemsChanged =>
     if itemsChanged.viewableItems->Array.length == 1 {
       itemsChanged.viewableItems[0]
-      ->Option.map(wrapper => setCurrentDates(_ => wrapper.item))
+      ->Option.map(wrapper => currentDates_set(_ => wrapper.item))
       ->ignore
     }
-  )
+  , [currentDates_set])
 
-  let onShowThisWeek = React.useCallback3(_ =>
-    // scrollToIndexParams triggers the setCurrentDates
-    // setCurrentDates(_ => todayDates.current);
+  let onShowThisWeek = React.useCallback0(_ =>
+    // scrollToIndexParams triggers the currentDates_set
+    // currentDates_set(_ => todayDates.current);
     flatListRef.current
     ->Js.Nullable.toOption
     ->Option.map(flatList =>
       flatList->FlatList.scrollToIndex(FlatList.scrollToIndexParams(~index=0, ()))
     )
     ->ignore
-  , (setCurrentDates, todayDates, flatListRef))
+  )
 
-  let (startDate1, supposedEndDate1) =
-    last5Weeks.current[0]->Option.getWithDefault(todayDates.current)
-  let endDate1 = supposedEndDate1->Date.min(today.current)
-  let (startDate2, supposedEndDate2) =
-    last5Weeks.current[1]->Option.getWithDefault(todayDates.current)
-  let endDate2 = supposedEndDate2->Date.min(today.current)
+  let (startDate1, supposedEndDate1) = last5Weeks[0]->Option.getWithDefault(todayDates)
+  let endDate1 = supposedEndDate1->Date.min(today)
+  let (startDate2, supposedEndDate2) = last5Weeks[1]->Option.getWithDefault(todayDates)
+  let endDate2 = supposedEndDate2->Date.min(today)
 
   let events1 = getEvents(startDate1, endDate1, true)
   let events2 = getEvents(startDate2, endDate2, true)
 
   let (noEventDuringThisWeek, set_noEventDuringThisWeek) = React.useState(() => None)
-  React.useEffect1(() => {
+  React.useEffect3(() => {
     switch events1 {
     | Some(evts1) => set_noEventDuringThisWeek(_ => Some(Calendars.noEvents(evts1, settings)))
     | _ => ()
     }
     None
-  }, [events1])
+  }, (events1, set_noEventDuringThisWeek, settings))
   let (noEventDuringLastWeeks, set_noEventDuringLastWeeks) = React.useState(() => None)
-  React.useEffect2(() => {
+  React.useEffect4(() => {
     switch (events1, events2) {
     | (Some(evts1), Some(evts2)) =>
       set_noEventDuringLastWeeks(_ => Some(
@@ -130,7 +152,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
     | _ => ()
     }
     None
-  }, (events1, events2))
+  }, (events1, events2, set_noEventDuringLastWeeks, settings))
 
   let longNoEventsExplanation =
     " " ++
@@ -214,20 +236,20 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
   }
 
   let (onMessageNoEventsHeight, setOnMessageNoEventsHeight) = React.useState(() => None)
-  let onMessageNoEventsLayout = React.useCallback0((layoutEvent: Event.layoutEvent) => {
+  let onMessageNoEventsLayout = React.useCallback1((layoutEvent: Event.layoutEvent) => {
     let height = layoutEvent.nativeEvent.layout.height
     setOnMessageNoEventsHeight(_ => Some(height))
-  })
-  let animatedMessageNoEventsHeight = React.useRef(Animated.Value.create(0.))
-  let animatedMessageNoEventsOpacity = React.useRef(Animated.Value.create(0.))
-  let animatedMessageNoEventsScale = React.useRef(Animated.Value.create(0.))
-  React.useEffect1(() => {
+  }, [setOnMessageNoEventsHeight])
+  let animatedMessageNoEventsHeight = React.useRef(Animated.Value.create(0.)).current
+  let animatedMessageNoEventsOpacity = React.useRef(Animated.Value.create(0.)).current
+  let animatedMessageNoEventsScale = React.useRef(Animated.Value.create(0.)).current
+  React.useEffect4(() => {
     onMessageNoEventsHeight->Option.map(height => {
       open Animated
       parallel(
         [
           spring(
-            animatedMessageNoEventsHeight.current,
+            animatedMessageNoEventsHeight,
             Value.Spring.config(
               ~useNativeDriver=true,
               ~toValue=height->Value.Spring.fromRawValue,
@@ -236,7 +258,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
             ),
           ),
           spring(
-            animatedMessageNoEventsScale.current,
+            animatedMessageNoEventsScale,
             Value.Spring.config(
               ~useNativeDriver=true,
               ~toValue=1.->Value.Spring.fromRawValue,
@@ -246,7 +268,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
             ),
           ),
           timing(
-            animatedMessageNoEventsOpacity.current,
+            animatedMessageNoEventsOpacity,
             Value.Timing.config(
               ~useNativeDriver=true,
               ~toValue=1.->Value.Timing.fromRawValue,
@@ -260,16 +282,21 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
       )->Animation.start()
     })->ignore
     None
-  }, [onMessageNoEventsHeight])
+  }, (
+    onMessageNoEventsHeight,
+    animatedMessageNoEventsHeight,
+    animatedMessageNoEventsOpacity,
+    animatedMessageNoEventsScale,
+  ))
 
   <>
     <SpacedView>
       <TitlePre style={theme.styles["textLightOnBackgroundDark"]}>
         {{
           open Date
-          today.current->Js.Date.getDay->dayLongString ++
+          today->Js.Date.getDay->dayLongString ++
             (" " ++
-            (today.current->dateString ++ (" " ++ today.current->monthLongString)))
+            (today->dateString ++ (" " ++ today->monthLongString)))
         }
         ->Js.String.toUpperCase
         ->React.string}
@@ -305,10 +332,8 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
             // and animate the rest
 
             ~position=onMessageNoEventsHeight->Option.isNone ? #absolute : #relative,
-            ~opacity=animatedMessageNoEventsOpacity.current->Animated.StyleProp.float,
-            ~transform=[
-              scale(~scale=animatedMessageNoEventsScale.current->Animated.StyleProp.float),
-            ],
+            ~opacity=animatedMessageNoEventsOpacity->Animated.StyleProp.float,
+            ~transform=[scale(~scale=animatedMessageNoEventsScale->Animated.StyleProp.float)],
             (),
           )
         }>
@@ -414,7 +439,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
                 translateY(
                   ~translateY={
                     open Animated.Interpolation
-                    animatedMessageNoEventsHeight.current->interpolate(
+                    animatedMessageNoEventsHeight->interpolate(
                       config(
                         ~inputRange=[0., height],
                         ~outputRange=[-.height, 0.]->fromFloatArray,
@@ -445,16 +470,16 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
         showsHorizontalScrollIndicator=false
         inverted=true
         initialNumToRender=1
-        data=last5Weeks.current
+        data=last5Weeks
         style={Style.array([theme.styles["background"], styleWidth])}
         getItemLayout
         keyExtractor={((first, _), _index) => first->Js.Date.toString}
         renderItem
-        onViewableItemsChanged=onViewableItemsChanged.current
+        onViewableItemsChanged
       />
       <Separator style={theme.styles["separatorOnBackground"]} />
       <BlockFootnote>
-        {("Updated " ++ Date.formatRelative(updatedAt, today.current))->React.string}
+        {("Updated " ++ Date.formatRelative(updatedAt, today))->React.string}
         <Spacer size=XS />
         {!refreshing ? React.null : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
       </BlockFootnote>

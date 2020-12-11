@@ -6,12 +6,6 @@ let title = "Edit Goal"
 
 let quickDurations = [30., 45., 60., 90.]
 
-@bs.module("react")
-external useEffect6: (
-  @bs.uncurry (unit => option<unit => unit>),
-  ('a, 'b, 'c, 'd, 'e, 'f),
-) => unit = "useEffect"
-
 @react.component
 let make = (
   ~initialGoal: option<Goal.t>=?,
@@ -44,7 +38,7 @@ let make = (
   let handleSliderMinutesChange = React.useCallback1(value => {
     throttleMinutesTimer.current->Option.map(Js.Global.clearTimeout)->ignore
     throttleMinutesTimer.current = Some(Js.Global.setTimeout(() => setMinutes(_ => value), 100))
-  }, [])
+  }, [setMinutes])
   let (categoriesSelected, setCategoriesSelected) = React.useState(() =>
     initialGoal->Option.map(g => g.categoriesId)->Option.getWithDefault([])
   )
@@ -65,7 +59,7 @@ let make = (
     ->Date.durationInMs(Calendars.date0)
     ->Date.msToMin
 
-  useEffect6(() => {
+  React.useEffect7(() => {
     switch (
       // title,
       type_,
@@ -89,7 +83,7 @@ let make = (
     | _ => onChange(None)
     }
     None
-  }, (title, type_, minutes, days, categoriesSelected, activitiesSelected))
+  }, (title, type_, minutes, days, categoriesSelected, activitiesSelected, onChange))
 
   let dash =
     <View

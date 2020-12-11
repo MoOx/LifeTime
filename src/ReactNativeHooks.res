@@ -6,6 +6,6 @@ let useAppState = () => {
     let onChange = state => setAppState(_ => state)
     AppState.addEventListener(#change(onChange))
     Some(() => AppState.removeEventListener(#change(onChange)))
-  }, [])
+  }, [setAppState])
   appState
 }

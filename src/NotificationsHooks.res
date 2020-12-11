@@ -1,7 +1,7 @@
 let useNotificationStatus = () => {
   let (notificationStatus, notificationStatus_set) = React.useState(() => None)
   let appState = ReactNativeHooks.useAppState()
-  React.useEffect1(() => {
+  React.useEffect2(() => {
     if appState === #active {
       open ReactNativePermissions
       checkNotifications()
@@ -10,9 +10,9 @@ let useNotificationStatus = () => {
       ->ignore
     }
     None
-  }, [appState])
+  }, (appState, notificationStatus_set))
 
-  let requestNotificationPermission = React.useCallback(() =>
+  let requestNotificationPermission = React.useCallback2(() =>
     notificationStatus !== Some(ReactNativePermissions.blocked)
       ? {
           open ReactNativePermissions
@@ -22,7 +22,7 @@ let useNotificationStatus = () => {
           ->ignore
         }
       : ReactNativePermissions.openSettings()->ignore
-  )
+  , (notificationStatus, notificationStatus_set))
 
   (notificationStatus, requestNotificationPermission)
 }

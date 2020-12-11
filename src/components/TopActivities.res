@@ -16,10 +16,10 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
     mapTitleDuration->Option.flatMap(dpt => dpt[0])->Option.getWithDefault(("", 50.))
 
   let (width, setWidth) = React.useState(() => 0.)
-  let onLayout = React.useCallback0((layoutEvent: Event.layoutEvent) => {
+  let onLayout = React.useCallback1((layoutEvent: Event.layoutEvent) => {
     let width = layoutEvent.nativeEvent.layout.width
     setWidth(_ => width)
-  })
+  }, [setWidth])
   // keep some place for duration string
   let availableWidthForBar = width -. 85. -. SpacedView.space *. 4.
 

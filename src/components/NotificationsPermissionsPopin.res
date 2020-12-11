@@ -13,10 +13,10 @@ let make = () => {
   ) = NotificationsHooks.useNotificationStatus()
 
   let (onNotificationPopinHeight, setOnNotificationPopinHeight) = React.useState(() => None)
-  let onNotificationPopinLayout = React.useCallback0((layoutEvent: Event.layoutEvent) => {
+  let onNotificationPopinLayout = React.useCallback1((layoutEvent: Event.layoutEvent) => {
     let height = layoutEvent.nativeEvent.layout.height
     setOnNotificationPopinHeight(_ => Some(height))
-  })
+  }, [setOnNotificationPopinHeight])
   let animatedBottomTranslateY = React.useRef(Animated.Value.create(1000.))
   React.useEffect1(() => {
     onNotificationPopinHeight->Option.map(_height => {
