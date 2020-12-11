@@ -33,122 +33,69 @@ let make = () => {
     ), [setSettings])
 
   <>
-    <Spacer size=L />
-    <Separator style={theme.styles["separatorOnBackground"]} />
-    <View style={theme.styles["background"]}>
-      <TouchableWithoutFeedback
-        onPress={_ => {
-          Clipboard.setString(
-            settings->Js.Json.stringifyAny->Option.getWithDefault("LifeTime export: error"),
-          )
-          Alert.alert(
-            ~title="Export Finished",
-            ~message="Data are in you clipboard. Be sure to paste that in a safe place.",
-            ~buttons=[Alert.button(~text="Ok", ~style=#default, ())],
-            (),
-          )
-        }}>
-        <View style={Predefined.styles["rowCenter"]}>
-          <Spacer size=S />
-          <SpacedView vertical=XS horizontal=None>
-            <SVGExport width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />
-          </SpacedView>
-          <Spacer size=XS />
-          <View style={Predefined.styles["flex"]}>
-            <SpacedView vertical=XS horizontal=None>
-              <View style={Predefined.styles["row"]}>
-                <View
-                  style={
-                    open Style
-                    array([Predefined.styles["flex"], Predefined.styles["justifyCenter"]])
-                  }>
-                  <Text style={Style.array([Theme.text["body"], theme.styles["textOnBackground"]])}>
-                    {"Export Backup"->React.string}
-                  </Text>
-                </View>
-                <Spacer size=S />
-              </View>
-            </SpacedView>
-            <Separator style={theme.styles["separatorOnBackground"]} />
-          </View>
-        </View>
-      </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback
-        onPress={_ =>
-          Alert.alert(
-            ~title="Import Data from Clipboard?",
-            ~message="This is a destructive command, all settings will be overwritten by the content of the clipboard (assuming that's a valid Export Backup).",
-            ~buttons=[
-              Alert.button(~text="Cancel", ~style=#default, ()),
-              Alert.button(~text="Import", ~style=#destructive, ~onPress=() => handleImport(), ()),
-            ],
-            (),
-          )}>
-        <View style={Predefined.styles["rowCenter"]}>
-          <Spacer size=S />
-          <SpacedView vertical=XS horizontal=None>
-            <SVGImport width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />
-          </SpacedView>
-          <Spacer size=XS />
-          <View style={Predefined.styles["flex"]}>
-            <SpacedView vertical=XS horizontal=None>
-              <View style={Predefined.styles["row"]}>
-                <View
-                  style={
-                    open Style
-                    array([Predefined.styles["flex"], Predefined.styles["justifyCenter"]])
-                  }>
-                  <Text style={Style.array([Theme.text["body"], theme.styles["textOnBackground"]])}>
-                    {"Import Backup"->React.string}
-                  </Text>
-                </View>
-                <Spacer size=S />
-              </View>
-            </SpacedView>
-          </View>
-        </View>
-      </TouchableWithoutFeedback>
-    </View>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <Spacer />
+    <ListSeparator />
+    <ListItem
+      separator=true
+      color={theme.colors.blue}
+      onPress={_ => {
+        Clipboard.setString(
+          settings->Js.Json.stringifyAny->Option.getWithDefault("LifeTime export: error"),
+        )
+        Alert.alert(
+          ~title="Export Finished",
+          ~message="Data are in you clipboard. Be sure to paste that in a safe place.",
+          ~buttons=[Alert.button(~text="Ok", ~style=#default, ())],
+          (),
+        )
+      }}
+      icon={<SVGExport width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}>
+      {"Export Backup"->React.string}
+    </ListItem>
+    <ListItem
+      color={theme.colors.blue}
+      onPress={_ =>
+        Alert.alert(
+          ~title="Import Data from Clipboard?",
+          ~message="This is a destructive command, all settings will be overwritten by the content of the clipboard (assuming that's a valid Export Backup).",
+          ~buttons=[
+            Alert.button(~text="Cancel", ~style=#default, ()),
+            Alert.button(~text="Import", ~style=#destructive, ~onPress=() => handleImport(), ()),
+          ],
+          (),
+        )}
+      icon={<SVGImport width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}>
+      {"Import Backup"->React.string}
+    </ListItem>
+    <ListSeparator />
     <BlockFootnote>
       {"Export is placing data into your clipboard. Import assume that you have your export in the clipboard."->React.string}
     </BlockFootnote>
     <Spacer size=L />
-    <Separator style={theme.styles["separatorOnBackground"]} />
-    <View style={theme.styles["background"]}>
-      <TouchableWithoutFeedback
-        onPress={_ =>
-          Alert.alert(
-            ~title="Reset Settings & Erase All Data?",
-            ~message="This is a destructive operation and will wipe all settings & data. It cannot be undone unless you use an Export.",
-            ~buttons=[
-              Alert.button(~text="Cancel", ~style=#default, ()),
-              Alert.button(
-                ~text="Reset",
-                ~style=#destructive,
-                ~onPress=() => setSettings(_ => AppSettings.defaultSettings),
-                (),
-              ),
-            ],
-            (),
-          )}>
-        <View>
-          <SpacedView vertical=XS horizontal=XS style={Predefined.styles["rowCenter"]}>
-            <Text
-              style={
-                open Style
-                array([Theme.text["body"], textStyle(~color=theme.colors.red, ())])
-              }>
-              {"Reset Settings & Erase All Data"->React.string}
-            </Text>
-          </SpacedView>
-        </View>
-      </TouchableWithoutFeedback>
-    </View>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
+    <ListItem
+      color={theme.colors.red}
+      center=true
+      onPress={_ =>
+        Alert.alert(
+          ~title="Reset Settings & Erase All Data?",
+          ~message="This is a destructive operation and will wipe all settings & data. It cannot be undone unless you use an Export.",
+          ~buttons=[
+            Alert.button(~text="Cancel", ~style=#default, ()),
+            Alert.button(
+              ~text="Reset",
+              ~style=#destructive,
+              ~onPress=() => setSettings(_ => AppSettings.defaultSettings),
+              (),
+            ),
+          ],
+          (),
+        )}>
+      {"Reset Settings & Erase All Data"->React.string}
+    </ListItem>
+    <ListSeparator />
     <BlockFootnote>
       {"This is a destructive operation and will delete all application data. All your calendars and events are safe and untouched."->React.string}
     </BlockFootnote>
-    <Spacer />
   </>
 }
