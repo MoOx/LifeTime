@@ -50,7 +50,7 @@ module H1 = {
       <Text
         style={
           open Style
-          array([Theme.text["largeTitle"], Theme.text["bold"], theme.styles["textOnBackground"]])
+          array([Theme.text["largeTitle"], Theme.text["bold"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -69,7 +69,7 @@ module H2 = {
       <Text
         style={
           open Style
-          array([Theme.text["title1"], Theme.text["bold"], theme.styles["textOnBackground"]])
+          array([Theme.text["title1"], Theme.text["bold"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -88,7 +88,7 @@ module H3 = {
       <Text
         style={
           open Style
-          array([Theme.text["title2"], Theme.text["bold"], theme.styles["textOnBackground"]])
+          array([Theme.text["title2"], Theme.text["bold"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -107,7 +107,7 @@ module H4 = {
       <Text
         style={
           open Style
-          array([Theme.text["title3"], Theme.text["bold"], theme.styles["textOnBackground"]])
+          array([Theme.text["title3"], Theme.text["bold"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -126,7 +126,7 @@ module H5 = {
       <Text
         style={
           open Style
-          array([Theme.text["headline"], Theme.text["bold"], theme.styles["textOnBackground"]])
+          array([Theme.text["headline"], Theme.text["bold"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -144,7 +144,7 @@ module H6 = {
       <Text
         style={
           open Style
-          array([Theme.text["headline"], Theme.text["semiBold"], theme.styles["textOnBackground"]])
+          array([Theme.text["headline"], Theme.text["semiBold"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -162,7 +162,7 @@ module P = {
       <Text
         style={
           open Style
-          array([Theme.text["body"], theme.styles["textOnBackground"]])
+          array([Theme.text["body"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -179,7 +179,7 @@ module TextNode = {
     <Text
       style={
         open Style
-        array([Theme.text["body"], theme.styles["textOnBackground"]])
+        array([Theme.text["body"], theme.styles["text"]])
       }>
       children
     </Text>
@@ -219,18 +219,13 @@ module Li = {
   let make = (~props as _=Js.Obj.empty(), ~bullet=j`•`, ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme())
     <View style={styles["liWrapper"]}>
-      <Text
-        style={Style.array([
-          styles["liBullet"],
-          Theme.text["body"],
-          theme.styles["textOnBackground"],
-        ])}>
+      <Text style={Style.array([styles["liBullet"], Theme.text["body"], theme.styles["text"]])}>
         {bullet->React.string}
       </Text>
       <Text
         style={
           open Style
-          array([Theme.text["body"], theme.styles["textOnBackground"]])
+          array([Theme.text["body"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -264,7 +259,7 @@ module Details = {
         <Text
           style={
             open Style
-            array([Theme.text["callout"], theme.styles["textOnBackground"]])
+            array([Theme.text["callout"], theme.styles["text"]])
           }>
           {(isExpanded ? j`▼ ` : j`▶ `)->React.string}
           {summary->Option.getWithDefault("Click to see details"->React.string)}

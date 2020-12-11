@@ -149,7 +149,7 @@ let make = (
             array([
               Predefined.styles["flex"],
               Theme.text["body"],
-              theme.styles["textOnBackground"],
+              theme.styles["text"],
               textStyle(~padding=0.->dp, ()),
             ])
           }
@@ -179,7 +179,7 @@ let make = (
                   <Text
                     style={
                       open Style
-                      array([Theme.text["body"], theme.styles["textOnBackground"]])
+                      array([Theme.text["body"], theme.styles["text"]])
                     }>
                     {"Goal to Reach"->React.string}
                   </Text>
@@ -216,7 +216,7 @@ let make = (
                   <Text
                     style={
                       open Style
-                      array([Theme.text["body"], theme.styles["textOnBackground"]])
+                      array([Theme.text["body"], theme.styles["text"]])
                     }>
                     {"Limit to Respect"->React.string}
                   </Text>
@@ -252,11 +252,7 @@ let make = (
                 cp
               })} hitSlop={View.edgeInsets(~top=20., ~bottom=20., ~left=20., ~right=20., ())}>
             <View>
-              <Text
-                style={Style.array([
-                  Theme.text["caption1"],
-                  theme.styles["textVeryLightOnBackground"],
-                ])}>
+              <Text style={Style.array([Theme.text["caption1"], theme.styles["textLight2"]])}>
                 {day->float->Date.dayShortString->React.string}
               </Text>
               <Spacer size=XXS />
@@ -307,11 +303,7 @@ let make = (
       </View>
       <SpacedView vertical=XS>
         <View style={Predefined.styles["rowCenter"]}>
-          <Text
-            style={Style.array([
-              Theme.text["caption1"],
-              theme.styles["textVeryLightOnBackground"],
-            ])}>
+          <Text style={Style.array([Theme.text["caption1"], theme.styles["textLight2"]])}>
             {"0"->React.string}
           </Text>
           <Spacer size=XS />
@@ -340,11 +332,7 @@ let make = (
             />
           </View>
           <Spacer size=XS />
-          <Text
-            style={Style.array([
-              Theme.text["caption1"],
-              theme.styles["textVeryLightOnBackground"],
-            ])}>
+          <Text style={Style.array([Theme.text["caption1"], theme.styles["textLight2"]])}>
             {"24"->React.string}
           </Text>
         </View>
@@ -357,18 +345,14 @@ let make = (
             <Text
               style={
                 open Style
-                array([
-                  Predefined.styles["flex"],
-                  Theme.text["callout"],
-                  theme.styles["textOnBackground"],
-                ])
+                array([Predefined.styles["flex"], Theme.text["callout"], theme.styles["text"]])
               }>
               {"Average Time per Day"->React.string}
             </Text>
             <Text
               style={
                 open Style
-                array([Theme.text["callout"], theme.styles["textLightOnBackground"]])
+                array([Theme.text["callout"], theme.styles["textLight1"]])
               }
               numberOfLines=1
               adjustsFontSizeToFit=true>
@@ -389,7 +373,7 @@ let make = (
                 array([
                   Predefined.styles["flex"],
                   Theme.text["callout"],
-                  theme.styles["textOnBackground"],
+                  theme.styles["text"],
                   textStyle(~fontWeight=Theme.fontWeights.medium, ()),
                 ])
               }>
@@ -400,7 +384,7 @@ let make = (
                 open Style
                 array([
                   Theme.text["callout"],
-                  theme.styles["textLightOnBackground"],
+                  theme.styles["textLight1"],
                   textStyle(~fontWeight=Theme.fontWeights.semiBold, ()),
                 ])
               }
@@ -479,11 +463,7 @@ let make = (
                       }>
                       <View style={Predefined.styles["rowCenter"]}>
                         <View style={Predefined.styles["flex"]}>
-                          <Text
-                            style={Style.array([
-                              Theme.text["body"],
-                              theme.styles["textOnBackground"],
-                            ])}>
+                          <Text style={Style.array([Theme.text["body"], theme.styles["text"]])}>
                             {name->React.string}
                           </Text>
                         </View>
@@ -492,7 +472,7 @@ let make = (
                               <Text
                                 style={Style.array([
                                   Theme.text["subhead"],
-                                  theme.styles["textVeryLightOnBackground"],
+                                  theme.styles["textLight2"],
                                 ])}>
                                 {(
                                   selectedCat
@@ -592,7 +572,7 @@ let make = (
                                     array([
                                       Predefined.styles["flex"],
                                       Theme.text["body"],
-                                      theme.styles["textOnBackground"],
+                                      theme.styles["text"],
                                     ])
                                   }
                                   numberOfLines=1>

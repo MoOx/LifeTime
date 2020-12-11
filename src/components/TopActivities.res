@@ -40,9 +40,9 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
           <SpacedView>
             <Center>
               <Spacer size=XXL />
-              <Title style={theme.styles["textOnBackground"]}> {"No Events"->React.string} </Title>
+              <Title style={theme.styles["text"]}> {"No Events"->React.string} </Title>
               <Spacer />
-              <Text style={theme.styles["textVeryLightOnBackground"]}>
+              <Text style={theme.styles["textLight2"]}>
                 {"You should select at least a calendar"->React.string}
               </Text>
               <Spacer size=XXL />
@@ -59,17 +59,22 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
         <>
           {switch mapTitleDuration {
           | [] =>
-            <SpacedView>
+            <SpacedView horizontal=L>
               <Center>
-                <Spacer size=XXL />
-                <Title style={theme.styles["textOnBackground"]}>
-                  {"No Events"->React.string}
-                </Title>
                 <Spacer />
-                <Text style={theme.styles["textVeryLightOnBackground"]}>
-                  {"That's unexpected. Try filling the blanks!"->React.string}
+                <Text
+                  style={Style.array([
+                    Theme.text["title3"],
+                    Theme.text["medium"],
+                    theme.styles["textLight2"],
+                  ])}>
+                  {"No activities"->React.string}
                 </Text>
-                <Spacer size=XXL />
+                <Spacer size=XXS />
+                <Text style={Style.array([Theme.text["footnote"], theme.styles["textLight2"]])}>
+                  {"You should add some events to your calendar or activate more calendars."->React.string}
+                </Text>
+                <Spacer />
               </Center>
             </SpacedView>
           | _ => <>
@@ -96,7 +101,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                           <Text
                             style={
                               open Style
-                              array([Theme.text["callout"], theme.styles["textOnBackground"]])
+                              array([Theme.text["callout"], theme.styles["text"]])
                             }
                             numberOfLines=1>
                             {title->React.string}
@@ -126,10 +131,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                             <Text
                               style={
                                 open Style
-                                array([
-                                  Theme.text["footnote"],
-                                  theme.styles["textVeryLightOnBackground"],
-                                ])
+                                array([Theme.text["footnote"], theme.styles["textLight2"]])
                               }
                               numberOfLines=1
                               adjustsFontSizeToFit=true>

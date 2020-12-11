@@ -36,7 +36,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
     <SpacedView>
       <TitlePre> {" "->React.string} </TitlePre>
       <View style={Predefined.styles["rowSpaceBetween"]}>
-        <Title style={theme.styles["textOnBackground"]}> {title->React.string} </Title>
+        <Title style={theme.styles["text"]}> {title->React.string} </Title>
         <View style={Predefined.styles["row"]}>
           {Global.__DEV__
             ? <>
@@ -45,27 +45,21 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                     forceWelcomeContent_set(forceWelcomeContent => !forceWelcomeContent)}>
                   <View style={Style.style(~opacity=0.10, ())}>
                     <SVGInfo
-                      width={24.->Style.dp}
-                      height={24.->Style.dp}
-                      fill=theme.namedColors.textOnBackground
+                      width={24.->Style.dp} height={24.->Style.dp} fill=theme.namedColors.text
                     />
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={_ => debug_set(debug => !debug)}>
                   <View style={Style.style(~opacity=0.10, ())}>
                     <SVGScope
-                      width={24.->Style.dp}
-                      height={24.->Style.dp}
-                      fill=theme.namedColors.textOnBackground
+                      width={24.->Style.dp} height={24.->Style.dp} fill=theme.namedColors.text
                     />
                   </View>
                 </TouchableOpacity>
               </>
             : React.null}
           <TouchableOpacity onPress={_ => onNewGoalPress(Goal.Type.serializedGoal)}>
-            <SVGPlus
-              width={24.->Style.dp} height={24.->Style.dp} fill=theme.namedColors.textOnBackground
-            />
+            <SVGPlus width={24.->Style.dp} height={24.->Style.dp} fill=theme.namedColors.text />
           </TouchableOpacity>
         </View>
       </View>
@@ -77,7 +71,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
             <Text
               style={
                 open Style
-                array([Theme.text["subhead"], theme.styles["textLightOnBackgroundDark"]])
+                array([Theme.text["subhead"], theme.styles["textOnDarkLight"]])
               }>
               {j`LifeTime lets you visualize the time you spend on everything. This allows you to take more informed decisions about how to use your valuable time.`->React.string}
             </Text>
@@ -85,7 +79,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
             <Text
               style={
                 open Style
-                array([Theme.text["subhead"], theme.styles["textLightOnBackgroundDark"]])
+                array([Theme.text["subhead"], theme.styles["textOnDarkLight"]])
               }>
               {j`You can help yourself by adding goals & limits you would like to respect. LifeTime will try to remind you when you successfully achieve your goals & respect your limits and can help your to improve your self-discipline if needed.`->React.string}
             </Text>
@@ -108,7 +102,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                   <Text
                     style={
                       open Style
-                      array([Theme.text["body"], theme.styles["textOnBackground"]])
+                      array([Theme.text["body"], theme.styles["text"]])
                     }>
                     {"Add a Goal"->React.string}
                   </Text>
@@ -135,7 +129,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                   <Text
                     style={
                       open Style
-                      array([Theme.text["body"], theme.styles["textOnBackground"]])
+                      array([Theme.text["body"], theme.styles["text"]])
                     }>
                     {"Add a Limit"->React.string}
                   </Text>
@@ -151,7 +145,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
         : <Text
             style={
               open Style
-              array([theme.styles["textLightOnBackgroundDark"], textStyle(~fontSize=7.5, ())])
+              array([theme.styles["textOnDarkLight"], textStyle(~fontSize=7.5, ())])
             }>
             {"remainingMinThisWeek: "->React.string}
             {remainingMinThisWeek->Date.minToString->React.string}
@@ -294,7 +288,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                         style={
                           open Style
                           array([
-                            Theme.styleSheets.dark["textLightOnBackgroundDark"],
+                            Theme.styleSheets.dark["textOnDarkLight"],
                             textStyle(~fontSize=7.5, ()),
                           ])
                         }>
@@ -364,7 +358,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                         open Style
                         array([
                           Theme.text["caption1"],
-                          Theme.styleSheets.dark["textLightOnBackgroundDark"],
+                          Theme.styleSheets.dark["textOnDarkLight"],
                           textStyle(~fontWeight=Theme.fontWeights.bold, ()),
                         ])
                       }>
@@ -381,7 +375,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                         open Style
                         array([
                           Theme.text["title1"],
-                          Theme.styleSheets.dark["textOnBackground"],
+                          Theme.styleSheets.dark["text"],
                           textStyle(~fontWeight=Theme.fontWeights.medium, ()),
                         ])
                       }
@@ -391,10 +385,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                     <Text
                       style={
                         open Style
-                        array([
-                          Theme.text["footnote"],
-                          Theme.styleSheets.dark["textLightOnBackgroundDark"],
-                        ])
+                        array([Theme.text["footnote"], Theme.styleSheets.dark["textOnDarkLight"]])
                       }>
                       {{
                         let durationInMinutes =
@@ -557,7 +548,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                           open Style
                           array([
                             Theme.text["caption1"],
-                            Theme.styleSheets.dark["textLightOnBackgroundDark"],
+                            Theme.styleSheets.dark["textOnDarkLight"],
                             textStyle(~fontWeight=Theme.fontWeights.light, ()),
                           ])
                         }>
@@ -568,7 +559,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                           open Style
                           array([
                             Theme.text["title2"],
-                            Theme.styleSheets.dark["textOnBackground"],
+                            Theme.styleSheets.dark["text"],
                             textStyle(
                               //  ~fontWeight=Theme.fontWeights.light,
                               ~fontWeight=Theme.fontWeights.medium,
@@ -591,7 +582,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
             //    style=Style.(
             //      array([|
             //        Theme.text##caption2,
-            //        Theme.styleSheets.dark##textLightOnBackgroundDark,
+            //        Theme.styleSheets.dark##textOnDarkLight,
             //      |])
             //    )>
             //    {currentTime->Date.minToString->React.string}

@@ -31,7 +31,7 @@ let make = (
   <View style>
     <Spacer />
     <SpacedView vertical=None>
-      <Text style={theme.styles["textVeryLightOnBackground"]}>
+      <Text style={theme.styles["textLight2"]}>
         {if todayFirst == startDate {
           "Daily Average"
         } else if previousFirst == startDate {
@@ -59,7 +59,7 @@ let make = (
             <Text
               style={
                 open Style
-                array([Theme.text["callout"], theme.styles["textOnBackground"]])
+                array([Theme.text["callout"], theme.styles["text"]])
               }>
               {"Total Logged Time"->React.string}
             </Text>
@@ -68,7 +68,7 @@ let make = (
             <Text
               style={
                 open Style
-                array([Theme.text["callout"], theme.styles["textLightOnBackground"]])
+                array([Theme.text["callout"], theme.styles["textLight1"]])
               }>
               {mapTitleDuration
               ->Option.map(mapTitleDuration =>

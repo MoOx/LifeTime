@@ -33,7 +33,7 @@ let make = (
                     open Style
                     arrayOption([
                       Some(Theme.text["body"]),
-                      Some(theme.styles["textOnBackground"]),
+                      Some(theme.styles["text"]),
                       center ? Some(textStyle(~textAlign=#center, ())) : None,
                       color->Option.map(c => textStyle(~color=c, ())),
                     ])

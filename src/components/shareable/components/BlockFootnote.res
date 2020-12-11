@@ -7,7 +7,7 @@ let make = (~children) => {
     <Text
       style={
         open Style
-        array([Theme.text["footnote"], theme.styles["textLightOnBackgroundDark"]])
+        array([Theme.text["footnote"], theme.styles["textOnDarkLight"]])
       }>
       children
     </Text>

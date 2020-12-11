@@ -54,7 +54,7 @@ let make = (~navigation, ~route as _) => {
         safeArea=true
         animateTranslateY=false
         backgroundElement={<StickyHeaderBackground />}
-        textStyle={theme.styles["textOnBackground"]}
+        textStyle={theme.styles["text"]}
         title=Home.title
       />
       <Animated.ScrollView
@@ -74,8 +74,8 @@ let make = (~navigation, ~route as _) => {
         refreshControl={<RefreshControl
           refreshing
           onRefresh
-          tintColor=theme.namedColors.textLightOnBackgroundDark
-          colors=[theme.namedColors.textLightOnBackgroundDark]
+          tintColor=theme.namedColors.textOnDarkLight
+          colors=[theme.namedColors.textOnDarkLight]
         />}
         showsHorizontalScrollIndicator=false
         showsVerticalScrollIndicator=false

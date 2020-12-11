@@ -291,7 +291,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
 
   <>
     <SpacedView>
-      <TitlePre style={theme.styles["textLightOnBackgroundDark"]}>
+      <TitlePre style={theme.styles["textOnDarkLight"]}>
         {{
           open Date
           today->Js.Date.getDay->dayLongString ++
@@ -302,7 +302,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
         ->React.string}
       </TitlePre>
       <View style={Predefined.styles["rowSpaceBetween"]}>
-        <Title style={theme.styles["textOnBackground"]}> {title->React.string} </Title>
+        <Title style={theme.styles["text"]}> {title->React.string} </Title>
         <View style={Predefined.styles["row"]}>
           {Global.__DEV__
             ? <>
@@ -310,7 +310,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
                   ? <Text
                       style={
                         open Style
-                        array([theme.styles["textLightOnBackgroundDark"], Theme.text["caption2"]])
+                        array([theme.styles["textOnDarkLight"], Theme.text["caption2"]])
                       }>
                       {"Hermes on"->React.string}
                     </Text>
@@ -406,11 +406,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
               <Text
                 style={
                   open Style
-                  array([
-                    Theme.text["title1"],
-                    Theme.text["heavy"],
-                    theme.styles["textOnBackground"],
-                  ])
+                  array([Theme.text["title1"], Theme.text["heavy"], theme.styles["text"]])
                 }>
                 {"No Events"->React.string}
               </Text>
@@ -418,7 +414,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
               <Text
                 style={
                   open Style
-                  array([Theme.text["subhead"], theme.styles["textOnBackground"]])
+                  array([Theme.text["subhead"], theme.styles["text"]])
                 }>
                 {messageNoEvents->React.string}
               </Text>

@@ -36,7 +36,7 @@ let make = (~navigation, ~route as _) => {
         backgroundElement={<StickyHeaderBackground />}
         color=theme.colors.blue
         color2=theme.colors.blue
-        textStyle={theme.styles["textOnBackground"]}
+        textStyle={theme.styles["text"]}
         title=Filters.title
         right={({color, defaultStyle}) =>
           <TouchableOpacity onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>

@@ -73,7 +73,7 @@ let make = () => {
               <View style={Predefined.styles["flexGrow"]}>
                 <SpacedView vertical=XS horizontal=None style={Predefined.styles["rowCenter"]}>
                   <View style={Predefined.styles["flexGrow"]}>
-                    <Text style={Style.array([styles["text"], theme.styles["textOnBackground"]])}>
+                    <Text style={Style.array([styles["text"], theme.styles["text"]])}>
                       {calendar.title->React.string}
                     </Text>
                     <Text style={Style.array([styles["infoText"], theme.styles["textGray2"]])}>

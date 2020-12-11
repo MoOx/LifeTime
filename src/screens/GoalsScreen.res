@@ -23,7 +23,7 @@ let make = (~navigation, ~route as _) => {
         safeArea=true
         animateTranslateY=false
         backgroundElement={<StickyHeaderBackground />}
-        textStyle={theme.styles["textOnBackground"]}
+        textStyle={theme.styles["text"]}
         title=Goals.title
       />
       <Animated.ScrollView

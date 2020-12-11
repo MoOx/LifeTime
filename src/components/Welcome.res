@@ -95,6 +95,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
         {stopTogether: false},
       )->Animation.start()
     }
+
     None
   })
 
@@ -117,7 +118,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
         <Text
           style={
             open Style
-            array([styles["title"], theme.styles["textOnBackground"]])
+            array([styles["title"], theme.styles["text"]])
           }
           numberOfLines=1
           adjustsFontSizeToFit=true>
@@ -136,7 +137,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
         <Text
           style={
             open Style
-            array([styles["baseline"], theme.styles["textOnBackground"]])
+            array([styles["baseline"], theme.styles["text"]])
           }>
           {"Your personal coach, helping you to reach your goals and spend your valuable time on things you love."->React.string}
         </Text>

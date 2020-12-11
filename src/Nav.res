@@ -29,7 +29,7 @@ module StatsStackScreen = {
               viewStyle(~paddingHorizontal=(Spacer.space *. 3.)->dp, ())
             },
             ~headerTintColor=theme.colors.blue,
-            ~headerTitleStyle=theme.styles["textOnBackground"],
+            ~headerTitleStyle=theme.styles["text"],
             ~headerStyle=theme.styles["stackHeader"],
             (),
           )}
@@ -67,7 +67,7 @@ module SettingsStackScreen = {
           StatsStack.options(
             ~title=SettingsDangerZoneScreen.title,
             ~headerTintColor=theme.colors.blue,
-            ~headerTitleStyle=theme.styles["textOnBackground"],
+            ~headerTitleStyle=theme.styles["text"],
             ~headerStyle=theme.styles["stackHeader"],
             (),
           )}
@@ -80,7 +80,7 @@ module SettingsStackScreen = {
           options(
             ~title=SettingsNotificationsScreen.title,
             ~headerTintColor=theme.colors.blue,
-            ~headerTitleStyle=theme.styles["textOnBackground"],
+            ~headerTitleStyle=theme.styles["text"],
             ~headerStyle=theme.styles["stackHeader"],
             (),
           )

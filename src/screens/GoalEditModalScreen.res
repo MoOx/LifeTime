@@ -29,7 +29,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
         ...settings,
         lastUpdated: Js.Date.now(),
         goals: settings.goals->Array.map(existingGoal =>
-        // we replace the goal at the same place
+          // we replace the goal at the same place
           existingGoal.id != goalId ? existingGoal : goal
         ),
       })
@@ -81,7 +81,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
         backgroundElement={<StickyHeaderBackground />}
         color=theme.colors.blue
         color2=theme.colors.blue
-        textStyle={theme.styles["textOnBackground"]}
+        textStyle={theme.styles["text"]}
         title=GoalEdit.title
         left={({color, defaultStyle}) =>
           <TouchableOpacity onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>

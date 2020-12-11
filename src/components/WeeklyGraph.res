@@ -135,7 +135,7 @@ let make = (~events, ~mapCategoryDuration, ~startDate, ~supposedEndDate) => {
               <Text
                 style={
                   open Style
-                  array([theme.styles["textVeryLightOnBackground"], textStyle(~fontSize=10., ())])
+                  array([theme.styles["textLight2"], textStyle(~fontSize=10., ())])
                 }>
                 {startDate
                 ->DateFns.addDays(i->Js.Int.toFloat)
@@ -205,7 +205,7 @@ let make = (~events, ~mapCategoryDuration, ~startDate, ~supposedEndDate) => {
                     open Style
                     array([
                       textStyle(~position=#absolute, ~top=-5.->dp, ~right=-20.->dp, ()),
-                      theme.styles["textVeryLightOnBackground"],
+                      theme.styles["textLight2"],
                       textStyle(~fontSize=10., ~lineHeight=10., ()),
                     ])
                   }>

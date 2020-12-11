@@ -50,7 +50,7 @@ let make = (~activityTitle, ~onSkipActivity) => {
               <SpacedView vertical=XS horizontal=None>
                 <View style={Predefined.styles["row"]}>
                   <View style={Predefined.styles["flexGrow"]}>
-                    <Text style={Style.array([styles["text"], theme.styles["textOnBackground"]])}>
+                    <Text style={Style.array([styles["text"], theme.styles["text"]])}>
                       {name->React.string}
                     </Text>
                   </View>

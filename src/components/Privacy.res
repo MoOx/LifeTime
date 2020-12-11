@@ -13,14 +13,12 @@ let make = () => {
   let theme = Theme.useTheme(AppSettings.useTheme())
 
   <SpacedView horizontal=L vertical=XL style={styles["container"]}>
-    <Center>
-      <Title style={theme.styles["textOnBackground"]}> {title->React.string} </Title>
-    </Center>
+    <Center> <Title style={theme.styles["text"]}> {title->React.string} </Title> </Center>
     <Spacer size=L />
     <Text
       style={
         open Style
-        array([Theme.text["body"], theme.styles["textOnBackground"]])
+        array([Theme.text["body"], theme.styles["text"]])
       }>
       {j`LifeTime is designed to protect your information. It only runs computation on your device and does not share your information anywhere.
 

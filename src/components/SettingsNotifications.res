@@ -28,7 +28,7 @@ let make = () => {
                   open Style
                   array([Predefined.styles["flex"], Predefined.styles["justifyCenter"]])
                 }>
-                <Text style={Style.array([Theme.text["body"], theme.styles["textOnBackground"]])}>
+                <Text style={Style.array([Theme.text["body"], theme.styles["text"]])}>
                   {"Allow Notifications"->React.string}
                 </Text>
               </View>
@@ -61,7 +61,7 @@ let make = () => {
                   open Style
                   array([Predefined.styles["flex"], Predefined.styles["justifyCenter"]])
                 }>
-                <Text style={Style.array([Theme.text["body"], theme.styles["textOnBackground"]])}>
+                <Text style={Style.array([Theme.text["body"], theme.styles["text"]])}>
                   {"Daily Reminders"->React.string}
                 </Text>
               </View>

@@ -73,7 +73,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
         backgroundElement={<StickyHeaderBackground />}
         color=theme.colors.blue
         color2=theme.colors.blue
-        textStyle={theme.styles["textOnBackground"]}
+        textStyle={theme.styles["text"]}
         title="New Goal"
         left={({color, defaultStyle}) =>
           <TouchableOpacity onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>

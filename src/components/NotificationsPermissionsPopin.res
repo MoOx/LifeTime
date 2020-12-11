@@ -142,11 +142,7 @@ let make = () => {
                 <Text
                   style={
                     open Style
-                    array([
-                      Theme.text["title2"],
-                      Theme.text["bold"],
-                      theme.styles["textOnBackground"],
-                    ])
+                    array([Theme.text["title2"], Theme.text["bold"], theme.styles["text"]])
                   }>
                   {"Set Up Reminders"->React.string}
                 </Text>
@@ -154,7 +150,7 @@ let make = () => {
                 <Text
                   style={
                     open Style
-                    array([Theme.text["body"], theme.styles["textOnBackground"]])
+                    array([Theme.text["body"], theme.styles["text"]])
                   }>
                   {("Enabling notifications can help you to stay motivated by giving you quick recap of your progress goals when necessary. " ++
                   ("\n" ++
