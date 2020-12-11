@@ -107,13 +107,13 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
     />
   }
 
-  let onViewableItemsChanged = React.useCallback1(itemsChanged =>
+  let onViewableItemsChanged = React.useRef(itemsChanged =>
     if itemsChanged.viewableItems->Array.length == 1 {
       itemsChanged.viewableItems[0]
       ->Option.map(wrapper => currentDates_set(_ => wrapper.item))
       ->ignore
     }
-  , [currentDates_set])
+  ).current
 
   let onShowThisWeek = React.useCallback0(_ =>
     // scrollToIndexParams triggers the currentDates_set
