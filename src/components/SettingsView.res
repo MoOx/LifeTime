@@ -106,6 +106,50 @@ let make = (~navigation) => {
       {SettingsDangerZoneScreen.title->React.string}
     </ListItem>
     <ListSeparator />
+    {Global.__DEV__ == true
+      ? <>
+          <Spacer size=S />
+          <ListHeader text="__DEV__ Demo Data" />
+          <ListSeparator />
+          <ListItem
+            onPress={_ =>
+              Alert.alert(
+                ~title="Inject Demo Data",
+                ~message="This will create a specific calendar called '" ++
+                Demo.calendarDemoTitle ++ "' and will inject some data.",
+                ~buttons=[
+                  Alert.button(~text="Cancel", ~style=#default, ()),
+                  Alert.button(~text="Inject", ~onPress=() => Demo.injectFreshData(), ()),
+                ],
+                (),
+              )}
+            color={theme.colors.blue}
+            separator={true}>
+            {"Inject Demo Data"->React.string}
+          </ListItem>
+          <ListItem
+            onPress={_ =>
+              Alert.alert(
+                ~title="Remove Demo Data",
+                ~message="This will remove the calendar called '" ++
+                Demo.calendarDemoTitle ++ "' and all the data in it.",
+                ~buttons=[
+                  Alert.button(~text="Keep", ~style=#default, ()),
+                  Alert.button(
+                    ~text="Remove",
+                    ~style=#destructive,
+                    ~onPress=() => Demo.removeData(),
+                    (),
+                  ),
+                ],
+                (),
+              )}
+            color={theme.colors.red}>
+            {"Remove Demo Data"->React.string}
+          </ListItem>
+          <ListSeparator />
+        </>
+      : React.null}
     <Spacer size=L />
   </>
 }
