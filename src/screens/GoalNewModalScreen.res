@@ -11,6 +11,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.))
 
   let (goal, setGoal) = React.useState(_ => None)
+  let handleChange = React.useCallback1(goal => setGoal(_ => goal), [setGoal])
 
   let (isReadyToSave, disabled, onPress) = goal->Option.map(goal => (
     true,
@@ -100,9 +101,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
           </TouchableOpacity>}
       />
       <Spacer size=XL />
-      <GoalEdit
-        initialGoal={...Goal.undefined, type_: type_} onChange={goal => setGoal(_ => goal)}
-      />
+      <GoalEdit initialGoal={...Goal.undefined, type_: type_} onChange={handleChange} />
     </Animated.ScrollView>
   </>
 }

@@ -20,6 +20,14 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
     )
 
   let (goal, setGoal) = React.useState(_ => None)
+  let handleChange = React.useCallback1(goal => setGoal(_ => goal), [setGoal])
+  let handleDelete = React.useCallback3(() => {
+    setSettings(settings => {
+      ...settings,
+      goals: settings.goals->Array.keep(goal => goal.id != initialGoal.id),
+    })
+    navigation->Navigators.RootStack.Navigation.goBack()
+  }, (setSettings, navigation, initialGoal.id))
 
   let (isReadyToSave, disabled, onPress) = goal->Option.map(goal => (
     true,
@@ -108,17 +116,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
           </TouchableOpacity>}
       />
       <Spacer size=XL />
-      <GoalEdit
-        initialGoal
-        onChange={goal => setGoal(_ => goal)}
-        onDelete={() => {
-          setSettings(settings => {
-            ...settings,
-            goals: settings.goals->Array.keep(goal => goal.id != initialGoal.id),
-          })
-          navigation->Navigators.RootStack.Navigation.goBack()
-        }}
-      />
+      <GoalEdit initialGoal onChange={handleChange} onDelete={handleDelete} />
     </Animated.ScrollView>
   </>
 }
