@@ -1,0 +1,9 @@
+{
+    "eslint.lintTask.enable": true,
+    "triggerTaskOnSave.tasks": {
+        "eslint-rescript": [
+            "src/**/*.res",
+            "src/**/*.re"
+        ],
+    }
+}
