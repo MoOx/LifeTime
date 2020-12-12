@@ -22,6 +22,30 @@ appName = app["name"]
 xcodeproj = "./ios/" + appName +".xcodeproj"
 workspace = "./ios/" + appName +".xcworkspace"
 
+platform :android do
+  desc "Submit a new Beta Build to Google Play Store Beta"
+  lane :beta do
+    gradle(
+      project_dir: "android",
+      task: "clean assembleRelease",
+    )
+    notification(subtitle: appName+" for Android", message: "Build ready. Uploading.")
+    upload_to_play_store(
+      track: "beta",
+    )
+    notification(subtitle: appName+" for Android", message: "Upload complete")
+  end
+
+  desc "Deploy a new version to the Google Play"
+  lane :deploy do
+    gradle(
+      project_dir: "android",
+      task: "clean assembleRelease",
+    )
+    upload_to_play_store
+  end
+end
+
 platform :ios do
   desc "iOS: Push a new beta build to TestFlight"
   lane :beta do
@@ -34,9 +58,9 @@ platform :ios do
       scheme: appName,
       export_xcargs: "-allowProvisioningUpdates"
     )
-    notification(subtitle: appName, message: "Finished Building. Uploading...")
+    notification(subtitle: appName+" for iOS", message: "Build ready. Uploading.")
     upload_to_testflight
-    notification(subtitle: appName, message: "Upload complete")
+    notification(subtitle: appName+" for iOS", message: "Upload complete")
   end
 end
 

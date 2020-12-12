@@ -100,6 +100,7 @@ src/SVGs/components
 src/md/*.json
 
 # sensitive information
+android/google-service-api-key.json
 sentry.properties
 fastlane/AppFile
 fastlane/MatchFile
