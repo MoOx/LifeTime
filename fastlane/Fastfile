@@ -23,11 +23,6 @@ xcodeproj = "./ios/" + appName +".xcodeproj"
 workspace = "./ios/" + appName +".xcworkspace"
 
 platform :ios do
-  lane :sync_code_signing_update do
-    sync_code_signing(type: "development")
-    sync_code_signing(type: "appstore")
-  end
-  
   desc "iOS: Push a new beta build to TestFlight"
   lane :beta do
     increment_build_number_in_xcodeproj(
@@ -37,8 +32,11 @@ platform :ios do
     build_app(
       workspace: workspace,
       scheme: appName,
+      export_xcargs: "-allowProvisioningUpdates"
     )
+    notification(subtitle: appName, message: "Finished Building. Uploading...")
     upload_to_testflight
+    notification(subtitle: appName, message: "Upload complete")
   end
 end
 
