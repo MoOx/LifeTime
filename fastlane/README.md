@@ -23,6 +23,20 @@ Bump version
 
 ----
 
+## Android
+### android beta
+```
+fastlane android beta
+```
+Submit a new Beta Build to Google Play Store Beta
+### android deploy
+```
+fastlane android deploy
+```
+Deploy a new version to the Google Play
+
+----
+
 ## iOS
 ### ios beta
 ```

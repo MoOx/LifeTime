@@ -130,6 +130,7 @@ GEM
       xcodeproj (>= 1.13.0, < 2.0.0)
       xcpretty (~> 0.3.0)
       xcpretty-travis-formatter (>= 0.0.3)
+    fastlane-plugin-increment_version_code (0.4.3)
     fastlane-plugin-load_json (0.0.1)
     fastlane-plugin-versioning (0.4.4)
     ffi (1.13.1)
@@ -242,6 +243,7 @@ PLATFORMS
 DEPENDENCIES
   cocoapods
   fastlane
+  fastlane-plugin-increment_version_code
   fastlane-plugin-load_json
   fastlane-plugin-versioning
 

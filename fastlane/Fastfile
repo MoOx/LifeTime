@@ -25,11 +25,13 @@ workspace = "./ios/" + appName +".xcworkspace"
 platform :android do
   desc "Submit a new Beta Build to Google Play Store Beta"
   lane :beta do
+    increment_version_code
     gradle(
       project_dir: "android",
-      task: "clean assembleRelease",
+      task: "bundle",
+      build_type: "Release",
     )
-    notification(subtitle: appName+" for Android", message: "Build ready. Uploading.")
+    notification(subtitle: appName+" for Android", message: "Build complete")
     upload_to_play_store(
       track: "beta",
     )
@@ -58,7 +60,7 @@ platform :ios do
       scheme: appName,
       export_xcargs: "-allowProvisioningUpdates"
     )
-    notification(subtitle: appName+" for iOS", message: "Build ready. Uploading.")
+    notification(subtitle: appName+" for iOS", message: "Build complete")
     upload_to_testflight
     notification(subtitle: appName+" for iOS", message: "Upload complete")
   end
