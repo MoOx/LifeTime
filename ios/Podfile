@@ -33,11 +33,3 @@ target 'LifeTime' do
   end
 end
 
-target 'LifeTime-tvOS' do
-  # Pods for LifeTime-tvOS
-
-  target 'LifeTime-tvOSTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-end

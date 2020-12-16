@@ -34,18 +34,14 @@
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* LifeTimeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LifeTimeTests.m; sourceTree = "<group>"; };
 		0AB51CF5FBECD9FE437A79FE /* Pods-LifeTime-LifeTimeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-LifeTimeTests.release.xcconfig"; path = "Target Support Files/Pods-LifeTime-LifeTimeTests/Pods-LifeTime-LifeTimeTests.release.xcconfig"; sourceTree = "<group>"; };
-		0E2C72916AEA2FC273730B9A /* libPods-LifeTime-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LifeTime-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		126E990817DB00BCFC08F694 /* Pods-LifeTimeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTimeTests.debug.xcconfig"; path = "Target Support Files/Pods-LifeTimeTests/Pods-LifeTimeTests.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* LifeTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LifeTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = LifeTime/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = LifeTime/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = LifeTime/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = LifeTime/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = LifeTime/main.m; sourceTree = "<group>"; };
-		2DAC86974657372A178511E4 /* Pods-LifeTime-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-LifeTime-tvOS/Pods-LifeTime-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		33CDF874EBE9F033F81121DD /* Pods-LifeTime.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime.release.xcconfig"; path = "Target Support Files/Pods-LifeTime/Pods-LifeTime.release.xcconfig"; sourceTree = "<group>"; };
 		408021321C30B4A98AE24CE4 /* Pods-LifeTime.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime.debug.xcconfig"; path = "Target Support Files/Pods-LifeTime/Pods-LifeTime.debug.xcconfig"; sourceTree = "<group>"; };
-		459F4DC83EFF62E731BB0B1B /* Pods-LifeTime-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-LifeTime-tvOSTests/Pods-LifeTime-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		6E96C932B3892BA8B27D96D4 /* Pods-LifeTime-LifeTimeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-LifeTimeTests.debug.xcconfig"; path = "Target Support Files/Pods-LifeTime-LifeTimeTests/Pods-LifeTime-LifeTimeTests.debug.xcconfig"; sourceTree = "<group>"; };
 		7400B171A26F61BB093FE1DF /* libPods-LifeTime-LifeTimeTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LifeTime-LifeTimeTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E343613250B9BA500BF3AA4 /* LifeTime.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = LifeTime.entitlements; path = LifeTime/LifeTime.entitlements; sourceTree = "<group>"; };
@@ -53,11 +49,7 @@
 		7E44D66024C1D5470052B1A3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = LifeTime/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7E4A430B245C81460005A203 /* LifeTime-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LifeTime-Bridging-Header.h"; sourceTree = "<group>"; };
 		7EF095F323A2D5CE0030AFF6 /* Icon-transparent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-transparent.png"; path = "LifeTime/Icon-transparent.png"; sourceTree = "<group>"; };
-		9A9B67576FA914BBC7BC494A /* Pods-LifeTime-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-LifeTime-tvOSTests/Pods-LifeTime-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9CF9C661A53A1D74910D3874 /* libPods-LifeTime.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LifeTime.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A8B711944F2FBF952527E3F4 /* libPods-LifeTime-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LifeTime-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		BA90FBE1B084AAE02D6D7DE1 /* Pods-LifeTime-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-tvOS.release.xcconfig"; path = "Target Support Files/Pods-LifeTime-tvOS/Pods-LifeTime-tvOS.release.xcconfig"; sourceTree = "<group>"; };
-		EB59170ED3FE0F9FBE0CBAFE /* Pods-LifeTimeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTimeTests.release.xcconfig"; path = "Target Support Files/Pods-LifeTimeTests/Pods-LifeTimeTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
@@ -123,8 +115,6 @@
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				9CF9C661A53A1D74910D3874 /* libPods-LifeTime.a */,
-				A8B711944F2FBF952527E3F4 /* libPods-LifeTime-tvOS.a */,
-				0E2C72916AEA2FC273730B9A /* libPods-LifeTime-tvOSTests.a */,
 				7400B171A26F61BB093FE1DF /* libPods-LifeTime-LifeTimeTests.a */,
 			);
 			name = Frameworks;
@@ -166,12 +156,6 @@
 			children = (
 				408021321C30B4A98AE24CE4 /* Pods-LifeTime.debug.xcconfig */,
 				33CDF874EBE9F033F81121DD /* Pods-LifeTime.release.xcconfig */,
-				2DAC86974657372A178511E4 /* Pods-LifeTime-tvOS.debug.xcconfig */,
-				BA90FBE1B084AAE02D6D7DE1 /* Pods-LifeTime-tvOS.release.xcconfig */,
-				9A9B67576FA914BBC7BC494A /* Pods-LifeTime-tvOSTests.debug.xcconfig */,
-				459F4DC83EFF62E731BB0B1B /* Pods-LifeTime-tvOSTests.release.xcconfig */,
-				126E990817DB00BCFC08F694 /* Pods-LifeTimeTests.debug.xcconfig */,
-				EB59170ED3FE0F9FBE0CBAFE /* Pods-LifeTimeTests.release.xcconfig */,
 				6E96C932B3892BA8B27D96D4 /* Pods-LifeTime-LifeTimeTests.debug.xcconfig */,
 				0AB51CF5FBECD9FE437A79FE /* Pods-LifeTime-LifeTimeTests.release.xcconfig */,
 			);
