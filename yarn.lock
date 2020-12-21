@@ -2501,6 +2501,13 @@
     sudo-prompt "^9.0.0"
     wcwidth "^1.0.1"
 
+"@react-native-community/datetimepicker@^3.0.8":
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/@react-native-community/datetimepicker/-/datetimepicker-3.0.8.tgz#3960b39dfeea4a0f11425e24e0852764ed9133ca"
+  integrity sha512-85pOIjRnhrUmyWFH52qGGya1MDwE7vU4fDqt21yY6EyT7TolwQvZknwId8TAmREawsMoCMchke6VFo1IqRaUOA==
+  dependencies:
+    invariant "^2.2.4"
+
 "@react-native-community/eslint-config@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@react-native-community/eslint-config/-/eslint-config-2.0.0.tgz#35dcc529a274803fc4e0a6b3d6c274551fb91774"
@@ -2589,6 +2596,11 @@
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/@reason-react-native/async-storage/-/async-storage-1.6.0.tgz#3c1a2c67cbbf26f23c5b8faca3af9c7d0f6b22cf"
   integrity sha512-vJbzW8nZh1q30YaBhKtX+x6JrAGhpdA+FJu/wP3HIO5c/LK1l+/gPmTCz+7DZnn7zu2dhhckpVVAm7fNYTnzgQ==
+
+"@reason-react-native/datetimepicker@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@reason-react-native/datetimepicker/-/datetimepicker-3.0.1.tgz#282246649a01f278191c740809f17623033dfc70"
+  integrity sha512-k5KVbVJ2f/9t4uoSeyLotKfGL9f8EeYBgwN6Xtl9YUFlMVUejynvxdtsEHo42LQVxavrf8EDtqosf6cqbDppfA==
 
 "@reason-react-native/permissions@^2.2.0":
   version "2.2.0"

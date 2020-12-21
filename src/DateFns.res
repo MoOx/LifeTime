@@ -7,6 +7,7 @@ type localeOptions = {
   weekStartsOn: option<int>,
 }
 
+@bs.module("date-fns") external format: (t, string) => string = "format"
 @bs.module("date-fns")
 external formatRelative: (t, t, option<localeOptions>) => string = "formatRelative"
 @bs.module("date-fns") external formatISO: (t, option<localeOptions>) => string = "formatISO"

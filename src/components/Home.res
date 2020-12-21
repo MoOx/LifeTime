@@ -458,7 +458,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
           <Spacer size=XS />
         </Row>
       </View>
-      <Separator style={theme.styles["separatorOnBackground"]} />
+      <ListSeparator />
       <FlatList
         ref={flatListRef->Ref.value}
         horizontal=true
@@ -473,7 +473,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
         renderItem
         onViewableItemsChanged
       />
-      <Separator style={theme.styles["separatorOnBackground"]} />
+      <ListSeparator />
       <BlockFootnote>
         {("Updated " ++ Date.formatRelative(updatedAt, today))->React.string}
         <Spacer size=XS />
@@ -488,7 +488,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
               lastUpdated: Js.Date.now(),
               activitiesSkippedFlag: !settings.activitiesSkippedFlag,
             })}>
-          <Separator style={theme.styles["separatorOnBackground"]} />
+          <ListSeparator />
           <SpacedView vertical=XS style={theme.styles["background"]}>
             <Center>
               <Text
@@ -504,7 +504,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
               </Text>
             </Center>
           </SpacedView>
-          <Separator style={theme.styles["separatorOnBackground"]} />
+          <ListSeparator />
         </TouchableOpacity>
       </SpacedView>
       <Spacer />

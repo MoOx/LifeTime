@@ -126,7 +126,7 @@ let make = (
   )
 
   <SpacedView horizontal=None>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <View style={theme.styles["background"]}>
       <SpacedView vertical=S>
         <TextInput
@@ -156,10 +156,10 @@ let make = (
         />
       </SpacedView>
     </View>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <Spacer />
     <Row> <Spacer size=XS /> <BlockHeading text="Type" /> </Row>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <View style={theme.styles["background"]}>
       <TouchableWithoutFeedback onPress={_ => setType(_ => Some(Goal.Type.Goal))}>
         <View style={Predefined.styles["rowCenter"]}>
@@ -194,7 +194,7 @@ let make = (
                 <Spacer size=S />
               </View>
             </SpacedView>
-            <Separator style={theme.styles["separatorOnBackground"]} />
+            <ListSeparator />
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -234,11 +234,11 @@ let make = (
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <Separator style={theme.styles["separatorOnBackground"]} />
+      <ListSeparator />
     </View>
     <Spacer />
     <Row> <Spacer size=XS /> <BlockHeading text="Days" /> </Row>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <View style={theme.styles["background"]}>
       <SpacedView style={Predefined.styles["rowSpaceBetween"]}>
         {days
@@ -269,13 +269,13 @@ let make = (
         ->React.array}
       </SpacedView>
     </View>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <BlockFootnote>
       {"Select the days where you would like to respect this goal."->React.string}
     </BlockFootnote>
     <Spacer />
     <Row> <Spacer size=XS /> <BlockHeading text="Duration" /> </Row>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <View style={theme.styles["background"]}>
       <Spacer size=S />
       <View style={Predefined.styles["row"]}>
@@ -340,7 +340,7 @@ let make = (
       <View style={Predefined.styles["rowSpaceBetween"]}>
         <Spacer />
         <View style={Predefined.styles["flex"]}>
-          <Separator style={theme.styles["separatorOnBackground"]} />
+          <ListSeparator />
           <SpacedView horizontal=None vertical=S style={Predefined.styles["row"]}>
             <Text
               style={
@@ -365,7 +365,7 @@ let make = (
       <View style={Predefined.styles["rowSpaceBetween"]}>
         <Spacer />
         <View style={Predefined.styles["flex"]}>
-          <Separator style={theme.styles["separatorOnBackground"]} />
+          <ListSeparator />
           <SpacedView horizontal=None vertical=S style={Predefined.styles["row"]}>
             <Text
               style={
@@ -397,13 +397,13 @@ let make = (
         </View>
       </View>
     </View>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <BlockFootnote>
       {j`Goals are mesured on a weekly basis. The time spent on an entire week is what matters to achieve your goal.`->React.string}
     </BlockFootnote>
     <Spacer />
     <Row> <Spacer size=XS /> <BlockHeading text="Category or Activity" /> </Row>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <View style={theme.styles["background"]}>
       {ActivityCategories.defaults->List.toArray->Array.mapWithIndex((index, category) => {
         let (id, name, colorName, iconName) = category
@@ -510,9 +510,7 @@ let make = (
                         <Spacer size=S />
                       </View>
                     </SpacedView>
-                    {separator
-                      ? <Separator style={theme.styles["separatorOnBackground"]} />
-                      : React.null}
+                    {separator ? <ListSeparator /> : React.null}
                   </View>
                 </View>
               </View>
@@ -582,9 +580,7 @@ let make = (
                               <Spacer size=S />
                             </View>
                           </SpacedView>
-                          {separator
-                            ? <Separator style={theme.styles["separatorOnBackground"]} />
-                            : React.null}
+                          {separator ? <ListSeparator /> : React.null}
                         </View>
                       </View>
                     </View>
@@ -594,13 +590,13 @@ let make = (
         </React.Fragment>
       })->React.array}
     </View>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <BlockFootnote>
       {j`By selecting a category, all future activities in that category will be included.`->React.string}
     </BlockFootnote>
     {onDelete->Option.map(onDelete => <>
       <Spacer size=L />
-      <Separator style={theme.styles["separatorOnBackground"]} />
+      <ListSeparator />
       <View style={theme.styles["background"]}>
         <TouchableWithoutFeedback
           onPress={_ =>
@@ -626,7 +622,7 @@ let make = (
           </View>
         </TouchableWithoutFeedback>
       </View>
-      <Separator style={theme.styles["separatorOnBackground"]} />
+      <ListSeparator />
     </>)->Option.getWithDefault(React.null)}
     <Spacer />
   </SpacedView>

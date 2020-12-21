@@ -89,7 +89,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
             <Row> <Spacer size=XS /> <BlockHeading text="Minimum to achieve" /> </Row>
             <Row> <Spacer size=XS /> </Row>
           </View>
-          <Separator style={theme.styles["separatorOnBackground"]} />
+          <ListSeparator />
           <View style={theme.styles["background"]}>
             <TouchableOpacity onPress={_ => onNewGoalPress(Goal.Type.serializedGoal)}>
               <View style={Predefined.styles["rowCenter"]}>
@@ -110,13 +110,13 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
               </View>
             </TouchableOpacity>
           </View>
-          <Separator style={theme.styles["separatorOnBackground"]} />
+          <ListSeparator />
           <Spacer />
           <View style={Predefined.styles["rowSpaceBetween"]}>
             <Row> <Spacer size=XS /> <BlockHeading text="Maximum to respect" /> </Row>
             <Row> <Spacer size=XS /> </Row>
           </View>
-          <Separator style={theme.styles["separatorOnBackground"]} />
+          <ListSeparator />
           <View style={theme.styles["background"]}>
             <TouchableOpacity onPress={_ => onNewGoalPress(Goal.Type.serializedLimit)}>
               <View style={Predefined.styles["rowCenter"]}>
@@ -137,7 +137,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
               </View>
             </TouchableOpacity>
           </View>
-          <Separator style={theme.styles["separatorOnBackground"]} />
+          <ListSeparator />
         </>}
     <SpacedView horizontal=XS vertical=None>
       {!debug

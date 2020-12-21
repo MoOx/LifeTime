@@ -318,6 +318,8 @@ PODS:
     - React
   - RNCPushNotificationIOS (1.7.3):
     - React-Core
+  - RNDateTimePicker (3.0.8):
+    - React-Core
   - RNGestureHandler (1.8.0):
     - React
   - RNLocalize (1.4.0):
@@ -398,6 +400,7 @@ DEPENDENCIES:
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
+  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNLocalize (from `../node_modules/react-native-localize`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
@@ -496,6 +499,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/masked-view"
   RNCPushNotificationIOS:
     :path: "../node_modules/@react-native-community/push-notification-ios"
+  RNDateTimePicker:
+    :path: "../node_modules/@react-native-community/datetimepicker"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNLocalize:
@@ -561,6 +566,7 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 6d99641f8e6f15d169d695d8ef184bf187903f11
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNCPushNotificationIOS: edeeea93b7210d2f918fc0e46e1a2a189b5fdacc
+  RNDateTimePicker: 8eba76de1afd556bc00c874f4d0c0616e30e32f1
   RNGestureHandler: 7a5833d0f788dbd107fbb913e09aa0c1ff333c39
   RNLocalize: b6df30cc25ae736d37874f9bce13351db2f56796
   RNPermissions: 5df468064df661a4c8c017e2791ce90d7695eea5
@@ -572,6 +578,6 @@ SPEC CHECKSUMS:
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 437f8a49428b178c1f5b00e3119e665a5b34f379
+PODFILE CHECKSUM: 7e8917b637cfc684e63c41b57497a5e5aa551fe3
 
 COCOAPODS: 1.10.0

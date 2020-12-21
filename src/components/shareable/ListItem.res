@@ -4,17 +4,17 @@ open ReactMultiversal
 
 @react.component
 let make = (
-  ~onPress,
-  ~icon=?,
-  ~separator=false,
+  ~center=false,
   ~children,
   ~color=?,
-  ~iconRight=?,
-  ~center=false,
+  ~icon=?,
+  ~right=?,
+  ~onPress=?,
+  ~separator=false,
 ) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
-  <View style={theme.styles["background"]}>
-    <TouchableWithoutFeedback onPress>
+  let child =
+    <View style={theme.styles["background"]}>
       <View style={Predefined.styles["rowCenter"]}>
         <Spacer size=S />
         {icon->Option.map(icon => {
@@ -41,15 +41,18 @@ let make = (
                   {children}
                 </Text>
               </View>
-              {iconRight->Option.map(icon => {
+              {right->Option.map(icon => {
                 <View style={Predefined.styles["rowCenter"]}> <Spacer size=S /> {icon} </View>
               })->Option.getWithDefault(React.null)}
               <Spacer size=S />
             </View>
           </SpacedView>
-          {separator ? <Separator style={theme.styles["separatorOnBackground"]} /> : React.null}
+          {separator ? <ListSeparator /> : React.null}
         </View>
       </View>
-    </TouchableWithoutFeedback>
-  </View>
+    </View>
+
+  onPress->Option.map(onPress => {
+    <TouchableWithoutFeedback onPress> {child} </TouchableWithoutFeedback>
+  })->Option.getWithDefault(child)
 }

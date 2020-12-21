@@ -19,7 +19,7 @@ let make = (~navigation) => {
       onPress={_ =>
         navigation->Navigators.RootStack.Navigation.navigate("SettingsNotificationsScreen")}
       icon={<SVGAppBadge width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
-      iconRight={<ListItemChevron />}>
+      right={<ListItemChevron />}>
       {SettingsNotificationsScreen.title->React.string}
     </ListItem>
     <ListSeparator />
@@ -31,7 +31,7 @@ let make = (~navigation) => {
       onPress={_ =>
         setSettings(settings => {...settings, lastUpdated: Js.Date.now(), theme: "light"})}
       icon={<SVGSunoutline width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
-      iconRight={switch themeKey {
+      right={switch themeKey {
       | #light =>
         <SVGCheckmark width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue />
       | _ => React.null
@@ -43,7 +43,7 @@ let make = (~navigation) => {
       onPress={_ =>
         setSettings(settings => {...settings, lastUpdated: Js.Date.now(), theme: "dark"})}
       icon={<SVGMoonsymbol width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.indigo />}
-      iconRight={switch themeKey {
+      right={switch themeKey {
       | #dark =>
         <SVGCheckmark width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue />
       | _ => React.null
@@ -55,7 +55,7 @@ let make = (~navigation) => {
       onPress={_ =>
         setSettings(settings => {...settings, lastUpdated: Js.Date.now(), theme: "auto"})}
       icon={<SVGMoonshine width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.purple />}
-      iconRight={switch themeKey {
+      right={switch themeKey {
       | #auto =>
         <SVGCheckmark width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue />
       | _ => React.null
@@ -73,27 +73,27 @@ let make = (~navigation) => {
       separator=true
       onPress={_ => navigation->Navigators.RootStack.Navigation.navigate("HelpModalScreen")}
       icon={<SVGInfo width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
-      iconRight={<ListItemChevron />}>
+      right={<ListItemChevron />}>
       {"Help"->React.string}
     </ListItem>
     <ListItem
       separator=true
       onPress={_ => navigation->Navigators.RootStack.Navigation.navigate("WelcomeModalScreen")}
       icon={<SVGPlaycircle width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
-      iconRight={<ListItemChevron />}>
+      right={<ListItemChevron />}>
       {"Welcome Screen"->React.string}
     </ListItem>
     <ListItem
       separator=true
       onPress={_ => Calendars.openCalendarApp()}
       icon={<SVGCalendar width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
-      iconRight={<ListItemChevron />}>
+      right={<ListItemChevron />}>
       {"Calendar App"->React.string}
     </ListItem>
     <ListItem
       onPress={_ => ReactNativePermissions.openSettings()->ignore}
       icon={<SVGSettings width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
-      iconRight={<ListItemChevron />}>
+      right={<ListItemChevron />}>
       {"App System Settings"->React.string}
     </ListItem>
     <ListSeparator />
@@ -102,7 +102,7 @@ let make = (~navigation) => {
     <ListItem
       onPress={_ =>
         navigation->Navigators.RootStack.Navigation.navigate("SettingsDangerZoneScreen")}
-      iconRight={<ListItemChevron />}>
+      right={<ListItemChevron />}>
       {SettingsDangerZoneScreen.title->React.string}
     </ListItem>
     <ListSeparator />

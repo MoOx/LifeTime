@@ -44,7 +44,7 @@ let make = () => {
                 })} text="Show All"
             />} <Spacer size=XS /> </Row>
     </View>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <View style={theme.styles["background"]}>
       {calendars->Option.map(calendars => calendars->Array.mapWithIndex((index, calendar) =>
           <TouchableOpacity key=calendar.id onPress={_ => setSettings(settings => {
@@ -92,15 +92,11 @@ let make = () => {
                   }
                   <Spacer size=S />
                 </SpacedView>
-                {index !== calendars->Array.length - 1
-                  ? <Separator style={theme.styles["separatorOnBackground"]} />
-                  : React.null}
+                {index !== calendars->Array.length - 1 ? <ListSeparator /> : React.null}
               </View>
             </View>
           </TouchableOpacity>
-        )->React.array)->Option.getWithDefault(
-        React.null,
-      )} <Separator style={theme.styles["separatorOnBackground"]} />
+        )->React.array)->Option.getWithDefault(React.null)} <ListSeparator />
     </View>
   </>
 }

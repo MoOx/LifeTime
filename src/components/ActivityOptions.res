@@ -16,7 +16,7 @@ let make = (~activityTitle, ~onSkipActivity) => {
     settings.activitiesSkipped->Array.some(skipped => Activities.isSimilar(skipped, activityTitle))
   <SpacedView horizontal=None>
     <Row> <Spacer size=XS /> <BlockHeading text="Category" /> </Row>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <View style={theme.styles["background"]}>
       {ActivityCategories.defaults
       ->List.mapWithIndex((index, (id, name, colorName, iconName)) => {
@@ -63,7 +63,7 @@ let make = (~activityTitle, ~onSkipActivity) => {
                 </View>
               </SpacedView>
               {index !== ActivityCategories.defaults->List.length - 1
-                ? <Separator style={theme.styles["separatorOnBackground"]} />
+                ? <ListSeparator />
                 : React.null}
             </View>
           </View>
@@ -72,7 +72,7 @@ let make = (~activityTitle, ~onSkipActivity) => {
       //  <View> <Spacer /> </View>
       ->List.toArray
       ->React.array}
-      <Separator style={theme.styles["separatorOnBackground"]} />
+      <ListSeparator />
     </View>
     <Spacer size=L />
     <TouchableOpacity
@@ -94,7 +94,7 @@ let make = (~activityTitle, ~onSkipActivity) => {
         })
         onSkipActivity()
       }}>
-      <Separator style={theme.styles["separatorOnBackground"]} />
+      <ListSeparator />
       <SpacedView vertical=XS style={theme.styles["background"]}>
         <Center>
           <Text
@@ -106,7 +106,7 @@ let make = (~activityTitle, ~onSkipActivity) => {
           </Text>
         </Center>
       </SpacedView>
-      <Separator style={theme.styles["separatorOnBackground"]} />
+      <ListSeparator />
     </TouchableOpacity>
     <BlockFootnote>
       {(

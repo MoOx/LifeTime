@@ -53,7 +53,7 @@ let make = (
     <View style={Predefined.styles["row"]}>
       <Spacer size=S />
       <View style={Predefined.styles["flexGrow"]}>
-        <Separator style={theme.styles["separatorOnBackground"]} />
+        <ListSeparator />
         <SpacedView horizontal=None vertical=S style={Predefined.styles["row"]}>
           <View style={Predefined.styles["flexGrow"]}>
             <Text

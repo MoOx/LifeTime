@@ -31,7 +31,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
         <Spacer size=XS />
       </Row>
     </View>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <View onLayout style={theme.styles["background"]}>
       {calendars
       ->Option.map(calendars => Calendars.availableCalendars(calendars, settings))
@@ -150,7 +150,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                       {index < mapTitleDuration->Array.length - 1 ||
                         (shouldShowMore ||
                         shouldShowLess)
-                        ? <Separator style={theme.styles["separatorOnBackground"]} />
+                        ? <ListSeparator />
                         : React.null}
                     </View>
                   </View>
@@ -201,7 +201,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                           </TouchableOpacity>
                         : React.null}
                     </View>
-                    <Separator style={theme.styles["separatorOnBackground"]} />
+                    <ListSeparator />
                   </Row>
                 : React.null}
             </>
@@ -213,6 +213,6 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
         </SpacedView>,
       )}
     </View>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
   </>
 }
