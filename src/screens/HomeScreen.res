@@ -112,11 +112,16 @@ let make = (~navigation, ~route as _) => {
             navigation->Navigators.RootStack.Navigation.navigate("HelpModalScreen")}
           onFiltersPress={() =>
             navigation->Navigators.RootStack.Navigation.navigate("FiltersModalScreen")}
-          onActivityPress={activity =>
+          onActivityPress={(activity, week) => {
+            let (start, end) = week
             navigation->Navigators.StatsStack.Navigation.navigateWithParams(
               "ActivityOptionsScreen",
-              {currentActivityTitle: Some(activity)},
-            )}
+              {
+                currentActivityTitle: Some(activity),
+                currentWeek: (start->Js.Date.toString, end->Js.Date.toString),
+              },
+            )
+          }}
         />
       </Animated.ScrollView>
     </View>

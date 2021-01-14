@@ -276,7 +276,14 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
       {!refreshing ? React.null : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
     </BlockFootnote>
     <Spacer />
-    <TopActivities activities=settings.activities mapTitleDuration onFiltersPress onActivityPress />
+    <TopActivities
+      activities=settings.activities
+      mapTitleDuration
+      onFiltersPress
+      onActivityPress
+      startDate
+      endDate
+    />
     <Spacer />
     <SpacedView horizontal=None>
       <ListSeparator />
