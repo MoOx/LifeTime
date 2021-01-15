@@ -7,9 +7,43 @@ let styles = {
   {"text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ())}
 }->StyleSheet.create
 
+let filterEventsByTitle = (
+  events: array<ReactNativeCalendarEvents.calendarEventReadable>,
+  title: string,
+) => events->Array.keep(evt => !(!(evt.title == title)))
+
 @react.component
-let make = (~activityTitle, ~onSkipActivity) => {
+let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
+  let (getEvents, _updatedAt, requestUpdate) = React.useContext(Calendars.context)
+
+  let _windowDimensions = Dimensions.useWindowDimensions()
+
+  React.useEffect3(() => {
+    if refreshing {
+      requestUpdate()
+      onRefreshDone()
+    }
+    None
+  }, (refreshing, requestUpdate, onRefreshDone))
+
+  React.useEffect1(() => {
+    let handleAppStateChange = newAppState =>
+      if newAppState == #active {
+        requestUpdate()
+      }
+
+    AppState.addEventListener(#change(state => handleAppStateChange(state)))
+    Some(() => AppState.removeEventListener(#change(state => handleAppStateChange(state))))
+  }, [requestUpdate])
+
+  let today = Date.now()
+  let (last5Weeks, _last5Weeks_set) = React.useState(() =>
+    Array.range(0, 5)->Array.map(currentWeekReverseIndex =>
+      Date.weekDates(today->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
+    )
+  )
+
   let themeModeKey = AppSettings.useTheme()
   let theme = Theme.useTheme(themeModeKey)
   let isSkipped =
@@ -74,6 +108,20 @@ let make = (~activityTitle, ~onSkipActivity) => {
       ->React.array}
       <Separator style={theme.styles["separatorOnBackground"]} />
     </View>
+    // TODO: add graph
+    <Row> <Spacer size=XS /> <BlockHeading text="Events" /> </Row>
+    <Separator style={theme.styles["separatorOnBackground"]} />
+    <View style={theme.styles["background"]}> {last5Weeks->Array.mapWithIndex((index,week) => {
+          let (startDate, endDate) = week
+          let events = getEvents(startDate, endDate, true)
+          switch (events) {
+            | Some(eventsValue) => {
+            let filteredEvents = filterEventsByTitle(eventsValue, activityTitle)
+            <Events startDate endDate key=Belt.Int.toString(index) events=filteredEvents />
+            }
+            | None => <></>
+          }
+        })->React.array} <Separator style={theme.styles["separatorOnBackground"]} /> </View>
     <Spacer size=L />
     <TouchableOpacity
       onPress={_ => {

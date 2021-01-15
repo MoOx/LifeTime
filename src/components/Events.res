@@ -26,7 +26,7 @@ let make = (
           " - " ++
           endDate->Js.Date.getDate->Belt.Float.toString ++
           " " ++
-          endDate->Js.Date.getMonth->Belt.Float.toString}
+          endDate->Date.monthShortString}
         />
       </Row>
       {events->Array.mapWithIndex((index, el) => {
@@ -34,37 +34,46 @@ let make = (
           Js.Date.getTime(el.endDate->Js.Date.fromString) -.
           Js.Date.getTime(el.startDate->Js.Date.fromString)
         let durationString = (duration /. 1000. /. 60.)->Date.minToString
-        <View key=el.id style={Predefined.styles["rowCenter"]}>
-          <Row style={Predefined.styles["alignCenter"]}>
-            <View
-              style={
-                open Style
-                array([
-                  theme.styles["backgroundGray3"],
-                  viewStyle(
-                    // ~backgroundColor=color,
-                    ~width=15.->dp,
-                    ~height=6.->dp,
-                    ~borderRadius=6.,
-                    ~overflow=#hidden,
-                    (),
-                  ),
-                ])
-              }
-            />
-            <Spacer size=XXS />
-            <Text
-              style={
-                open Style
-                array([Theme.text["footnote"], theme.styles["textLight2"]])
-              }
-              numberOfLines=1
-              adjustsFontSizeToFit=true>
-              {durationString->React.string}
-            </Text>
-          </Row>
+        <View key=el.id style={Predefined.styles["rowSpaceBetween"]}>
           <Spacer size=S />
-          <View style={Predefined.styles["flexGrow"]}>
+          //   <Row style={Predefined.styles["alignCenter"]}>
+          //     <View
+          //       style={
+          //         open Style
+          //         array([
+          //           theme.styles["backgroundGray3"],
+          //           viewStyle(
+          //             // ~backgroundColor=color,
+          //             ~width=15.->dp,
+          //             ~height=6.->dp,
+          //             ~borderRadius=6.,
+          //             ~overflow=#hidden,
+          //             (),
+          //           ),
+          //         ])
+          //       }
+          //     />
+          //     <Spacer size=XXS />
+          //     <Text
+          //       style={
+          //         open Style
+          //         array([Theme.text["footnote"], theme.styles["textLight2"]])
+          //       }
+          //       numberOfLines=1
+          //       adjustsFontSizeToFit=true>
+          //       {durationString->React.string}
+          //     </Text>
+          //   </Row>
+          <Text
+            style={
+              open Style
+              array([theme.styles["textLight1"]])
+            }
+            numberOfLines=1
+            adjustsFontSizeToFit=true>
+            {durationString->React.string}
+          </Text>
+          <View>
             <SpacedView vertical=XS horizontal=None>
               <View style={Predefined.styles["row"]}>
                 <View style={Predefined.styles["flexGrow"]}>
