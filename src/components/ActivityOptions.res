@@ -44,6 +44,8 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
     )
   )
 
+  // TODO: Get all events here
+
   let themeModeKey = AppSettings.useTheme()
   let theme = Theme.useTheme(themeModeKey)
   let isSkipped =

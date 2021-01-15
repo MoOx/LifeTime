@@ -22,6 +22,7 @@ let make = (
       <Row>
         <Spacer size=XS />
         <BlockHeading
+          style={theme.styles["background"]}
           text={startDate->Js.Date.getDate->Belt.Float.toString ++
           " - " ++
           endDate->Js.Date.getDate->Belt.Float.toString ++
@@ -29,68 +30,80 @@ let make = (
           endDate->Date.monthShortString}
         />
       </Row>
+      <Separator style={theme.styles["separatorOnBackground"]} />
       {events->Array.mapWithIndex((index, el) => {
         let duration =
           Js.Date.getTime(el.endDate->Js.Date.fromString) -.
           Js.Date.getTime(el.startDate->Js.Date.fromString)
         let durationString = (duration /. 1000. /. 60.)->Date.minToString
-        <View key=el.id style={Predefined.styles["rowSpaceBetween"]}>
-          <Spacer size=S />
-          //   <Row style={Predefined.styles["alignCenter"]}>
-          //     <View
-          //       style={
-          //         open Style
-          //         array([
-          //           theme.styles["backgroundGray3"],
-          //           viewStyle(
-          //             // ~backgroundColor=color,
-          //             ~width=15.->dp,
-          //             ~height=6.->dp,
-          //             ~borderRadius=6.,
-          //             ~overflow=#hidden,
-          //             (),
-          //           ),
-          //         ])
-          //       }
-          //     />
-          //     <Spacer size=XXS />
-          //     <Text
-          //       style={
-          //         open Style
-          //         array([Theme.text["footnote"], theme.styles["textLight2"]])
-          //       }
-          //       numberOfLines=1
-          //       adjustsFontSizeToFit=true>
-          //       {durationString->React.string}
-          //     </Text>
-          //   </Row>
-          <Text
-            style={
-              open Style
-              array([theme.styles["textLight1"]])
-            }
-            numberOfLines=1
-            adjustsFontSizeToFit=true>
-            {durationString->React.string}
-          </Text>
-          <View>
-            <SpacedView vertical=XS horizontal=None>
-              <View style={Predefined.styles["row"]}>
-                <View style={Predefined.styles["flexGrow"]}>
-                  <Text style={Style.array([styles["text"], theme.styles["text"]])}>
-                    {Js.Date.fromString(el.startDate)->Js.Date.toLocaleString->React.string}
+        <View key=el.id>
+          <View style={Predefined.styles["rowSpaceBetween"]}>
+            <Row>
+              <Spacer size=S />
+              <View>
+                <Text
+                  style={Style.array([styles["text"], theme.styles["textLight1"]])}
+                  numberOfLines=1
+                  adjustsFontSizeToFit=true>
+                  {(endDate->Js.Date.getDate->Belt.Float.toString ++
+                  " " ++
+                  endDate->Date.monthShortString)->React.string}
+                </Text>
+                <Row style={Predefined.styles["alignCenter"]}>
+                  <View
+                    style={
+                      open Style
+                      array([
+                        theme.styles["backgroundGray3"],
+                        viewStyle(
+                          // ~backgroundColor=color,
+                          ~width=15.->dp,
+                          ~height=6.->dp,
+                          ~borderRadius=6.,
+                          ~overflow=#hidden,
+                          (),
+                        ),
+                      ])
+                    }
+                  />
+                  <Spacer size=XXS />
+                  <Text
+                    style={
+                      open Style
+                      array([Theme.text["footnote"], theme.styles["textLight2"]])
+                    }
+                    numberOfLines=1
+                    adjustsFontSizeToFit=true>
+                    {durationString->React.string}
                   </Text>
-                  <Text style={Style.array([styles["text"], theme.styles["text"]])}>
-                    {Js.Date.fromString(el.endDate)->Js.Date.toLocaleString->React.string}
-                  </Text>
-                </View>
-                <Spacer size=S />
+                </Row>
               </View>
-            </SpacedView>
-            {index !== ActivityCategories.defaults->List.length - 1
-              ? <Separator style={theme.styles["separatorOnBackground"]} />
-              : React.null}
+            </Row>
+            <View>
+              <SpacedView vertical=XS horizontal=None>
+                <View style={Predefined.styles["row"]}>
+                  <View style={Predefined.styles["flexGrow"]}>
+                    <Text style={Style.array([styles["text"], theme.styles["textLight1"]])}>
+                      {(Js.Date.fromString(el.startDate)->Js.Date.getHours->Belt.Float.toString ++
+                      ":" ++
+                      Js.Date.fromString(el.startDate)->Js.Date.getMinutes->Belt.Float.toString)
+                        ->React.string}
+                    </Text>
+                    <Text style={Style.array([styles["text"], theme.styles["text"]])}>
+                      {(Js.Date.fromString(el.endDate)->Js.Date.getHours->Belt.Float.toString ++
+                      ":" ++
+                      Js.Date.fromString(el.endDate)->Js.Date.getMinutes->Belt.Float.toString)
+                        ->React.string}
+                    </Text>
+                  </View>
+                  <Spacer size=S />
+                </View>
+              </SpacedView>
+            </View>
           </View>
+          {index !== events->Array.length - 1
+            ? <Separator style={theme.styles["separatorOnBackground"]} />
+            : React.null}
         </View>
       })->React.array}
     </View>
