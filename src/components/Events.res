@@ -7,6 +7,8 @@ let styles = {
   {"text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ())}
 }->StyleSheet.create
 
+let padTime = (time: string) => ("00" ++ time)->Js.String2.sliceToEnd(~from=-2)
+
 @react.component
 let make = (
   ~events: array<ReactNativeCalendarEvents.calendarEventReadable>,
@@ -84,16 +86,26 @@ let make = (
                 <View style={Predefined.styles["row"]}>
                   <View style={Predefined.styles["flexGrow"]}>
                     <Text style={Style.array([styles["text"], theme.styles["textLight1"]])}>
-                      {(Js.Date.fromString(el.startDate)->Js.Date.getHours->Belt.Float.toString ++
+                      {(Js.Date.fromString(el.startDate)
+                      ->Js.Date.getHours
+                      ->Belt.Float.toString
+                      ->padTime ++
                       ":" ++
-                      Js.Date.fromString(el.startDate)->Js.Date.getMinutes->Belt.Float.toString)
-                        ->React.string}
+                      Js.Date.fromString(el.startDate)
+                      ->Js.Date.getMinutes
+                      ->Belt.Float.toString
+                      ->padTime)->React.string}
                     </Text>
                     <Text style={Style.array([styles["text"], theme.styles["text"]])}>
-                      {(Js.Date.fromString(el.endDate)->Js.Date.getHours->Belt.Float.toString ++
+                      {(Js.Date.fromString(el.endDate)
+                      ->Js.Date.getHours
+                      ->Belt.Float.toString
+                      ->padTime ++
                       ":" ++
-                      Js.Date.fromString(el.endDate)->Js.Date.getMinutes->Belt.Float.toString)
-                        ->React.string}
+                      Js.Date.fromString(el.endDate)
+                      ->Js.Date.getMinutes
+                      ->Belt.Float.toString
+                      ->padTime)->React.string}
                     </Text>
                   </View>
                   <Spacer size=S />
