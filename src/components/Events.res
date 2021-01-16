@@ -11,20 +11,30 @@ let padTime = (time: string) => ("00" ++ time)->Js.String2.sliceToEnd(~from=-2)
 
 @react.component
 let make = (
-  ~events: array<ReactNativeCalendarEvents.calendarEventReadable>,
+  ~eventsWithDuration: array<(ReactNativeCalendarEvents.calendarEventReadable, float)>,
+  ~maxDuration: float,
   ~startDate: Js.Date.t,
   ~endDate: Js.Date.t,
 ) => {
   let themeModeKey = AppSettings.useTheme()
   let theme = Theme.useTheme(themeModeKey)
-  switch events->Array.length {
+
+  let (width, setWidth) = React.useState(() => 0.)
+  let onLayout = React.useCallback1((layoutEvent: Event.layoutEvent) => {
+    let width = layoutEvent.nativeEvent.layout.width
+    setWidth(_ => width)
+  }, [setWidth])
+
+  let availableWidthForBar = width -. 85. -. SpacedView.space *. 4.
+
+  switch eventsWithDuration->Array.length {
   | 0 => <> </>
   | _x =>
-    <View>
+    <View onLayout>
       <Row>
-        <Spacer size=XS />
+        <Spacer size=S />
         <BlockHeading
-          style={theme.styles["background"]}
+          style={Style.array([theme.styles["background"], theme.styles["text"]])}
           text={startDate->Js.Date.getDate->Belt.Float.toString ++
           " - " ++
           endDate->Js.Date.getDate->Belt.Float.toString ++
@@ -33,12 +43,10 @@ let make = (
         />
       </Row>
       <Separator style={theme.styles["separatorOnBackground"]} />
-      {events->Array.mapWithIndex((index, el) => {
-        let duration =
-          Js.Date.getTime(el.endDate->Js.Date.fromString) -.
-          Js.Date.getTime(el.startDate->Js.Date.fromString)
-        let durationString = (duration /. 1000. /. 60.)->Date.minToString
-        <View key=el.id>
+      {eventsWithDuration->Array.mapWithIndex((index, el) => {
+        let (event, duration) = el
+        let durationString = duration->Date.minToString
+        <View key=event.id>
           <View style={Predefined.styles["rowSpaceBetween"]}>
             <Row>
               <Spacer size=S />
@@ -59,7 +67,7 @@ let make = (
                         theme.styles["backgroundGray3"],
                         viewStyle(
                           // ~backgroundColor=color,
-                          ~width=15.->dp,
+                          ~width=(duration /. maxDuration *. availableWidthForBar)->dp,
                           ~height=6.->dp,
                           ~borderRadius=6.,
                           ~overflow=#hidden,
@@ -72,7 +80,7 @@ let make = (
                   <Text
                     style={
                       open Style
-                      array([Theme.text["footnote"], theme.styles["textLight2"]])
+                      array([Theme.text["footnote"], theme.styles["textLight1"]])
                     }
                     numberOfLines=1
                     adjustsFontSizeToFit=true>
@@ -86,23 +94,23 @@ let make = (
                 <View style={Predefined.styles["row"]}>
                   <View style={Predefined.styles["flexGrow"]}>
                     <Text style={Style.array([styles["text"], theme.styles["textLight1"]])}>
-                      {(Js.Date.fromString(el.startDate)
+                      {(Js.Date.fromString(event.startDate)
                       ->Js.Date.getHours
                       ->Belt.Float.toString
                       ->padTime ++
                       ":" ++
-                      Js.Date.fromString(el.startDate)
+                      Js.Date.fromString(event.startDate)
                       ->Js.Date.getMinutes
                       ->Belt.Float.toString
                       ->padTime)->React.string}
                     </Text>
                     <Text style={Style.array([styles["text"], theme.styles["text"]])}>
-                      {(Js.Date.fromString(el.endDate)
+                      {(Js.Date.fromString(event.endDate)
                       ->Js.Date.getHours
                       ->Belt.Float.toString
                       ->padTime ++
                       ":" ++
-                      Js.Date.fromString(el.endDate)
+                      Js.Date.fromString(event.endDate)
                       ->Js.Date.getMinutes
                       ->Belt.Float.toString
                       ->padTime)->React.string}
@@ -113,7 +121,7 @@ let make = (
               </SpacedView>
             </View>
           </View>
-          {index !== events->Array.length - 1
+          {index !== eventsWithDuration->Array.length - 1
             ? <Separator style={theme.styles["separatorOnBackground"]} />
             : React.null}
         </View>

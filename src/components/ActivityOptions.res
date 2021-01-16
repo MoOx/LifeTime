@@ -44,7 +44,29 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
     )
   )
 
-  // TODO: Get all events here
+  let allEvents = last5Weeks->Array.map(week => {
+    let (startDate, endDate) = week
+    let filteredEvents =
+      getEvents(startDate, endDate, true)->Option.map(event =>
+        event->filterEventsByTitle(activityTitle)
+      )->Option.getWithDefault([])
+    let eventsWithDuration = filteredEvents->Array.map(event => {
+        let duration =
+          Js.Date.getTime(event.endDate->Js.Date.fromString) -.
+          Js.Date.getTime(event.startDate->Js.Date.fromString)
+        let durationInMin = duration /. 1000. /. 60.
+        // let durationString = hoursDuration->Date.minToString
+        (event, durationInMin)
+    })
+    eventsWithDuration
+  })
+
+  let maxDuration = allEvents->Array.reduce(0., (a, events) => {
+      let res = events->Array.reduce(0., (b, (_, duration)) => {
+        duration > b ? duration : b
+      })
+      res > a ? res : a
+  })
 
   let themeModeKey = AppSettings.useTheme()
   let theme = Theme.useTheme(themeModeKey)
@@ -113,17 +135,16 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
     // TODO: add graph
     <Row> <Spacer size=XS /> <BlockHeading text="Events" /> </Row>
     <Separator style={theme.styles["separatorOnBackground"]} />
-    <View style={theme.styles["background"]}> {last5Weeks->Array.mapWithIndex((index,week) => {
-          let (startDate, endDate) = week
-          let events = getEvents(startDate, endDate, true)
-          switch (events) {
-            | Some(eventsValue) => {
-            let filteredEvents = filterEventsByTitle(eventsValue, activityTitle)
-            <Events startDate endDate key=Belt.Int.toString(index) events=filteredEvents />
-            }
-            | None => <></>
+    <View style={theme.styles["background"]}> {last5Weeks->Array.mapWithIndex((index, week) => {
+        let (startDate, endDate) = week
+        let eventsWithDuration = allEvents[index]
+        switch eventsWithDuration {
+        | Some(eventsWithDuration) => {
+            <Events startDate endDate key={Belt.Int.toString(index)} eventsWithDuration maxDuration />
           }
-        })->React.array} <Separator style={theme.styles["separatorOnBackground"]} /> </View>
+        | None => <> </>
+        }
+      })->React.array} <Separator style={theme.styles["separatorOnBackground"]} /> </View>
     <Spacer size=L />
     <TouchableOpacity
       onPress={_ => {
