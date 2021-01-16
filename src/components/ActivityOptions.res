@@ -1,6 +1,7 @@
 open Belt
 open ReactNative
 open ReactMultiversal
+open VirtualizedList
 
 let styles = {
   open Style
@@ -17,7 +18,12 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
   let (getEvents, _updatedAt, requestUpdate) = React.useContext(Calendars.context)
 
-  let _windowDimensions = Dimensions.useWindowDimensions()
+  let windowDimensions = Dimensions.useWindowDimensions()
+
+  let styleWidth = {
+    open Style
+    style(~width=windowDimensions.width->dp, ())
+  }
 
   React.useEffect3(() => {
     if refreshing {
@@ -47,26 +53,55 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
   let allEvents = last5Weeks->Array.map(week => {
     let (startDate, endDate) = week
     let filteredEvents =
-      getEvents(startDate, endDate, true)->Option.map(event =>
-        event->filterEventsByTitle(activityTitle)
-      )->Option.getWithDefault([])
+      getEvents(startDate, endDate, true)
+      ->Option.map(event => event->filterEventsByTitle(activityTitle))
+      ->Option.getWithDefault([])
     let eventsWithDuration = filteredEvents->Array.map(event => {
-        let duration =
-          Js.Date.getTime(event.endDate->Js.Date.fromString) -.
-          Js.Date.getTime(event.startDate->Js.Date.fromString)
-        let durationInMin = duration /. 1000. /. 60.
-        // let durationString = hoursDuration->Date.minToString
-        (event, durationInMin)
+      let duration =
+        Js.Date.getTime(event.endDate->Js.Date.fromString) -.
+        Js.Date.getTime(event.startDate->Js.Date.fromString)
+      let durationInMin = duration /. 1000. /. 60.
+      // let durationString = hoursDuration->Date.minToString
+      (event, durationInMin)
     })
     eventsWithDuration
   })
 
   let maxDuration = allEvents->Array.reduce(0., (a, events) => {
-      let res = events->Array.reduce(0., (b, (_, duration)) => {
-        duration > b ? duration : b
-      })
-      res > a ? res : a
+    let res = events->Array.reduce(0., (b, (_, duration)) => {
+      duration > b ? duration : b
+    })
+    res > a ? res : a
   })
+
+  let todayDates = Date.weekDates(today)
+
+  let previousDates = Date.weekDates(today->DateFns.addDays(-7.))
+
+  let (todayFirst, _) = todayDates
+  let (previousFirst, _) = previousDates
+
+  let getItemLayout = React.useMemo1(((), _items, index) => {
+    length: windowDimensions.width,
+    offset: windowDimensions.width *. index->float,
+    index: index,
+  }, [windowDimensions.width])
+
+  let renderItem = (renderItemProps: renderItemProps<'a>) => {
+    let (currentStartDate, currentSupposedEndDate) = renderItemProps.item
+    <WeeklyBarChartDetail
+      today
+      todayFirst
+      previousFirst
+      startDate=currentStartDate
+      // isVisible={
+      //   startDate == currentStartDate
+      //   && supposedEndDate == currentSupposedEndDate
+      // }
+      supposedEndDate=currentSupposedEndDate
+      style=styleWidth
+    />
+  }
 
   let themeModeKey = AppSettings.useTheme()
   let theme = Theme.useTheme(themeModeKey)
@@ -132,16 +167,31 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
       ->React.array}
       <Separator style={theme.styles["separatorOnBackground"]} />
     </View>
-    // TODO: add graph
+    <Row> <Spacer size=XS /> <BlockHeading text="Activity chart" /> </Row>
+    <Separator style={theme.styles["separatorOnBackground"]} />
+    <View style={theme.styles["background"]}>
+      <FlatList
+        horizontal=true
+        pagingEnabled=true
+        showsHorizontalScrollIndicator=false
+        inverted=true
+        initialNumToRender=1
+        data=last5Weeks
+        style={Style.array([theme.styles["background"], styleWidth])}
+        getItemLayout
+        keyExtractor={((first, _), _index) => first->Js.Date.toString}
+        renderItem
+      />
+      <Separator style={theme.styles["separatorOnBackground"]} />
+    </View>
     <Row> <Spacer size=XS /> <BlockHeading text="Events" /> </Row>
     <Separator style={theme.styles["separatorOnBackground"]} />
     <View style={theme.styles["background"]}> {last5Weeks->Array.mapWithIndex((index, week) => {
         let (startDate, endDate) = week
         let eventsWithDuration = allEvents[index]
         switch eventsWithDuration {
-        | Some(eventsWithDuration) => {
-            <Events startDate endDate key={Belt.Int.toString(index)} eventsWithDuration maxDuration />
-          }
+        | Some(eventsWithDuration) =>
+          <Events startDate endDate key={Belt.Int.toString(index)} eventsWithDuration maxDuration />
         | None => <> </>
         }
       })->React.array} <Separator style={theme.styles["separatorOnBackground"]} /> </View>

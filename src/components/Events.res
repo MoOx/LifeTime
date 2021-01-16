@@ -43,8 +43,8 @@ let make = (
         />
       </Row>
       <Separator style={theme.styles["separatorOnBackground"]} />
-      {eventsWithDuration->Array.mapWithIndex((index, el) => {
-        let (event, duration) = el
+      {eventsWithDuration->Array.mapWithIndex((index, eventWithDuration) => {
+        let (event, duration) = eventWithDuration
         let durationString = duration->Date.minToString
         <View key=event.id>
           <View style={Predefined.styles["rowSpaceBetween"]}>
