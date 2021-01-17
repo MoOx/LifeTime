@@ -1,5 +1,11 @@
+open Belt
 open ReactNative
 open ReactMultiversal
+
+let filterEventsByTitle = (
+  events: array<ReactNativeCalendarEvents.calendarEventReadable>,
+  title: string,
+) => events->Array.keep(evt => !(!(evt.title == title)))
 
 @react.component
 let make = (
@@ -8,15 +14,19 @@ let make = (
   ~previousFirst,
   ~startDate,
   ~supposedEndDate,
+  ~activityTitle,
   // ~isVisible,
   ~style,
 ) => {
-  let (settings, _setSettings) = React.useContext(AppSettings.context)
+  let (_settings, _setSettings) = React.useContext(AppSettings.context)
   let (getEvents, _updatedAt, _requestUpdate) = React.useContext(Calendars.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
 
   let endDate = supposedEndDate->Date.min(today)
-  let events = getEvents(startDate, endDate, false)
+  let events =
+    getEvents(startDate, endDate, false)
+    ->Option.map(event => event->filterEventsByTitle(activityTitle))
+    ->Option.getWithDefault([])
 
   <View style>
     <Spacer />
@@ -36,9 +46,7 @@ let make = (
       </Text>
     </SpacedView>
     <Spacer size=S />
-    <SpacedView vertical=XS>
-      <WeeklyGraphDetail events startDate supposedEndDate />
-    </SpacedView>
+    <SpacedView vertical=XS> <WeeklyGraphDetail events startDate supposedEndDate /> </SpacedView>
     <Spacer size=S />
   </View>
 }

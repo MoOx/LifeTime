@@ -15,11 +15,24 @@ let slices = 5
 let graphHeight = 160.
 let graphLetterHeight = 16.
 
+// let flattenArray = (arr: array<array<'a>>): array<'a> =>
+//   arr->Array.to_list->Array.concat
+
 @react.component
-let make = (~events, ~startDate, ~supposedEndDate) => {
+let make = (
+  ~events: array<ReactNativeCalendarEvents.calendarEventReadable>,
+  ~startDate,
+  ~supposedEndDate,
+) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context)
 
   let theme = Theme.useTheme(AppSettings.useTheme())
+
+  let (width, setWidth) = React.useState(() => 0.)
+  let onLayout = React.useCallback1((layoutEvent: Event.layoutEvent) => {
+    let width = layoutEvent.nativeEvent.layout.width
+    setWidth(_ => width)
+  }, [setWidth])
 
   let supposedNumberOfDays = Date.durationInMs(startDate, supposedEndDate)->Date.msToDays
   let dates =
@@ -27,41 +40,42 @@ let make = (~events, ~startDate, ~supposedEndDate) => {
       startDate->DateFns.addDays(n->Js.Int.toFloat)
     )
 
-  let durationPerDate = React.useMemo3(() => events->Option.map(evts => {
-      let events = evts->Calendars.filterEvents(settings)
-
-      dates->Array.map(date => {
-        let startOfDate = date->Date.startOfDay
-        let endOfDate = date->Date.endOfDay
-        (date, events->Array.reduce(Map.String.empty, (mapPerCategories, evt) => {
-            let cat = settings->Calendars.categoryIdFromActivityTitle(evt.title)
-            if (
-              Date.hasOverlap(
-                evt.startDate->Js.Date.fromString,
-                evt.endDate->Js.Date.fromString,
-                date,
-              )
-            ) {
-              mapPerCategories->Map.String.set(
-                cat,
-                mapPerCategories->Map.String.get(cat)->Option.getWithDefault(0.) +.
-                  Date.durationInMs(
-                    evt.startDate->Js.Date.fromString->Date.max(startOfDate),
-                    evt.endDate->Js.Date.fromString->Date.min(endOfDate),
-                  )->Date.msToMin,
-              )
-            } else {
-              mapPerCategories
-            }
-          }))
-      })
-    }), (events, settings, dates))
-
-  let (width, setWidth) = React.useState(() => 0.)
-  let onLayout = React.useCallback1((layoutEvent: Event.layoutEvent) => {
-    let width = layoutEvent.nativeEvent.layout.width
-    setWidth(_ => width)
-  }, [setWidth])
+  let eventsPerDate = React.useMemo3(() => {
+    // TODO: color + event continue next day + ratio
+    let events = events->Calendars.filterEvents(settings)
+    let minutesInDay = 1440.
+    let minUnit = width /. minutesInDay
+    dates->Array.map(date => {
+      let startOfDate = date->Date.startOfDay
+      let startOfDateMin = date->Date.startOfDay->Js.Date.getTime->Date.msToMin
+      let endOfDate = date->Date.endOfDay
+      (date, events->Array.map(evt => {
+          if (
+            Date.hasOverlap(
+              evt.startDate->Js.Date.fromString,
+              evt.endDate->Js.Date.fromString,
+              date,
+            )
+          ) {
+            let start =
+              (evt.startDate
+              ->Js.Date.fromString
+              ->Date.max(startOfDate)
+              ->Js.Date.getTime
+              ->Date.msToMin -. startOfDateMin) *. minUnit
+            let end =
+              (evt.endDate
+              ->Js.Date.fromString
+              ->Date.min(endOfDate)
+              ->Js.Date.getTime
+              ->Date.msToMin -. startOfDateMin) *. minUnit
+            (evt.id, start, end)
+          } else {
+            ("", 0., 0.)
+          }
+        })->Array.keep(((id, _, _)) => id != ""))
+    })
+  }, (events, settings, dates))
 
   let boxStyle = {
     open Style
@@ -71,11 +85,13 @@ let make = (~events, ~startDate, ~supposedEndDate) => {
       ~borderTopWidth=StyleSheet.hairlineWidth,
       ~borderTopColor=theme.colors.gray4,
       ~height=(graphHeight +. graphLetterHeight)->dp,
+      ~width=width->dp,
       (),
     )
   }
 
   <Row>
+    <Spacer size=S />
     <View onLayout style={Predefined.styles["flexGrow"]}>
       <View
         style={
@@ -91,8 +107,9 @@ let make = (~events, ~startDate, ~supposedEndDate) => {
                   styles["dash"],
                   viewStyle(
                     ~position=#absolute,
-                    ~left=0.->dp,
-                    ~top=(100. /. supposedNumberOfDays *. i->float)->pct,
+                    ~top=-20.->dp,
+                    ~bottom=0.->dp,
+                    ~left=(100. /. supposedNumberOfDays *. i->float)->pct,
                     (),
                   ),
                 ])
@@ -106,9 +123,8 @@ let make = (~events, ~startDate, ~supposedEndDate) => {
                 open Style
                 viewStyle(
                   ~position=#absolute,
-                  ~left=0.->dp,
+                  ~left=-20.->dp,
                   ~top=(104. /. supposedNumberOfDays *. i->float)->pct,
-                  //  ~height=graphHeight->dp,
                   (),
                 )
               }>
@@ -147,7 +163,7 @@ let make = (~events, ~startDate, ~supposedEndDate) => {
             viewStyle(~height=graphHeight->dp, ()),
           ])
         }>
-        {Array.range(1, slices - 1)->Array.map(i =>
+        {Array.range(1, slices)->Array.map(i =>
           <React.Fragment key={i->string_of_int}>
             <View
               style={
@@ -156,7 +172,7 @@ let make = (~events, ~startDate, ~supposedEndDate) => {
                   styles["dash"],
                   viewStyle(
                     ~position=#absolute,
-                    ~bottom=-20.->dp,
+                    ~bottom=-30.->dp,
                     ~left=(100. /. slices->float *. i->float)->pct,
                     ~height=StyleSheet.hairlineWidth->dp,
                     ~backgroundColor=theme.colors.gray5,
@@ -172,7 +188,7 @@ let make = (~events, ~startDate, ~supposedEndDate) => {
                 open Style
                 viewStyle(
                   ~position=#absolute,
-                  ~bottom=-20.->dp,
+                  ~bottom=-30.->dp,
                   ~right=(100. /. slices->float *. i->float)->pct,
                   (),
                 )
@@ -186,7 +202,7 @@ let make = (~events, ~startDate, ~supposedEndDate) => {
                     textStyle(~fontSize=10., ~lineHeight=10., ()),
                   ])
                 }>
-                {(23 / i)->Js.Int.toString->React.string} {"h"->React.string}
+                {(24 - (i - 1) * 6)->Js.Int.toString->React.string} {"h"->React.string}
               </Text>
             </SpacedView>
           </React.Fragment>
@@ -200,8 +216,9 @@ let make = (~events, ~startDate, ~supposedEndDate) => {
                 ~position=#absolute,
                 ~left=0.->dp,
                 ~right=0.->dp,
-                ~bottom=-5.->pct,
+                ~bottom=-10.->pct,
                 ~height=StyleSheet.hairlineWidth->dp,
+                ~width=width->dp,
                 ~backgroundColor=theme.colors.gray5,
                 (),
               ),
@@ -214,60 +231,44 @@ let make = (~events, ~startDate, ~supposedEndDate) => {
           open Style
           array([Predefined.styles["col"]])
         }>
+        <Spacer size=XXS />
         {// TODO: handle events
-        durationPerDate->Option.map(dpd => dpd->Array.map(((date, mapPerCategories)) =>
-            <SpacedView
-              key={date->Js.Date.toISOString}
-              horizontal=S
-              vertical=XS
-              style={
-                open Style
-                  viewStyle(
-                    ~width=100.->dp,
-                    ~flexDirection=#columnReverse,
-                    ~height=6.->dp,
-                    ~paddingBottom=graphLetterHeight->dp,
-                    (),
-                  )
-              }>
+        eventsPerDate->Array.map(((date, ranges)) =>
+          <SpacedView
+            key={date->Js.Date.toISOString}
+            horizontal=S
+            vertical=XS
+            style={
+              open Style
+              viewStyle(
+                ~flexDirection=#row,
+                ~height=6.->dp,
+                ~paddingBottom=graphLetterHeight->dp,
+                (),
+              )
+            }>
+            {ranges->Array.map(((id, rangeFrom, rangeTo)) =>
               <View
-                key="zerrtrze"
+                key=id
                 style={
                   open Style
-                  array([theme.styles["backgroundGray3"],viewStyle(~height=6.->dp, ~borderRadius=6., ())])
+                  array([
+                    theme.styles["backgroundGray3"],
+                    viewStyle(
+                      ~height=6.->dp,
+                      ~width=(rangeTo -. rangeFrom)->dp,
+                      ~position=#absolute,
+                      // ~opacity=0.5,
+                      ~left=rangeFrom->dp,
+                      ~borderRadius=6.,
+                      (),
+                    ),
+                  ])
                 }
               />
-              // {mapCategoryDuration
-              // ->Option.map(mapCategoryDuration =>
-              //   mapCategoryDuration
-              //   ->Array.map(((catId, _categoryId)) =>
-              //     mapPerCategories->Map.String.toArray->Array.map(((key, value)) => {
-              //       let (_, _, colorName, _) = ActivityCategories.getFromId(catId)
-              //       let backgroundColor = colorName->ActivityCategories.getColor(theme.mode)
-              //       key != catId
-              //         ? React.null
-              //         : <View
-              //             key
-              //             style={
-              //               open Style
-              //               array([
-              //                 viewStyle(
-              //                   ~backgroundColor,
-              //                   ~height=(graphHeight /.
-              //                   maxDuration->Option.getWithDefault(0.) *.
-              //                   value)->dp,
-              //                   (),
-              //                 ),
-              //               ])
-              //             }
-              //           />
-              //     })->React.array
-              //   )
-              //   ->React.array
-              // )
-              // ->Option.getWithDefault(React.null)}
-            </SpacedView>
-          )->React.array)->Option.getWithDefault(React.null)}
+            )->React.array}
+          </SpacedView>
+        )->React.array}
       </View>
     </View>
     <Spacer />

@@ -55,9 +55,9 @@ let make = (
                   style={Style.array([styles["text"], theme.styles["textLight1"]])}
                   numberOfLines=1
                   adjustsFontSizeToFit=true>
-                  {(endDate->Js.Date.getDate->Belt.Float.toString ++
+                  {(event.endDate->Js.Date.fromString->Js.Date.getDate->Belt.Float.toString ++
                   " " ++
-                  endDate->Date.monthShortString)->React.string}
+                  event.endDate->Js.Date.fromString->Date.monthShortString)->React.string}
                 </Text>
                 <Row style={Predefined.styles["alignCenter"]}>
                   <View
@@ -66,7 +66,6 @@ let make = (
                       array([
                         theme.styles["backgroundGray3"],
                         viewStyle(
-                          // ~backgroundColor=color,
                           ~width=(duration /. maxDuration *. availableWidthForBar)->dp,
                           ~height=6.->dp,
                           ~borderRadius=6.,
