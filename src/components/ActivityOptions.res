@@ -13,6 +13,19 @@ let filterEventsByTitle = (
   title: string,
 ) => events->Array.keep(evt => !(!(evt.title == title)))
 
+let sortEventsByDecreasingStartDate = (
+  events: array<ReactNativeCalendarEvents.calendarEventReadable>,
+) => events->SortArray.stableSortBy((a, b) =>
+    a.startDate->Js.Date.fromString->Js.Date.getTime <
+      b.startDate->Js.Date.fromString->Js.Date.getTime
+      ? 1
+      : switch a.startDate->Js.Date.fromString->Js.Date.getTime >
+          b.startDate->Js.Date.fromString->Js.Date.getTime {
+        | true => -1
+        | false => 0
+        }
+  )
+
 @react.component
 let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
@@ -54,7 +67,9 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
     let (startDate, endDate) = week
     let filteredEvents =
       getEvents(startDate, endDate, true)
-      ->Option.map(event => event->filterEventsByTitle(activityTitle))
+      ->Option.map(event =>
+        event->filterEventsByTitle(activityTitle)->sortEventsByDecreasingStartDate
+      )
       ->Option.getWithDefault([])
     filteredEvents
   })
@@ -62,7 +77,8 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
   let eventsWithDuration = last5Weeks->Array.mapWithIndex((ind, _week) => {
     let filteredEvents = events[ind]
     let events = filteredEvents->Option.map(event => event->Array.map(event => {
-        let durationInMin = Date.durationInMs(
+        let durationInMin =
+          Date.durationInMs(
             event.startDate->Js.Date.fromString,
             event.endDate->Js.Date.fromString,
           )->Date.msToMin
@@ -93,15 +109,15 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
 
   let renderItem = (renderItemProps: renderItemProps<'a>) => {
     let (currentStartDate, currentSupposedEndDate) = renderItemProps.item
-      <WeeklyBarChartDetail
-        today
-        todayFirst
-        previousFirst
-        startDate=currentStartDate
-        activityTitle
-        supposedEndDate=currentSupposedEndDate
-        style=styleWidth
-      />
+    <WeeklyBarChartDetail
+      today
+      todayFirst
+      previousFirst
+      startDate=currentStartDate
+      activityTitle
+      supposedEndDate=currentSupposedEndDate
+      style=styleWidth
+    />
   }
 
   let themeModeKey = AppSettings.useTheme()
@@ -112,8 +128,7 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
     <Row> <Spacer size=XS /> <BlockHeading text="Category" /> </Row>
     <Separator style={theme.styles["separatorOnBackground"]} />
     <View style={theme.styles["background"]}>
-      {ActivityCategories.defaults
-      ->List.mapWithIndex((index, (id, name, colorName, iconName)) => {
+      {ActivityCategories.defaults->List.mapWithIndex((index, (id, name, colorName, iconName)) => {
         let color = colorName->ActivityCategories.getColor(theme.mode)
         <TouchableOpacity
           key=id
@@ -162,10 +177,7 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
             </View>
           </View>
         </TouchableOpacity>
-      })
-      ->List.toArray
-      ->React.array}
-      <Separator style={theme.styles["separatorOnBackground"]} />
+      })->List.toArray->React.array} <Separator style={theme.styles["separatorOnBackground"]} />
     </View>
     <Row> <Spacer size=XS /> <BlockHeading text="Activity chart" /> </Row>
     <Separator style={theme.styles["separatorOnBackground"]} />
