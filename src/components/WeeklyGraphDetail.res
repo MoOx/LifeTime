@@ -20,10 +20,14 @@ let make = (
   ~events: array<ReactNativeCalendarEvents.calendarEventReadable>,
   ~startDate,
   ~supposedEndDate,
+  ~categoryId,
 ) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context)
 
   let theme = Theme.useTheme(AppSettings.useTheme())
+
+  let (_, _, colorName, _) = ActivityCategories.getFromId(categoryId)
+  let backgroundColor = colorName->ActivityCategories.getColor(theme.mode)
 
   let (width, setWidth) = React.useState(() => 0.)
   let onLayout = React.useCallback1((layoutEvent: Event.layoutEvent) => {
@@ -38,7 +42,6 @@ let make = (
     )
 
   let eventsPerDate = React.useMemo3(() => {
-    // TODO: color + event continue next day + ratio
     let events = events->Calendars.filterEvents(settings)
     let minutesInDay = 1440.
     let minUnit = width /. minutesInDay
@@ -231,14 +234,13 @@ let make = (
                 style={
                   open Style
                   array([
-                    theme.styles["backgroundGray3"],
                     viewStyle(
                       ~height=6.->dp,
                       ~width=(rangeTo -. rangeFrom)->dp,
                       ~position=#absolute,
-                      // ~opacity=0.5,
                       ~left=rangeFrom->dp,
                       ~borderRadius=6.,
+                      ~backgroundColor,
                       (),
                     ),
                   ])

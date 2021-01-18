@@ -59,7 +59,7 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
     filteredEvents
   })
 
-  let eventsWithDuration = last5Weeks->Array.mapWithIndex((ind, week) => {
+  let eventsWithDuration = last5Weeks->Array.mapWithIndex((ind, _week) => {
     let filteredEvents = events[ind]
     let events = filteredEvents->Option.map(event => event->Array.map(event => {
         let durationInMin = Date.durationInMs(

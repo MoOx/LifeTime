@@ -18,7 +18,7 @@ let make = (
   // ~isVisible,
   ~style,
 ) => {
-  let (_settings, _setSettings) = React.useContext(AppSettings.context)
+  let (settings, setSettings) = React.useContext(AppSettings.context)
   let (getEvents, _updatedAt, _requestUpdate) = React.useContext(Calendars.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
 
@@ -27,6 +27,9 @@ let make = (
     getEvents(startDate, endDate, false)
     ->Option.map(event => event->filterEventsByTitle(activityTitle))
     ->Option.getWithDefault([])
+
+  
+  let categoryId = settings->Calendars.categoryIdFromActivityTitle(activityTitle)
 
   <View style>
     <Spacer />
@@ -46,7 +49,7 @@ let make = (
       </Text>
     </SpacedView>
     <Spacer size=S />
-    <SpacedView vertical=XS> <WeeklyGraphDetail events startDate supposedEndDate /> </SpacedView>
+    <SpacedView vertical=XS> <WeeklyGraphDetail events startDate supposedEndDate categoryId /> </SpacedView>
     <Spacer size=S />
   </View>
 }
