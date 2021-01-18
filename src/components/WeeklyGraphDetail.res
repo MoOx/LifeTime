@@ -11,12 +11,9 @@ let styles = {
   }
 }->StyleSheet.create
 
-let slices = 5
+let slices = 6
 let graphHeight = 160.
 let graphLetterHeight = 16.
-
-// let flattenArray = (arr: array<array<'a>>): array<'a> =>
-//   arr->Array.to_list->Array.concat
 
 @react.component
 let make = (
@@ -96,26 +93,15 @@ let make = (
       <View
         style={
           open Style
-          array([StyleSheet.absoluteFill, Predefined.styles["rowSpaceBetween"], boxStyle])
+          array([
+            StyleSheet.absoluteFill,
+            Predefined.styles["rowSpaceBetween"],
+            boxStyle,
+            viewStyle(~width=width->dp, ()),
+          ])
         }>
         {Array.range(0, supposedNumberOfDays->int_of_float)->Array.map(i =>
           <React.Fragment key={i->string_of_int}>
-            <Dash
-              style={
-                open Style
-                array([
-                  styles["dash"],
-                  viewStyle(
-                    ~position=#absolute,
-                    ~top=-20.->dp,
-                    ~bottom=0.->dp,
-                    ~left=(100. /. supposedNumberOfDays *. i->float)->pct,
-                    (),
-                  ),
-                ])
-              }
-              dashColor=theme.colors.gray4
-            />
             <SpacedView
               horizontal=XXS
               vertical=None
@@ -142,70 +128,62 @@ let make = (
             </SpacedView>
           </React.Fragment>
         )->React.array}
-        <Dash
-          style={
-            open Style
-            array([
-              styles["dash"],
-              viewStyle(~position=#absolute, ~top=0.->dp, ~bottom=0.->dp, ~left=100.->pct, ()),
-            ])
-          }
-          dashColor=theme.colors.gray4
-        />
       </View>
       <View
         style={
           open Style
           array([
-            StyleSheet.absoluteFill,
-            Predefined.styles["colSpaceBetween"],
-            boxStyle,
-            viewStyle(~height=graphHeight->dp, ()),
+            Predefined.styles["rowSpaceBetween"],
+            viewStyle(~width=(width +. 30.)->dp, ~position=#absolute, ~bottom=15.->dp, ()),
           ])
         }>
-        {Array.range(1, slices)->Array.map(i =>
-          <React.Fragment key={i->string_of_int}>
-            <View
-              style={
-                open Style
-                array([
-                  styles["dash"],
-                  viewStyle(
-                    ~position=#absolute,
-                    ~bottom=-30.->dp,
-                    ~left=(100. /. slices->float *. i->float)->pct,
-                    ~height=StyleSheet.hairlineWidth->dp,
-                    ~backgroundColor=theme.colors.gray5,
-                    (),
-                  ),
-                ])
-              }
-            />
+        {Array.range(0, slices)->Array.map(i =>
+          <View key={i->string_of_int}>
             <SpacedView
               horizontal=XXS
               vertical=None
               style={
                 open Style
-                viewStyle(
-                  ~position=#absolute,
-                  ~bottom=-30.->dp,
-                  ~right=(100. /. slices->float *. i->float)->pct,
-                  (),
-                )
+                viewStyle(~bottom=-15.->dp, ())
               }>
-              <Text
+              <Dash
                 style={
                   open Style
                   array([
-                    textStyle(~position=#absolute, ~top=-5.->dp, ~right=-20.->dp, ()),
-                    theme.styles["textLight2"],
-                    textStyle(~fontSize=10., ~lineHeight=10., ()),
+                    styles["dash"],
+                    viewStyle(
+                      ~position=#absolute,
+                      ~top=-.(graphHeight +. 10.)->dp,
+                      ~bottom=-0.->dp,
+                      (),
+                    ),
                   ])
-                }>
-                {(24 - (i - 1) * 6)->Js.Int.toString->React.string} {"h"->React.string}
-              </Text>
+                }
+                dashColor=theme.colors.gray4
+              />
             </SpacedView>
-          </React.Fragment>
+            <View>
+              <SpacedView
+                horizontal=XXS
+                vertical=None
+                style={
+                  open Style
+                  viewStyle(~bottom=-15.->dp, ())
+                }>
+                <Text
+                  style={
+                    open Style
+                    array([
+                      textStyle(~top=5.->dp, ~right=10.->dp, ()),
+                      theme.styles["textLight2"],
+                      textStyle(~fontSize=10., ~lineHeight=10., ()),
+                    ])
+                  }>
+                  {(i * 4)->Js.Int.toString->React.string} {"h"->React.string}
+                </Text>
+              </SpacedView>
+            </View>
+          </View>
         )->React.array}
         <View
           style={
