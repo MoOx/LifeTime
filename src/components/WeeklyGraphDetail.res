@@ -41,7 +41,7 @@ let make = (
       startDate->DateFns.addDays(n->Js.Int.toFloat)
     )
 
-  let eventsPerDate = React.useMemo3(() => {
+  let eventsPerDate = React.useMemo4(() => {
     let events = events->Calendars.filterEvents(settings)
     let minutesInDay = 1440.
     let minUnit = width /. minutesInDay
@@ -75,7 +75,7 @@ let make = (
           }
         })->Array.keep(((id, _, _)) => id != ""))
     })
-  }, (events, settings, dates))
+  }, (events, settings, dates, width))
 
   let boxStyle = {
     open Style
