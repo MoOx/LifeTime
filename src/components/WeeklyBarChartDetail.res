@@ -15,10 +15,9 @@ let make = (
   ~startDate,
   ~supposedEndDate,
   ~activityTitle,
-  // ~isVisible,
   ~style,
 ) => {
-  let (settings, setSettings) = React.useContext(AppSettings.context)
+  let (settings, _setSettings) = React.useContext(AppSettings.context)
   let (getEvents, _updatedAt, _requestUpdate) = React.useContext(Calendars.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
 
@@ -28,7 +27,6 @@ let make = (
     ->Option.map(event => event->filterEventsByTitle(activityTitle))
     ->Option.getWithDefault([])
 
-  
   let categoryId = settings->Calendars.categoryIdFromActivityTitle(activityTitle)
 
   <View style>

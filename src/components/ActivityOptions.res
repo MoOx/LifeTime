@@ -56,15 +56,32 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
     Some(() => AppState.removeEventListener(#change(state => handleAppStateChange(state))))
   }, [requestUpdate])
 
-  let today = Date.now()
-  let (last5Weeks, _last5Weeks_set) = React.useState(() =>
+  let (today, today_set) = React.useState(() => Date.now())
+  let appState = ReactNativeHooks.useAppState()
+  React.useEffect2(() => {
+    if appState === #active {
+      today_set(_ => Date.now())
+    }
+    None
+  }, (appState, today_set))
+
+  let (last5Weeks, last5Weeks_set) = React.useState(() =>
     Array.range(0, 5)->Array.map(currentWeekReverseIndex =>
       Date.weekDates(today->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
     )
   )
+  React.useEffect2(() => {
+    last5Weeks_set(_ =>
+      Array.range(0, 5)->Array.map(currentWeekReverseIndex =>
+        Date.weekDates(today->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
+      )
+    )
+    None
+  }, (today, last5Weeks_set))
 
   let events = last5Weeks->Array.map(week => {
-    let (startDate, endDate) = week
+    let (startDate, supposedEndDate) = week
+    let endDate = supposedEndDate->Date.min(today)
     let filteredEvents =
       getEvents(startDate, endDate, true)
       ->Option.map(event =>
