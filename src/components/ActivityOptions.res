@@ -46,24 +46,15 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
     None
   }, (refreshing, requestUpdate, onRefreshDone))
 
-  React.useEffect1(() => {
-    let handleAppStateChange = newAppState =>
-      if newAppState == #active {
-        requestUpdate()
-      }
-
-    AppState.addEventListener(#change(state => handleAppStateChange(state)))
-    Some(() => AppState.removeEventListener(#change(state => handleAppStateChange(state))))
-  }, [requestUpdate])
-
   let (today, today_set) = React.useState(() => Date.now())
   let appState = ReactNativeHooks.useAppState()
-  React.useEffect2(() => {
+  React.useEffect3(() => {
     if appState === #active {
+      requestUpdate()
       today_set(_ => Date.now())
     }
     None
-  }, (appState, today_set))
+  }, (appState, today_set, requestUpdate))
 
   let (last5Weeks, last5Weeks_set) = React.useState(() =>
     Array.range(0, 5)->Array.map(currentWeekReverseIndex =>

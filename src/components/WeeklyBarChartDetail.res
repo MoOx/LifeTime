@@ -34,15 +34,15 @@ let make = (
     <SpacedView vertical=None>
       <Text style={theme.styles["textLight2"]}>
         {if todayFirst == startDate {
-          "Chronogram"
+          "Events"
         } else if previousFirst == startDate {
-          "Last Week's Chronogram"
+          "Last Week's Events"
         } else {
           startDate->Js.Date.getDate->Js.Float.toString ++
             (" - " ++
             (endDate->Js.Date.getDate->Js.Float.toString ++
               (" " ++
-              (endDate->Date.monthShortString ++ " Chronogram"))))
+              (endDate->Date.monthShortString ++ " Events"))))
         }->React.string}
       </Text>
     </SpacedView>
