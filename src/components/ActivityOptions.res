@@ -76,12 +76,6 @@ let make = (
     None
   }, (today, last5Weeks_set))
 
-  let (todayDates, todayDates_set) = React.useState(() => Date.weekDates(today))
-  React.useEffect2(() => {
-    todayDates_set(_ => Date.weekDates(today))
-    None
-  }, (today, todayDates_set))
-
   let ((startDate, supposedEndDate), currentDates_set) = React.useState(() => {
     let (start, end) = currentWeek
     (start->Js.Date.fromString, end->Js.Date.fromString)
@@ -120,7 +114,6 @@ let make = (
 
   let renderItem = (renderItemProps: renderItemProps<'a>) => {
     let (currentStartDate, currentSupposedEndDate) = renderItemProps.item
-    // Js.log((currentStartDate, currentSupposedEndDate))
     <WeeklyBarChartDetail
       today
       todayFirst
@@ -131,6 +124,23 @@ let make = (
       style=styleWidth
     />
   }
+
+  let flatListRef = React.useRef(Js.Nullable.null)
+
+  React.useEffect2(() => {
+    let (currentStartDate, _) = currentWeek
+    let index = last5Weeks->Js.Array2.findIndex(week => {
+      let (weekStart, _) = week
+      weekStart->Js.Date.toString == currentStartDate
+    })
+    flatListRef.current
+    ->Js.Nullable.toOption
+    ->Option.map(flatList =>
+      flatList->FlatList.scrollToIndex(FlatList.scrollToIndexParams(~index, ~animated=false, ()))
+    )
+    ->ignore
+    None
+  }, (last5Weeks, currentWeek))
 
   let themeModeKey = AppSettings.useTheme()
   let theme = Theme.useTheme(themeModeKey)
@@ -196,6 +206,7 @@ let make = (
     <Separator style={theme.styles["separatorOnBackground"]} />
     <View style={theme.styles["background"]}>
       <FlatList
+        ref={flatListRef->Ref.value}
         horizontal=true
         pagingEnabled=true
         showsHorizontalScrollIndicator=false
