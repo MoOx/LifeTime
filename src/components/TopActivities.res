@@ -5,7 +5,13 @@ open ReactMultiversal
 let numberOfActivitiesToShow = 8
 
 @react.component
-let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
+let make = (
+  ~mapTitleDuration,
+  ~onFiltersPress,
+  ~onActivityPress,
+  ~startDate,
+  ~endDate,
+) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context)
 
   let theme = Theme.useTheme(AppSettings.useTheme())
@@ -87,7 +93,13 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                   ->Calendars.categoryIdFromActivityTitle(title)
                   ->ActivityCategories.getFromId
                 let color = colorName->ActivityCategories.getColor(theme.mode)
-                <TouchableOpacity key=title onPress={_ => onActivityPress(title)}>
+                <TouchableOpacity
+                  key=title
+                  onPress={_ =>
+                    onActivityPress(
+                      title,
+                      (startDate, endDate),
+                    )}>
                   <View style={Predefined.styles["rowCenter"]}>
                     <Spacer size=S />
                     <SpacedView vertical=XS horizontal=None>

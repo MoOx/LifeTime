@@ -34,7 +34,7 @@ let make = (
     <SpacedView vertical=None>
       <Text style={theme.styles["textLight2"]}>
         {if todayFirst == startDate {
-          "Events"
+          "Current Week's Events"
         } else if previousFirst == startDate {
           "Last Week's Events"
         } else {

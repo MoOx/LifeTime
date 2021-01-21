@@ -480,7 +480,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
         {!refreshing ? React.null : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
       </BlockFootnote>
       <Spacer />
-      <TopActivities mapTitleDuration onFiltersPress onActivityPress />
+      <TopActivities mapTitleDuration onFiltersPress onActivityPress startDate endDate />
       <Spacer />
       <SpacedView horizontal=None>
         <TouchableOpacity onPress={_ => setSettings(settings => {

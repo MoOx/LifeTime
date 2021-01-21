@@ -24,14 +24,16 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.StatsStac
       showsHorizontalScrollIndicator=false
       showsVerticalScrollIndicator=false>
       {route.params
-      ->Option.flatMap(params => params.currentActivityTitle)
-      ->Option.map(currentActivityTitle =>
-        <ActivityOptions
-          refreshing
-          onRefreshDone
-          activityTitle=currentActivityTitle
-          onSkipActivity={() => navigation->Navigators.RootStack.Navigation.goBack()}
-        />
+      ->Option.flatMap(params =>
+        params.currentActivityTitle->Option.map(currentActivityTitle =>
+          <ActivityOptions
+            refreshing
+            onRefreshDone
+            activityTitle=currentActivityTitle
+            currentWeek=params.currentWeek
+            onSkipActivity={() => navigation->Navigators.RootStack.Navigation.goBack()}
+          />
+        )
       )
       ->Option.getWithDefault(React.null)}
     </Animated.ScrollView>

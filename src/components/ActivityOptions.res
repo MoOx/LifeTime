@@ -27,7 +27,13 @@ let sortEventsByDecreasingStartDate = (
   )
 
 @react.component
-let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
+let make = (
+  ~activityTitle,
+  ~refreshing,
+  ~onRefreshDone,
+  ~onSkipActivity,
+  ~currentWeek: (string, string),
+) => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
   let (getEvents, _updatedAt, requestUpdate) = React.useContext(Calendars.context)
 
@@ -70,41 +76,38 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
     None
   }, (today, last5Weeks_set))
 
-  let events = last5Weeks->Array.map(week => {
-    let (startDate, supposedEndDate) = week
-    let endDate = supposedEndDate->Date.min(today)
-    let filteredEvents =
-      getEvents(startDate, endDate, true)
-      ->Option.map(event =>
-        event->filterEventsByTitle(activityTitle)->sortEventsByDecreasingStartDate
-      )
-      ->Option.getWithDefault([])
-    filteredEvents
+  let (todayDates, todayDates_set) = React.useState(() => Date.weekDates(today))
+  React.useEffect2(() => {
+    todayDates_set(_ => Date.weekDates(today))
+    None
+  }, (today, todayDates_set))
+
+  let ((startDate, supposedEndDate), currentDates_set) = React.useState(() => {
+    let (start, end) = currentWeek
+    (start->Js.Date.fromString, end->Js.Date.fromString)
   })
 
-  let eventsWithDuration = last5Weeks->Array.mapWithIndex((ind, _week) => {
-    let filteredEvents = events[ind]
-    let events = filteredEvents->Option.map(event => event->Array.map(event => {
-        let durationInMin =
-          Date.durationInMs(
-            event.startDate->Js.Date.fromString,
-            event.endDate->Js.Date.fromString,
-          )->Date.msToMin
-        (event, durationInMin)
-      }))->Option.getWithDefault([])
-    events
-  })
+  let onViewableItemsChanged = React.useRef(itemsChanged =>
+    if itemsChanged.viewableItems->Array.length == 1 {
+      itemsChanged.viewableItems[0]
+      ->Option.map(wrapper => currentDates_set(_ => wrapper.item))
+      ->ignore
+    }
+  ).current
 
-  let maxDuration = eventsWithDuration->Array.reduce(0., (a, events) => {
-    let res = events->Array.reduce(0., (b, (_, duration)) => {
-      duration > b ? duration : b
-    })
-    res > a ? res : a
-  })
+  let endDate = supposedEndDate->Date.min(today)
+
+  let events =
+    getEvents(startDate, endDate, true)
+    ->Option.map(event =>
+      event->filterEventsByTitle(activityTitle)->sortEventsByDecreasingStartDate
+    )
+    ->Option.getWithDefault([])
 
   let todayDates = Date.weekDates(today)
 
   let previousDates = Date.weekDates(today->DateFns.addDays(-7.))
+  let _followingDates = Date.weekDates(today->DateFns.addDays(7.))
 
   let (todayFirst, _) = todayDates
   let (previousFirst, _) = previousDates
@@ -117,6 +120,7 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
 
   let renderItem = (renderItemProps: renderItemProps<'a>) => {
     let (currentStartDate, currentSupposedEndDate) = renderItemProps.item
+    // Js.log((currentStartDate, currentSupposedEndDate))
     <WeeklyBarChartDetail
       today
       todayFirst
@@ -187,6 +191,7 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
         </TouchableOpacity>
       })->List.toArray->React.array} <Separator style={theme.styles["separatorOnBackground"]} />
     </View>
+    <Spacer size=S />
     <Row> <Spacer size=XS /> <BlockHeading text="Activity chart" /> </Row>
     <Separator style={theme.styles["separatorOnBackground"]} />
     <View style={theme.styles["background"]}>
@@ -201,20 +206,14 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity) => {
         getItemLayout
         keyExtractor={((first, _), _index) => first->Js.Date.toString}
         renderItem
+        onViewableItemsChanged
       />
       <Separator style={theme.styles["separatorOnBackground"]} />
     </View>
     <Row> <Spacer size=XS /> <BlockHeading text="Events" /> </Row>
     <Separator style={theme.styles["separatorOnBackground"]} />
-    <View style={theme.styles["background"]}> {last5Weeks->Array.mapWithIndex((index, week) => {
-        let (startDate, endDate) = week
-        let eventsWithDuration = eventsWithDuration[index]
-        switch eventsWithDuration {
-        | Some(eventsWithDuration) =>
-          <Events startDate endDate key={Belt.Int.toString(index)} eventsWithDuration maxDuration />
-        | None => <> </>
-        }
-      })->React.array} <Separator style={theme.styles["separatorOnBackground"]} /> </View>
+    <View style={theme.styles["background"]}> <Events startDate endDate events /> </View>
+    <Separator style={theme.styles["separatorOnBackground"]} />
     <Spacer size=L />
     <TouchableOpacity
       onPress={_ => {

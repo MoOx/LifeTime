@@ -11,8 +11,7 @@ let padTime = (time: string) => ("00" ++ time)->Js.String2.sliceToEnd(~from=-2)
 
 @react.component
 let make = (
-  ~eventsWithDuration: array<(ReactNativeCalendarEvents.calendarEventReadable, float)>,
-  ~maxDuration: float,
+  ~events: array<ReactNativeCalendarEvents.calendarEventReadable>,
   ~startDate: Js.Date.t,
   ~endDate: Js.Date.t,
 ) => {
@@ -27,8 +26,38 @@ let make = (
 
   let availableWidthForBar = width -. 85. -. SpacedView.space *. 4.
 
+  let eventsWithDuration = events->Array.map(event => {
+    let durationInMin =
+      Date.durationInMs(
+        event.startDate->Js.Date.fromString,
+        event.endDate->Js.Date.fromString,
+      )->Date.msToMin
+    (event, durationInMin)
+  })
+
+  let maxDuration =
+    eventsWithDuration->Array.reduce(0., (max, (_, duration)) => duration > max ? duration : max)
+
   switch eventsWithDuration->Array.length {
-  | 0 => <> </>
+  | 0 =>
+    <SpacedView horizontal=L>
+      <Center>
+        <Spacer />
+        <Text
+          style={Style.array([
+            Theme.text["title3"],
+            Theme.text["medium"],
+            theme.styles["textLight2"],
+          ])}>
+          {"No events"->React.string}
+        </Text>
+        <Spacer size=XXS />
+        <Text style={Style.array([Theme.text["footnote"], theme.styles["textLight2"]])}>
+          {"You should add some events to your calendar or activate more calendars."->React.string}
+        </Text>
+        <Spacer />
+      </Center>
+    </SpacedView>
   | _x =>
     <View onLayout>
       <Row>
