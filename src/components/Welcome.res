@@ -23,7 +23,7 @@ let styles = {
     ),
     "baseline": textStyle(~fontSize=18., ~lineHeight=18. *. 1.4, ()),
     "bottom": viewStyle(),
-    "iconCalendar": imageStyle(~width=48.->dp, ~height=48.->dp, ()),
+    "iconCalendar": imageStyle(~width=48.->dp, ~height=48.->dp, ~marginTop=2.->dp, ()),
     "bottomText": viewStyle(~flexShrink=1., ()),
     "permissions": textStyle(~flexShrink=1., ~fontSize=12., ~lineHeight=12. *. 1.4, ()),
     "permissionsLink": textStyle(
