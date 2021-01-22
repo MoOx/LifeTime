@@ -1,0 +1,23 @@
+diff --git a/node_modules/react-refresh/cjs/react-refresh-runtime.development.js b/node_modules/react-refresh/cjs/react-refresh-runtime.development.js
+index a6a1184..d8710e7 100644
+--- a/node_modules/react-refresh/cjs/react-refresh-runtime.development.js
++++ b/node_modules/react-refresh/cjs/react-refresh-runtime.development.js
+@@ -530,12 +530,17 @@ function isLikelyComponentType(type) {
+ 
+ 
+           var name = type.name || type.displayName;
+-          return typeof name === 'string' && /^[A-Z]/.test(name);
++          return (
++            typeof name === 'string' &&
++            (/^[A-Z]/.test(name) || /^make/.test(name) || name === '$$default')
++          );
+         }
+ 
+       case 'object':
+         {
+           if (type != null) {
++            // `in` doesn't trigger proxy getters
++            if ('make' in type) return true;
+             switch (type.$$typeof) {
+               case REACT_FORWARD_REF_TYPE:
+               case REACT_MEMO_TYPE:
