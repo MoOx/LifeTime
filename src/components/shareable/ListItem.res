@@ -53,6 +53,6 @@ let make = (
     </View>
 
   onPress->Option.map(onPress => {
-    <TouchableWithoutFeedback onPress> {child} </TouchableWithoutFeedback>
+    <Pressable onPress> {child} </Pressable>
   })->Option.getWithDefault(child)
 }

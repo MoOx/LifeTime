@@ -161,7 +161,7 @@ let make = (
     <Row> <Spacer size=XS /> <BlockHeading text="Type" /> </Row>
     <ListSeparator />
     <View style={theme.styles["background"]}>
-      <TouchableWithoutFeedback onPress={_ => setType(_ => Some(Goal.Type.Goal))}>
+      <Pressable onPress={_ => setType(_ => Some(Goal.Type.Goal))}>
         <View style={Predefined.styles["rowCenter"]}>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
@@ -197,8 +197,8 @@ let make = (
             <ListSeparator />
           </View>
         </View>
-      </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback onPress={_ => setType(_ => Some(Goal.Type.Limit))}>
+      </Pressable>
+      <Pressable onPress={_ => setType(_ => Some(Goal.Type.Limit))}>
         <View style={Predefined.styles["rowCenter"]}>
           <Spacer size=S />
           <SpacedView vertical=XS horizontal=None>
@@ -233,7 +233,7 @@ let make = (
             </SpacedView>
           </View>
         </View>
-      </TouchableWithoutFeedback>
+      </Pressable>
       <ListSeparator />
     </View>
     <Spacer />
@@ -246,7 +246,7 @@ let make = (
         ->Array.concat(days->Array.slice(~offset=0, ~len=Date.weekStartsOn))
         ->Array.mapWithIndex((index, dayOn) => {
           let day = mod(index + Date.weekStartsOn, 7)
-          <TouchableWithoutFeedback key={index->string_of_int} onPress={_ => setDays(days => {
+          <Pressable key={index->string_of_int} onPress={_ => setDays(days => {
                 let cp = days->Array.copy
                 cp->Array.set(day, !dayOn)->ignore
                 cp
@@ -264,7 +264,7 @@ let make = (
                 />
               }}
             </View>
-          </TouchableWithoutFeedback>
+          </Pressable>
         })
         ->React.array}
       </SpacedView>
@@ -425,8 +425,7 @@ let make = (
         <React.Fragment key=id>
           <View style={Predefined.styles["rowCenter"]}>
             <Spacer size=S />
-            <TouchableWithoutFeedback
-              onPress={_ => handleCategoryCheck(id, selectedCategoryActivities)}>
+            <Pressable onPress={_ => handleCategoryCheck(id, selectedCategoryActivities)}>
               <View>
                 <SpacedView vertical=XS horizontal=None>
                   {if !selectedCat {
@@ -440,9 +439,9 @@ let make = (
                   }}
                 </SpacedView>
               </View>
-            </TouchableWithoutFeedback>
+            </Pressable>
             <Spacer size=XS />
-            <TouchableWithoutFeedback
+            <Pressable
               onPress={_ =>
                 canOpenCategory
                   ? handleCategoryOpen(id)
@@ -514,7 +513,7 @@ let make = (
                   </View>
                 </View>
               </View>
-            </TouchableWithoutFeedback>
+            </Pressable>
           </View>
           {opened ? categoryActivities->Array.mapWithIndex((index, activity) => {
                 let selected =
@@ -534,7 +533,7 @@ let make = (
                     ])
                   }>
                   <Spacer size=S />
-                  <TouchableWithoutFeedback
+                  <Pressable
                     disabled=selectedCat onPress={_ => handleActivityCheckPress(activity.id)}>
                     <View>
                       <SpacedView vertical=XS horizontal=None>
@@ -549,8 +548,8 @@ let make = (
                         }}
                       </SpacedView>
                     </View>
-                  </TouchableWithoutFeedback>
-                  <TouchableWithoutFeedback
+                  </Pressable>
+                  <Pressable
                     disabled=selectedCat onPress={_ => handleActivityCheckPress(activity.id)}>
                     <View style={Predefined.styles["flex"]}>
                       <View style={Predefined.styles["rowCenter"]}>
@@ -584,7 +583,7 @@ let make = (
                         </View>
                       </View>
                     </View>
-                  </TouchableWithoutFeedback>
+                  </Pressable>
                 </View>
               })->React.array : React.null}
         </React.Fragment>
@@ -598,7 +597,7 @@ let make = (
       <Spacer size=L />
       <ListSeparator />
       <View style={theme.styles["background"]}>
-        <TouchableWithoutFeedback
+        <Pressable
           onPress={_ =>
             Alert.alert(
               ~title="Delete This Goal",
@@ -620,7 +619,7 @@ let make = (
               </Text>
             </SpacedView>
           </View>
-        </TouchableWithoutFeedback>
+        </Pressable>
       </View>
       <ListSeparator />
     </>)->Option.getWithDefault(React.null)}
