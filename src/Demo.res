@@ -61,7 +61,37 @@ let injectFreshData = () => {
       id->Option.map(calendarId => {
         open ReactNativeCalendarEvents
         let today = Date.now()
+        let lastWeekSameDay = today->DateFns.addDays(-7.)
+        let startOfLastWeekDate = Date.startOfWeek(lastWeekSameDay)
         let startOfWeekDate = Date.startOfWeek(today)
+        [
+          (-2., 8.25),
+          (-1., 8.5),
+          (-2.5, 7.),
+          (-1.75, 7.75),
+          (0.5, 8.),
+          (-1.5, 8.75),
+          (0., 7.75),
+        ]->Array.forEachWithIndex((index, (startadd, endadd)) => {
+          open DateFns
+          saveEvent(
+            "Sleep",
+            writableEvent(
+              ~calendarId,
+              ~notes="LifeTime Demo Event",
+              ~startDate=startOfLastWeekDate
+              ->addDays(index->Js.Int.toFloat)
+              ->addHours(startadd)
+              ->Js.Date.getTime,
+              ~endDate=startOfLastWeekDate
+              ->addDays(index->Js.Int.toFloat)
+              ->addHours(endadd)
+              ->Js.Date.getTime,
+              (),
+            ),
+            None,
+          )->ignore
+        })
         [
           (-2., 8.25),
           (-1., 8.5),
