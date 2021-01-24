@@ -8,24 +8,6 @@ let styles = {
   {"text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ())}
 }->StyleSheet.create
 
-let filterEventsByTitle = (
-  events: array<ReactNativeCalendarEvents.calendarEventReadable>,
-  title: string,
-) => events->Array.keep(evt => !(!(evt.title == title)))
-
-let sortEventsByDecreasingStartDate = (
-  events: array<ReactNativeCalendarEvents.calendarEventReadable>,
-) => events->SortArray.stableSortBy((a, b) =>
-    a.startDate->Js.Date.fromString->Js.Date.getTime <
-      b.startDate->Js.Date.fromString->Js.Date.getTime
-      ? 1
-      : switch a.startDate->Js.Date.fromString->Js.Date.getTime >
-          b.startDate->Js.Date.fromString->Js.Date.getTime {
-        | true => -1
-        | false => 0
-        }
-  )
-
 @react.component
 let make = (
   ~activityTitle,
@@ -94,7 +76,7 @@ let make = (
   let events =
     getEvents(startDate, endDate, true)
     ->Option.map(event =>
-      event->filterEventsByTitle(activityTitle)->sortEventsByDecreasingStartDate
+      event->Calendars.filterEventsByTitle(activityTitle)->Calendars.sortEventsByDecreasingStartDate
     )
     ->Option.getWithDefault([])
 

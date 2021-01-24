@@ -2,11 +2,6 @@ open Belt
 open ReactNative
 open ReactMultiversal
 
-let filterEventsByTitle = (
-  events: array<ReactNativeCalendarEvents.calendarEventReadable>,
-  title: string,
-) => events->Array.keep(evt => !(!(evt.title == title)))
-
 @react.component
 let make = (
   ~today: Js.Date.t,
@@ -24,7 +19,7 @@ let make = (
   let endDate = supposedEndDate->Date.min(today)
   let events =
     getEvents(startDate, endDate, false)
-    ->Option.map(event => event->filterEventsByTitle(activityTitle))
+    ->Option.map(event => event->Calendars.filterEventsByTitle(activityTitle))
     ->Option.getWithDefault([])
 
   let categoryId = settings->Calendars.categoryIdFromActivityTitle(activityTitle)
