@@ -239,7 +239,7 @@ let makeMapCategoryDuration = (
 let filterEventsByTitle = (
   events: array<ReactNativeCalendarEvents.calendarEventReadable>,
   title: string,
-) => events->Array.keep(evt => !(!(evt.title == title)))
+) => events->Array.keep(evt => evt.title == title)
 
 let sortEventsByDecreasingStartDate = (
   events: array<ReactNativeCalendarEvents.calendarEventReadable>,
