@@ -358,8 +358,8 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                         open Style
                         array([
                           Theme.text["caption1"],
+                          Theme.text["weight700"],
                           Theme.styleSheets.dark["textOnDarkLight"],
-                          textStyle(~fontWeight=Theme.fontWeights.bold, ()),
                         ])
                       }>
                       {switch goal.type_->Goal.Type.fromSerialized {
@@ -375,8 +375,8 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                         open Style
                         array([
                           Theme.text["title1"],
+                          Theme.text["weight500"],
                           Theme.styleSheets.dark["text"],
-                          textStyle(~fontWeight=Theme.fontWeights.medium, ()),
                         ])
                       }
                       numberOfLines=1>
@@ -548,8 +548,8 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                           open Style
                           array([
                             Theme.text["caption1"],
+                            Theme.text["weight300"],
                             Theme.styleSheets.dark["textOnDarkLight"],
-                            textStyle(~fontWeight=Theme.fontWeights.light, ()),
                           ])
                         }>
                         {"Daily Average"->React.string}
@@ -559,13 +559,9 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                           open Style
                           array([
                             Theme.text["title2"],
+                            Theme.text["weight500"],
                             Theme.styleSheets.dark["text"],
-                            textStyle(
-                              //  ~fontWeight=Theme.fontWeights.light,
-                              ~fontWeight=Theme.fontWeights.medium,
-                              ~textAlign=#right,
-                              (),
-                            ),
+                            textStyle(~textAlign=#right, ()),
                           ])
                         }>
                         {switch proportionalAverageTime {

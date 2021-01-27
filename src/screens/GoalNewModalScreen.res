@@ -81,7 +81,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
             <Animated.Text
               style={
                 open Style
-                array([defaultStyle, textStyle(~color, ~fontWeight=Theme.fontWeights.regular, ())])
+                array([defaultStyle, Theme.text["weight400"], textStyle(~color, ())])
               }>
               {"Cancel"->React.string}
             </Animated.Text>

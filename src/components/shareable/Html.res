@@ -50,7 +50,7 @@ module H1 = {
       <Text
         style={
           open Style
-          array([Theme.text["largeTitle"], Theme.text["bold"], theme.styles["text"]])
+          array([Theme.text["largeTitle"], Theme.text["weight700"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -69,7 +69,7 @@ module H2 = {
       <Text
         style={
           open Style
-          array([Theme.text["title1"], Theme.text["bold"], theme.styles["text"]])
+          array([Theme.text["title1"], Theme.text["weight700"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -88,7 +88,7 @@ module H3 = {
       <Text
         style={
           open Style
-          array([Theme.text["title2"], Theme.text["bold"], theme.styles["text"]])
+          array([Theme.text["title2"], Theme.text["weight700"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -107,7 +107,7 @@ module H4 = {
       <Text
         style={
           open Style
-          array([Theme.text["title3"], Theme.text["bold"], theme.styles["text"]])
+          array([Theme.text["title3"], Theme.text["weight700"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -126,7 +126,7 @@ module H5 = {
       <Text
         style={
           open Style
-          array([Theme.text["headline"], Theme.text["bold"], theme.styles["text"]])
+          array([Theme.text["headline"], Theme.text["weight700"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -144,7 +144,7 @@ module H6 = {
       <Text
         style={
           open Style
-          array([Theme.text["headline"], Theme.text["semiBold"], theme.styles["text"]])
+          array([Theme.text["headline"], Theme.text["weight600"], theme.styles["text"]])
         }>
         children
       </Text>

@@ -106,92 +106,45 @@ let fontWeights = {
 }
 
 let text = {
-  "largeTitle": textStyle(
-    ~fontSize=34.,
-    ~lineHeight=41.,
-    ~letterSpacing=0.37,
-    ~fontWeight=fontWeights.regular,
-    (),
-  ),
-  "title1": textStyle(
-    ~fontSize=28.,
-    ~lineHeight=34.,
-    ~letterSpacing=0.36,
-    ~fontWeight=fontWeights.regular,
-    (),
-  ),
-  "title2": textStyle(
-    ~fontSize=22.,
-    ~lineHeight=28.,
-    ~letterSpacing=0.35,
-    ~fontWeight=fontWeights.regular,
-    (),
-  ),
-  "title3": textStyle(
-    ~fontSize=20.,
-    ~lineHeight=24.,
-    ~letterSpacing=0.38,
-    ~fontWeight=fontWeights.regular,
-    (),
-  ),
-  "headline": textStyle(
-    ~fontSize=17.,
-    ~lineHeight=22.,
-    ~letterSpacing=-0.41,
-    ~fontWeight=fontWeights.semiBold,
-    (),
-  ),
-  "body": textStyle(
-    ~fontSize=17.,
-    ~lineHeight=22.,
-    ~letterSpacing=-0.41,
-    ~fontWeight=fontWeights.regular,
-    (),
-  ),
-  "callout": textStyle(
-    ~fontSize=16.,
-    ~lineHeight=21.,
-    ~letterSpacing=-0.32,
-    ~fontWeight=fontWeights.regular,
-    (),
-  ),
-  "subhead": textStyle(
-    ~fontSize=15.,
-    ~lineHeight=20.,
-    ~letterSpacing=-0.24,
-    ~fontWeight=fontWeights.regular,
-    (),
-  ),
-  "footnote": textStyle(
-    ~fontSize=13.,
-    ~lineHeight=18.,
-    ~letterSpacing=-0.08,
-    ~fontWeight=fontWeights.regular,
-    (),
-  ),
-  "caption1": textStyle(
-    ~fontSize=12.,
-    ~lineHeight=16.,
-    ~letterSpacing=0.,
-    ~fontWeight=fontWeights.regular,
-    (),
-  ),
-  "caption2": textStyle(
-    ~fontSize=11.,
-    ~lineHeight=13.,
-    ~letterSpacing=0.07,
-    ~fontWeight=fontWeights.regular,
-    (),
-  ),
-  "thin": textStyle(~fontWeight=fontWeights.thin, ()),
-  "ultraLight": textStyle(~fontWeight=fontWeights.ultraLight, ()),
-  "light": textStyle(~fontWeight=fontWeights.light, ()),
-  "regular": textStyle(~fontWeight=fontWeights.regular, ()),
-  "medium": textStyle(~fontWeight=fontWeights.medium, ()),
-  "semiBold": textStyle(~fontWeight=fontWeights.semiBold, ()),
-  "bold": textStyle(~fontWeight=fontWeights.bold, ()),
-  "heavy": textStyle(~fontWeight=fontWeights.heavy, ()),
-  "black": textStyle(~fontWeight=fontWeights.black, ()),
+  "largeTitle": textStyle(~fontSize=34., ~lineHeight=41., ~letterSpacing=0.37, ()),
+  "title1": textStyle(~fontSize=28., ~lineHeight=34., ~letterSpacing=0.36, ()),
+  "title2": textStyle(~fontSize=22., ~lineHeight=28., ~letterSpacing=0.35, ()),
+  "title3": textStyle(~fontSize=20., ~lineHeight=24., ~letterSpacing=0.38, ()),
+  "headline": textStyle(~fontSize=17., ~lineHeight=22., ~letterSpacing=-0.41, ()),
+  "body": textStyle(~fontSize=17., ~lineHeight=22., ~letterSpacing=-0.41, ()),
+  "callout": textStyle(~fontSize=16., ~lineHeight=21., ~letterSpacing=-0.32, ()),
+  "subhead": textStyle(~fontSize=15., ~lineHeight=20., ~letterSpacing=-0.24, ()),
+  "footnote": textStyle(~fontSize=13., ~lineHeight=18., ~letterSpacing=-0.08, ()),
+  "caption1": textStyle(~fontSize=12., ~lineHeight=16., ~letterSpacing=0., ()),
+  "caption2": textStyle(~fontSize=11., ~lineHeight=13., ~letterSpacing=0.07, ()),
+  "weight100": Platform.os === Platform.android
+    ? textStyle(~fontFamily="sans-serif-thin", ~fontWeight=#_100, ())
+    : textStyle(~fontWeight=#_100, ()),
+  "weight200": Platform.os === Platform.android
+    ? textStyle(~fontFamily="sans-serif-light", ~fontWeight=#_200, ())
+    : textStyle(~fontWeight=#_200, ()),
+  "weight300": Platform.os === Platform.android
+    ? textStyle(~fontFamily="sans-serif-light", ~fontWeight=#_300, ())
+    : textStyle(~fontWeight=#_300, ()),
+  "weight400": Platform.os === Platform.android
+    ? textStyle(~fontFamily="sans-serif", ~fontWeight=#_400, ())
+    : textStyle(~fontWeight=#_400, ()),
+  "weight500": Platform.os === Platform.android
+    ? textStyle(~fontFamily="sans-serif-medium", ~fontWeight=#_500, ())
+    : textStyle(~fontWeight=#_500, ()),
+  "weight600": Platform.os === Platform.android
+    ? textStyle(~fontFamily="sans-serif-medium", ~fontWeight=#_600, ())
+    : textStyle(~fontWeight=#_600, ()),
+  "weight700": Platform.os === Platform.android
+    ? textStyle(~fontFamily="sans-serif-bold", ~fontWeight=#_700, ())
+    : textStyle(~fontWeight=#_700, ()),
+  // pixel 3 handle sans-serif-bold / bold as heavy, but oneplus & oppo doesn't, so we stick to bold...
+  "weight800": Platform.os === Platform.android
+    ? textStyle(~fontFamily="sans-serif-bold", ~fontWeight=#_700, ())
+    : textStyle(~fontWeight=#_800, ()),
+  "weight900": Platform.os === Platform.android
+    ? textStyle(~fontFamily="sans-serif-black", ~fontWeight=#_900, ())
+    : textStyle(~fontWeight=#_900, ()),
 }->StyleSheet.create
 
 let styleSheets = {

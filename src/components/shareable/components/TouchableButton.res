@@ -44,7 +44,7 @@ let make = (~onPress, ~text, ~styleBackground=?, ~styleText=?, ~mode=Contained) 
           open Style
           arrayOption([
             Some(Theme.text["callout"]),
-            Some(Theme.text["semiBold"]),
+            Some(Theme.text["weight600"]),
             styleText
             ->Option.map(s => Some(s))
             ->Option.getWithDefault(

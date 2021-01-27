@@ -64,7 +64,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
         <Text
           style={
             open Style
-            array([Theme.text["title2"], Theme.text["bold"], theme.styles["text"]])
+            array([Theme.text["title2"], Theme.text["weight700"], theme.styles["text"]])
           }>
           {"Set Up Calendars Access"->React.string}
         </Text>

@@ -13,11 +13,10 @@ let styles = {
       ~alignSelf=#flexStart,
       (),
     ),
-    "title": textStyle(~fontSize=58., ~lineHeight=58., ~fontWeight=#_100, ()),
+    "title": textStyle(~fontSize=58., ~lineHeight=58., ()),
     "appName": textStyle(
       ~fontSize=68.,
       ~lineHeight=68.,
-      ~fontWeight=#_800,
       // ~color=Consts.Colors.color1,
       (),
     ),
@@ -26,13 +25,7 @@ let styles = {
     "iconCalendar": imageStyle(~width=48.->dp, ~height=48.->dp, ~marginTop=2.->dp, ()),
     "bottomText": viewStyle(~flexShrink=1., ()),
     "permissions": textStyle(~flexShrink=1., ~fontSize=12., ~lineHeight=12. *. 1.4, ()),
-    "permissionsLink": textStyle(
-      ~flexShrink=1.,
-      ~fontSize=14.,
-      ~lineHeight=14. *. 1.4,
-      ~fontWeight=#_600,
-      (),
-    ),
+    "permissionsLink": textStyle(~textAlign=#center, ~fontSize=14., ~lineHeight=14. *. 1.4, ()),
   }
 }->StyleSheet.create
 
@@ -118,7 +111,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
         <Text
           style={
             open Style
-            array([styles["title"], theme.styles["text"]])
+            array([styles["title"], theme.styles["text"], Theme.text["weight100"]])
           }
           numberOfLines=1
           adjustsFontSizeToFit=true>
@@ -127,7 +120,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
         <Text
           style={
             open Style
-            array([styles["appName"], theme.styles["textMain"]])
+            array([styles["appName"], theme.styles["textMain"], Theme.text["weight800"]])
           }
           numberOfLines=1
           adjustsFontSizeToFit=true>

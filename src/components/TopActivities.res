@@ -65,7 +65,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                 <Text
                   style={Style.array([
                     Theme.text["title3"],
-                    Theme.text["medium"],
+                    Theme.text["weight500"],
                     theme.styles["textLight2"],
                   ])}>
                   {"No activities"->React.string}

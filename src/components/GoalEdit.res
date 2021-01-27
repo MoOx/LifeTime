@@ -290,7 +290,8 @@ let make = (
                   open Style
                   array([
                     Theme.text["subhead"],
-                    textStyle(~color=theme.colors.blue, ~fontWeight=Theme.fontWeights.semiBold, ()),
+                    Theme.text["weight600"],
+                    textStyle(~color=theme.colors.blue, ()),
                   ])
                 }
                 numberOfLines=1
@@ -373,8 +374,8 @@ let make = (
                 array([
                   Predefined.styles["flex"],
                   Theme.text["callout"],
+                  Theme.text["weight500"],
                   theme.styles["text"],
-                  textStyle(~fontWeight=Theme.fontWeights.medium, ()),
                 ])
               }>
               {"Weekly Goal"->React.string}
@@ -382,11 +383,7 @@ let make = (
             <Text
               style={
                 open Style
-                array([
-                  Theme.text["callout"],
-                  theme.styles["textLight1"],
-                  textStyle(~fontWeight=Theme.fontWeights.semiBold, ()),
-                ])
+                array([Theme.text["callout"], Theme.text["weight600"], theme.styles["textLight1"]])
               }
               numberOfLines=1
               adjustsFontSizeToFit=true>

@@ -406,7 +406,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
               <Text
                 style={
                   open Style
-                  array([Theme.text["title1"], Theme.text["heavy"], theme.styles["text"]])
+                  array([Theme.text["title1"], Theme.text["weight800"], theme.styles["text"]])
                 }>
                 {"No Events"->React.string}
               </Text>
