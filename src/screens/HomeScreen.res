@@ -111,24 +111,22 @@ let make = (~navigation, ~route as _) => {
       </Animated.ScrollView>
     </View>
     {hasCalendarAccess == false
-      ? <ScrollView
+      ? <View
           style={
             open Style
             style(
+              ~paddingTop=safeAreaInsets.top->dp,
               ~position=#absolute,
               ~top=0.->dp,
               ~bottom=0.->dp,
               ~left=0.->dp,
               ~right=0.->dp,
               ~backgroundColor="rgba(0,0,0,0.2)",
+              ~justifyContent=#flexEnd,
               (),
             )
-          }
-          contentContainerStyle={
-            open Style
-            style(~flexGrow=1., ~justifyContent=#flexEnd, ())
           }>
-          <SpacedView vertical=S horizontal=S>
+          <SpacedView vertical=S horizontal=S style={Predefined.styles["flexShrink"]}>
             <CalendarsPermissions
               onAboutPrivacyPress={_ =>
                 navigation->Navigators.RootStack.Navigation.navigate("PrivacyModalScreen")}
@@ -168,7 +166,7 @@ let make = (~navigation, ~route as _) => {
                 )->ignore}
             />
           </SpacedView>
-        </ScrollView>
+        </View>
       : React.null}
   </>
 }

@@ -49,26 +49,27 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
           ],
           (),
         ),
+        Predefined.styles["flex"],
       ])
     }>
-    <View
+    <SpacedView
       style={
         open Style
         array([styles["content"], theme.styles["background"]])
       }>
-      <SpacedView>
-        <View style={Predefined.styles["center"]}>
-          <IconCalendar style={styles["iconCalendar"]} />
-        </View>
-        <Spacer />
-        <Text
-          style={
-            open Style
-            array([Theme.text["title2"], Theme.text["weight700"], theme.styles["text"]])
-          }>
-          {"Set Up Calendars Access"->React.string}
-        </Text>
-        <Spacer size=S />
+      <View style={Predefined.styles["center"]}>
+        <IconCalendar style={styles["iconCalendar"]} />
+      </View>
+      <Spacer />
+      <Text
+        style={
+          open Style
+          array([Theme.text["title2"], Theme.text["weight700"], theme.styles["text"]])
+        }>
+        {"Set Up Calendars Access"->React.string}
+      </Text>
+      <Spacer size=S />
+      <ScrollView style={Predefined.styles["flex"]}>
         <Text
           style={
             open Style
@@ -90,16 +91,16 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
             {"Learn more about LifeTime & Privacy..."->React.string}
           </Text>
         </TouchableOpacity>
-        <Spacer />
-        <TouchableButton
-          text="Allow Calendars Access"
-          onPress=onContinuePress
-          styleBackground={
-            open Style
-            viewStyle(~backgroundColor=theme.colors.blue, ())
-          }
-        />
-      </SpacedView>
-    </View>
+      </ScrollView>
+      <Spacer />
+      <TouchableButton
+        text="Allow Calendars Access"
+        onPress=onContinuePress
+        styleBackground={
+          open Style
+          viewStyle(~backgroundColor=theme.colors.blue, ())
+        }
+      />
+    </SpacedView>
   </Animated.View>
 }
