@@ -302,7 +302,14 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
         ->React.string}
       </TitlePre>
       <View style={Predefined.styles["rowSpaceBetween"]}>
-        <Title style={theme.styles["text"]}> {title->React.string} </Title>
+        <Text
+          style={Style.array([
+            Theme.text["largeTitle"],
+            Theme.text["weight700"],
+            theme.styles["text"],
+          ])}>
+          {title->React.string}
+        </Text>
         <View style={Predefined.styles["row"]}>
           {Global.__DEV__
             ? <>
@@ -406,7 +413,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
               <Text
                 style={
                   open Style
-                  array([Theme.text["title1"], Theme.text["weight800"], theme.styles["text"]])
+                  array([Theme.text["title1"], Theme.text["weight700"], theme.styles["text"]])
                 }>
                 {"No Events"->React.string}
               </Text>

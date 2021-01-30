@@ -38,13 +38,13 @@ let make = (~navigation, ~route as _) => {
         color2=theme.colors.blue
         textStyle={theme.styles["text"]}
         title=Filters.title
-        right={({color, defaultStyle}) =>
+        right={({color}) =>
           <TouchableOpacity onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
             <Text
               allowFontScaling=false
               style={
                 open Style
-                array([defaultStyle, style(~color, ())])
+                array([Theme.text["body"], Theme.text["weight600"], style(~color, ())])
               }>
               {"Done"->React.string}
             </Text>

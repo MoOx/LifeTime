@@ -13,7 +13,16 @@ let make = () => {
   let theme = Theme.useTheme(AppSettings.useTheme())
 
   <SpacedView horizontal=L vertical=XL style={styles["container"]}>
-    <Center> <Title style={theme.styles["text"]}> {title->React.string} </Title> </Center>
+    <Center>
+      <Text
+        style={Style.array([
+          Theme.text["largeTitle"],
+          Theme.text["weight700"],
+          theme.styles["text"],
+        ])}>
+        {title->React.string}
+      </Text>
+    </Center>
     <Spacer size=L />
     <Text
       style={

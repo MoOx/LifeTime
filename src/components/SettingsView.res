@@ -12,7 +12,14 @@ let make = (~navigation) => {
   <>
     <SpacedView>
       <TitlePre> {" "->React.string} </TitlePre>
-      <Title style={theme.styles["text"]}> {title->React.string} </Title>
+      <Text
+        style={Style.array([
+          Theme.text["largeTitle"],
+          Theme.text["weight700"],
+          theme.styles["text"],
+        ])}>
+        {title->React.string}
+      </Text>
     </SpacedView>
     <ListSeparator />
     <ListItem

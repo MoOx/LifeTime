@@ -76,23 +76,24 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
         color2=theme.colors.blue
         textStyle={theme.styles["text"]}
         title="New Goal"
-        left={({color, defaultStyle}) =>
+        left={({color}) =>
           <TouchableOpacity onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
             <Animated.Text
               style={
                 open Style
-                array([defaultStyle, Theme.text["weight400"], textStyle(~color, ())])
+                array([Theme.text["body"], Theme.text["weight400"], textStyle(~color, ())])
               }>
               {"Cancel"->React.string}
             </Animated.Text>
           </TouchableOpacity>}
-        right={({color, defaultStyle}) =>
+        right={({color}) =>
           <TouchableOpacity disabled onPress>
             <Animated.Text
               style={
                 open Style
                 array([
-                  defaultStyle,
+                  Theme.text["body"],
+                  Theme.text["weight600"],
                   textStyle(~color=isReadyToSave ? color : theme.colors.gray3, ()),
                 ])
               }>

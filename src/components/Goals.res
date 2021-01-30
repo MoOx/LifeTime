@@ -36,7 +36,14 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
     <SpacedView>
       <TitlePre> {" "->React.string} </TitlePre>
       <View style={Predefined.styles["rowSpaceBetween"]}>
-        <Title style={theme.styles["text"]}> {title->React.string} </Title>
+        <Text
+          style={Style.array([
+            Theme.text["largeTitle"],
+            Theme.text["weight700"],
+            theme.styles["text"],
+          ])}>
+          {title->React.string}
+        </Text>
         <View style={Predefined.styles["row"]}>
           {Global.__DEV__
             ? <>

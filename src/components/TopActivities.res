@@ -40,7 +40,14 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
           <SpacedView>
             <Center>
               <Spacer size=XXL />
-              <Title style={theme.styles["text"]}> {"No Events"->React.string} </Title>
+              <Text
+                style={Style.array([
+                  Theme.text["title1"],
+                  Theme.text["weight600"],
+                  theme.styles["text"],
+                ])}>
+                {"No Events"->React.string}
+              </Text>
               <Spacer />
               <Text style={theme.styles["textLight2"]}>
                 {"You should select at least a calendar"->React.string}
