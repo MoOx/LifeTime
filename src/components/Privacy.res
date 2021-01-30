@@ -38,6 +38,5 @@ This mean, unless you backup your data, you cannot recover your personal setting
 In the future, if we need to share collect data to improve the application, this will be with your explicit consent and all the data will be anonymised to respect privacy.
 `->React.string}
     </Text>
-    <Spacer size=XXL />
   </SpacedView>
 }
