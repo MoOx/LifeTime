@@ -111,7 +111,7 @@ let make = (~navigation, ~route as _) => {
       </Animated.ScrollView>
     </View>
     {hasCalendarAccess == false
-      ? <View
+      ? <ScrollView
           style={
             open Style
             style(
@@ -121,9 +121,12 @@ let make = (~navigation, ~route as _) => {
               ~left=0.->dp,
               ~right=0.->dp,
               ~backgroundColor="rgba(0,0,0,0.2)",
-              ~justifyContent=#flexEnd,
               (),
             )
+          }
+          contentContainerStyle={
+            open Style
+            style(~flexGrow=1., ~justifyContent=#flexEnd, ())
           }>
           <SpacedView vertical=S horizontal=S>
             <CalendarsPermissions
@@ -165,7 +168,7 @@ let make = (~navigation, ~route as _) => {
                 )->ignore}
             />
           </SpacedView>
-        </View>
+        </ScrollView>
       : React.null}
   </>
 }

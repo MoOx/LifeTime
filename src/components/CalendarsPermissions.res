@@ -75,10 +75,9 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
             array([Theme.text["body"], theme.styles["text"]])
           }>
           {("LifeTime has been designed to protect your personal data and respect your privacy. " ++
-          ("It has been built as an on-device service that you can trust. " ++
-          ("\n" ++
-          ("\n" ++
-          ("We decided to rely on calendars as primary source of informations to follow your activities. " ++ "That's why LifeTime must read your calendars to be able to show you personal summary of your activities. ")))))
+          "It has been built as an on-device service that you can trust. " ++
+          "\n" ++
+          "\n" ++ "Calendars are used as the primary source of informations to follow your activities. LifeTime must have read access to them to be able to show reports and suggestions.")
             ->React.string}
         </Text>
         <Spacer />
