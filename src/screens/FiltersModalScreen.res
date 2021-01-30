@@ -41,6 +41,7 @@ let make = (~navigation, ~route as _) => {
         right={({color, defaultStyle}) =>
           <TouchableOpacity onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
             <Text
+              allowFontScaling=false
               style={
                 open Style
                 array([defaultStyle, style(~color, ())])

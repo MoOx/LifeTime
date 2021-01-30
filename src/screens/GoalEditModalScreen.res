@@ -104,6 +104,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
         right={({color, defaultStyle}) =>
           <TouchableOpacity disabled onPress>
             <Animated.Text
+              allowFontScaling=false
               style={
                 open Style
                 array([

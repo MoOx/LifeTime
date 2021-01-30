@@ -120,7 +120,8 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
               array([styles["title"], theme.styles["text"], Theme.text["weight100"]])
             }
             numberOfLines=1
-            adjustsFontSizeToFit=true>
+            adjustsFontSizeToFit=true
+            allowFontScaling=false>
             {"Welcome to"->React.string}
           </Text>
           <Text
@@ -129,7 +130,8 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
               array([styles["appName"], theme.styles["textMain"], Theme.text["weight800"]])
             }
             numberOfLines=1
-            adjustsFontSizeToFit=true>
+            adjustsFontSizeToFit=true
+            allowFontScaling=false>
             {"LifeTime"->React.string}
           </Text>
           <Spacer size={isWindowTall ? M : XXS} />
