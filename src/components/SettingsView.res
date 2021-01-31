@@ -13,6 +13,7 @@ let make = (~navigation) => {
     <SpacedView>
       <TitlePre> {" "->React.string} </TitlePre>
       <Text
+        allowFontScaling=false
         style={Style.array([
           Theme.text["largeTitle"],
           Theme.text["weight700"],

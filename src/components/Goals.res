@@ -37,6 +37,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
       <TitlePre> {" "->React.string} </TitlePre>
       <View style={Predefined.styles["rowSpaceBetween"]}>
         <Text
+          allowFontScaling=false
           style={Style.array([
             Theme.text["largeTitle"],
             Theme.text["weight700"],

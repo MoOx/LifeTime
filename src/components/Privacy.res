@@ -15,6 +15,7 @@ let make = () => {
   <SpacedView horizontal=L vertical=XL style={styles["container"]}>
     <Center>
       <Text
+        allowFontScaling=false
         style={Style.array([
           Theme.text["largeTitle"],
           Theme.text["weight700"],

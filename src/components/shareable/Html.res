@@ -48,10 +48,12 @@ module H1 = {
     <View accessibilityRole=#header>
       <Spacer />
       <Text
-        style={
-          open Style
-          array([Theme.text["largeTitle"], Theme.text["weight700"], theme.styles["text"]])
-        }>
+        allowFontScaling=false
+        style={Style.array([
+          Theme.text["largeTitle"],
+          Theme.text["weight700"],
+          theme.styles["text"],
+        ])}>
         children
       </Text>
       <Spacer />
