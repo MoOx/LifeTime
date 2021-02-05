@@ -10,8 +10,10 @@ let make = (~navigation, ~route as _) => {
   let (hasCalendarAccess, hasCalendarAccess_set) = React.useState(() => true)
   React.useEffect3(() => {
     open ReactNativeCalendarEvents
-    checkPermissions(true)->FutureJs.fromPromise(error => Js.log(error))->Future.tapOk(status => {
-      Js.log(("status", status))
+    checkPermissions(true)
+    ->FutureJs.fromPromise(error => Js.log(("[LifeTime] HomeScreen: checkPermissions", error)))
+    ->Future.tapOk(status => {
+      // Js.log(("[LifeTime] HomeScreen: checkPermissions status", status))
       if status != #authorized {
         hasCalendarAccess_set(_ => false)
         if settings.lastUpdated === 0. {
@@ -23,13 +25,15 @@ let make = (~navigation, ~route as _) => {
           )->ignore
         }
       }
-    })->Future.tapError(_err =>
+    })
+    ->Future.tapError(_err =>
       Alert.alert(
         ~title="Ooops, something bad happened",
         ~message="Please report us this error with informations about your device so we can improve LifeTime.",
         (),
       )
-    )->ignore
+    )
+    ->ignore
     None
   }, (hasCalendarAccess_set, navigation, settings.lastUpdated))
 
@@ -133,10 +137,10 @@ let make = (~navigation, ~route as _) => {
               onContinuePress={_ =>
                 ReactNativeCalendarEvents.requestPermissions()->FutureJs.fromPromise(error => {
                   // @todo error!
-                  Js.log(error)
+                  Js.log(("[LifeTime] HomeScreen: onContinuePress", error))
                   error
                 })->Future.tapOk(status => {
-                  Js.log(("new status", status))
+                  Js.log(("[LifeTime] HomeScreen: onContinuePress new status", status))
                   switch status {
                   | #authorized => hasCalendarAccess_set(_ => true)
                   | #denied

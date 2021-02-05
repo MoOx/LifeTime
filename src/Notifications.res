@@ -25,11 +25,11 @@ let appropriateTimeForNextNotification = (today: float, notifFrequency: array<op
 
   let supposedMaxLimitDate = supposedDate->getTime -. 1000. *. 60. *. minutesGapToAvoidTooCloseNotif
   let adjustedDate = if today >= supposedMaxLimitDate {
-    (// date + 1j if...
+    // date + 1j if...
     // - you open the app Xmin before the notification
     //   (eg: you open at 8:30+ => delay to avoid a notification poping at 9:00)
     // - you open the app after the notification hour
-    today +. 1000. *. 60. *. 60. *. 24.)->fromFloat
+    (today +. 1000. *. 60. *. 60. *. 24.)->fromFloat
   } else {
     // current date if we open the app after midnight
     // we still want notif in the morning
@@ -45,6 +45,7 @@ let appropriateTimeForNextNotification = (today: float, notifFrequency: array<op
     (),
   )
   Js.log((
+    "[LifeTime] Notifications: ",
     ("Notification planned at", adjustedNotifTime->toISOString),
     ("today", today->fromFloat->toISOString),
     ("supposedDate", supposedDate->toISOString),

@@ -31,7 +31,7 @@ let useCalendars = updater => {
   React.useEffect2(() => {
     findCalendars()->FutureJs.fromPromise(error => {
       // @todo error!
-      Js.log(error)
+      Js.log(("[LifeTime] Calendars: useCalendars", error))
       error
     })->Future.tapOk(res => set(_ => Some(res->sort)))->ignore
     None
@@ -82,7 +82,7 @@ let useEvents = () => {
         )
         ->FutureJs.fromPromise(error => {
           // @todo error!
-          Js.log(error)
+          Js.log(("[LifeTime] Calendars: useEvents/getEvents", startDate, endDate, error))
 
           // setEventsMapByRange(eventsMapByRange => {
           //   eventsMapByRange->Map.String.set(

@@ -11,7 +11,7 @@ let make = () => {
 
   let handleImport = React.useCallback1(() => Clipboard.getString()->FutureJs.fromPromise(error => {
       // @todo error!
-      Js.log2("LifeTime: import: ", error)
+      Js.log(("[LifeTime] SettingsDangerZone: import", error))
       "Unable to read from clipboard"
     })->Future.get(x =>
       switch x {

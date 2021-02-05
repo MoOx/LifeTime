@@ -10,7 +10,7 @@ let navigatorEmitter = EventEmitter.make()
       ~requestPermissions=false,
       ~popInitialNotification=true,
       ~onNotification=notification => {
-        Js.log(("NOTIFICATION", notification))
+        Js.log(("[LifeTime] App: onNotification ", notification))
         switch notification.id {
         | Some(id) when id == Notifications.Ids.reminderDailyCheck =>
           navigatorEmitter->EventEmitter.emit("navigate", "GoalsScreen")
@@ -62,7 +62,7 @@ let app = () => {
     if initialStateContainer->Option.isNone {
       ReactNativeAsyncStorage.getItem(navigationStateStorageKey)->FutureJs.fromPromise(error => {
         // @todo error
-        Js.log2("Restoring Navigation State: ", error)
+        Js.log(("[LifeTime] App: Restoring Navigation State: ", error))
         error
       })->Future.tap(res =>
         switch res {
@@ -72,13 +72,16 @@ let app = () => {
             switch Js.Json.parseExn(jsonState) {
             | state => setInitialState(_ => Some(Some(state)))
             | exception _ =>
-              Js.log2("Restoring Navigation State: unable to decode valid json", jsonState)
+              Js.log((
+                "[LifeTime] App: Restoring Navigation State: unable to decode valid json",
+                jsonState,
+              ))
               setInitialState(_ => Some(None))
             }
           | None => setInitialState(_ => Some(None))
           }
         | Result.Error(e) =>
-          Js.log2("Restoring Navigation State: unable to get json state", e)
+          Js.log(("[LifeTime] App: Restoring Navigation State: unable to get json state", e))
           setInitialState(_ => Some(None))
         }
       )->ignore
@@ -119,7 +122,10 @@ let app = () => {
                 switch maybeJsonState {
                 | Some(jsonState) =>
                   ReactNativeAsyncStorage.setItem(navigationStateStorageKey, jsonState)->ignore
-                | None => Js.log("Unable to stringify navigation state")
+                | None =>
+                  Js.log(
+                    "[LifeTime] App: <Native.NavigationContainer> onStateChange: Unable to stringify navigation state",
+                  )
                 }
               }}>
               <Nav.RootNavigator />

@@ -5,7 +5,9 @@ let useNotificationStatus = () => {
     if appState === #active {
       open ReactNativePermissions
       checkNotifications()
-      ->FutureJs.fromPromise(error => Js.Console.error(error))
+      ->FutureJs.fromPromise(error =>
+        Js.Console.error(("[LifeTime] NotificationsHooks: checkNotifications", error))
+      )
       ->Future.tapOk(res => notificationStatus_set(_ => Some(res.status)))
       ->ignore
     }
@@ -17,7 +19,12 @@ let useNotificationStatus = () => {
       ? {
           open ReactNativePermissions
           requestNotifications(["alert", "badge", "sound"])
-          ->FutureJs.fromPromise(error => Js.Console.error(error))
+          ->FutureJs.fromPromise(error =>
+            Js.Console.error((
+              "[LifeTime] NotificationsHooks: requestNotificationPermission",
+              error,
+            ))
+          )
           ->Future.tapOk(res => notificationStatus_set(_ => Some(res.status)))
           ->ignore
         }
