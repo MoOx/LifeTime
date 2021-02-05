@@ -37,8 +37,11 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
   let (today, today_set) = React.useState(() => Date.now())
   let appState = ReactNativeHooks.useAppState()
   React.useEffect2(() => {
-    if appState === #active {
-      today_set(_ => Date.now())
+    open Js.Date
+    let now = Date.now()
+    // only update today when active AND there is an relevant diff
+    if appState === #active && now->getTime -. today->getTime > 1000. *. 5. {
+      today_set(_ => now)
     }
     None
   }, (appState, today_set))
