@@ -372,7 +372,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                     open Style
                     array([Predefined.styles["rowSpaceBetween"], Predefined.styles["alignStart"]])
                   }>
-                  <View>
+                  <View style={Predefined.styles["flex"]}>
                     <Text
                       style={
                         open Style
