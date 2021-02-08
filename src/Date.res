@@ -322,3 +322,28 @@ let hasOverlap = (startA, endA, dateB) => {
   // https://stackoverflow.com/a/325964/988941
   startA->getTime <= endB->getTime && endA->getTime >= startB->getTime
 }
+
+module Hooks = {
+  let useToday = () => {
+    let (today, today_set) = React.useState(() => now())
+    let appState = ReactNativeHooks.useAppState()
+    React.useEffect3(() => {
+      let now = now()
+      // only update today when active AND there is an relevant diff
+      if appState === #active && now->getTime -. today->getTime > 1000. *. 5. {
+        today_set(_ => now)
+      }
+      None
+    }, (appState, today, today_set))
+    today
+  }
+
+  let useWeekDates = date => {
+    let (dates, dates_set) = React.useState(() => weekDates(date))
+    React.useEffect2(() => {
+      dates_set(_ => weekDates(date))
+      None
+    }, (date, dates_set))
+    dates
+  }
+}

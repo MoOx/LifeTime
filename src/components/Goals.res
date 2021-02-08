@@ -10,10 +10,11 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
   let (getEvents, fetchEvents, _updatedAt, _requestUpdate) = React.useContext(Calendars.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
 
-  let today = React.useRef(Date.now())
-  let todayDates = React.useRef(Date.weekDates(today.current))
-  let (startDate, supposedEndDate) = todayDates.current
-  let endDate = supposedEndDate->Date.min(today.current)
+  let today = Date.Hooks.useToday()
+  let todayDates = Date.Hooks.useWeekDates(today)
+
+  let (startDate, supposedEndDate) = todayDates
+  let endDate = supposedEndDate->Date.min(today)
   let endDateTonight = endDate->Date.endOfDay
   let remainingMinThisWeek =
     (supposedEndDate->Js.Date.getTime -. endDate->Js.Date.getTime)->Date.msToMin

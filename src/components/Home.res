@@ -34,22 +34,9 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
     Some(() => AppState.removeEventListener(#change(state => handleAppStateChange(state))))
   }, [requestUpdate])
 
-  let (today, today_set) = React.useState(() => Date.now())
-  let appState = ReactNativeHooks.useAppState()
-  React.useEffect3(() => {
-    open Js.Date
-    let now = Date.now()
-    // only update today when active AND there is an relevant diff
-    if appState === #active && now->getTime -. today->getTime > 1000. *. 5. {
-      today_set(_ => now)
-    }
-    None
-  }, (appState, today, today_set))
-  let (todayDates, todayDates_set) = React.useState(() => Date.weekDates(today))
-  React.useEffect2(() => {
-    todayDates_set(_ => Date.weekDates(today))
-    None
-  }, (today, todayDates_set))
+  let today = Date.Hooks.useToday()
+  let todayDates = Date.Hooks.useWeekDates(today)
+  
   let (previousDates, previousDates_set) = React.useState(() =>
     Date.weekDates(today->DateFns.addDays(-7.))
   )
