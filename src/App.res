@@ -89,7 +89,7 @@ let app = () => {
     None
   }, (initialStateContainer, setInitialState))
 
-  let calendarsContextValue = Calendars.useEvents()
+  let calendarsContextValue = Calendars.useEventsContext()
   let isReady = initialStateContainer->Option.isSome
 
   // let (initialized, initialized_set) = React.useState(() => false);

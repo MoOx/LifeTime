@@ -7,7 +7,7 @@ let title = "Goals"
 @react.component
 let make = (~onNewGoalPress, ~onEditGoalPress) => {
   let (settings, _setSettings) = React.useContext(AppSettings.context)
-  let (getEvents, _updatedAt, _requestUpdate) = React.useContext(Calendars.context)
+  let (getEvents, fetchEvents, _updatedAt, _requestUpdate) = React.useContext(Calendars.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
 
   let today = React.useRef(Date.now())
@@ -17,7 +17,18 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
   let endDateTonight = endDate->Date.endOfDay
   let remainingMinThisWeek =
     (supposedEndDate->Js.Date.getTime -. endDate->Js.Date.getTime)->Date.msToMin
-  let events = getEvents(startDate, endDate, true)
+  let fetchedEvents = getEvents(startDate, endDate)
+  React.useEffect4(() => {
+    switch fetchedEvents {
+    | NotAsked => fetchEvents(startDate, endDate)
+    | _ => ()
+    }
+    None
+  }, (fetchEvents, fetchedEvents, startDate, endDate))
+  let events = switch fetchedEvents {
+  | Done(evts) => Some(evts)
+  | _ => None
+  }
   let mapTitleDuration =
     events->Option.map(es =>
       es->Calendars.filterEvents(settings)->Calendars.makeMapTitleDuration(startDate, endDate)

@@ -13,7 +13,7 @@ let make = (~navigation, ~route as _) => {
     checkPermissions(true)
     ->FutureJs.fromPromise(error => Js.log(("[LifeTime] HomeScreen: checkPermissions", error)))
     ->Future.tapOk(status => {
-      // Js.log(("[LifeTime] HomeScreen: checkPermissions status", status))
+      Js.log(("[LifeTime] HomeScreen: checkPermissions status", status))
       if status != #authorized {
         hasCalendarAccess_set(_ => false)
         if settings.lastUpdated === 0. {

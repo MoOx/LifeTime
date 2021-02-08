@@ -8,7 +8,7 @@ let title = "Your LifeTime"
 @react.component
 let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
-  let (getEvents, updatedAt, requestUpdate) = React.useContext(Calendars.context)
+  let (getEvents, fetchEvents, updatedAt, requestUpdate) = React.useContext(Calendars.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
   let windowDimensions = Dimensions.useWindowDimensions()
   let styleWidth = {
@@ -36,7 +36,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
 
   let (today, today_set) = React.useState(() => Date.now())
   let appState = ReactNativeHooks.useAppState()
-  React.useEffect2(() => {
+  React.useEffect3(() => {
     open Js.Date
     let now = Date.now()
     // only update today when active AND there is an relevant diff
@@ -44,7 +44,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
       today_set(_ => now)
     }
     None
-  }, (appState, today_set))
+  }, (appState, today, today_set))
   let (todayDates, todayDates_set) = React.useState(() => Date.weekDates(today))
   React.useEffect2(() => {
     todayDates_set(_ => Date.weekDates(today))
@@ -80,7 +80,18 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
   let (todayFirst, _) = todayDates
   let (previousFirst, _) = previousDates
 
-  let events = getEvents(startDate, endDate, true)
+  let fetchedEvents = getEvents(startDate, endDate)
+  React.useEffect4(() => {
+    switch fetchedEvents {
+    | NotAsked => fetchEvents(startDate, endDate)
+    | _ => ()
+    }
+    None
+  }, (fetchEvents, fetchedEvents, startDate, endDate))
+  let events = switch fetchedEvents {
+  | Done(events) => Some(events)
+  | _ => None
+  }
   let mapTitleDuration =
     events->Option.map(es =>
       es->Calendars.filterEvents(settings)->Calendars.makeMapTitleDuration(startDate, endDate)
@@ -134,8 +145,30 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
   let (startDate2, supposedEndDate2) = last5Weeks[1]->Option.getWithDefault(todayDates)
   let endDate2 = supposedEndDate2->Date.min(today)
 
-  let events1 = getEvents(startDate1, endDate1, true)
-  let events2 = getEvents(startDate2, endDate2, true)
+  let fetchedEvents1 = getEvents(startDate1, endDate1)
+  React.useEffect4(() => {
+    switch fetchedEvents1 {
+    | NotAsked => fetchEvents(startDate1, endDate1)
+    | _ => ()
+    }
+    None
+  }, (fetchEvents, fetchedEvents1, startDate1, endDate1))
+  let events1 = switch fetchedEvents1 {
+  | Done(evts) => Some(evts)
+  | _ => None
+  }
+  let fetchedEvents2 = getEvents(startDate2, endDate2)
+  React.useEffect4(() => {
+    switch fetchedEvents2 {
+    | NotAsked => fetchEvents(startDate2, endDate2)
+    | _ => ()
+    }
+    None
+  }, (fetchEvents, fetchedEvents2, startDate2, endDate2))
+  let events2 = switch fetchedEvents2 {
+  | Done(evts) => Some(evts)
+  | _ => None
+  }
 
   let (noEventDuringThisWeek, set_noEventDuringThisWeek) = React.useState(() => None)
   React.useEffect3(() => {

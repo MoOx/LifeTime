@@ -39,12 +39,18 @@ let useCalendars = updater => {
   value
 }
 
-type events = option<array<calendarEventReadable>>
-let defaultContext: ((Js.Date.t, Js.Date.t, bool) => events, Js.Date.t, unit => unit) = (
-  (_, _, _) => None,
-  Js.Date.make(),
-  _ => (),
-)
+type fetchable<'a> =
+  | NotAsked
+  | Fetching
+  | Done('a)
+
+type events = fetchable<array<calendarEventReadable>>
+let defaultContext: (
+  (Js.Date.t, Js.Date.t) => events,
+  (Js.Date.t, Js.Date.t) => unit,
+  Js.Date.t,
+  unit => unit,
+) = ((_, _) => NotAsked, (_, _) => (), Js.Date.make(), _ => ())
 let context = React.createContext(defaultContext)
 
 module ContextProvider = {
@@ -59,52 +65,67 @@ module ContextProvider = {
 let makeMapKey = (startDate, endDate) =>
   startDate->Js.Date.toISOString ++ endDate->Js.Date.toISOString
 
-let useEvents = () => {
-  let (updatedAt, setUpdatedAt) = React.useState(_ => Date.now())
-  let (eventsMapByRange, setEventsMapByRange) = React.useState(() => Map.String.empty)
+// round to ...HH:MM+1:00:000
+let roundDate = (date: Js.Date.t) => {
+  // let roundDateSeconds = 10.
+  open Js.Date
+  date
+  ->getTime
+  ->fromFloat
+  ->setMilliseconds(0.)
+  ->fromFloat
+  // ->setSeconds((date->getSeconds /. roundDateSeconds)->Js.Math.round *. roundDateSeconds)
+  ->setSeconds(0.)
+  ->fromFloat
+  ->setMinutes(date->getMinutes +. 1.)
+  ->fromFloat
+}
+
+let useEventsContext = () => {
+  let (updatedAt, updatedAt_set) = React.useState(_ => Date.now())
+  let (eventsMapByRange, eventsMapByRange_set) = React.useState(() => Map.String.empty)
 
   let requestUpdate = React.useCallback2(() => {
-    setUpdatedAt(_ => Date.now())
-    setEventsMapByRange(_ => Map.String.empty)
-  }, (setUpdatedAt, setEventsMapByRange))
+    updatedAt_set(_ => Date.now())
+    eventsMapByRange_set(_ => Map.String.empty)
+  }, (updatedAt_set, eventsMapByRange_set))
 
-  let getEvents = React.useCallback2((startDate, endDate, allowFetch) => {
-    let res = eventsMapByRange->Map.String.get(makeMapKey(startDate, endDate))
-    if res->Option.isNone {
-      let res = eventsMapByRange->Map.String.get(makeMapKey(startDate, endDate))
-      if res->Option.isNone && allowFetch {
-        fetchAllEvents(
-          startDate->Js.Date.toISOString,
-          endDate->Js.Date.toISOString,
-          // we filter calendar later cause if you UNSELECT ALL
-          // this `fetchAllEvents` DEFAULT TO ALL
-          None,
-        )
-        ->FutureJs.fromPromise(error => {
-          // @todo error!
-          Js.log(("[LifeTime] Calendars: useEvents/getEvents", startDate, endDate, error))
+  let getEvents = React.useCallback1((startDate, endDate) => {
+    eventsMapByRange
+    ->Map.String.get(makeMapKey(startDate, endDate))
+    ->Option.getWithDefault(NotAsked)
+  }, [eventsMapByRange])
 
-          // setEventsMapByRange(eventsMapByRange => {
-          //   eventsMapByRange->Map.String.set(
-          //     makeMapKey(startDate, endDate),
-          //     None,
-          //   )
-          // });
-          error
-        })
-        ->Future.tapOk(res =>
-          setEventsMapByRange(eventsMapByRange =>
-            eventsMapByRange->Map.String.set(makeMapKey(startDate, endDate), Some(res))
-          )
-        )
-        ->ignore
-        ()
-      }
-    }
-    res->Option.flatMap(res => res)
-  }, (eventsMapByRange, setEventsMapByRange))
+  let fetchEvents = React.useCallback1((startDate, endDate) => {
+    let key = makeMapKey(startDate, endDate)
+    // set None as a loading state
+    eventsMapByRange_set(eventsMapByRange => eventsMapByRange->Map.String.set(key, Fetching))
+    fetchAllEvents(
+      startDate->Js.Date.toISOString,
+      endDate->Js.Date.toISOString,
+      // we filter calendar later cause if you UNSELECT ALL
+      // this `fetchAllEvents` DEFAULT TO ALL
+      None,
+    )
+    ->FutureJs.fromPromise(error => {
+      // @todo error!
+      Js.log(("[LifeTime] Calendars: useEventsContext/getEvents", startDate, endDate, error))
 
-  (getEvents, updatedAt, requestUpdate)
+      // eventsMapByRange_set(eventsMapByRange => {
+      //   eventsMapByRange->Map.String.set(
+      //     key,
+      //     None,
+      //   )
+      // });
+      error
+    })
+    ->Future.tapOk(res =>
+      eventsMapByRange_set(eventsMapByRange => eventsMapByRange->Map.String.set(key, Done(res)))
+    )
+    ->ignore
+  }, [eventsMapByRange_set])
+
+  (getEvents, fetchEvents, updatedAt, requestUpdate)
 }
 
 let isAllDayEvent = (evt: calendarEventReadable) => evt.allDay->Option.getWithDefault(false)
