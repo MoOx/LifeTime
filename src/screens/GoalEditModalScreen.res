@@ -97,6 +97,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
         left={({color}) =>
           <TouchableOpacity onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
             <Animated.Text
+              allowFontScaling=false
               style={
                 open Style
                 array([Theme.text["body"], Theme.text["weight400"], textStyle(~color, ())])
