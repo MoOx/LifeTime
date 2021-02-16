@@ -9,7 +9,7 @@ module StatsStackScreen = {
   @react.component
   let make = (~navigation as _, ~route as _) => {
     let theme = Theme.useTheme(AppSettings.useTheme())
-    <StatsStack.Navigator screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
+    <StatsStack.Navigator>
       <StatsStack.Screen
         name="HomeScreen"
         component=HomeScreen.make
@@ -23,14 +23,6 @@ module StatsStackScreen = {
             ~title=screenOptions.route.params
             ->Option.flatMap(params => params.currentActivityTitle)
             ->Option.getWithDefault("Activity"),
-            ~headerBackTitle="Back",
-            ~headerTitleContainerStyle={
-              open Style
-              viewStyle(~paddingHorizontal=(Spacer.space *. 3.)->dp, ())
-            },
-            ~headerTintColor=theme.colors.blue,
-            ~headerTitleStyle=theme.styles["text"],
-            ~headerStyle=theme.styles["stackHeader"],
             (),
           )}
       />
@@ -40,21 +32,22 @@ module StatsStackScreen = {
 
 module GoalsStackScreen = {
   @react.component
-  let make = (~navigation as _, ~route as _) =>
-    <GoalsStack.Navigator screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
+  let make = (~navigation as _, ~route as _) => {
+    <GoalsStack.Navigator>
       <GoalsStack.Screen
         name="GoalsScreen"
         component=GoalsScreen.make
         options={_ => GoalsStack.options(~headerShown=false, ())}
       />
     </GoalsStack.Navigator>
+  }
 }
 
 module SettingsStackScreen = {
   @react.component
   let make = (~navigation as _, ~route as _) => {
     let theme = Theme.useTheme(AppSettings.useTheme())
-    <SettingsStack.Navigator screenOptions={_ => Stack.TransitionPresets.slideFromRightIOS}>
+    <SettingsStack.Navigator>
       <SettingsStack.Screen
         name="SettingsScreen"
         component=SettingsScreen.make
@@ -63,27 +56,14 @@ module SettingsStackScreen = {
       <SettingsStack.Screen
         name="SettingsDangerZoneScreen"
         component=SettingsDangerZoneScreen.make
-        options={_ =>
-          StatsStack.options(
-            ~title=SettingsDangerZoneScreen.title,
-            ~headerTintColor=theme.colors.blue,
-            ~headerTitleStyle=theme.styles["text"],
-            ~headerStyle=theme.styles["stackHeader"],
-            (),
-          )}
+        options={_ => StatsStack.options(~title=SettingsDangerZoneScreen.title, ())}
       />
       <SettingsStack.Screen
         name="SettingsNotificationsScreen"
         component=SettingsNotificationsScreen.make
         options={_ => {
           open StatsStack
-          options(
-            ~title=SettingsNotificationsScreen.title,
-            ~headerTintColor=theme.colors.blue,
-            ~headerTitleStyle=theme.styles["text"],
-            ~headerStyle=theme.styles["stackHeader"],
-            (),
-          )
+          options(~title=SettingsNotificationsScreen.title, ())
         }}
       />
     </SettingsStack.Navigator>
@@ -162,12 +142,7 @@ module RootNavigator = {
   let make = () =>
     <RootStack.Navigator
       initialRouteName="Tabs"
-      mode=#modal
-      headerMode=#none
-      screenOptions={_ =>
-        RootStack.options(~gestureEnabled=true, ~cardOverlayEnabled=true, ())->Stack.mergeOptions(
-          Stack.TransitionPresets.modalPresentationIOS,
-        )}>
+      screenOptions={_ => RootStack.options(~stackPresentation=#formSheet, ~headerShown=false, ())}>
       <RootStack.Screen name="Tabs" component=TabsScreen.make />
       <RootStack.Screen
         name="WelcomeModalScreen"

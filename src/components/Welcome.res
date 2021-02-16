@@ -84,114 +84,108 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
     None
   })
   let isWindowTall = windowDimensions.height > 650.
-  <View style={styles["content"]}>
-    <SpacedView horizontal={isWindowTall ? XL : L} vertical=M style={Predefined.styles["flexGrow"]}>
-      <Animated.View
-        style={
-          open Style
-          array([
-            styles["pitch"],
-            style(
-              ~opacity=animatedPitchOpacity.current->Animated.StyleProp.float,
-              ~transform=[scale(~scale=animatedPitchScale.current->Animated.StyleProp.float)],
+  <SpacedView horizontal={isWindowTall ? XL : L} vertical=M style={Predefined.styles["flexGrow"]}>
+    <Animated.View
+      style={
+        open Style
+        array([
+          styles["pitch"],
+          style(
+            ~opacity=animatedPitchOpacity.current->Animated.StyleProp.float,
+            ~transform=[scale(~scale=animatedPitchScale.current->Animated.StyleProp.float)],
+            (),
+          ),
+        ])
+      }>
+      <Pressable onPress=onContinuePress>
+        <Image
+          style={
+            open Style
+            let size = windowDimensions.height > 650. ? 76. : 52.
+            imageStyle(
+              ~width=size->dp,
+              ~height=size->dp,
+              ~borderRadius=size /. 5.,
+              ~alignSelf=#flexStart,
               (),
-            ),
-          ])
-        }>
-        <Pressable onPress=onContinuePress>
-          <Image
-            style={
-              open Style
-              let size = windowDimensions.height > 650. ? 76. : 52.
-              imageStyle(
-                ~width=size->dp,
-                ~height=size->dp,
-                ~borderRadius=size /. 5.,
-                ~alignSelf=#flexStart,
-                (),
-              )
-            }
-            source={icon->Image.Source.fromRequired}
-          />
-          <Spacer size={isWindowTall ? M : XXS} />
+            )
+          }
+          source={icon->Image.Source.fromRequired}
+        />
+        <Spacer size={isWindowTall ? M : XXS} />
+        <Text
+          style={
+            open Style
+            array([styles["title"], theme.styles["text"], Theme.text["weight100"]])
+          }
+          numberOfLines=1
+          adjustsFontSizeToFit=true
+          allowFontScaling=false>
+          {"Welcome to"->React.string}
+        </Text>
+        <Text
+          style={
+            open Style
+            array([styles["appName"], theme.styles["textMain"], Theme.text["weight800"]])
+          }
+          numberOfLines=1
+          adjustsFontSizeToFit=true
+          allowFontScaling=false>
+          {"LifeTime"->React.string}
+        </Text>
+        <Spacer size={isWindowTall ? M : XXS} />
+        <Text
+          style={
+            open Style
+            array([styles["baseline"], theme.styles["text"]])
+          }>
+          {"Your personal coach, helping you to reach your goals and spend your valuable time on things you love."->React.string}
+        </Text>
+      </Pressable>
+    </Animated.View>
+    <Spacer />
+    <Animated.View
+      style={
+        open Style
+        array([
+          styles["bottom"],
+          style(
+            ~opacity=animatedBottomOpacity.current->Animated.StyleProp.float,
+            ~transform=[
+              translateY(~translateY=animatedBottomTranslateY.current->Animated.StyleProp.float),
+            ],
+            (),
+          ),
+        ])
+      }>
+      <Pressable onPress=onContinuePress>
+        <Row>
+          <IconCalendar style={styles["iconCalendar"]} />
+          <Spacer size=S />
           <Text
             style={
               open Style
-              array([styles["title"], theme.styles["text"], Theme.text["weight100"]])
-            }
-            numberOfLines=1
-            adjustsFontSizeToFit=true
-            allowFontScaling=false>
-            {"Welcome to"->React.string}
-          </Text>
-          <Text
-            style={
-              open Style
-              array([styles["appName"], theme.styles["textMain"], Theme.text["weight800"]])
-            }
-            numberOfLines=1
-            adjustsFontSizeToFit=true
-            allowFontScaling=false>
-            {"LifeTime"->React.string}
-          </Text>
-          <Spacer size={isWindowTall ? M : XXS} />
-          <Text
-            style={
-              open Style
-              array([styles["baseline"], theme.styles["text"]])
+              array([styles["permissions"], theme.styles["textGray"]])
             }>
-            {"Your personal coach, helping you to reach your goals and spend your valuable time on things you love."->React.string}
+            {"LifeTime needs access to your calendar to show activity reports & suggestions. Your data stay on your device."->React.string}
           </Text>
-        </Pressable>
-      </Animated.View>
+        </Row>
+      </Pressable>
+      <TouchableOpacity onPress=onAboutPrivacyPress>
+        <SpacedView horizontal=None vertical=S>
+          <Text
+            style={
+              open Style
+              array([Theme.text["weight600"], styles["permissionsLink"], theme.styles["textMain"]])
+            }>
+            {"About LifeTime & Privacy..."->React.string}
+          </Text>
+        </SpacedView>
+      </TouchableOpacity>
+      <Spacer size=S />
+      <Spacer size=XS />
+      <TouchableButton text="Continue" onPress=onContinuePress />
       <Spacer />
-      <Animated.View
-        style={
-          open Style
-          array([
-            styles["bottom"],
-            style(
-              ~opacity=animatedBottomOpacity.current->Animated.StyleProp.float,
-              ~transform=[
-                translateY(~translateY=animatedBottomTranslateY.current->Animated.StyleProp.float),
-              ],
-              (),
-            ),
-          ])
-        }>
-        <Pressable onPress=onContinuePress>
-          <Row>
-            <IconCalendar style={styles["iconCalendar"]} />
-            <Spacer size=S />
-            <Text
-              style={
-                open Style
-                array([styles["permissions"], theme.styles["textGray"]])
-              }>
-              {"LifeTime needs access to your calendar to show activity reports & suggestions. Your data stay on your device."->React.string}
-            </Text>
-          </Row>
-        </Pressable>
-        <TouchableOpacity onPress=onAboutPrivacyPress>
-          <SpacedView horizontal=None vertical=S>
-            <Text
-              style={
-                open Style
-                array([
-                  Theme.text["weight600"],
-                  styles["permissionsLink"],
-                  theme.styles["textMain"],
-                ])
-              }>
-              {"About LifeTime & Privacy..."->React.string}
-            </Text>
-          </SpacedView>
-        </TouchableOpacity>
-        <Spacer size=S />
-        <Spacer size=XS />
-        <TouchableButton text="Continue" onPress=onContinuePress />
-        <Spacer />
-      </Animated.View>
-    </SpacedView>
-  </View>
+    </Animated.View>
+  </SpacedView>
 }

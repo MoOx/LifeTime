@@ -9,7 +9,6 @@ let title = help.title->Option.getWithDefault("Help")
 @react.component
 let make = () =>
   // let theme = Theme.useTheme(AppSettings.useTheme());
-  <SpacedView
-    horizontal=M vertical=L style={Predefined.styles["flexGrow"]}>
+  <SpacedView horizontal=M vertical=None style={Predefined.styles["flexGrow"]}>
     <MarkdownJsonRenderer body=help.body />
   </SpacedView>

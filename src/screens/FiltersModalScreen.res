@@ -4,13 +4,30 @@ open ReactMultiversal
 @react.component
 let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
-
+  let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets()
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.))
   <>
-    <StatusBar barStyle=#lightContent backgroundColor=Theme.Colors.dark.backgroundDark />
+    <StatusBar
+      barStyle={Theme.formSheetStatusBarStyle(theme.mode, #darkContent)}
+      translucent={true}
+      backgroundColor="transparent"
+    />
     <NavigationBar backgroundColor=theme.namedColors.backgroundDark />
     <Animated.ScrollView
-      style={Style.array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])}
+      style={
+        open Style
+        array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])
+      }
+      contentContainerStyle={
+        open Style
+        viewStyle(
+          ~paddingTop=(Theme.isFormSheetSupported ? 0. : safeAreaInsets.top)->dp,
+          ~paddingBottom=safeAreaInsets.bottom->dp,
+          ~paddingLeft=safeAreaInsets.left->dp,
+          ~paddingRight=safeAreaInsets.right->dp,
+          (),
+        )
+      }
       showsHorizontalScrollIndicator=false
       showsVerticalScrollIndicator=false
       scrollEventThrottle=16
@@ -31,7 +48,7 @@ let make = (~navigation, ~route as _) => {
       }>
       <StickyHeader
         scrollYAnimatedValue=scrollYAnimatedValue.current
-        safeArea=false
+        safeArea={Theme.formSheetSafeArea}
         animateBackgroundOpacity=False
         backgroundElement={<StickyHeaderBackground />}
         color=theme.colors.blue

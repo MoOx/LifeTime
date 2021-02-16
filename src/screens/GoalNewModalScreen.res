@@ -31,7 +31,11 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
     ->Option.flatMap(params => params.newGoalType)
     ->Option.getWithDefault(Goal.Type.Goal->Goal.Type.toSerialized)
   <>
-    <StatusBar barStyle=#lightContent backgroundColor=Theme.Colors.dark.backgroundDark />
+    <StatusBar
+      barStyle={Theme.formSheetStatusBarStyle(theme.mode, #darkContent)}
+      translucent={true}
+      backgroundColor="transparent"
+    />
     <NavigationBar backgroundColor=theme.namedColors.backgroundDark />
     <Animated.ScrollView
       style={
@@ -41,8 +45,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
       contentContainerStyle={
         open Style
         viewStyle(
-          // no top, handled by modal
-          // ~paddingTop=safeAreaInsets.top->dp,
+          ~paddingTop=(Theme.isFormSheetSupported ? 0. : safeAreaInsets.top)->dp,
           ~paddingBottom=safeAreaInsets.bottom->dp,
           ~paddingLeft=safeAreaInsets.left->dp,
           ~paddingRight=safeAreaInsets.right->dp,
@@ -69,7 +72,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
       }>
       <StickyHeader
         scrollYAnimatedValue=scrollYAnimatedValue.current
-        safeArea=false
+        safeArea={Theme.formSheetSafeArea}
         animateBackgroundOpacity=False
         backgroundElement={<StickyHeaderBackground />}
         color=theme.colors.blue

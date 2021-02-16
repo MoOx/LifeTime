@@ -51,6 +51,11 @@ let colors = theme =>
   | #dark => Predefined.Colors.Ios.dark
   }
 
+@bs.module("react-native") @bs.scope("Platform")
+external versionIos: string = "Version"
+@bs.module("react-native") @bs.scope("Platform")
+external versionAndroid: int = "Version"
+
 let statusBarStyle = (theme, barStyle) =>
   switch (theme, barStyle) {
   | (#light, #lightContent) => #lightContent
@@ -66,6 +71,13 @@ let statusBarColor = (theme, barStyle) =>
   | (#dark, #darkContent) => Colors.dark.backgroundDark
   | (#dark, #lightContent) => Colors.dark.backgroundDark
   }
+
+let isFormSheetSupported = Platform.os === Platform.ios && versionIos > "13"
+
+let formSheetStatusBarStyle = (theme, barStyle) =>
+  isFormSheetSupported ? #lightContent : statusBarStyle(theme, barStyle)
+
+let formSheetSafeArea = isFormSheetSupported ? false : true
 
 type fontWeightNumeric = [
   | #bold
@@ -180,6 +192,7 @@ let styleSheets = {
     "backgroundGray6": viewStyle(~backgroundColor=Predefined.Colors.Ios.light.gray6, ()),
     "backgroundMain": viewStyle(~backgroundColor=Colors.light.main, ()),
     "separatorOnBackground": viewStyle(~backgroundColor=Predefined.Colors.Ios.light.gray3, ()),
+    "separatorLightOnBackground": viewStyle(~backgroundColor=Predefined.Colors.Ios.light.gray4, ()),
     "stackHeader": viewStyle(
       ~backgroundColor=Colors.light.background,
       ~borderBottomColor=Predefined.Colors.Ios.light.gray4,
@@ -212,6 +225,7 @@ let styleSheets = {
     "backgroundGray6": viewStyle(~backgroundColor=Predefined.Colors.Ios.dark.gray6, ()),
     "backgroundMain": viewStyle(~backgroundColor=Colors.dark.main, ()),
     "separatorOnBackground": viewStyle(~backgroundColor=Predefined.Colors.Ios.dark.gray4, ()),
+    "separatorLightOnBackground": viewStyle(~backgroundColor=Predefined.Colors.Ios.dark.gray5, ()),
     "stackHeader": viewStyle(
       ~backgroundColor=Colors.dark.background,
       ~borderBottomColor=Predefined.Colors.Ios.dark.gray4,

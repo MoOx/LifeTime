@@ -12,7 +12,7 @@ let title = "LifeTime & Privacy"
 let make = () => {
   let theme = Theme.useTheme(AppSettings.useTheme())
 
-  <SpacedView horizontal=L vertical=XL style={styles["container"]}>
+  <SpacedView horizontal=L vertical=None style={styles["container"]}>
     <Center>
       <Text
         allowFontScaling=false

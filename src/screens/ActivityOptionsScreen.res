@@ -8,7 +8,8 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.StatsStac
   <>
     <StatusBar
       barStyle={Theme.statusBarStyle(theme.mode, #darkContent)}
-      backgroundColor={Theme.statusBarColor(theme.mode, #darkContent)}
+      translucent={true}
+      backgroundColor="transparent"
     />
     <Animated.ScrollView
       style={Style.array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])}

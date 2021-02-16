@@ -5,16 +5,18 @@ open ReactMultiversal
 let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
   <>
-    <StatusBar barStyle=#lightContent backgroundColor=Theme.Colors.dark.backgroundDark />
+    <StatusBar
+      barStyle={Theme.formSheetStatusBarStyle(theme.mode, #darkContent)}
+      translucent={true}
+      backgroundColor={"transparent"}
+    />
     <ScrollView
       style={theme.styles["background"]} contentContainerStyle={Predefined.styles["flexGrow"]}>
-      <ReactNativeSafeAreaContext.SafeAreaView style={Predefined.styles["flexGrow"]}>
-        <Welcome
-          onAboutPrivacyPress={_ =>
-            navigation->Navigators.RootStack.Navigation.navigate("PrivacyModalScreen")}
-          onContinuePress={_ => navigation->Navigators.RootStack.Navigation.goBack()}
-        />
-      </ReactNativeSafeAreaContext.SafeAreaView>
+      <Welcome
+        onAboutPrivacyPress={_ =>
+          navigation->Navigators.RootStack.Navigation.navigate("PrivacyModalScreen")}
+        onContinuePress={_ => navigation->Navigators.RootStack.Navigation.goBack()}
+      />
     </ScrollView>
   </>
 }

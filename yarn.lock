@@ -13109,10 +13109,9 @@ react-native-safe-area-context@^3.1.0:
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-3.1.9.tgz#48864ea976b0fa57142a2cc523e1fd3314e7247e"
   integrity sha512-wmcGbdyE/vBSL5IjDPReoJUEqxkZsywZw5gPwsVUV1NBpw5eTIdnL6Y0uNKHE25Z661moxPHQz6kwAkYQyorxA==
 
-react-native-screens@^2.15.2:
-  version "2.15.2"
-  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.15.2.tgz#a449700e895b462937211ec72ed6f09652758f06"
-  integrity sha512-CagNf2APXkVoRlF3Mugr264FbKbrBg9eXUkqhIPVeZB8EsdS8XPrnt99yj/pzmT+yJMBY0dGrjXT8+68WYh6YQ==
+"react-native-screens@https://github.com/software-mansion/react-native-screens#b00a488":
+  version "2.17.1"
+  resolved "https://github.com/software-mansion/react-native-screens#b00a488f20d0b116997f1a2db5cbfc517dd43582"
 
 react-native-svg@^12.0.0:
   version "12.1.0"

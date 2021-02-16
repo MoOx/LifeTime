@@ -10,7 +10,8 @@ let make = (~navigation, ~route as _) => {
   <>
     <StatusBar
       barStyle={Theme.statusBarStyle(theme.mode, #darkContent)}
-      backgroundColor={Theme.statusBarColor(theme.mode, #darkContent)}
+      translucent={true}
+      backgroundColor="transparent"
     />
     <View
       style={
