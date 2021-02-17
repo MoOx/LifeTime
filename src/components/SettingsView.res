@@ -26,9 +26,9 @@ let make = (~navigation) => {
     <ListItem
       onPress={_ =>
         navigation->Navigators.RootStack.Navigation.navigate("SettingsNotificationsScreen")}
-      icon={<SVGAppBadge width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
+      left={<SVGAppBadge width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
       right={<ListItemChevron />}>
-      {SettingsNotificationsScreen.title->React.string}
+      <ListItemText> {SettingsNotificationsScreen.title->React.string} </ListItemText>
     </ListItem>
     <ListSeparator />
     <Spacer />
@@ -38,37 +38,36 @@ let make = (~navigation) => {
       separator=true
       onPress={_ =>
         setSettings(settings => {...settings, lastUpdated: Js.Date.now(), theme: "light"})}
-      icon={<SVGSunoutline width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
+      left={<SVGSunoutline width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
       right={switch themeKey {
       | #light =>
         <SVGCheckmark width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue />
       | _ => React.null
       }}>
-      {"Light"->React.string}
+      <ListItemText> {"Light"->React.string} </ListItemText>
     </ListItem>
     <ListItem
       separator=true
       onPress={_ =>
         setSettings(settings => {...settings, lastUpdated: Js.Date.now(), theme: "dark"})}
-      icon={<SVGMoonsymbol width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.indigo />}
+      left={<SVGMoonsymbol width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.indigo />}
       right={switch themeKey {
       | #dark =>
         <SVGCheckmark width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue />
       | _ => React.null
       }}>
-      {"Dark"->React.string}
+      <ListItemText> {"Dark"->React.string} </ListItemText>
     </ListItem>
     <ListItem
-      separator=true
       onPress={_ =>
         setSettings(settings => {...settings, lastUpdated: Js.Date.now(), theme: "auto"})}
-      icon={<SVGMoonshine width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.purple />}
+      left={<SVGMoonshine width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.purple />}
       right={switch themeKey {
       | #auto =>
         <SVGCheckmark width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue />
       | _ => React.null
       }}>
-      {"Auto"->React.string}
+      <ListItemText> {"Auto"->React.string} </ListItemText>
     </ListItem>
     <ListSeparator />
     <BlockFootnote>
@@ -80,29 +79,29 @@ let make = (~navigation) => {
     <ListItem
       separator=true
       onPress={_ => navigation->Navigators.RootStack.Navigation.navigate("HelpModalScreen")}
-      icon={<SVGInfo width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
+      left={<SVGInfo width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
       right={<ListItemChevron />}>
-      {"Help"->React.string}
+      <ListItemText> {"Help"->React.string} </ListItemText>
     </ListItem>
     <ListItem
       separator=true
       onPress={_ => navigation->Navigators.RootStack.Navigation.navigate("WelcomeModalScreen")}
-      icon={<SVGPlaycircle width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
+      left={<SVGPlaycircle width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
       right={<ListItemChevron />}>
-      {"Welcome Screen"->React.string}
+      <ListItemText> {"Welcome Screen"->React.string} </ListItemText>
     </ListItem>
     <ListItem
       separator=true
       onPress={_ => Calendars.openCalendarApp()}
-      icon={<SVGCalendar width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
+      left={<SVGCalendar width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
       right={<ListItemChevron />}>
-      {"Calendar App"->React.string}
+      <ListItemText> {"Calendar App"->React.string} </ListItemText>
     </ListItem>
     <ListItem
       onPress={_ => ReactNativePermissions.openSettings()->ignore}
-      icon={<SVGSettings width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
+      left={<SVGSettings width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
       right={<ListItemChevron />}>
-      {"App System Settings"->React.string}
+      <ListItemText> {"App System Settings"->React.string} </ListItemText>
     </ListItem>
     <ListSeparator />
     <Spacer size=L />
@@ -111,7 +110,7 @@ let make = (~navigation) => {
       onPress={_ =>
         navigation->Navigators.RootStack.Navigation.navigate("SettingsDangerZoneScreen")}
       right={<ListItemChevron />}>
-      {SettingsDangerZoneScreen.title->React.string}
+      <ListItemText> {SettingsDangerZoneScreen.title->React.string} </ListItemText>
     </ListItem>
     <ListSeparator />
     {Global.__DEV__ == true
@@ -131,9 +130,10 @@ let make = (~navigation) => {
                 ],
                 (),
               )}
-            color={theme.colors.blue}
             separator={true}>
-            {"Inject Demo Data"->React.string}
+            <ListItemText color={theme.colors.blue}>
+              {"Inject Demo Data"->React.string}
+            </ListItemText>
           </ListItem>
           <ListItem
             onPress={_ =>
@@ -151,9 +151,10 @@ let make = (~navigation) => {
                   ),
                 ],
                 (),
-              )}
-            color={theme.colors.red}>
-            {"Remove Demo Data"->React.string}
+              )}>
+            <ListItemText color={theme.colors.red}>
+              {"Remove Demo Data"->React.string}
+            </ListItemText>
           </ListItem>
           <ListSeparator />
         </>

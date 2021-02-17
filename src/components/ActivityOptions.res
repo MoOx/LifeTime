@@ -2,11 +2,6 @@ open Belt
 open ReactNative
 open ReactMultiversal
 
-let styles = {
-  open Style
-  {"text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ())}
-}->StyleSheet.create
-
 @react.component
 let make = (~activityTitle, ~onSkipActivity) => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
@@ -17,65 +12,42 @@ let make = (~activityTitle, ~onSkipActivity) => {
   <SpacedView horizontal=None>
     <Row> <Spacer size=XS /> <BlockHeading text="Category" /> </Row>
     <ListSeparator />
-    <View style={theme.styles["background"]}>
-      {ActivityCategories.defaults
-      ->List.mapWithIndex((index, (id, name, colorName, iconName)) => {
-        let color = colorName->ActivityCategories.getColor(theme.mode)
-        <TouchableOpacity
-          key=id
-          onPress={_ => {
-            let createdAt = Js.Date.now()
-            setSettings(settings => {
-              ...settings,
-              lastUpdated: Js.Date.now(),
-              activities: settings.activities
-              ->Array.keep(acti => !Activities.isSimilar(acti.title, activityTitle))
-              ->Array.concat([
-                {
-                  id: Utils.makeId(activityTitle, createdAt),
-                  title: activityTitle,
-                  createdAt: createdAt,
-                  categoryId: id,
-                },
-              ]),
-            })
-          }}>
-          <View style={Predefined.styles["rowCenter"]}>
-            <Spacer size=S />
-            <SpacedView vertical=XS horizontal=None>
-              <NamedIcon name=iconName fill=color />
-            </SpacedView>
-            <Spacer size=XS />
-            <View style={Predefined.styles["flexGrow"]}>
-              <SpacedView vertical=XS horizontal=None>
-                <View style={Predefined.styles["row"]}>
-                  <View style={Predefined.styles["flexGrow"]}>
-                    <Text style={Style.array([styles["text"], theme.styles["text"]])}>
-                      {name->React.string}
-                    </Text>
-                  </View>
-                  {if id != settings->Calendars.categoryIdFromActivityTitle(activityTitle) {
-                    <SVGCircle width={26.->Style.dp} height={26.->Style.dp} fill=color />
-                  } else {
-                    <SVGCheckmarkcircle width={26.->Style.dp} height={26.->Style.dp} fill=color />
-                  }}
-                  <Spacer size=S />
-                </View>
-              </SpacedView>
-              {index !== ActivityCategories.defaults->List.length - 1
-                ? <ListSeparator />
-                : React.null}
-            </View>
-          </View>
-        </TouchableOpacity>
-      })
-      //  <View> <Spacer /> </View>
-      ->List.toArray
-      ->React.array}
-      <ListSeparator />
-    </View>
+    {ActivityCategories.defaults
+    ->List.mapWithIndex((index, (id, name, colorName, iconName)) => {
+      let color = colorName->ActivityCategories.getColor(theme.mode)
+      <ListItem
+        key=id
+        separator={index !== ActivityCategories.defaults->List.length - 1}
+        onPress={_ => {
+          let createdAt = Js.Date.now()
+          setSettings(settings => {
+            ...settings,
+            lastUpdated: Js.Date.now(),
+            activities: settings.activities
+            ->Array.keep(acti => !Activities.isSimilar(acti.title, activityTitle))
+            ->Array.concat([
+              {
+                id: Utils.makeId(activityTitle, createdAt),
+                title: activityTitle,
+                createdAt: createdAt,
+                categoryId: id,
+              },
+            ]),
+          })
+        }}
+        left={<NamedIcon name=iconName fill=color />}
+        right={id != settings->Calendars.categoryIdFromActivityTitle(activityTitle)
+          ? <SVGCircle width={26.->Style.dp} height={26.->Style.dp} fill=color />
+          : <SVGCheckmarkcircle width={26.->Style.dp} height={26.->Style.dp} fill=color />}>
+        <ListItemText> {name->React.string} </ListItemText>
+      </ListItem>
+    })
+    ->List.toArray
+    ->React.array}
+    <ListSeparator />
     <Spacer size=L />
-    <TouchableOpacity
+    <ListSeparator />
+    <ListItem
       onPress={_ => {
         setSettings(settings => {
           let isSkipped =
@@ -94,20 +66,11 @@ let make = (~activityTitle, ~onSkipActivity) => {
         })
         onSkipActivity()
       }}>
-      <ListSeparator />
-      <SpacedView vertical=XS style={theme.styles["background"]}>
-        <Center>
-          <Text
-            style={
-              open Style
-              textStyle(~color=theme.colors.red, ())
-            }>
-            {(!isSkipped ? "Hide Activity" : "Reveal Activity")->React.string}
-          </Text>
-        </Center>
-      </SpacedView>
-      <ListSeparator />
-    </TouchableOpacity>
+      <ListItemText color=theme.colors.red center=true>
+        {(!isSkipped ? "Hide Activity" : "Reveal Activity")->React.string}
+      </ListItemText>
+    </ListItem>
+    <ListSeparator />
     <BlockFootnote>
       {(
         !isSkipped

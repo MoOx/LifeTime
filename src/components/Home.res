@@ -36,7 +36,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
 
   let today = Date.Hooks.useToday()
   let todayDates = Date.Hooks.useWeekDates(today)
-  
+
   let (previousDates, previousDates_set) = React.useState(() =>
     Date.weekDates(today->DateFns.addDays(-7.))
   )
@@ -239,11 +239,15 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
           key="helpSkipAct" text="Help me customize settings" onPress={_ => onFiltersPress()}
         />,
         <TouchableButton
-          key="openCalendar" text="Toggle Hidden Activities" onPress={_ => setSettings(settings => {
+          key="openCalendar"
+          text="Toggle Hidden Activities"
+          onPress={_ =>
+            setSettings(settings => {
               ...settings,
               lastUpdated: Js.Date.now(),
               activitiesSkippedFlag: !settings.activitiesSkippedFlag,
-            })} mode=TouchableButton.Simple
+            })}
+          mode=TouchableButton.Simple
         />,
         <TouchableButton
           key="openCalendar"
@@ -267,7 +271,8 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
   let animatedMessageNoEventsOpacity = React.useRef(Animated.Value.create(0.)).current
   let animatedMessageNoEventsScale = React.useRef(Animated.Value.create(0.)).current
   React.useEffect4(() => {
-    onMessageNoEventsHeight->Option.map(height => {
+    onMessageNoEventsHeight
+    ->Option.map(height => {
       open Animated
       parallel(
         [
@@ -303,7 +308,8 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
         ],
         {stopTogether: false},
       )->Animation.start()
-    })->ignore
+    })
+    ->ignore
     None
   }, (
     onMessageNoEventsHeight,
@@ -351,7 +357,8 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
         </View>
       </View>
     </SpacedView>
-    {messagesNoEvents->Option.map(((messageNoEvents, messageNoEventsButtons)) =>
+    {messagesNoEvents
+    ->Option.map(((messageNoEvents, messageNoEventsButtons)) =>
       <Animated.View
         onLayout=onMessageNoEventsLayout
         style={
@@ -456,11 +463,13 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
           </View>
         </SpacedView>
       </Animated.View>
-    )->Option.getWithDefault(React.null)}
+    )
+    ->Option.getWithDefault(React.null)}
     <Animated.View
       style={
         open Style
-        arrayOption([onMessageNoEventsHeight->Option.map(height =>
+        arrayOption([
+          onMessageNoEventsHeight->Option.map(height =>
             style(
               ~transform=[
                 translateY(
@@ -478,7 +487,8 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
               ],
               (),
             )
-          )])
+          ),
+        ])
       }>
       <View style={Predefined.styles["rowSpaceBetween"]}>
         <Row> <Spacer size=XS /> <BlockHeading text="Weekly Chart" /> </Row>
@@ -514,29 +524,21 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
       <TopActivities mapTitleDuration onFiltersPress onActivityPress />
       <Spacer />
       <SpacedView horizontal=None>
-        <TouchableOpacity onPress={_ => setSettings(settings => {
+        <ListSeparator />
+        <ListItem
+          onPress={_ =>
+            setSettings(settings => {
               ...settings,
               lastUpdated: Js.Date.now(),
               activitiesSkippedFlag: !settings.activitiesSkippedFlag,
             })}>
-          <ListSeparator />
-          <SpacedView vertical=XS style={theme.styles["background"]}>
-            <Center>
-              <Text
-                style={
-                  open Style
-                  array([Theme.text["callout"], textStyle(~color=theme.colors.blue, ())])
-                }>
-                {(
-                  settings.activitiesSkippedFlag
-                    ? "Reveal Hidden Activities"
-                    : "Mask Hidden Activities"
-                )->React.string}
-              </Text>
-            </Center>
-          </SpacedView>
-          <ListSeparator />
-        </TouchableOpacity>
+          <ListItemText color=theme.colors.blue center=true>
+            {(
+              settings.activitiesSkippedFlag ? "Reveal Hidden Activities" : "Mask Hidden Activities"
+            )->React.string}
+          </ListItemText>
+        </ListItem>
+        <ListSeparator />
       </SpacedView>
       <Spacer />
     </Animated.View>

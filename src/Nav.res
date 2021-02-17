@@ -1,14 +1,14 @@
 open Belt
 open ReactNative
-open ReactMultiversal
-open ReactNavigation
+// open ReactMultiversal
+// open ReactNavigation
 
 open Navigators
 
 module StatsStackScreen = {
   @react.component
   let make = (~navigation as _, ~route as _) => {
-    let theme = Theme.useTheme(AppSettings.useTheme())
+    // let theme = Theme.useTheme(AppSettings.useTheme())
     <StatsStack.Navigator>
       <StatsStack.Screen
         name="HomeScreen"
@@ -46,7 +46,7 @@ module GoalsStackScreen = {
 module SettingsStackScreen = {
   @react.component
   let make = (~navigation as _, ~route as _) => {
-    let theme = Theme.useTheme(AppSettings.useTheme())
+    // let theme = Theme.useTheme(AppSettings.useTheme())
     <SettingsStack.Navigator>
       <SettingsStack.Screen
         name="SettingsScreen"

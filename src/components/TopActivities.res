@@ -60,7 +60,8 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
         }
       )
       ->Option.getWithDefault(React.null)}
-      {mapTitleDuration->Option.map(mapTitleDuration => {
+      {mapTitleDuration
+      ->Option.map(mapTitleDuration => {
         let shouldShowMore = mapTitleDuration->Array.length > activitiesToShow
         let shouldShowLess = activitiesToShow > numberOfActivitiesToShow
         <>
@@ -94,74 +95,58 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
                   ->Calendars.categoryIdFromActivityTitle(title)
                   ->ActivityCategories.getFromId
                 let color = colorName->ActivityCategories.getColor(theme.mode)
-                <TouchableOpacity key=title onPress={_ => onActivityPress(title)}>
-                  <View style={Predefined.styles["rowCenter"]}>
-                    <Spacer size=S />
-                    <SpacedView vertical=XS horizontal=None>
-                      <NamedIcon name=iconName fill=color />
-                    </SpacedView>
-                    <Spacer size=XS />
-                    <View style={Predefined.styles["flex"]}>
-                      <SpacedView
-                        vertical=XS horizontal=None style={Predefined.styles["rowCenter"]}>
-                        <View style={Predefined.styles["flex"]}>
-                          <Text
-                            style={
-                              open Style
-                              array([Theme.text["callout"], theme.styles["text"]])
-                            }
-                            numberOfLines=1>
-                            {title->React.string}
-                          </Text>
-                          <Spacer size=XXS />
-                          <Row style={Predefined.styles["alignCenter"]}>
-                            <View
-                              style={
-                                open Style
-                                array([
-                                  theme.styles["backgroundGray3"],
-                                  viewStyle(
-                                    // ~backgroundColor=color,
+                <ListItem
+                  key=title
+                  onPress={_ => onActivityPress(title)}
+                  separator={index < mapTitleDuration->Array.length - 1 ||
+                    (shouldShowMore ||
+                    shouldShowLess)}
+                  left={<NamedIcon name=iconName fill=color />}
+                  right={<SVGChevronright
+                    width={14.->Style.dp}
+                    height={14.->Style.dp}
+                    fill=Predefined.Colors.Ios.light.gray4
+                  />}>
+                  <Text
+                    style={
+                      open Style
+                      array([Theme.text["callout"], theme.styles["text"]])
+                    }
+                    numberOfLines=1>
+                    {title->React.string}
+                  </Text>
+                  <Spacer size=XXS />
+                  <Row style={Predefined.styles["alignCenter"]}>
+                    <View
+                      style={
+                        open Style
+                        array([
+                          theme.styles["backgroundGray3"],
+                          viewStyle(
+                            // ~backgroundColor=color,
 
-                                    ~width=(totalDurationInMin /.
-                                    maxDurationInMin *.
-                                    availableWidthForBar)->dp,
-                                    ~height=6.->dp,
-                                    ~borderRadius=6.,
-                                    ~overflow=#hidden,
-                                    (),
-                                  ),
-                                ])
-                              }
-                            />
-                            <Spacer size=XXS />
-                            <Text
-                              style={
-                                open Style
-                                array([Theme.text["footnote"], theme.styles["textLight2"]])
-                              }
-                              numberOfLines=1
-                              adjustsFontSizeToFit=true>
-                              {durationString->React.string}
-                            </Text>
-                          </Row>
-                        </View>
-                        <Spacer size=XS />
-                        <SVGChevronright
-                          width={14.->Style.dp}
-                          height={14.->Style.dp}
-                          fill=Predefined.Colors.Ios.light.gray4
-                        />
-                        <Spacer size=S />
-                      </SpacedView>
-                      {index < mapTitleDuration->Array.length - 1 ||
-                        (shouldShowMore ||
-                        shouldShowLess)
-                        ? <ListSeparator />
-                        : React.null}
-                    </View>
-                  </View>
-                </TouchableOpacity>
+                            ~width=(totalDurationInMin /. maxDurationInMin *. availableWidthForBar)
+                              ->dp,
+                            ~height=6.->dp,
+                            ~borderRadius=6.,
+                            ~overflow=#hidden,
+                            (),
+                          ),
+                        ])
+                      }
+                    />
+                    <Spacer size=XXS />
+                    <Text
+                      style={
+                        open Style
+                        array([Theme.text["footnote"], theme.styles["textLight2"]])
+                      }
+                      numberOfLines=1
+                      adjustsFontSizeToFit=true>
+                      {durationString->React.string}
+                    </Text>
+                  </Row>
+                </ListItem>
               })
               ->React.array}
               {shouldShowMore || shouldShowLess
@@ -214,7 +199,8 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
             </>
           }}
         </>
-      })->Option.getWithDefault(
+      })
+      ->Option.getWithDefault(
         <SpacedView vertical=XXL>
           <ActivityIndicator size=ActivityIndicator.Size.small />
         </SpacedView>,

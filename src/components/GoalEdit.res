@@ -107,23 +107,24 @@ let make = (
       )
     )
   }, (setCategoriesSelected, setActivitiesSelected))
-  let handleCategoryOpen = React.useCallback1(key => setCategoriesOpen(categoriesOpened =>
+  let handleCategoryOpen = React.useCallback1(key =>
+    setCategoriesOpen(categoriesOpened =>
       if categoriesOpened->Array.some(catKey => catKey == key) {
         categoriesOpened->Array.keep(catKey => catKey != key)
       } else {
         categoriesOpened->Array.concat([key])
       }
-    ), [setCategoriesOpen])
-  let handleActivityCheckPress = React.useCallback1(
-    key => setActivitiesSelected(activitiesSelected =>
-        if activitiesSelected->Array.some(act => act == key) {
-          activitiesSelected->Array.keep(act => act != key)
-        } else {
-          activitiesSelected->Array.concat([key])
-        }
-      ),
-    [setActivitiesSelected],
-  )
+    )
+  , [setCategoriesOpen])
+  let handleActivityCheckPress = React.useCallback1(key =>
+    setActivitiesSelected(activitiesSelected =>
+      if activitiesSelected->Array.some(act => act == key) {
+        activitiesSelected->Array.keep(act => act != key)
+      } else {
+        activitiesSelected->Array.concat([key])
+      }
+    )
+  , [setActivitiesSelected])
 
   <SpacedView horizontal=None>
     <ListSeparator />
@@ -160,82 +161,28 @@ let make = (
     <Spacer />
     <Row> <Spacer size=XS /> <BlockHeading text="Type" /> </Row>
     <ListSeparator />
-    <View style={theme.styles["background"]}>
-      <Pressable onPress={_ => setType(_ => Some(Goal.Type.Goal))}>
-        <View style={Predefined.styles["rowCenter"]}>
-          <Spacer size=S />
-          <SpacedView vertical=XS horizontal=None>
-            <NamedIcon name=#scope fill=theme.colors.green />
-          </SpacedView>
-          <Spacer size=XS />
-          <View style={Predefined.styles["flex"]}>
-            <SpacedView vertical=XS horizontal=None>
-              <View style={Predefined.styles["row"]}>
-                <View
-                  style={
-                    open Style
-                    array([Predefined.styles["flex"], Predefined.styles["justifyCenter"]])
-                  }>
-                  <Text
-                    style={
-                      open Style
-                      array([Theme.text["body"], theme.styles["text"]])
-                    }>
-                    {"Goal to Reach"->React.string}
-                  </Text>
-                </View>
-                {switch type_ {
-                | Some(Goal) =>
-                  <SVGCheckmark
-                    width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue
-                  />
-                | _ => React.null
-                }}
-                <Spacer size=S />
-              </View>
-            </SpacedView>
-            <ListSeparator />
-          </View>
-        </View>
-      </Pressable>
-      <Pressable onPress={_ => setType(_ => Some(Goal.Type.Limit))}>
-        <View style={Predefined.styles["rowCenter"]}>
-          <Spacer size=S />
-          <SpacedView vertical=XS horizontal=None>
-            <NamedIcon name=#hourglass fill=theme.colors.orange />
-          </SpacedView>
-          <Spacer size=XS />
-          <View style={Predefined.styles["flex"]}>
-            <SpacedView vertical=XS horizontal=None>
-              <View style={Predefined.styles["row"]}>
-                <View
-                  style={
-                    open Style
-                    array([Predefined.styles["flex"], Predefined.styles["justifyCenter"]])
-                  }>
-                  <Text
-                    style={
-                      open Style
-                      array([Theme.text["body"], theme.styles["text"]])
-                    }>
-                    {"Limit to Respect"->React.string}
-                  </Text>
-                </View>
-                {switch type_ {
-                | Some(Limit) =>
-                  <SVGCheckmark
-                    width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue
-                  />
-                | _ => React.null
-                }}
-                <Spacer size=S />
-              </View>
-            </SpacedView>
-          </View>
-        </View>
-      </Pressable>
-      <ListSeparator />
-    </View>
+    <ListItem
+      separator=true
+      onPress={_ => setType(_ => Some(Goal.Type.Goal))}
+      left={<NamedIcon name=#scope fill=theme.colors.green />}
+      right={switch type_ {
+      | Some(Goal) =>
+        <SVGCheckmark width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue />
+      | _ => React.null
+      }}>
+      <ListItemText> {"Goal to Reach"->React.string} </ListItemText>
+    </ListItem>
+    <ListItem
+      onPress={_ => setType(_ => Some(Goal.Type.Limit))}
+      left={<NamedIcon name=#hourglass fill=theme.colors.orange />}
+      right={switch type_ {
+      | Some(Limit) =>
+        <SVGCheckmark width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue />
+      | _ => React.null
+      }}>
+      <ListItemText> {"Limit to Respect"->React.string} </ListItemText>
+    </ListItem>
+    <ListSeparator />
     <Spacer />
     <Row> <Spacer size=XS /> <BlockHeading text="Days" /> </Row>
     <ListSeparator />
@@ -246,11 +193,15 @@ let make = (
         ->Array.concat(days->Array.slice(~offset=0, ~len=Date.weekStartsOn))
         ->Array.mapWithIndex((index, dayOn) => {
           let day = mod(index + Date.weekStartsOn, 7)
-          <Pressable key={index->string_of_int} onPress={_ => setDays(days => {
+          <Pressable
+            key={index->string_of_int}
+            onPress={_ =>
+              setDays(days => {
                 let cp = days->Array.copy
                 cp->Array.set(day, !dayOn)->ignore
                 cp
-              })} hitSlop={View.edgeInsets(~top=20., ~bottom=20., ~left=20., ~right=20., ())}>
+              })}
+            hitSlop={View.edgeInsets(~top=20., ~bottom=20., ~left=20., ~right=20., ())}>
             <View>
               <Text style={Style.array([Theme.text["caption1"], theme.styles["textLight2"]])}>
                 {day->float->Date.dayShortString->React.string}
@@ -279,7 +230,9 @@ let make = (
     <View style={theme.styles["background"]}>
       <Spacer size=S />
       <View style={Predefined.styles["row"]}>
-        <Spacer size=S /> {quickDurations->Array.map(quickDuration =>
+        <Spacer size=S />
+        {quickDurations
+        ->Array.map(quickDuration =>
           <TouchableOpacity
             key={quickDuration->Js.Float.toString}
             onPress={_ => setMinutes(_ => quickDuration)}
@@ -300,7 +253,9 @@ let make = (
               </Text>
             </SpacedView>
           </TouchableOpacity>
-        )->React.array} <Spacer size=S />
+        )
+        ->React.array}
+        <Spacer size=S />
       </View>
       <SpacedView vertical=XS>
         <View style={Predefined.styles["rowCenter"]}>
@@ -402,7 +357,9 @@ let make = (
     <Row> <Spacer size=XS /> <BlockHeading text="Category or Activity" /> </Row>
     <ListSeparator />
     <View style={theme.styles["background"]}>
-      {ActivityCategories.defaults->List.toArray->Array.mapWithIndex((index, category) => {
+      {ActivityCategories.defaults
+      ->List.toArray
+      ->Array.mapWithIndex((index, category) => {
         let (id, name, colorName, iconName) = category
         let color = colorName->ActivityCategories.getColor(theme.mode)
         let selectedCat = categoriesSelected->Array.some(catKey => catKey == id)
@@ -420,206 +377,132 @@ let make = (
         let canOpenCategory =
           id != ActivityCategories.unknown && categoryActivities->Array.length > 0
         <React.Fragment key=id>
-          <View style={Predefined.styles["rowCenter"]}>
-            <Spacer size=S />
-            <Pressable onPress={_ => handleCategoryCheck(id, selectedCategoryActivities)}>
-              <View>
-                <SpacedView vertical=XS horizontal=None>
-                  {if !selectedCat {
-                    <SVGCircle
+          <ListItem
+            onPress={_ =>
+              canOpenCategory
+                ? handleCategoryOpen(id)
+                : handleCategoryCheck(id, selectedCategoryActivities)}
+            left={<>
+              <Pressable
+                onPress={_ => handleCategoryCheck(id, selectedCategoryActivities)}
+                hitSlop={View.edgeInsets(~top=6., ~bottom=6., ~left=6., ~right=6., ())}>
+                {!selectedCat
+                  ? <SVGCircle
                       width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.gray
                     />
-                  } else {
-                    <SVGCheckmarkcircle
+                  : <SVGCheckmarkcircle
                       width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue
-                    />
-                  }}
-                </SpacedView>
-              </View>
-            </Pressable>
-            <Spacer size=XS />
-            <Pressable
-              onPress={_ =>
-                canOpenCategory
-                  ? handleCategoryOpen(id)
-                  : handleCategoryCheck(id, selectedCategoryActivities)}>
-              <View style={Predefined.styles["flex"]}>
-                <View style={Predefined.styles["rowCenter"]}>
-                  <SpacedView vertical=XS horizontal=None>
-                    <NamedIcon name=iconName fill=color />
-                  </SpacedView>
-                  <Spacer size=XS />
-                  <View style={Predefined.styles["flex"]}>
-                    <SpacedView
-                      vertical=XS
-                      horizontal=None
-                      style={
-                        open Style
-                        array([Predefined.styles["flex"], Predefined.styles["center"]])
-                      }>
-                      <View style={Predefined.styles["rowCenter"]}>
-                        <View style={Predefined.styles["flex"]}>
-                          <Text style={Style.array([Theme.text["body"], theme.styles["text"]])}>
-                            {name->React.string}
-                          </Text>
-                        </View>
-                        {selectedCat || selectedCategoryActivities->Array.length > 0
-                          ? <>
-                              <Text
-                                style={Style.array([
-                                  Theme.text["subhead"],
-                                  theme.styles["textLight2"],
-                                ])}>
-                                {(
-                                  selectedCat
-                                    ? "All"
-                                    : {
-                                        let numberOfActivities =
-                                          selectedCategoryActivities->Array.length
-                                        switch numberOfActivities {
-                                        | 1 => numberOfActivities->string_of_int ++ " activity"
-                                        | _ => numberOfActivities->string_of_int ++ " activities"
-                                        }
-                                      }
-                                )->React.string}
-                              </Text>
-                              <Spacer size=S />
-                            </>
-                          : React.null}
-                        // using a key because (at least in simulator, it seems to be buggy)
-                        <Animated.View
-                          key={opened ? "opened" : "unopened"}
-                          style={
-                            open Style
-                            viewStyle(
-                              ~opacity=canOpenCategory ? 1. : 0.05,
-                              ~transform=[rotate(~rotate=(opened ? 90. : 0.)->deg)],
-                              (),
-                            )
-                          }>
-                          <SVGChevronright
-                            width={14.->Style.dp}
-                            height={14.->Style.dp}
-                            fill=Predefined.Colors.Ios.light.gray4
-                          />
-                        </Animated.View>
-                        <Spacer size=S />
-                      </View>
-                    </SpacedView>
-                    {separator ? <ListSeparator /> : React.null}
-                  </View>
-                </View>
-              </View>
-            </Pressable>
-          </View>
-          {opened ? categoryActivities->Array.mapWithIndex((index, activity) => {
+                    />}
+              </Pressable>
+              <Spacer size=XS />
+              <NamedIcon name=iconName fill=color />
+            </>}
+            right={<>
+              {selectedCat || selectedCategoryActivities->Array.length > 0
+                ? <>
+                    <Text style={Style.array([Theme.text["subhead"], theme.styles["textLight2"]])}>
+                      {(
+                        selectedCat
+                          ? "All"
+                          : {
+                              let numberOfActivities = selectedCategoryActivities->Array.length
+                              switch numberOfActivities {
+                              | 1 => numberOfActivities->string_of_int ++ " activity"
+                              | _ => numberOfActivities->string_of_int ++ " activities"
+                              }
+                            }
+                      )->React.string}
+                    </Text>
+                    <Spacer size=S />
+                  </>
+                : React.null}
+              // using a key because (at least in simulator, it seems to be buggy)
+              <Animated.View
+                key={opened ? "opened" : "unopened"}
+                style={
+                  open Style
+                  viewStyle(
+                    ~opacity=canOpenCategory ? 1. : 0.05,
+                    ~transform=[rotate(~rotate=(opened ? 90. : 0.)->deg)],
+                    (),
+                  )
+                }>
+                <SVGChevronright
+                  width={14.->Style.dp}
+                  height={14.->Style.dp}
+                  fill=Predefined.Colors.Ios.light.gray4
+                />
+              </Animated.View>
+            </>}
+            separator>
+            <ListItemText> {name->React.string} </ListItemText>
+          </ListItem>
+          {opened
+            ? categoryActivities
+              ->Array.mapWithIndex((index, activity) => {
                 let selected =
                   selectedCat || activitiesSelected->Array.some(key => key == activity.id)
                 let separator = separator || index != categoryActivities->Array.length - 1
-                <View
+                <ListItem
                   key=activity.id
-                  style={
-                    open Style
-                    array([
-                      Predefined.styles["rowCenter"],
-                      viewStyle(
-                        ~backgroundColor="rgba(125,125,125,0.03)",
-                        ~opacity=selectedCat ? 0.5 : 1.,
-                        (),
-                      ),
-                    ])
-                  }>
-                  <Spacer size=S />
-                  <Pressable
-                    disabled=selectedCat onPress={_ => handleActivityCheckPress(activity.id)}>
-                    <View>
+                  disabled=selectedCat
+                  separator
+                  style={Style.viewStyle(~opacity=selectedCat ? 0.5 : 1., ())}
+                  left={<>
+                    <Pressable
+                      disabled=selectedCat onPress={_ => handleActivityCheckPress(activity.id)}>
                       <SpacedView vertical=XS horizontal=None>
-                        {if !selected {
-                          <SVGCircle
-                            width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.gray
-                          />
-                        } else {
-                          <SVGCheckmarkcircle
-                            width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue
-                          />
-                        }}
+                        {!selected
+                          ? <SVGCircle
+                              width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.gray
+                            />
+                          : <SVGCheckmarkcircle
+                              width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue
+                            />}
                       </SpacedView>
-                    </View>
-                  </Pressable>
-                  <Pressable
-                    disabled=selectedCat onPress={_ => handleActivityCheckPress(activity.id)}>
-                    <View style={Predefined.styles["flex"]}>
-                      <View style={Predefined.styles["rowCenter"]}>
-                        <SpacedView
-                          vertical=XS horizontal=Custom(13.) style={Predefined.styles["center"]}>
-                          <NamedIcon
-                            name=iconName fill=color width={22.->Style.dp} height={22.->Style.dp}
-                          />
-                        </SpacedView>
-                        <View style={Predefined.styles["flex"]}>
-                          <SpacedView vertical=XS horizontal=None>
-                            <View style={Predefined.styles["rowCenter"]}>
-                              <View style={Predefined.styles["flex"]}>
-                                <Text
-                                  style={
-                                    open Style
-                                    array([
-                                      Predefined.styles["flex"],
-                                      Theme.text["body"],
-                                      theme.styles["text"],
-                                    ])
-                                  }
-                                  numberOfLines=1>
-                                  {activity.title->React.string}
-                                </Text>
-                              </View>
-                              <Spacer size=S />
-                            </View>
-                          </SpacedView>
-                          {separator ? <ListSeparator /> : React.null}
-                        </View>
-                      </View>
-                    </View>
-                  </Pressable>
-                </View>
-              })->React.array : React.null}
+                    </Pressable>
+                    <Spacer size=Custom(13.) />
+                    <NamedIcon
+                      name=iconName fill=color width={22.->Style.dp} height={22.->Style.dp}
+                    />
+                    <Spacer size=Custom(3.) />
+                  </>}
+                  onPress={_ => handleActivityCheckPress(activity.id)}>
+                  <ListItemText> {activity.title->React.string} </ListItemText>
+                </ListItem>
+              })
+              ->React.array
+            : React.null}
         </React.Fragment>
-      })->React.array}
+      })
+      ->React.array}
     </View>
     <ListSeparator />
     <BlockFootnote>
       {j`By selecting a category, all future activities in that category will be included.`->React.string}
     </BlockFootnote>
-    {onDelete->Option.map(onDelete => <>
+    {onDelete
+    ->Option.map(onDelete => <>
       <Spacer size=L />
       <ListSeparator />
-      <View style={theme.styles["background"]}>
-        <Pressable
-          onPress={_ =>
-            Alert.alert(
-              ~title="Delete This Goal",
-              ~message="You are about to delete this goal.\nAre you sure?",
-              ~buttons=[
-                Alert.button(~text="Cancel", ~style=#default, ()),
-                Alert.button(~text="Delete", ~style=#destructive, ~onPress=() => onDelete(), ()),
-              ],
-              (),
-            )}>
-          <View>
-            <SpacedView vertical=XS horizontal=XS style={Predefined.styles["rowCenter"]}>
-              <Text
-                style={
-                  open Style
-                  array([Theme.text["body"], textStyle(~color=theme.colors.red, ())])
-                }>
-                {"Delete Goal"->React.string}
-              </Text>
-            </SpacedView>
-          </View>
-        </Pressable>
-      </View>
+      <ListItem
+        onPress={_ =>
+          Alert.alert(
+            ~title="Delete This Goal",
+            ~message="You are about to delete this goal.\nAre you sure?",
+            ~buttons=[
+              Alert.button(~text="Cancel", ~style=#default, ()),
+              Alert.button(~text="Delete", ~style=#destructive, ~onPress=() => onDelete(), ()),
+            ],
+            (),
+          )}>
+        <ListItemText color=theme.colors.red center=true>
+          {"Delete Goal"->React.string}
+        </ListItemText>
+      </ListItem>
       <ListSeparator />
-    </>)->Option.getWithDefault(React.null)}
+    </>)
+    ->Option.getWithDefault(React.null)}
     <Spacer />
   </SpacedView>
 }

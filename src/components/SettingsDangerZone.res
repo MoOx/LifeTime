@@ -9,11 +9,14 @@ let make = () => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
 
-  let handleImport = React.useCallback1(() => Clipboard.getString()->FutureJs.fromPromise(error => {
+  let handleImport = React.useCallback1(() =>
+    Clipboard.getString()
+    ->FutureJs.fromPromise(error => {
       // @todo error!
       Js.log(("[LifeTime] SettingsDangerZone: import", error))
       "Unable to read from clipboard"
-    })->Future.get(x =>
+    })
+    ->Future.get(x =>
       switch x {
       | Error(e) => Alert.alert(~title=e, ())
       | Ok(clip) when clip === "" => Alert.alert(~title="No data in your clipboard", ())
@@ -23,21 +26,27 @@ let make = () => {
           Alert.alert(~title="Data don't seem to be a valid Export Backup", ())
           None
         }
-        rawJson->Option.map(rawJson => rawJson->AppSettings.decodeJsonSettings->Future.get(x =>
+        rawJson
+        ->Option.map(rawJson =>
+          rawJson
+          ->AppSettings.decodeJsonSettings
+          ->Future.get(x =>
             switch x {
             | Error(e) => Alert.alert(~title=e, ())
             | Ok(settings) => setSettings(_ => settings)
             }
-          ))->ignore
+          )
+        )
+        ->ignore
       }
-    ), [setSettings])
+    )
+  , [setSettings])
 
   <>
     <Spacer />
     <ListSeparator />
     <ListItem
       separator=true
-      color={theme.colors.blue}
       onPress={_ => {
         Clipboard.setString(
           settings->Js.Json.stringifyAny->Option.getWithDefault("LifeTime export: error"),
@@ -49,11 +58,10 @@ let make = () => {
           (),
         )
       }}
-      icon={<SVGExport width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}>
-      {"Export Backup"->React.string}
+      left={<SVGExport width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}>
+      <ListItemText color={theme.colors.blue}> {"Export Backup"->React.string} </ListItemText>
     </ListItem>
     <ListItem
-      color={theme.colors.blue}
       onPress={_ =>
         Alert.alert(
           ~title="Import Data from Clipboard?",
@@ -64,8 +72,8 @@ let make = () => {
           ],
           (),
         )}
-      icon={<SVGImport width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}>
-      {"Import Backup"->React.string}
+      left={<SVGImport width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}>
+      <ListItemText color={theme.colors.blue}> {"Import Backup"->React.string} </ListItemText>
     </ListItem>
     <ListSeparator />
     <BlockFootnote>
@@ -74,8 +82,6 @@ let make = () => {
     <Spacer size=L />
     <ListSeparator />
     <ListItem
-      color={theme.colors.red}
-      center=true
       onPress={_ =>
         Alert.alert(
           ~title="Reset Settings & Erase All Data?",
@@ -91,7 +97,9 @@ let make = () => {
           ],
           (),
         )}>
-      {"Reset Settings & Erase All Data"->React.string}
+      <ListItemText color={theme.colors.red} center=true>
+        {"Reset Settings & Erase All Data"->React.string}
+      </ListItemText>
     </ListItem>
     <ListSeparator />
     <BlockFootnote>

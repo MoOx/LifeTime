@@ -37,7 +37,7 @@ let make = () => {
             ReactNativePermissions.openSettings()->ignore
           }}
       />}>
-      {"Allow Notifications"->React.string}
+      <ListItemText> {"Allow Notifications"->React.string} </ListItemText>
     </ListItem>
     <ListSeparator />
     <Spacer size=L />
@@ -60,34 +60,41 @@ let make = () => {
           }
         }}
       />}>
-      {
-        let text = "Daily Reminders"->React.string
-        !allowReminderEditing ? <Text style={theme.styles["textLight2"]}> {text} </Text> : text
-      }
+      <ListItemText>
+        {
+          let text = "Daily Reminders"->React.string
+          !allowReminderEditing ? <Text style={theme.styles["textLight2"]}> {text} </Text> : text
+        }
+      </ListItemText>
     </ListItem>
-    {settings.notificationsRecurrentReminders->SortArray.stableSortBy((a, b) => {
+    {settings.notificationsRecurrentReminders
+    ->SortArray.stableSortBy((a, b) => {
       a[1]
       ->Option.flatMap(v => v)
       ->Option.map(v =>
         b[1]->Option.flatMap(v2 => v2)->Option.map(v2 => v2 > v ? -1 : 1)->Option.getWithDefault(0)
       )
       ->Option.getWithDefault(0)
-    })->Array.mapWithIndex((index, notifTime) => {
+    })
+    ->Array.mapWithIndex((index, notifTime) => {
       let datetime = Notifications.appropriateTimeForNextNotification(Js.Date.now(), notifTime)
       <ListItem
         separator={allowReminderEditing
           ? true
           : index != settings.notificationsRecurrentReminders->Array.length - 1}
         key={datetime->Js.Date.toISOString}>
-        {
-          let time =
-            datetime
-            ->DateFns.format(ReactNativeLocalize.uses24HourClock() ? "HH:mm" : "h:mm aa")
-            ->React.string
-          !allowReminderEditing ? <Text style={theme.styles["textLight2"]}> {time} </Text> : time
-        }
+        <ListItemText>
+          {
+            let time =
+              datetime
+              ->DateFns.format(ReactNativeLocalize.uses24HourClock() ? "HH:mm" : "h:mm aa")
+              ->React.string
+            !allowReminderEditing ? <Text style={theme.styles["textLight2"]}> {time} </Text> : time
+          }
+        </ListItemText>
       </ListItem>
-    })->React.array}
+    })
+    ->React.array}
     {allowReminderEditing && showDatetimepicker
       ? <>
           <View style={theme.styles["background"]}>
@@ -118,16 +125,20 @@ let make = () => {
                 let minutes = newReminderDate->Js.Date.getMinutes->Belt.Float.toInt
                 let hours = newReminderDate->Js.Date.getHours->Belt.Float.toInt
                 let newReminder = [Some(minutes), Some(hours)]
-                if settings.notificationsRecurrentReminders->Array.keep(r => {
-                  r[0]
-                  ->Option.flatMap(v => v)
-                  ->Option.map(v => v === minutes)
-                  ->Option.getWithDefault(false) &&
-                    r[1]
+                if (
+                  settings.notificationsRecurrentReminders
+                  ->Array.keep(r => {
+                    r[0]
                     ->Option.flatMap(v => v)
-                    ->Option.map(v => v === hours)
-                    ->Option.getWithDefault(false)
-                })->Array.length > 0 {
+                    ->Option.map(v => v === minutes)
+                    ->Option.getWithDefault(false) &&
+                      r[1]
+                      ->Option.flatMap(v => v)
+                      ->Option.map(v => v === hours)
+                      ->Option.getWithDefault(false)
+                  })
+                  ->Array.length > 0
+                ) {
                   Alert.alert(
                     ~title="Duplicate Reminder",
                     ~message="You already have a identical reminder. It's not necessary to have it twice.",
@@ -144,9 +155,7 @@ let make = () => {
                   showDatetimepicker_set(_ => false)
                 }
               }}>
-              <Text style={Style.array([Theme.text["body"], theme.styles["textBlue"]])}>
-                {"Add"->React.string}
-              </Text>
+              <ListItemText color=theme.colors.blue> {"Add"->React.string} </ListItemText>
             </TouchableOpacity>}
             rightSpace=M
           />
@@ -157,7 +166,9 @@ let make = () => {
           onPress={_ => {
             showDatetimepicker_set(_ => true)
           }}>
-          <Text style={theme.styles["textBlue"]}> {"Add a New Reminder"->React.string} </Text>
+          <ListItemText color=theme.colors.blue>
+            {"Add a New Reminder"->React.string}
+          </ListItemText>
         </ListItem>
       : React.null}
     <ListSeparator />
