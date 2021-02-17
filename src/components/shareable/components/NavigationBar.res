@@ -1,6 +1,6 @@
 open Belt
 
-@bs.module("react-native-navigation-bar-color")
+@module("react-native-navigation-bar-color")
 external changeNavigationBarColor: string => unit = "default"
 
 // we pile new values in front & remove them by the beginning

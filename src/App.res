@@ -62,11 +62,13 @@ let app = () => {
 
   React.useEffect2(() => {
     if initialStateContainer->Option.isNone {
-      ReactNativeAsyncStorage.getItem(navigationStateStorageKey)->FutureJs.fromPromise(error => {
+      ReactNativeAsyncStorage.getItem(navigationStateStorageKey)
+      ->FutureJs.fromPromise(error => {
         // @todo error
         Js.log(("[LifeTime] App: Restoring Navigation State: ", error))
         error
-      })->Future.tap(res =>
+      })
+      ->Future.tap(res =>
         switch res {
         | Result.Ok(jsonState) =>
           switch jsonState->Js.Null.toOption {
@@ -86,7 +88,8 @@ let app = () => {
           Js.log(("[LifeTime] App: Restoring Navigation State: unable to get json state", e))
           setInitialState(_ => Some(None))
         }
-      )->ignore
+      )
+      ->ignore
     }
     None
   }, (initialStateContainer, setInitialState))
@@ -104,11 +107,15 @@ let app = () => {
   }, [optionalSettings_set])
 
   let settings_set = settingsCallback =>
-    optionalSettings_set(settings => settings->Option.map(settings => {
+    optionalSettings_set(settings =>
+      settings
+      ->Option.map(settings => {
         let newSettings = settingsCallback(settings)
         AppSettings.setSettings(newSettings)
         Some(newSettings)
-      })->Option.getWithDefault(settings))
+      })
+      ->Option.getWithDefault(settings)
+    )
 
   optionalSettings
   ->Option.map(settings =>
@@ -116,7 +123,8 @@ let app = () => {
       <ReactNativeDarkMode.DarkModeProvider>
         <AppSettings.ContextProvider value=(settings, settings_set)>
           <Calendars.ContextProvider value=calendarsContextValue>
-            {initialStateContainer->Option.map(initialState =>
+            {initialStateContainer
+            ->Option.map(initialState =>
               <Native.NavigationContainer
                 ref={navigationRef->Obj.magic}
                 // doesn't work properly with native-stack
@@ -134,7 +142,10 @@ let app = () => {
                 }}>
                 <Nav.RootNavigator />
               </Native.NavigationContainer>
-            )->Option.getWithDefault(React.null)} <Bootsplash isReady /> <NotificationsRegisterer />
+            )
+            ->Option.getWithDefault(React.null)}
+            <Bootsplash isReady />
+            <NotificationsRegisterer />
           </Calendars.ContextProvider>
         </AppSettings.ContextProvider>
       </ReactNativeDarkMode.DarkModeProvider>

@@ -1,13 +1,13 @@
 type showConfig
-@bs.obj external showConfig: (~duration: float=?) => showConfig = ""
+@obj external showConfig: (~duration: float=?) => showConfig = ""
 
 type hideConfig
-@bs.obj external hideConfig: (~duration: float=?) => hideConfig = ""
+@obj external hideConfig: (~duration: float=?) => hideConfig = ""
 
-@bs.module("react-native-bootsplash") @bs.scope("default")
+@module("react-native-bootsplash") @scope("default")
 external show: option<showConfig> => unit = "show"
 
-@bs.module("react-native-bootsplash") @bs.scope("default")
+@module("react-native-bootsplash") @scope("default")
 external hide: option<hideConfig> => unit = "hide"
 
 /*

@@ -1,7 +1,7 @@
 open ReactNavigation
 open Core
 
-@bs.module("react-native-screens")
+@module("react-native-screens")
 external enableScreens: unit => unit = "enableScreens"
 
 module NativeStack = {
@@ -17,12 +17,12 @@ module NativeStack = {
 
     type t = navigation
 
-    @bs.send external push: (t, string) => unit = "push"
-    @bs.send external pushWithParams: (t, string, M.params) => unit = "push"
+    @send external push: (t, string) => unit = "push"
+    @send external pushWithParams: (t, string, M.params) => unit = "push"
 
-    @bs.send external pop: (t, ~count: int=?, unit) => unit = "pop"
+    @send external pop: (t, ~count: int=?, unit) => unit = "pop"
 
-    @bs.send external popToTop: (t, unit) => unit = "popToTop"
+    @send external popToTop: (t, unit) => unit = "popToTop"
   }
 
   module Make = (
@@ -76,7 +76,7 @@ module NativeStack = {
       color: option<ReactNative.Color.t>,
     }
 
-    @bs.obj
+    @obj
     external options: (
       ~backButtonInCustomView: bool=?,
       ~contentStyle: ReactNative.Style.t=?,
@@ -151,7 +151,7 @@ module NativeStack = {
       children: option<renderCallbackProp => React.element>,
     }
 
-    @bs.module("react-native-screens/native-stack")
+    @module("react-native-screens/native-stack")
     external make: unit => {
       "Navigator": navigatorProps => React.element,
       "Screen": screenProps<M.params> => React.element,
@@ -159,7 +159,7 @@ module NativeStack = {
 
     let stack = make()
     module ScreenWithCallback = {
-      @bs.obj
+      @obj
       external makeProps: (
         ~name: string,
         ~options: optionsCallback=?,
@@ -172,7 +172,7 @@ module NativeStack = {
     }
     module Screen = {
       type componentProps = {navigation: navigation}
-      @bs.obj
+      @obj
       external makeProps: (
         ~name: string,
         ~options: optionsCallback=?,
@@ -186,7 +186,7 @@ module NativeStack = {
     }
 
     module Navigator = {
-      @bs.obj
+      @obj
       external makeProps: (
         ~initialRouteName: string=?,
         ~screenOptions: optionsCallback=?,
@@ -199,6 +199,6 @@ module NativeStack = {
     }
   }
 
-  @bs.val
+  @val
   external mergeOptions: (options, options) => options = "Object.assign"
 }

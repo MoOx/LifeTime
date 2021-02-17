@@ -28,7 +28,7 @@ module RootStack = {
       screen: option<string>,
     }
 
-    @bs.obj
+    @obj
     external params: (
       ~newGoalType: Goal.Type.serializableT=?,
       ~goalId: Goal.id=?,

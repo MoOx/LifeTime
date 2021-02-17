@@ -1,7 +1,7 @@
 type gestureRef
 
 module NativeViewGestureHandler = {
-  @react.component @bs.module("react-native-gesture-handler")
+  @react.component @module("react-native-gesture-handler")
   external make: (
     ~waitFor: React.ref<gestureRef>=?,
     ~simultaneousHandlers: React.ref<gestureRef>=?,
@@ -19,7 +19,7 @@ module ScrollView = {
   include ScrollViewElement
 
   type contentOffset
-  @bs.obj external contentOffset: (~x: float, ~y: float) => contentOffset = ""
+  @obj external contentOffset: (~x: float, ~y: float) => contentOffset = ""
 
   type contentInsetAdjustmentBehavior = [#automatic | #scrollableAxes | #never | #always]
 
@@ -33,7 +33,7 @@ module ScrollView = {
 
   type snapToAlignment = [#start | #center | #end_]
 
-  @react.component @bs.module("react-native-gesture-handler")
+  @react.component @module("react-native-gesture-handler")
   external make: (
     ~waitFor: React.ref<gestureRef>=?,
     ~simultaneousHandlers: option<option<array<React.ref<gestureRef>>>>=?,
@@ -56,7 +56,7 @@ module ScrollView = {
     ~fadingEdgeLength: float=?,
     ~horizontal: bool=?,
     ~indicatorStyle: indicatorStyle=?,
-    ~keyboardDismissMode: @bs.string [#none | #interactive | @bs.as("on-drag") #onDrag]=?,
+    ~keyboardDismissMode: @string [#none | #interactive | @as("on-drag") #onDrag]=?,
     ~keyboardShouldPersistTaps: keyboardShouldPersistTaps=?,
     ~maximumZoomScale: float=?,
     ~minimumZoomScale: float=?,
@@ -100,8 +100,8 @@ module ScrollView = {
     ~accessible: bool=?,
     ~collapsable: bool=?,
     ~hitSlop: View.edgeInsets=?,
-    ~importantForAccessibility: @bs.string
-    [#auto | #yes | #no | @bs.as("no-hide-descendants") #noHideDescendants]=?,
+    ~importantForAccessibility: @string
+    [#auto | #yes | #no | @as("no-hide-descendants") #noHideDescendants]=?,
     ~nativeID: string=?,
     ~needsOffscreenAlphaCompositing: bool=?,
     ~onAccessibilityAction: Accessibility.actionEvent => unit=?,
@@ -122,8 +122,7 @@ module ScrollView = {
     ~onResponderTerminationRequest: Event.pressEvent => bool=?,
     ~onStartShouldSetResponder: Event.pressEvent => bool=?,
     ~onStartShouldSetResponderCapture: Event.pressEvent => bool=?,
-    ~pointerEvents: @bs.string
-    [#auto | #none | @bs.as("box-none") #boxNone | @bs.as("box-only") #boxOnly]=?,
+    ~pointerEvents: @string [#auto | #none | @as("box-none") #boxNone | @as("box-only") #boxOnly]=?,
     ~removeClippedSubviews: bool=?,
     ~renderToHardwareTextureAndroid: bool=?,
     ~shouldRasterizeIOS: bool=?,

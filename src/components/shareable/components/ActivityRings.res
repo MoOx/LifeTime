@@ -5,7 +5,7 @@ type ring = {
   progress: float,
 }
 
-@bs.module("./ActivityRings.js") @react.component
+@module("./ActivityRings.js") @react.component
 external make: (
   ~rings: array<ring>,
   ~width: float,

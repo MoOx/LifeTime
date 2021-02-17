@@ -51,9 +51,9 @@ let colors = theme =>
   | #dark => Predefined.Colors.Ios.dark
   }
 
-@bs.module("react-native") @bs.scope("Platform")
+@module("react-native") @scope("Platform")
 external versionIos: string = "Version"
-@bs.module("react-native") @bs.scope("Platform")
+@module("react-native") @scope("Platform")
 external versionAndroid: int = "Version"
 
 let statusBarStyle = (theme, barStyle) =>

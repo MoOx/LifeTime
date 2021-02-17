@@ -3,7 +3,7 @@ open ReactNative
 open ReactMultiversal
 
 // react-native-web
-@bs.module("react-native")
+@module("react-native")
 external createWebElementFromString: (string, 'props) => React.element = "createElement"
 
 let styles = {
