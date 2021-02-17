@@ -88,7 +88,7 @@ let make = (~activityTitle, ~onSkipActivity) => {
             activitiesSkipped: !isSkipped
               ? settings.activitiesSkipped->Array.concat([activityTitle])
               : settings.activitiesSkipped->Array.keep(alreadySkipped =>
-                  Activities.isSimilar(alreadySkipped, activityTitle)
+                  !Activities.isSimilar(alreadySkipped, activityTitle)
                 ),
           }
         })
