@@ -8,8 +8,17 @@ open Navigators
 module StatsStackScreen = {
   @react.component
   let make = (~navigation as _, ~route as _) => {
-    // let theme = Theme.useTheme(AppSettings.useTheme())
-    <StatsStack.Navigator>
+    let theme = Theme.useTheme(AppSettings.useTheme())
+    <StatsStack.Navigator
+      screenOptions={_ =>
+        StatsStack.options(
+          ~headerTintColor=theme.namedColors.text,
+          ~headerStyle={
+            backgroundColor: Some(theme.namedColors.background),
+            blurEffect: None,
+          },
+          (),
+        )}>
       <StatsStack.Screen
         name="HomeScreen"
         component=HomeScreen.make
@@ -46,8 +55,17 @@ module GoalsStackScreen = {
 module SettingsStackScreen = {
   @react.component
   let make = (~navigation as _, ~route as _) => {
-    // let theme = Theme.useTheme(AppSettings.useTheme())
-    <SettingsStack.Navigator>
+    let theme = Theme.useTheme(AppSettings.useTheme())
+    <SettingsStack.Navigator
+      screenOptions={_ =>
+        StatsStack.options(
+          ~headerTintColor=theme.namedColors.text,
+          ~headerStyle={
+            backgroundColor: Some(theme.namedColors.background),
+            blurEffect: None,
+          },
+          (),
+        )}>
       <SettingsStack.Screen
         name="SettingsScreen"
         component=SettingsScreen.make
