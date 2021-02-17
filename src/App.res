@@ -36,7 +36,7 @@ let navigatorEmitter = EventEmitter.make()
 type navigationState
 let navigationStateStorageKey = "react-navigation:state:2"
 // remove old entries
-ReactNativeAsyncStorage.removeItem("react-navigation:state")
+ReactNativeAsyncStorage.removeItem("react-navigation:state")->ignore
 
 let rec navigateToIfPossible = (navigation, navigateTo) =>
   switch navigation {
