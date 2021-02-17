@@ -2607,10 +2607,10 @@
   resolved "https://registry.yarnpkg.com/@reason-react-native/permissions/-/permissions-2.2.0.tgz#1730af63814a7ee34ec1d288f07312431f49b96e"
   integrity sha512-DVQpDZTIJ07QRfoel3RvQ5+wMOGY9xf+79Z8AyG3kJEcyn1P48pqYgtZtZZQzwMi0WK2ZLrjS/qTirNMAXmROQ==
 
-"@reason-react-native/push-notification-ios@^1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@reason-react-native/push-notification-ios/-/push-notification-ios-1.7.0.tgz#b549990737733f29f2700346264ae1ede5635771"
-  integrity sha512-f2ESxjMeIY9jASZgH8CpSxjfI+rx1hNM8lhgMSl3df323bvUid/gEIXEQCnGWN1yXYm7yJ4TfeB+bD2ZJOQk9g==
+"@reason-react-native/push-notification-ios@^1.7.2":
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/@reason-react-native/push-notification-ios/-/push-notification-ios-1.7.2.tgz#18dc28d2c0218d808ba1a31bb9d0d4445559dc6c"
+  integrity sha512-rURyGWBtA9CNjyt0dVnYs7RzeMXPtQZbcKnaTfOhal6oblRfVj7pCpwcKgTwl/3LX35YKeT+ZVjZR/3u6UdqYg==
 
 "@reason-react-native/safe-area-context@^3.1.0":
   version "3.1.0"
@@ -4347,10 +4347,10 @@ browserslist@^4.0.0, browserslist@^4.1.1, browserslist@^4.11.1, browserslist@^4.
     node-releases "^1.1.53"
     pkg-up "^2.0.0"
 
-bs-platform@^8.3.3:
-  version "8.3.3"
-  resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-8.3.3.tgz#68e3796ad0607c55da0f45fe14c0ce0aaf69682c"
-  integrity sha512-ayS5wdvrOX6PxU2wX7O2rLllzsQDzmGq582NNDFwfM6b9HQu7ki242Pc46o2/CnGHHumKVarpX0IZzjC2Llgcg==
+bs-platform@^8.4.0:
+  version "8.4.2"
+  resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-8.4.2.tgz#778dabd1dfb3bc95e0086c58dabae74e4ebdee8a"
+  integrity sha512-9q7S4/LLV/a68CweN382NJdCCr/lOSsJR3oQYnmPK98ChfO/AdiA3lYQkQTp6T+U0I5Z5RypUAUprNstwDtMDQ==
 
 bs-tinycolor@^2.0.1:
   version "2.0.2"
