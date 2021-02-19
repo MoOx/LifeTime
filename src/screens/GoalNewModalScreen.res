@@ -13,18 +13,21 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
   let (goal, setGoal) = React.useState(_ => None)
   let handleChange = React.useCallback1(goal => setGoal(_ => goal), [setGoal])
 
-  let (isReadyToSave, disabled, onPress) = goal->Option.map(goal => (
-    true,
-    false,
-    _ => {
-      setSettings(settings => {
-        ...settings,
-        lastUpdated: Js.Date.now(),
-        goals: settings.goals->Array.concat([goal]),
-      })
-      navigation->Navigators.RootStack.Navigation.goBack()
-    },
-  ))->Option.getWithDefault((false, true, _ => ()))
+  let (isReadyToSave, disabled, onPress) =
+    goal
+    ->Option.map(goal => (
+      true,
+      false,
+      _ => {
+        setSettings(settings => {
+          ...settings,
+          lastUpdated: Js.Date.now(),
+          goals: settings.goals->Array.concat([goal]),
+        })
+        navigation->Navigators.RootStack.Navigation.goBack()
+      },
+    ))
+    ->Option.getWithDefault((false, true, _ => ()))
 
   let type_ =
     route.params
@@ -80,19 +83,20 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
         textStyle={theme.styles["text"]}
         title="New Goal"
         left={({color}) =>
-          <TouchableOpacity onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
-            <Animated.Text
+          <TouchableOpacity
+            hitSlop=HitSlops.m onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
+            <Text
               allowFontScaling=false
               style={
                 open Style
                 array([Theme.text["body"], Theme.text["weight400"], textStyle(~color, ())])
               }>
               {"Cancel"->React.string}
-            </Animated.Text>
+            </Text>
           </TouchableOpacity>}
         right={({color}) =>
-          <TouchableOpacity disabled onPress>
-            <Animated.Text
+          <TouchableOpacity hitSlop=HitSlops.m disabled onPress>
+            <Text
               allowFontScaling=false
               style={
                 open Style
@@ -103,7 +107,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
                 ])
               }>
               {"Add"->React.string}
-            </Animated.Text>
+            </Text>
           </TouchableOpacity>}
       />
       <Spacer size=XL />

@@ -53,7 +53,8 @@ let make = (~navigation, ~route as _) => {
         textStyle={theme.styles["text"]}
         title=Help.title
         right={({color}) =>
-          <TouchableOpacity onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
+          <TouchableOpacity
+            hitSlop=HitSlops.m onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
             <Text
               allowFontScaling=false
               style={

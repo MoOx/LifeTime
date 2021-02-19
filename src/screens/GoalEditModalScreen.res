@@ -10,10 +10,11 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets()
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.))
 
-  let goalId = route.params
-  ->Option.flatMap(params => params.goalId)
-  // default to dumb string, as we this id only to filter existing goal when we edit it
-  ->Option.getWithDefault("")
+  let goalId =
+    route.params
+    ->Option.flatMap(params => params.goalId)
+    // default to dumb string, as we this id only to filter existing goal when we edit it
+    ->Option.getWithDefault("")
   let initialGoal =
     (settings.goals->Array.keep(goal => goal.id == goalId))[0]->Option.getWithDefault(
       Goal.undefined,
@@ -29,21 +30,24 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
     navigation->Navigators.RootStack.Navigation.goBack()
   }, (setSettings, navigation, initialGoal.id))
 
-  let (isReadyToSave, disabled, onPress) = goal->Option.map(goal => (
-    true,
-    false,
-    _ => {
-      setSettings(settings => {
-        ...settings,
-        lastUpdated: Js.Date.now(),
-        goals: settings.goals->Array.map(existingGoal =>
-          // we replace the goal at the same place
-          existingGoal.id != goalId ? existingGoal : goal
-        ),
-      })
-      navigation->Navigators.RootStack.Navigation.goBack()
-    },
-  ))->Option.getWithDefault((false, true, _ => ()))
+  let (isReadyToSave, disabled, onPress) =
+    goal
+    ->Option.map(goal => (
+      true,
+      false,
+      _ => {
+        setSettings(settings => {
+          ...settings,
+          lastUpdated: Js.Date.now(),
+          goals: settings.goals->Array.map(existingGoal =>
+            // we replace the goal at the same place
+            existingGoal.id != goalId ? existingGoal : goal
+          ),
+        })
+        navigation->Navigators.RootStack.Navigation.goBack()
+      },
+    ))
+    ->Option.getWithDefault((false, true, _ => ()))
 
   <>
     <StatusBar
@@ -95,19 +99,20 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
         textStyle={theme.styles["text"]}
         title=GoalEdit.title
         left={({color}) =>
-          <TouchableOpacity onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
-            <Animated.Text
+          <TouchableOpacity
+            hitSlop=HitSlops.m onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
+            <Text
               allowFontScaling=false
               style={
                 open Style
                 array([Theme.text["body"], Theme.text["weight400"], textStyle(~color, ())])
               }>
               {"Cancel"->React.string}
-            </Animated.Text>
+            </Text>
           </TouchableOpacity>}
         right={({color}) =>
-          <TouchableOpacity disabled onPress>
-            <Animated.Text
+          <TouchableOpacity hitSlop=HitSlops.m disabled onPress>
+            <Text
               allowFontScaling=false
               style={
                 open Style
@@ -118,7 +123,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
                 ])
               }>
               {"Save"->React.string}
-            </Animated.Text>
+            </Text>
           </TouchableOpacity>}
       />
       <Spacer size=XL />

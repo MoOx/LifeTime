@@ -61,6 +61,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
           {Global.__DEV__
             ? <>
                 <TouchableOpacity
+                  hitSlop=HitSlops.m
                   onPress={_ =>
                     forceWelcomeContent_set(forceWelcomeContent => !forceWelcomeContent)}>
                   <View style={Style.style(~opacity=0.10, ())}>
@@ -69,16 +70,19 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                     />
                   </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={_ => debug_set(debug => !debug)}>
+                <Spacer size=S />
+                <TouchableOpacity hitSlop=HitSlops.m onPress={_ => debug_set(debug => !debug)}>
                   <View style={Style.style(~opacity=0.10, ())}>
                     <SVGScope
                       width={24.->Style.dp} height={24.->Style.dp} fill=theme.namedColors.text
                     />
                   </View>
                 </TouchableOpacity>
+                <Spacer size=S />
               </>
             : React.null}
-          <TouchableOpacity onPress={_ => onNewGoalPress(Goal.Type.serializedGoal)}>
+          <TouchableOpacity
+            hitSlop=HitSlops.m onPress={_ => onNewGoalPress(Goal.Type.serializedGoal)}>
             <SVGPlus width={24.->Style.dp} height={24.->Style.dp} fill=theme.namedColors.text />
           </TouchableOpacity>
         </View>
@@ -171,7 +175,10 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
             {remainingMinThisWeek->Date.minToString->React.string}
             {"\n"->React.string}
           </Text>}
-      {forceWelcomeContent ? React.null : settings.goals->Array.map(goal => {
+      {forceWelcomeContent
+        ? React.null
+        : settings.goals
+          ->Array.map(goal => {
             let currentCategoriesTime =
               mapCategoryDuration
               ->Option.map(mapCategoryDuration =>
@@ -186,14 +193,18 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
               ->Option.getWithDefault(0.)
             let currentActivitiesTime =
               mapTitleDuration
-              ->Option.map(mapTitleDuration => goal.activitiesId->Array.map(actId => {
+              ->Option.map(mapTitleDuration =>
+                goal.activitiesId
+                ->Array.map(actId => {
                   let act = Activities.getFromId(actId, settings.activities)
                   mapTitleDuration
                   ->Array.map(((title, duration)) =>
                     Activities.isSimilar(title, act.title) ? duration : 0.
                   )
                   ->Array.reduce(0., (total, v) => total +. v)
-                })->Array.reduce(0., (total, v) => total +. v))
+                })
+                ->Array.reduce(0., (total, v) => total +. v)
+              )
               ->Option.getWithDefault(0.)
             let currentTime = currentCategoriesTime +. currentActivitiesTime
             let numberOfDays =
@@ -218,15 +229,22 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
             | _ => (false, false)
             }
             let backgroundColor =
-              goal.categoriesId->Array.concat(goal.activitiesId->Array.map(actId => {
+              goal.categoriesId
+              ->Array.concat(
+                goal.activitiesId->Array.map(actId => {
                   let act = actId->Activities.getFromId(settings.activities)
                   act.categoryId
-                }))->Array.map(catId => {
+                }),
+              )
+              ->Array.map(catId => {
                 let (_, _, color, _) = catId->ActivityCategories.getFromId
                 color
-              })->Array.reduce(Map.String.empty, (map, color) =>
+              })
+              ->Array.reduce(Map.String.empty, (map, color) =>
                 map->Map.String.set(color, map->Map.String.get(color)->Option.getWithDefault(0) + 1)
-              )->Map.String.toArray->SortArray.stableSortBy(((_, weight), (_, weight2)) =>
+              )
+              ->Map.String.toArray
+              ->SortArray.stableSortBy(((_, weight), (_, weight2)) =>
                 if weight < weight2 {
                   1
                 } else if weight > weight2 {
@@ -234,21 +252,22 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                 } else {
                   0
                 }
-              )->Array.get(
-                0,
-              )->Option.map(((c, _)) =>
-                c->ActivityCategories.getColor(#dark)
-              )->Option.getWithDefault(theme.colors.gray)
+              )
+              ->Array.get(0)
+              ->Option.map(((c, _)) => c->ActivityCategories.getColor(#dark))
+              ->Option.getWithDefault(theme.colors.gray)
 
             let goalTitle = if goal.title != "" {
               goal.title
             } else {
               goal.activitiesId
               ->Array.map(actId => (actId->Activities.getFromId(settings.activities)).title)
-              ->Array.concat(goal.categoriesId->Array.map(catId => {
+              ->Array.concat(
+                goal.categoriesId->Array.map(catId => {
                   let (_, title, _, _) = catId->ActivityCategories.getFromId
                   title
-                }))
+                }),
+              )
               ->Js.Array2.joinWith(", ")
             }
 
@@ -479,7 +498,8 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                           false,
                           true,
                         ] => "every day of the weekend"
-                      | _ => goal.days->Array.reduceWithIndex("", (days, day, index) =>
+                      | _ =>
+                        goal.days->Array.reduceWithIndex("", (days, day, index) =>
                           if day {
                             days ++
                             (Date.dayShortString(index->float) ++
@@ -605,7 +625,8 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
             //    " / "->React.string
             //    {durationPerWeek->Date.minToString->React.string}
             //  </Text>
-          })->React.array}
+          })
+          ->React.array}
     </SpacedView>
   </>
 }

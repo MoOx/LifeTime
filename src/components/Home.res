@@ -410,7 +410,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
                 {"No Events Available"->React.string}
               </Text>
               <TouchableOpacity
-                hitSlop={View.edgeInsets(~top=10., ~bottom=10., ~left=10., ~right=10., ())}
+                hitSlop=HitSlops.m
                 onPress={_ => {
                   open Alert
                   alert(
