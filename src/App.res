@@ -1,4 +1,5 @@
 open Belt
+open ReactNative
 open ReactNavigation
 
 ReactNativeScreens.enableScreens()
@@ -109,16 +110,26 @@ let app = () => {
     None
   }, [optionalSettings_set])
 
-  let settings_set = settingsCallback =>
-    optionalSettings_set(settings =>
-      settings
-      ->Option.map(settings => {
-        let newSettings = settingsCallback(settings)
-        AppSettings.setSettings(newSettings)
-        Some(newSettings)
-      })
-      ->Option.getWithDefault(settings)
-    )
+  let settings_set = settingsCallback => {
+    Js.log("[LifeTime] App: Updating settings")
+    InteractionManager.runAfterInteractions(() => {
+      Js.Global.setTimeout(() => {
+        optionalSettings_set(settings =>
+          settings
+          ->Option.map(settings => {
+            let newSettings = settingsCallback(settings)
+            InteractionManager.runAfterInteractions(() => {
+              Js.Global.setTimeout(() => {
+                AppSettings.setSettings(newSettings)
+              }, 0)->ignore
+            })->ignore
+            Some(newSettings)
+          })
+          ->Option.getWithDefault(settings)
+        )
+      }, 0)->ignore
+    })->ignore
+  }
 
   optionalSettings
   ->Option.map(settings =>

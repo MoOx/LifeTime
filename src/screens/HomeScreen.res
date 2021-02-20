@@ -8,22 +8,18 @@ let make = (~navigation, ~route as _) => {
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets()
 
   let (hasCalendarAccess, hasCalendarAccess_set) = React.useState(() => true)
-  React.useEffect3(() => {
-    open ReactNativeCalendarEvents
-    checkPermissions(true)
-    ->FutureJs.fromPromise(error => Js.log(("[LifeTime] HomeScreen: checkPermissions", error)))
+  React.useEffect1(() => {
+    open ReactNativePermissions
+    switch Platform.os {
+    | os when os == Platform.ios => check(Ios.calendars)
+    | os when os == Platform.android => check(Android.read_calendar)
+    | _ => Js.Promise.resolve(unavailable)
+    }
+    ->FutureJs.fromPromise(error => Js.log(("[LifeTime] HomeScreen: permission check", error)))
     ->Future.tapOk(status => {
-      Js.log(("[LifeTime] HomeScreen: checkPermissions status", status))
-      if status != #authorized {
+      Js.log(("[LifeTime] HomeScreen: permission check status", status))
+      if status != granted {
         hasCalendarAccess_set(_ => false)
-        if settings.lastUpdated === 0. {
-          // lazy load just a bit to get a nicer visual effect
-          // (otherwise navigation is kind of TOO QUICK)
-          Js.Global.setTimeout(
-            () => navigation->Navigators.RootStack.Navigation.navigate("WelcomeModalScreen"),
-            100,
-          )->ignore
-        }
       }
     })
     ->Future.tapError(_err =>
@@ -35,7 +31,18 @@ let make = (~navigation, ~route as _) => {
     )
     ->ignore
     None
-  }, (hasCalendarAccess_set, navigation, settings.lastUpdated))
+  }, [hasCalendarAccess_set])
+  React.useEffect2(() => {
+    if settings.lastUpdated === 0. {
+      // lazy load just a bit to get a nicer visual effect
+      // (otherwise navigation is kind of TOO QUICK)
+      Js.Global.setTimeout(
+        () => navigation->Navigators.RootStack.Navigation.navigate("WelcomeModalScreen"),
+        100,
+      )->ignore
+    }
+    None
+  }, (navigation, settings.lastUpdated))
 
   let (refreshing, refreshing_set) = React.useState(() => false)
   let onRefresh = React.useCallback1(() => refreshing_set(_ => true), [refreshing_set])
@@ -136,11 +143,13 @@ let make = (~navigation, ~route as _) => {
               onAboutPrivacyPress={_ =>
                 navigation->Navigators.RootStack.Navigation.navigate("PrivacyModalScreen")}
               onContinuePress={_ =>
-                ReactNativeCalendarEvents.requestPermissions()->FutureJs.fromPromise(error => {
+                ReactNativeCalendarEvents.requestPermissions()
+                ->FutureJs.fromPromise(error => {
                   // @todo error!
                   Js.log(("[LifeTime] HomeScreen: onContinuePress", error))
                   error
-                })->Future.tapOk(status => {
+                })
+                ->Future.tapOk(status => {
                   Js.log(("[LifeTime] HomeScreen: onContinuePress new status", status))
                   switch status {
                   | #authorized => hasCalendarAccess_set(_ => true)
@@ -162,13 +171,15 @@ let make = (~navigation, ~route as _) => {
                       (),
                     )
                   }
-                })->Future.tapError(_err =>
+                })
+                ->Future.tapError(_err =>
                   Alert.alert(
                     ~title="Ooops, something bad happened",
                     ~message="Please report us this error with informations about your device so we can improve LifeTime.",
                     (),
                   )
-                )->ignore}
+                )
+                ->ignore}
             />
           </SpacedView>
         </View>

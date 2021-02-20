@@ -23,11 +23,11 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
   let (goal, setGoal) = React.useState(_ => None)
   let handleChange = React.useCallback1(goal => setGoal(_ => goal), [setGoal])
   let handleDelete = React.useCallback3(() => {
+    navigation->Navigators.RootStack.Navigation.goBack()
     setSettings(settings => {
       ...settings,
       goals: settings.goals->Array.keep(goal => goal.id != initialGoal.id),
     })
-    navigation->Navigators.RootStack.Navigation.goBack()
   }, (setSettings, navigation, initialGoal.id))
 
   let (isReadyToSave, disabled, onPress) =
@@ -36,6 +36,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
       true,
       false,
       _ => {
+        navigation->Navigators.RootStack.Navigation.goBack()
         setSettings(settings => {
           ...settings,
           lastUpdated: Js.Date.now(),
@@ -44,7 +45,6 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
             existingGoal.id != goalId ? existingGoal : goal
           ),
         })
-        navigation->Navigators.RootStack.Navigation.goBack()
       },
     ))
     ->Option.getWithDefault((false, true, _ => ()))

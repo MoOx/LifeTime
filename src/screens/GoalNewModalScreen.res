@@ -19,12 +19,12 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
       true,
       false,
       _ => {
+        navigation->Navigators.RootStack.Navigation.goBack()
         setSettings(settings => {
           ...settings,
           lastUpdated: Js.Date.now(),
           goals: settings.goals->Array.concat([goal]),
         })
-        navigation->Navigators.RootStack.Navigation.goBack()
       },
     ))
     ->Option.getWithDefault((false, true, _ => ()))
