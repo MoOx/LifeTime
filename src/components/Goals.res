@@ -512,6 +512,7 @@ let make = (~onNewGoalPress, ~onEditGoalPress) => {
                     </Text>
                   </View>
                   <TouchableOpacity
+                    hitSlop=HitSlops.m
                     onPress={_ => onEditGoalPress(goal.id)}
                     style={
                       open Style
