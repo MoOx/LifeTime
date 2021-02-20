@@ -256,30 +256,39 @@ type themeData<'a> = {
   namedColors: colors,
 }
 
+type themes<'a> = {
+  light: themeData<'a>,
+  dark: themeData<'a>,
+}
+let themes = {
+  light: {
+    mode: #light,
+    styles: styleSheets.light,
+    colors: Predefined.Colors.Ios.light,
+    namedColors: Colors.light,
+  },
+  dark: {
+    mode: #dark,
+    styles: styleSheets.dark,
+    colors: Predefined.Colors.Ios.dark,
+    namedColors: Colors.dark,
+  },
+}
+
 let useTheme = (acceptedMode): themeData<'a> => {
-  let autoMode = ReactNativeDarkMode.useDarkMode()
+  let autoMode = Appearance.useColorScheme()->Js.Null.toOption
   let mode = switch acceptedMode {
   | #auto =>
     switch autoMode {
-    | true => #dark
+    | Some(#dark) => #dark
     | _ => #light
     }
   | #light => #light
   | #dark => #dark
   }
   switch mode {
-  | #light => {
-      mode: mode,
-      styles: styleSheets.light,
-      colors: Predefined.Colors.Ios.light,
-      namedColors: Colors.light,
-    }
-  | #dark => {
-      mode: mode,
-      styles: styleSheets.dark,
-      colors: Predefined.Colors.Ios.dark,
-      namedColors: Colors.dark,
-    }
+  | #light => themes.light
+  | #dark => themes.dark
   }
 }
 

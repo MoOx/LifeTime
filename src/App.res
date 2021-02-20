@@ -120,35 +120,33 @@ let app = () => {
   optionalSettings
   ->Option.map(settings =>
     <ReactNativeSafeAreaContext.SafeAreaProvider>
-      <ReactNativeDarkMode.DarkModeProvider>
-        <AppSettings.ContextProvider value=(settings, settings_set)>
-          <Calendars.ContextProvider value=calendarsContextValue>
-            {initialStateContainer
-            ->Option.map(initialState =>
-              <Native.NavigationContainer
-                ref={navigationRef->Obj.magic}
-                // doesn't work properly with native-stack
-                // ?initialState
-                onStateChange={state => {
-                  let maybeJsonState = Js.Json.stringifyAny(state)
-                  switch maybeJsonState {
-                  | Some(jsonState) =>
-                    ReactNativeAsyncStorage.setItem(navigationStateStorageKey, jsonState)->ignore
-                  | None =>
-                    Js.log(
-                      "[LifeTime] App: <Native.NavigationContainer> onStateChange: Unable to stringify navigation state",
-                    )
-                  }
-                }}>
-                <Nav.RootNavigator />
-              </Native.NavigationContainer>
-            )
-            ->Option.getWithDefault(React.null)}
-            <Bootsplash isReady />
-            <NotificationsRegisterer />
-          </Calendars.ContextProvider>
-        </AppSettings.ContextProvider>
-      </ReactNativeDarkMode.DarkModeProvider>
+      <AppSettings.ContextProvider value=(settings, settings_set)>
+        <Calendars.ContextProvider value=calendarsContextValue>
+          {initialStateContainer
+          ->Option.map(initialState =>
+            <Native.NavigationContainer
+              ref={navigationRef->Obj.magic}
+              // doesn't work properly with native-stack
+              // ?initialState
+              onStateChange={state => {
+                let maybeJsonState = Js.Json.stringifyAny(state)
+                switch maybeJsonState {
+                | Some(jsonState) =>
+                  ReactNativeAsyncStorage.setItem(navigationStateStorageKey, jsonState)->ignore
+                | None =>
+                  Js.log(
+                    "[LifeTime] App: <Native.NavigationContainer> onStateChange: Unable to stringify navigation state",
+                  )
+                }
+              }}>
+              <Nav.RootNavigator />
+            </Native.NavigationContainer>
+          )
+          ->Option.getWithDefault(React.null)}
+          <Bootsplash isReady />
+          <NotificationsRegisterer />
+        </Calendars.ContextProvider>
+      </AppSettings.ContextProvider>
     </ReactNativeSafeAreaContext.SafeAreaProvider>
   )
   ->Option.getWithDefault(React.null)

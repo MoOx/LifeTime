@@ -59,7 +59,6 @@
     "react-native": "^0.63.0",
     "react-native-bootsplash": "^2.0.0",
     "react-native-calendar-events": "^2.0.0",
-    "react-native-dark-mode": "^0.2.1",
     "react-native-gesture-handler": "^1.8.0",
     "react-native-localize": "^1.4.0",
     "react-native-navigation-bar-color": "^2.0.1",
