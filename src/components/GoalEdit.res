@@ -188,20 +188,18 @@ let make = (
     <ListSeparator />
     <View style={theme.styles["background"]}>
       <SpacedView style={Predefined.styles["rowSpaceBetween"]}>
-        {days
-        ->Array.sliceToEnd(Date.weekStartsOn)
-        ->Array.concat(days->Array.slice(~offset=0, ~len=Date.weekStartsOn))
-        ->Array.mapWithIndex((index, dayOn) => {
-          let day = mod(index + Date.weekStartsOn, 7)
+        {Date.weekIndices
+        ->Array.map(day => {
+          let dayOn = days->Array.getExn(day)
           <Pressable
-            key={index->string_of_int}
+            key={day->string_of_int}
             onPress={_ =>
               setDays(days => {
                 let cp = days->Array.copy
                 cp->Array.set(day, !dayOn)->ignore
                 cp
               })}
-            hitSlop={View.edgeInsets(~top=20., ~bottom=20., ~left=20., ~right=20., ())}>
+            hitSlop=HitSlops.m>
             <View>
               <Text style={Style.array([Theme.text["caption1"], theme.styles["textLight2"]])}>
                 {day->float->Date.dayShortString->React.string}
@@ -385,7 +383,7 @@ let make = (
             left={<>
               <Pressable
                 onPress={_ => handleCategoryCheck(id, selectedCategoryActivities)}
-                hitSlop={View.edgeInsets(~top=6., ~bottom=6., ~left=6., ~right=6., ())}>
+                hitSlop=HitSlops.xs>
                 {!selectedCat
                   ? <SVGCircle
                       width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.gray

@@ -1,3 +1,4 @@
+open Belt
 open Js.Date
 open DateFns
 
@@ -301,6 +302,14 @@ let weekStartsOn = {
     1
   }
 }
+
+let weekIndices = {
+  let days = Array.range(0, 6)
+  days
+  ->Array.sliceToEnd(weekStartsOn)
+  ->Array.concat(days->Array.slice(~offset=0, ~len=weekStartsOn))
+}
+
 let localeOptions = Some({locale: None, weekStartsOn: Some(weekStartsOn)})
 
 // DateFns shortcuts
