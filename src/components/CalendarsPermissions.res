@@ -22,19 +22,17 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
   let animatedBottomTranslateY = React.useRef(Animated.Value.create(1000.))
 
   React.useEffect0(() => {
-    {
-      open Animated
-      spring(
-        animatedBottomTranslateY.current,
-        Value.Spring.config(
-          ~useNativeDriver=true,
-          ~toValue=1.->Value.Spring.fromRawValue,
-          ~tension=1.,
-          ~delay=150.,
-          (),
-        ),
-      )->Animation.start()
-    }
+    open Animated
+    spring(
+      animatedBottomTranslateY.current,
+      Value.Spring.config(
+        ~useNativeDriver=true,
+        ~toValue=1.->Value.Spring.fromRawValue,
+        ~tension=1.,
+        ~delay=150.,
+        (),
+      ),
+    )->Animation.start()
 
     None
   })

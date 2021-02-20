@@ -3,6 +3,7 @@ let useNotificationStatus = () => {
   let appState = ReactNativeHooks.useAppState()
   React.useEffect2(() => {
     if appState === #active {
+      Js.log("[LifeTime] NotificationsHooks: checkNotifications request")
       open ReactNativePermissions
       checkNotifications()
       ->FutureJs.fromPromise(error =>

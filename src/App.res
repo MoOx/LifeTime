@@ -52,6 +52,7 @@ let rec navigateToIfPossible = (navigation, navigateTo) =>
 let app = () => {
   let navigationRef = React.useRef(None)
   React.useEffect1(() => {
+    Js.log("[LifeTime] App: navigatorEmitter on(navigate) ")
     navigatorEmitter->EventEmitter.on("navigate", navigateTo =>
       navigateToIfPossible(navigationRef.current, navigateTo)
     )
@@ -62,13 +63,15 @@ let app = () => {
 
   React.useEffect2(() => {
     if initialStateContainer->Option.isNone {
+      Js.log("[LifeTime] App: Restoring Navigation initialStateContainer is empty")
       ReactNativeAsyncStorage.getItem(navigationStateStorageKey)
       ->FutureJs.fromPromise(error => {
         // @todo error
         Js.log(("[LifeTime] App: Restoring Navigation State: ", error))
         error
       })
-      ->Future.tap(res =>
+      ->Future.tap(res => {
+        Js.log("[LifeTime] App: Restoring Navigation State")
         switch res {
         | Result.Ok(jsonState) =>
           switch jsonState->Js.Null.toOption {
@@ -88,7 +91,7 @@ let app = () => {
           Js.log(("[LifeTime] App: Restoring Navigation State: unable to get json state", e))
           setInitialState(_ => Some(None))
         }
-      )
+      })
       ->ignore
     }
     None

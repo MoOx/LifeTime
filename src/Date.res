@@ -340,6 +340,7 @@ module Hooks = {
       let now = now()
       // only update today when active AND there is an relevant diff
       if appState === #active && now->getTime -. today->getTime > 1000. *. 5. {
+        Js.log("[LifeTime] Date: useToday update")
         today_set(_ => now)
       }
       None
@@ -350,6 +351,7 @@ module Hooks = {
   let useWeekDates = date => {
     let (dates, dates_set) = React.useState(() => weekDates(date))
     React.useEffect2(() => {
+      Js.log("[LifeTime] Date: useWeekDates update")
       dates_set(_ => weekDates(date))
       None
     }, (date, dates_set))

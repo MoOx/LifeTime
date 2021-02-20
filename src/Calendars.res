@@ -12,7 +12,8 @@ let openCalendarApp = () => {
 
 let date0 = Js.Date.makeWithYMDHM(~year=0., ~month=0., ~date=0., ~hours=0., ~minutes=0., ())
 
-let sort = (calendars: array<calendar>) => calendars->SortArray.stableSortBy((a, b) =>
+let sort = (calendars: array<calendar>) =>
+  calendars->SortArray.stableSortBy((a, b) =>
     a.title > b.title
       ? 1
       : switch a.title < b.title {
@@ -29,11 +30,15 @@ let availableCalendars = (calendars: array<calendar>, settings: AppSettings.t) =
 let useCalendars = updater => {
   let (value, set) = React.useState(() => None)
   React.useEffect2(() => {
-    findCalendars()->FutureJs.fromPromise(error => {
+    Js.log("[LifeTime] Calendars: useCalendars request")
+    findCalendars()
+    ->FutureJs.fromPromise(error => {
       // @todo error!
       Js.log(("[LifeTime] Calendars: useCalendars", error))
       error
-    })->Future.tapOk(res => set(_ => Some(res->sort)))->ignore
+    })
+    ->Future.tapOk(res => set(_ => Some(res->sort)))
+    ->ignore
     None
   }, (set, updater))
   value
@@ -86,6 +91,7 @@ let useEventsContext = () => {
   let (eventsMapByRange, eventsMapByRange_set) = React.useState(() => Map.String.empty)
 
   let requestUpdate = React.useCallback2(() => {
+    Js.log("[LifeTime] Calendars: requestUpdate")
     updatedAt_set(_ => Date.now())
     eventsMapByRange_set(_ => Map.String.empty)
   }, (updatedAt_set, eventsMapByRange_set))
@@ -97,6 +103,7 @@ let useEventsContext = () => {
   }, [eventsMapByRange])
 
   let fetchEvents = React.useCallback1((startDate, endDate) => {
+    Js.log(("[LifeTime] Calendars: fetchingEvents for", startDate, endDate))
     let key = makeMapKey(startDate, endDate)
     // set None as a loading state
     eventsMapByRange_set(eventsMapByRange => eventsMapByRange->Map.String.set(key, Fetching))
@@ -187,13 +194,17 @@ let makeMapTitleDuration = (
   events: array<calendarEventReadable>,
   startDate: Js.Date.t,
   endDate: Js.Date.t,
-) => events->Array.reduce(Map.String.empty, (map, evt) => {
+) =>
+  events
+  ->Array.reduce(Map.String.empty, (map, evt) => {
     let key = evt.title->Activities.minifyName
     map->Map.String.set(
       key,
       map->Map.String.get(key)->Option.getWithDefault([])->Array.concat([evt]),
     )
-  })->Map.String.toArray->Array.map(((_key, evts: array<calendarEventReadable>)) => {
+  })
+  ->Map.String.toArray
+  ->Array.map(((_key, evts: array<calendarEventReadable>)) => {
     let totalDurationInMin = evts->Array.reduce(0., (totalDurationInMin, evt) => {
       let durationInMs = Date.durationInMs(
         evt.endDate > endDate->Js.Date.toISOString ? endDate : evt.endDate->Js.Date.fromString,
@@ -205,7 +216,8 @@ let makeMapTitleDuration = (
       durationInMs->Js.Date.fromFloat->Js.Date.valueOf->Date.msToMin->Js.Math.round
     })
     (evts[0]->Option.map(evt => evt.title)->Option.getWithDefault(""), totalDurationInMin)
-  })->SortArray.stableSortBy(((_, minA), (_, minB)) =>
+  })
+  ->SortArray.stableSortBy(((_, minA), (_, minB)) =>
     minA > minB
       ? -1
       : switch minA < minB {
@@ -230,13 +242,17 @@ let makeMapCategoryDuration = (
   settings: AppSettings.t,
   startDate: Js.Date.t,
   endDate: Js.Date.t,
-) => events->Array.reduce(Map.String.empty, (map, evt) => {
+) =>
+  events
+  ->Array.reduce(Map.String.empty, (map, evt) => {
     let key = settings->categoryIdFromActivityTitle(evt.title)
     map->Map.String.set(
       key,
       map->Map.String.get(key)->Option.getWithDefault([])->Array.concat([evt]),
     )
-  })->Map.String.toArray->Array.map(((key, evts: array<calendarEventReadable>)) => {
+  })
+  ->Map.String.toArray
+  ->Array.map(((key, evts: array<calendarEventReadable>)) => {
     let totalDurationInMin = evts->Array.reduce(0., (totalDurationInMin, evt) => {
       let durationInMs = Date.durationInMs(
         evt.endDate > endDate->Js.Date.toISOString ? endDate : evt.endDate->Js.Date.fromString,
@@ -248,7 +264,8 @@ let makeMapCategoryDuration = (
       durationInMs->Js.Date.fromFloat->Js.Date.valueOf->Date.msToMin->Js.Math.round
     })
     (key, totalDurationInMin)
-  })->SortArray.stableSortBy(((_, minA), (_, minB)) =>
+  })
+  ->SortArray.stableSortBy(((_, minA), (_, minB)) =>
     minA > minB
       ? -1
       : switch minA < minB {

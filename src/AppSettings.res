@@ -74,21 +74,29 @@ let decodeJsonSettingsOrRaise = (json: Js.Json.t): t => {
     ) catch {
     | _ => defaultSettings.notificationsRecurrentReminders
     },
-    calendarsSkipped: json |> field("calendarsSkipped", array(json => {
+    calendarsSkipped: json |> field(
+      "calendarsSkipped",
+      array(json => {
         id: json |> field("id", string),
         title: json |> field("title", string),
         source: json |> field("source", string),
         color: json |> field("color", string),
-      })),
+      }),
+    ),
     activitiesSkippedFlag: json |> field("activitiesSkippedFlag", bool),
     activitiesSkipped: json |> field("activitiesSkipped", array(string)),
-    activities: json |> field("activities", array((json): Activities.t => {
+    activities: json |> field(
+      "activities",
+      array((json): Activities.t => {
         id: json |> field("id", string),
         title: json |> field("title", string),
         createdAt: json |> field("createdAt", Json.Decode.float),
         categoryId: json |> field("categoryId", string),
-      })),
-    goals: try json |> field("goals", array((json): Goal.t => {
+      }),
+    ),
+    goals: try json |> field(
+      "goals",
+      array((json): Goal.t => {
         id: json |> field("id", string),
         title: json |> field("title", string),
         createdAt: json |> field("createdAt", Json.Decode.float),
@@ -97,17 +105,20 @@ let decodeJsonSettingsOrRaise = (json: Js.Json.t): t => {
         durationPerDay: json |> field("durationPerDay", Json.Decode.float),
         categoriesId: json |> field("categoriesId", array(string)),
         activitiesId: json |> field("activitiesId", array(string)),
-      })) catch {
+      }),
+    ) catch {
     | _ => []
     },
   }
 }
 let decodeJsonSettings = (json: Js.Json.t): Future.t<Result.t<t, string>> =>
-  ReactNativeCalendarEvents.findCalendars()->FutureJs.fromPromise(error => {
+  ReactNativeCalendarEvents.findCalendars()
+  ->FutureJs.fromPromise(error => {
     // @todo error
     Js.log(("[LifeTime] AppSettings: ReactNativeCalendarEvents.findCalendars error", error))
     "Unable to retrieve calendars before parsing settings"
-  })->Future.flatMap(calendarsResult =>
+  })
+  ->Future.flatMap(calendarsResult =>
     try Ok(json->decodeJsonSettingsOrRaise) catch {
     | Json.Decode.DecodeError(_exn) =>
       Js.log(("[LifeTime] AppSettings: decodeJsonSettingsOrRaise", _exn))
@@ -123,7 +134,8 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t<Result.t<t, string>> =>
         settings.calendarsSkipped
       // ensure calendars ids are valid and reconciliate otherwise
       | Ok(calendars) =>
-        settings.calendarsSkipped->Array.reduce([], (calendarsToSkip, calendarSkipped) => {
+        settings.calendarsSkipped
+        ->Array.reduce([], (calendarsToSkip, calendarSkipped) => {
           let calMatches =
             calendars->Array.keep(calendar =>
               calendar.id === calendarSkipped.id ||
@@ -133,7 +145,8 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t<Result.t<t, string>> =>
           // (eg a device with multiple icloud account vs a device with one)
           // && calendar.source == calendarSkipped.source
           calendarsToSkip->Array.concat(calMatches)
-        })->Array.map(cal => {
+        })
+        ->Array.map(cal => {
           id: cal.id,
           title: cal.title,
           source: cal.source,
@@ -146,15 +159,24 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t<Result.t<t, string>> =>
 
 let storageKey = "settings"
 
-let getSettings = () => ReactNativeAsyncStorage.getItem(storageKey)->FutureJs.fromPromise(error => {
+let getSettings = () =>
+  ReactNativeAsyncStorage.getItem(storageKey)
+  ->FutureJs.fromPromise(error => {
     // @todo error
     Js.log(("[LifeTime] AppSettings: useSettings", error))
     "Unable to access settings from device"
-  })->Future.flatMapOk(res => res->Js.Null.toOption->Option.map(jsonString =>
+  })
+  ->Future.flatMapOk(res =>
+    res
+    ->Js.Null.toOption
+    ->Option.map(jsonString =>
       try jsonString->Json.parseOrRaise->decodeJsonSettings catch {
       | Json.ParseError(_) => Future.value(Result.Error("Unable to parse json settings"))
       }
-    )->Option.getWithDefault(Future.value(Ok(defaultSettings))))->Future.map(x =>
+    )
+    ->Option.getWithDefault(Future.value(Ok(defaultSettings)))
+  )
+  ->Future.map(x =>
     switch x {
     | Ok(settings) => settings
     | Error(err) =>
@@ -167,9 +189,10 @@ let setSettings = settings =>
   if settings != defaultSettings {
     settings
     ->Js.Json.stringifyAny
-    ->Option.map(stringifiedSettings =>
-      ReactNativeAsyncStorage.setItem(storageKey, stringifiedSettings)
-    )
+    ->Option.map(stringifiedSettings => {
+      ReactNativeAsyncStorage.setItem(storageKey, stringifiedSettings)->ignore
+      Js.log("[LifeTime] App: settings updated")
+    })
     ->ignore
     // if (ReactNative.Global.__DEV__) {
     //   Js.log((

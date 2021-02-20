@@ -18,21 +18,20 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
 
   React.useEffect3(() => {
     if refreshing {
+      Js.log("[LifeTime] Home: refreshing...")
       requestUpdate()
       onRefreshDone()
     }
     None
   }, (refreshing, requestUpdate, onRefreshDone))
 
-  React.useEffect1(() => {
-    let handleAppStateChange = newAppState =>
-      if newAppState == #active {
-        requestUpdate()
-      }
-
-    AppState.addEventListener(#change(state => handleAppStateChange(state)))
-    Some(() => AppState.removeEventListener(#change(state => handleAppStateChange(state))))
-  }, [requestUpdate])
+  let appState = ReactNativeHooks.useAppState()
+  React.useEffect2(() => {
+    if appState == #active {
+      requestUpdate()
+    }
+    None
+  }, (appState, requestUpdate))
 
   let today = Date.Hooks.useToday()
   let todayDates = Date.Hooks.useWeekDates(today)
@@ -41,6 +40,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
     Date.weekDates(today->DateFns.addDays(-7.))
   )
   React.useEffect2(() => {
+    Js.log("[LifeTime] Home: previousDates_set")
     previousDates_set(_ => Date.weekDates(today->DateFns.addDays(-7.)))
     None
   }, (today, previousDates_set))
@@ -50,6 +50,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
     )
   )
   React.useEffect2(() => {
+    Js.log("[LifeTime] Home: last5Weeks_set")
     last5Weeks_set(_ =>
       Array.range(0, 5)->Array.map(currentWeekReverseIndex =>
         Date.weekDates(today->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
