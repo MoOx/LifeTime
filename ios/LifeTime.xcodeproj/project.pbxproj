@@ -34,7 +34,7 @@
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* LifeTimeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LifeTimeTests.m; sourceTree = "<group>"; };
 		0AB51CF5FBECD9FE437A79FE /* Pods-LifeTime-LifeTimeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-LifeTimeTests.release.xcconfig"; path = "Target Support Files/Pods-LifeTime-LifeTimeTests/Pods-LifeTime-LifeTimeTests.release.xcconfig"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* LifeTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LifeTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* LifeTime.Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LifeTime.Dev.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = LifeTime/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = LifeTime/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = LifeTime/Images.xcassets; sourceTree = "<group>"; };
@@ -145,7 +145,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* LifeTime.app */,
+				13B07F961A680F5B00A75B9A /* LifeTime.Dev.app */,
 				00E356EE1AD99517003FC87E /* LifeTimeTests.xctest */,
 			);
 			name = Products;
@@ -204,7 +204,7 @@
 			);
 			name = LifeTime;
 			productName = LifeTime;
-			productReference = 13B07F961A680F5B00A75B9A /* LifeTime.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* LifeTime.Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -497,8 +497,8 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.moox.LifeTime;
-				PRODUCT_NAME = LifeTime;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.moox.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = LifeTime.Dev;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "LifeTime-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -529,7 +529,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.moox.LifeTime;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.moox.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = LifeTime;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "LifeTime-Bridging-Header.h";
