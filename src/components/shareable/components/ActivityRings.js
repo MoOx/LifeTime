@@ -84,28 +84,30 @@ const interpolateColor = (
     round(
       interpolate(animationValue, {
         inputRange: config.inputRange,
-        outputRange: colors.map((c) => red(c)),
+        outputRange: colors.map((c) => (typeof c === 'number' ? red(c) : 0)),
         extrapolate: 'clamp',
       }),
     ),
     round(
       interpolate(animationValue, {
         inputRange: config.inputRange,
-        outputRange: colors.map((c) => green(c)),
+        outputRange: colors.map((c) => (typeof c === 'number' ? green(c) : 0)),
         extrapolate: 'clamp',
       }),
     ),
     round(
       interpolate(animationValue, {
         inputRange: config.inputRange,
-        outputRange: colors.map((c) => blue(c)),
+        outputRange: colors.map((c) => (typeof c === 'number' ? blue(c) : 0)),
         extrapolate: 'clamp',
       }),
     ),
     round(
       interpolate(animationValue, {
         inputRange: config.inputRange,
-        outputRange: colors.map((c) => opacity(c)),
+        outputRange: colors.map((c) =>
+          typeof c === 'number' ? opacity(c) : 0,
+        ),
         extrapolate: 'clamp',
       }),
     ),
