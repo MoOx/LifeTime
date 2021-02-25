@@ -336,16 +336,23 @@ module Hooks = {
   let useToday = () => {
     let (today, today_set) = React.useState(() => now())
     let appState = ReactNativeHooks.useAppState()
-    React.useEffect3(() => {
+    let todayUpdate = React.useCallback2(() => {
       let now = now()
       // only update today when active AND there is an relevant diff
-      if appState === #active && now->getTime -. today->getTime > 1000. *. 5. {
+      if now->getTime -. today->getTime > 1000. *. 5. {
         Js.log("[LifeTime] Date: useToday update")
         today_set(_ => now)
       }
+    }, (today, today_set))
+    React.useEffect2(() => {
+      // only update today when active AND there is an relevant diff
+      if appState === #active {
+        todayUpdate()
+      }
       None
-    }, (appState, today, today_set))
-    today
+    }, (appState, todayUpdate))
+
+    (today, todayUpdate)
   }
 
   let useWeekDates = date => {

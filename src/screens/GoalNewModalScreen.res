@@ -4,7 +4,7 @@ open ReactMultiversal
 
 @react.component
 let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack.M.params>) => {
-  let (_settings, setSettings) = React.useContext(AppSettings.context)
+  let (settings, setSettings) = React.useContext(AppSettings.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
 
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets()
@@ -111,7 +111,11 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
           </TouchableOpacity>}
       />
       <Spacer size=XL />
-      <GoalEdit initialGoal={...Goal.undefined, type_: type_} onChange={handleChange} />
+      <GoalEdit
+        activities=settings.activities
+        initialGoal={...Goal.undefined, type_: type_}
+        onChange={handleChange}
+      />
     </Animated.ScrollView>
   </>
 }

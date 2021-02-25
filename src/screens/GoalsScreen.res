@@ -61,6 +61,11 @@ let make = (~navigation, ~route as _) => {
           )
         }>
         <Goals
+          activities=settings.activities
+          activitiesSkipped=settings.activitiesSkipped
+          activitiesSkippedFlag=settings.activitiesSkippedFlag
+          calendarsSkipped=settings.calendarsSkipped
+          goals=settings.goals
           onNewGoalPress={goalType =>
             navigation->Navigators.RootStack.Navigation.navigateWithParams(
               "GoalNewModalScreen",

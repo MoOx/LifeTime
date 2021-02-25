@@ -5,9 +5,13 @@ open ReactMultiversal
 let numberOfActivitiesToShow = 8
 
 @react.component
-let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
-  let (settings, _setSettings) = React.useContext(AppSettings.context)
-
+let make = (
+  ~activities,
+  ~calendarsSkipped,
+  ~mapTitleDuration,
+  ~onActivityPress,
+  ~onFiltersPress,
+) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
   let calendars = Calendars.useCalendars(None)
   let (activitiesToShow, setActivitiesToShow) = React.useState(() => numberOfActivitiesToShow)
@@ -34,7 +38,7 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
     <ListSeparator />
     <View onLayout style={theme.styles["background"]}>
       {calendars
-      ->Option.map(calendars => Calendars.availableCalendars(calendars, settings))
+      ->Option.map(calendars => calendars->Calendars.availableCalendars(calendarsSkipped))
       ->Option.map(c =>
         if c->Array.length === 0 {
           <SpacedView>
@@ -91,8 +95,8 @@ let make = (~mapTitleDuration, ~onFiltersPress, ~onActivityPress) => {
               ->Array.mapWithIndex((index, (title, totalDurationInMin)) => {
                 let durationString = totalDurationInMin->Date.minToString
                 let (_, _, colorName, iconName) =
-                  settings
-                  ->Calendars.categoryIdFromActivityTitle(title)
+                  title
+                  ->Calendars.categoryIdFromActivityTitle(activities)
                   ->ActivityCategories.getFromId
                 let color = colorName->ActivityCategories.getColor(theme.mode)
                 <ListItem

@@ -8,13 +8,12 @@ let quickDurations = [30., 45., 60., 90.]
 
 @react.component
 let make = (
+  ~activities: array<Activities.t>,
   ~initialGoal: option<Goal.t>=?,
   ~initialType: option<Goal.Type.t>=?,
   ~onChange,
   ~onDelete=?,
 ) => {
-  let (settings, _setSettings) = React.useContext(AppSettings.context)
-
   let theme = Theme.useTheme(AppSettings.useTheme())
 
   let (title, setTitle) = React.useState(() =>
@@ -378,8 +377,7 @@ let make = (
               let selectedCat = categoriesSelected->Array.some(catKey => catKey == id)
               let opened = categoriesOpened->Array.some(catKey => catKey == id)
               let separator = index != ActivityCategories.defaults->List.length - 1
-              let categoryActivities =
-                settings.activities->Array.keep(activity => activity.categoryId == id)
+              let categoryActivities = activities->Array.keep(activity => activity.categoryId == id)
               let selectedCategoryActivities = categoryActivities->Array.reduce([], (
                 selActs,
                 activity,

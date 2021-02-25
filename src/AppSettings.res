@@ -163,7 +163,7 @@ let getSettings = () =>
   ReactNativeAsyncStorage.getItem(storageKey)
   ->FutureJs.fromPromise(error => {
     // @todo error
-    Js.log(("[LifeTime] AppSettings: useSettings", error))
+    Js.log(("[LifeTime] AppSettings: getSettings", error))
     "Unable to access settings from device"
   })
   ->Future.flatMapOk(res =>
@@ -180,7 +180,7 @@ let getSettings = () =>
     switch x {
     | Ok(settings) => settings
     | Error(err) =>
-      Js.log(("[LifeTime] AppSettings: useSettings", err))
+      Js.log(("[LifeTime] AppSettings: getSettings", err))
       defaultSettings
     }
   )

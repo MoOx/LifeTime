@@ -22,9 +22,12 @@ let sort = (calendars: array<calendar>) =>
         }
   )
 
-let availableCalendars = (calendars: array<calendar>, settings: AppSettings.t) =>
+let availableCalendars = (
+  calendars: array<calendar>,
+  calendarsSkipped: array<AppSettings.calendarSkipped>,
+) =>
   calendars
-  ->Array.keep(c => !(settings.calendarsSkipped->Array.some(cs => cs.id == c.id)))
+  ->Array.keep(c => !(calendarsSkipped->Array.some(cs => cs.id == c.id)))
   ->Array.map(c => c.id)
 
 let useCalendars = updater => {
@@ -137,29 +140,47 @@ let useEventsContext = () => {
 
 let isAllDayEvent = (evt: calendarEventReadable) => evt.allDay->Option.getWithDefault(false)
 
-let isEventInSkippedCalendar = (evt: calendarEventReadable, settings: AppSettings.t) =>
-  settings.calendarsSkipped->Array.some(cs =>
+let isEventInSkippedCalendar = (
+  evt: calendarEventReadable,
+  calendarsSkipped: array<AppSettings.calendarSkipped>,
+) =>
+  calendarsSkipped->Array.some(cs =>
     cs.id == evt.calendar->Option.map(c => c.id)->Option.getWithDefault("")
   )
 
-let isEventSkippedActivity = (evt: calendarEventReadable, settings: AppSettings.t) =>
-  settings.activitiesSkippedFlag &&
-  settings.activitiesSkipped->Array.some(skipped => Activities.isSimilar(skipped, evt.title))
+let isEventSkippedActivity = (
+  evt: calendarEventReadable,
+  activitiesSkippedFlag,
+  activitiesSkipped,
+) =>
+  activitiesSkippedFlag &&
+  activitiesSkipped->Array.some(skipped => Activities.isSimilar(skipped, evt.title))
 
 let filterAllDayEvents = (events: array<calendarEventReadable>) =>
   events->Array.keep(evt => !(evt->isAllDayEvent))
 
-let filterEventsByCalendars = (events: array<calendarEventReadable>, settings: AppSettings.t) =>
-  events->Array.keep(evt => !(evt->isEventInSkippedCalendar(settings)))
+let filterEventsByCalendars = (events: array<calendarEventReadable>, calendarsSkipped) =>
+  events->Array.keep(evt => !(evt->isEventInSkippedCalendar(calendarsSkipped)))
 
-let filterEventsByActivities = (events: array<calendarEventReadable>, settings: AppSettings.t) =>
-  events->Array.keep(evt => !(evt->isEventSkippedActivity(settings)))
+let filterEventsByActivities = (
+  events: array<calendarEventReadable>,
+  activitiesSkippedFlag,
+  activitiesSkipped,
+) =>
+  events->Array.keep(evt =>
+    !(evt->isEventSkippedActivity(activitiesSkippedFlag, activitiesSkipped))
+  )
 
-let filterEvents = (events: array<calendarEventReadable>, settings: AppSettings.t) =>
+let filterEvents = (
+  events: array<calendarEventReadable>,
+  calendarsSkipped,
+  activitiesSkippedFlag,
+  activitiesSkipped,
+) =>
   events->Array.keep(evt =>
     !(evt->isAllDayEvent) &&
-    (!(evt->isEventInSkippedCalendar(settings)) &&
-    !(evt->isEventSkippedActivity(settings)))
+    (!(evt->isEventInSkippedCalendar(calendarsSkipped)) &&
+    !(evt->isEventSkippedActivity(activitiesSkippedFlag, activitiesSkipped)))
   )
 
 type noEvents =
@@ -168,7 +189,12 @@ type noEvents =
   | OnlySkippedCalendars
   | OnlySkippedActivities
   | Some
-let noEvents = (events: array<calendarEventReadable>, settings: AppSettings.t) =>
+let noEvents = (
+  events: array<calendarEventReadable>,
+  calendarsSkipped,
+  activitiesSkippedFlag,
+  activitiesSkipped,
+) =>
   switch events {
   | [] => None
   | evts =>
@@ -176,11 +202,12 @@ let noEvents = (events: array<calendarEventReadable>, settings: AppSettings.t) =
     if evtsWoAllDay == [] {
       OnlyAllDays
     } else {
-      let evtsWoCalendars = evtsWoAllDay->filterEventsByCalendars(settings)
+      let evtsWoCalendars = evtsWoAllDay->filterEventsByCalendars(calendarsSkipped)
       if evtsWoCalendars == [] {
         OnlySkippedCalendars
       } else {
-        let evtsWoActivities = evtsWoCalendars->filterEventsByActivities(settings)
+        let evtsWoActivities =
+          evtsWoCalendars->filterEventsByActivities(activitiesSkippedFlag, activitiesSkipped)
         if evtsWoActivities == [] {
           OnlySkippedActivities
         } else {
@@ -226,10 +253,10 @@ let makeMapTitleDuration = (
         }
   )
 
-let categoryIdFromActivityTitle = (settings: AppSettings.t, activityName) => {
+let categoryIdFromActivityTitle = (activityName, activities: array<Activities.t>) => {
   let activity =
     (
-      settings.activities->Array.keep(acti =>
+      activities->Array.keep(acti =>
         Activities.isSimilar(acti.title, activityName) &&
         acti.categoryId->ActivityCategories.isIdValid
       )
@@ -239,13 +266,13 @@ let categoryIdFromActivityTitle = (settings: AppSettings.t, activityName) => {
 
 let makeMapCategoryDuration = (
   events: array<calendarEventReadable>,
-  settings: AppSettings.t,
+  activities: array<Activities.t>,
   startDate: Js.Date.t,
   endDate: Js.Date.t,
 ) =>
   events
   ->Array.reduce(Map.String.empty, (map, evt) => {
-    let key = settings->categoryIdFromActivityTitle(evt.title)
+    let key = evt.title->categoryIdFromActivityTitle(activities)
     map->Map.String.set(
       key,
       map->Map.String.get(key)->Option.getWithDefault([])->Array.concat([evt]),

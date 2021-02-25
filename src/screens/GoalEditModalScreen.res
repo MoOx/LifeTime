@@ -127,7 +127,9 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
           </TouchableOpacity>}
       />
       <Spacer size=XL />
-      <GoalEdit initialGoal onChange={handleChange} onDelete={handleDelete} />
+      <GoalEdit
+        activities=settings.activities initialGoal onChange={handleChange} onDelete={handleDelete}
+      />
     </Animated.ScrollView>
   </>
 }

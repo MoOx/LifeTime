@@ -2,7 +2,7 @@ open Belt
 open ReactNative
 
 @react.component
-let make = () => {
+let make = (~notificationsRecurrentRemindersOn, ~notificationsRecurrentReminders) => {
   // clean badges when app is active
   let appState = ReactNativeHooks.useAppState()
   React.useEffect1(() => {
@@ -12,7 +12,6 @@ let make = () => {
     None
   }, [appState])
 
-  let (settings, _setSettings) = React.useContext(AppSettings.context)
   // update daily notification when opening the app
   let (
     notificationStatus,
@@ -24,8 +23,8 @@ let make = () => {
         "id": Notifications.Ids.reminderDailyCheck,
       })
 
-      if settings.notificationsRecurrentRemindersOn {
-        settings.notificationsRecurrentReminders->Array.forEach(notifTime => {
+      if notificationsRecurrentRemindersOn {
+        notificationsRecurrentReminders->Array.forEach(notifTime => {
           open ReactNativePushNotification
           localNotificationScheduleOptions(
             ~channelId="reminders",
@@ -46,10 +45,6 @@ let make = () => {
       }
     }
     None
-  }, (
-    notificationStatus,
-    settings.notificationsRecurrentReminders,
-    settings.notificationsRecurrentRemindersOn,
-  ))
+  }, (notificationStatus, notificationsRecurrentReminders, notificationsRecurrentRemindersOn))
   React.null
 }

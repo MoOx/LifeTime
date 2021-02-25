@@ -36,7 +36,7 @@ let make = (~activityTitle, ~onSkipActivity) => {
           })
         }}
         left={<NamedIcon name=iconName fill=color />}
-        right={id != settings->Calendars.categoryIdFromActivityTitle(activityTitle)
+        right={id != activityTitle->Calendars.categoryIdFromActivityTitle(settings.activities)
           ? <SVGCircle width={26.->Style.dp} height={26.->Style.dp} fill=color />
           : <SVGCheckmarkcircle width={26.->Style.dp} height={26.->Style.dp} fill=color />}>
         <ListItemText> {name->React.string} </ListItemText>
