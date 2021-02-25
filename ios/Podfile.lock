@@ -304,8 +304,8 @@ PODS:
     - React-Core (= 0.63.3)
     - React-cxxreact (= 0.63.3)
     - React-jsi (= 0.63.3)
-  - RNBootSplash (2.2.5):
-    - React
+  - RNBootSplash (3.1.5):
+    - React-Core
   - RNCalendarEvents (2.0.0):
     - React
   - RNCAsyncStorage (1.10.0):
@@ -553,7 +553,7 @@ SPEC CHECKSUMS:
   React-RCTText: 65a6de06a7389098ce24340d1d3556015c38f746
   React-RCTVibration: 8e9fb25724a0805107fc1acc9075e26f814df454
   ReactCommon: 4167844018c9ed375cc01a843e9ee564399e53c3
-  RNBootSplash: b3836aa90c5bec690c6cd3c9ab355fcf98d0fe1d
+  RNBootSplash: c7304515f0b7502878ecc0fdcce8136134419cdc
   RNCalendarEvents: c2c2e113f384bd193886bd529cf91f836b9e5888
   RNCAsyncStorage: 6d99641f8e6f15d169d695d8ef184bf187903f11
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f

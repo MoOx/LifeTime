@@ -26,6 +26,7 @@
     "@reason-react-native/svg",
     "bs-tinycolor",
     "react-multiversal",
+    "react-native-bootsplash",
     "reason-future",
     "reason-react-native",
     "reason-react-navigation",

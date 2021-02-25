@@ -1,5 +1,4 @@
 open ReactNavigation
-open ReactNativeScreens
 
 module M = {
   type params = unit

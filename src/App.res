@@ -2,7 +2,7 @@ open Belt
 open ReactNative
 open ReactNavigation
 
-ReactNativeScreens.enableScreens()
+NativeStack.enableScreens()
 
 let navigatorEmitter = EventEmitter.make()
 
@@ -98,8 +98,28 @@ let app = () => {
     None
   }, (initialStateContainer, setInitialState))
 
+  let onStateChange = React.useCallback0(state => {
+    let maybeJsonState = Js.Json.stringifyAny(state)
+    switch maybeJsonState {
+    | Some(jsonState) =>
+      ReactNativeAsyncStorage.setItem(navigationStateStorageKey, jsonState)->ignore
+    | None =>
+      Js.log(
+        "[LifeTime] App: <Native.NavigationContainer> onStateChange: Unable to stringify navigation state",
+      )
+    }
+  })
+
   let calendarsContextValue = Calendars.useEventsContext()
-  let isReady = initialStateContainer->Option.isSome
+  let onReady = React.useCallback0(() => {
+    ReactNativeBootsplash.hide({fade: true})->Js.Promise.then_(() => {
+      Js.log("[LifeTime] BootSplash: fading is over")
+      Js.Promise.resolve()
+    }, _)->Js.Promise.catch(error => {
+      Js.log(("[LifeTime] BootSplash: cannot hide splash", error))
+      Js.Promise.resolve()
+    }, _)->ignore
+  })
 
   // let (initialized, initialized_set) = React.useState(() => false);
   let (optionalSettings, optionalSettings_set) = React.useState(() => None)
@@ -142,22 +162,12 @@ let app = () => {
               ref={navigationRef->Obj.magic}
               // doesn't work properly with native-stack
               // ?initialState
-              onStateChange={state => {
-                let maybeJsonState = Js.Json.stringifyAny(state)
-                switch maybeJsonState {
-                | Some(jsonState) =>
-                  ReactNativeAsyncStorage.setItem(navigationStateStorageKey, jsonState)->ignore
-                | None =>
-                  Js.log(
-                    "[LifeTime] App: <Native.NavigationContainer> onStateChange: Unable to stringify navigation state",
-                  )
-                }
-              }}>
+              onStateChange
+              onReady>
               <Nav.RootNavigator />
             </Native.NavigationContainer>
           )
           ->Option.getWithDefault(React.null)}
-          <Bootsplash isReady />
           <NotificationsRegisterer />
         </Calendars.ContextProvider>
       </AppSettings.ContextProvider>
