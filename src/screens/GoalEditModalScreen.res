@@ -50,12 +50,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
     ->Option.getWithDefault((false, true, _ => ()))
 
   <>
-    <StatusBar
-      barStyle={Theme.formSheetStatusBarStyle(theme.mode, #darkContent)}
-      translucent={true}
-      backgroundColor="transparent"
-    />
-    <NavigationBar backgroundColor=theme.namedColors.backgroundDark />
+    <StatusBarFormSheet />
     <Animated.ScrollView
       style={
         open Style

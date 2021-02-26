@@ -7,12 +7,7 @@ let make = (~navigation, ~route as _) => {
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets()
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.))
   <>
-    <StatusBar
-      barStyle={Theme.formSheetStatusBarStyle(theme.mode, #darkContent)}
-      translucent={true}
-      backgroundColor="transparent"
-    />
-    <NavigationBar backgroundColor=theme.namedColors.backgroundDark />
+    <StatusBarFormSheet />
     <Animated.ScrollView
       style={
         open Style

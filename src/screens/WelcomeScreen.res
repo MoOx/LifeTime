@@ -5,11 +5,7 @@ open ReactMultiversal
 let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
   <>
-    <StatusBar
-      barStyle={Theme.formSheetStatusBarStyle(theme.mode, #darkContent)}
-      translucent={true}
-      backgroundColor={"transparent"}
-    />
+    <StatusBarFormSheet />
     <ScrollView
       style={theme.styles["background"]} contentContainerStyle={Predefined.styles["flexGrow"]}>
       <Welcome

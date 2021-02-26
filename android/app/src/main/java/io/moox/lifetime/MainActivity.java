@@ -8,11 +8,17 @@ import com.facebook.react.ReactActivity;
 import com.zoontek.rnbootsplash.RNBootSplash;
 
 public class MainActivity extends ReactActivity {
-
+  
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+    // react-native-screen recommend to not pass savedInstanceState to avoid crashes
+    // https://github.com/software-mansion/react-native-screens#android
+    // super.onCreate(savedInstanceState);
+    super.onCreate(null);
+    
     RNBootSplash.init(R.drawable.bootsplash, MainActivity.this);
+    
+    TransparentStatusAndNavigationBarModule.init(MainActivity.this);
   }
 
   /**

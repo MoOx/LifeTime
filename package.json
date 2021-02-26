@@ -61,7 +61,6 @@
     "react-native-calendar-events": "^2.0.0",
     "react-native-gesture-handler": "^1.8.0",
     "react-native-localize": "^1.4.0",
-    "react-native-navigation-bar-color": "^2.0.1",
     "react-native-permissions": "^2.2.0",
     "react-native-push-notification": "^6.0.0",
     "react-native-reanimated": "^1.13.0",

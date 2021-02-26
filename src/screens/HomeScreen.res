@@ -50,11 +50,6 @@ let make = (~navigation, ~route as _) => {
 
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.))
   <>
-    <StatusBar
-      barStyle={Theme.statusBarStyle(theme.mode, #darkContent)}
-      translucent={true}
-      backgroundColor={"transparent"}
-    />
     <View
       style={
         open Style

@@ -34,12 +34,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
     ->Option.flatMap(params => params.newGoalType)
     ->Option.getWithDefault(Goal.Type.Goal->Goal.Type.toSerialized)
   <>
-    <StatusBar
-      barStyle={Theme.formSheetStatusBarStyle(theme.mode, #darkContent)}
-      translucent={true}
-      backgroundColor="transparent"
-    />
-    <NavigationBar backgroundColor=theme.namedColors.backgroundDark />
+    <StatusBarFormSheet />
     <Animated.ScrollView
       style={
         open Style

@@ -119,6 +119,7 @@ let app = () => {
       Js.log(("[LifeTime] BootSplash: cannot hide splash", error))
       Js.Promise.resolve()
     }, _)->ignore
+    ()
   })
 
   // let (initialized, initialized_set) = React.useState(() => false);

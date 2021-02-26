@@ -1,7 +1,6 @@
 open Belt
 open ReactNative
 // open ReactMultiversal
-// open ReactNavigation
 
 open Navigators
 
@@ -92,72 +91,78 @@ module TabsScreen = {
   @react.component
   let make = (~navigation as _, ~route as _) => {
     let theme = Theme.useTheme(AppSettings.useTheme())
-    <>
-      <NavigationBar backgroundColor=theme.namedColors.background />
-      <Tabs.Navigator
-        initialRouteName="StatsStack"
-        tabBarOptions={Tabs.bottomTabBarOptions(
-          ~activeTintColor=theme.colors.blue,
-          ~inactiveTintColor=theme.colors.gray,
-          ~style={
-            open Style
-            array([theme.styles["background"], viewStyle(~borderTopColor=theme.colors.gray4, ())])
-          },
-          (),
-        )}>
-        <Tabs.Screen
-          name="StatsStack"
-          component=StatsStackScreen.make
-          options={_props =>
-            Tabs.options(
-              ~title="Summary",
-              ~tabBarIcon=tabBarIconProps =>
-                <SVGTimeline
-                  width={tabBarIconProps.size->Style.dp}
-                  height={tabBarIconProps.size->Style.dp}
-                  fill=tabBarIconProps.color
-                />,
-              (),
-            )}
-        />
-        <Tabs.Screen
-          name="GoalsStack"
-          component=GoalsStackScreen.make
-          options={_props =>
-            Tabs.options(
-              ~title="Goals",
-              ~tabBarIcon=tabBarIconProps =>
-                <SVGPennant
-                  width={tabBarIconProps.size->Style.dp}
-                  height={tabBarIconProps.size->Style.dp}
-                  fill=tabBarIconProps.color
-                />,
-              (),
-            )}
-        />
-        <Tabs.Screen
-          name="SettingsStack"
-          component=SettingsStackScreen.make
-          options={_props =>
-            Tabs.options(
-              ~title=SettingsScreen.title,
-              ~tabBarIcon=tabBarIconProps =>
-                <SVGSettings
-                  width={tabBarIconProps.size->Style.dp}
-                  height={tabBarIconProps.size->Style.dp}
-                  fill=tabBarIconProps.color
-                />,
-              (),
-            )}
-        />
-      </Tabs.Navigator>
-    </>
+    <Tabs.Navigator
+      initialRouteName="StatsStack"
+      tabBarOptions={Tabs.bottomTabBarOptions(
+        ~activeTintColor=theme.colors.blue,
+        ~inactiveTintColor=theme.colors.gray,
+        ~style={
+          open Style
+          array([theme.styles["background"], viewStyle(~borderTopColor=theme.colors.gray4, ())])
+        },
+        (),
+      )}>
+      <Tabs.Screen
+        name="StatsStack"
+        component=StatsStackScreen.make
+        options={_props =>
+          Tabs.options(
+            ~title="Summary",
+            ~tabBarIcon=tabBarIconProps =>
+              <SVGTimeline
+                width={tabBarIconProps.size->Style.dp}
+                height={tabBarIconProps.size->Style.dp}
+                fill=tabBarIconProps.color
+              />,
+            (),
+          )}
+      />
+      <Tabs.Screen
+        name="GoalsStack"
+        component=GoalsStackScreen.make
+        options={_props =>
+          Tabs.options(
+            ~title="Goals",
+            ~tabBarIcon=tabBarIconProps =>
+              <SVGPennant
+                width={tabBarIconProps.size->Style.dp}
+                height={tabBarIconProps.size->Style.dp}
+                fill=tabBarIconProps.color
+              />,
+            (),
+          )}
+      />
+      <Tabs.Screen
+        name="SettingsStack"
+        component=SettingsStackScreen.make
+        options={_props =>
+          Tabs.options(
+            ~title=SettingsScreen.title,
+            ~tabBarIcon=tabBarIconProps =>
+              <SVGSettings
+                width={tabBarIconProps.size->Style.dp}
+                height={tabBarIconProps.size->Style.dp}
+                fill=tabBarIconProps.color
+              />,
+            (),
+          )}
+      />
+    </Tabs.Navigator>
   }
 }
 
 module RootNavigator = {
   @react.component
-  let make = () =>
+  let make = () => {
+    React.useEffect1(() => {
+      TransparentStatusAndNavigationBar.init()
+      None
+    }, [])
+    let mode = Theme.useTheme(AppSettings.useTheme()).mode
+    React.useEffect1(() => {
+      TransparentStatusAndNavigationBar.setBarsStyle(Theme.barsStyle(mode, #darkContent))
+      None
+    }, [mode])
     <RootStack.Navigator
       initialRouteName="Tabs"
       screenOptions={_ => RootStack.options(~stackPresentation=#formSheet, ~headerShown=false, ())}>
@@ -173,4 +178,5 @@ module RootNavigator = {
       <RootStack.Screen name="GoalEditModalScreen" component=GoalEditModalScreen.make />
       <RootStack.Screen name="HelpModalScreen" component=HelpModalScreen.make />
     </RootStack.Navigator>
+  }
 }

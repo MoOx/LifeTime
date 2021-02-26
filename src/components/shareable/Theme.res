@@ -56,7 +56,15 @@ external versionIos: string = "Version"
 @module("react-native") @scope("Platform")
 external versionAndroid: int = "Version"
 
-let statusBarStyle = (theme, barStyle) =>
+let barsStyle = (theme, barStyle) =>
+  switch (theme, barStyle) {
+  | (#light, #lightContent) => #\"light-content"
+  | (#light, #darkContent) => #\"dark-content"
+  | (#dark, #darkContent) => #\"light-content"
+  | (#dark, #lightContent) => #\"dark-content"
+  }
+
+let barStyle = (theme, barStyle) =>
   switch (theme, barStyle) {
   | (#light, #lightContent) => #lightContent
   | (#light, #darkContent) => #darkContent
@@ -64,18 +72,7 @@ let statusBarStyle = (theme, barStyle) =>
   | (#dark, #lightContent) => #darkContent
   }
 
-let statusBarColor = (theme, barStyle) =>
-  switch (theme, barStyle) {
-  | (#light, #lightContent) => Colors.dark.backgroundDark
-  | (#light, #darkContent) => Colors.light.backgroundDark
-  | (#dark, #darkContent) => Colors.dark.backgroundDark
-  | (#dark, #lightContent) => Colors.dark.backgroundDark
-  }
-
 let isFormSheetSupported = Platform.os === Platform.ios && versionIos > "13"
-
-let formSheetStatusBarStyle = (theme, barStyle) =>
-  isFormSheetSupported ? #lightContent : statusBarStyle(theme, barStyle)
 
 let formSheetSafeArea = isFormSheetSupported ? false : true
 
@@ -276,10 +273,10 @@ let themes = {
 }
 
 let useTheme = (acceptedMode): themeData<'a> => {
-  let autoMode = Appearance.useColorScheme()->Js.Null.toOption
+  let colorScheme = Appearance.useColorScheme()->Js.Null.toOption
   let mode = switch acceptedMode {
   | #auto =>
-    switch autoMode {
+    switch colorScheme {
     | Some(#dark) => #dark
     | _ => #light
     }
