@@ -105,6 +105,7 @@ external localNotificationScheduleOptions: (
   ~actions: /* Android only properties */
   string=?,
   ~autoCancel: bool=?,
+  ~bigLargeIcon: string=?,
   ~bigPictureUrl: string=?,
   ~bigText: string=?,
   ~channelId: string=?,

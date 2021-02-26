@@ -1,6 +1,15 @@
 open Belt
 open ReactNative
 
+let reccurentRemindersCatchPhrase_default = "Check at your goals progress"
+let reccurentRemindersCatchPhrases = [
+  reccurentRemindersCatchPhrase_default,
+  "Take a look at your progress",
+  "How are your goals rings today?",
+  "What about taking a look to your goals and summary?",
+  "It's time to check your rings",
+]
+
 @react.component
 let make = (~notificationsRecurrentRemindersOn, ~notificationsRecurrentReminders) => {
   // clean badges when app is active
@@ -30,8 +39,16 @@ let make = (~notificationsRecurrentRemindersOn, ~notificationsRecurrentReminders
             ~channelId="reminders",
             ~id=Notifications.Ids.reminderDailyCheck,
             ~userInfo={"id": Notifications.Ids.reminderDailyCheck},
+            ~smallIcon="ic_notification",
+            ~largeIcon="ic_launcher",
+            // ~bigLargeIcon="ic_launcher",
             ~date=Notifications.appropriateTimeForNextNotification(Js.Date.now(), notifTime),
-            ~message="Check at your goals progress",
+            // ~date=(Js.Date.now() +. 1000. *. 20.)->Js.Date.fromFloat,
+            ~title=Platform.os === Platform.android ? "Reminder" : "",
+            ~message=reccurentRemindersCatchPhrases
+            ->Array.shuffle
+            ->Array.get(0)
+            ->Option.getWithDefault(reccurentRemindersCatchPhrase_default),
             ~repeatType=#day,
             ~number=1,
             ~priority=#low,
