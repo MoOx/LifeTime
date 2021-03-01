@@ -230,7 +230,7 @@ let make = (~onGetStarted as _, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~o
                   settings.activitiesSkippedFlag,
                   settings.activitiesSkipped,
                 )
-                ->Calendars.makeMapCategoryDuration(settings.activities, startDate, endDate)
+                ->Calendars.makeMapCategoryDuration(settings.activities, currentStartDate, endDate)
               )
             <WeeklyGraph
               key={currentStartDate->Js.Date.toString}

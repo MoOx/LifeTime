@@ -289,6 +289,7 @@ let make = React.memo((
                     {mapCategoryDuration
                     ->Option.map(mapCategoryDuration =>
                       mapCategoryDuration
+                      ->Array.reverse
                       ->Array.map(((catId, _categoryId)) =>
                         mapPerCategories
                         ->Map.String.toArray
