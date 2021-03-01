@@ -4,6 +4,12 @@ open ReactMultiversal
 
 let title = "Settings"
 
+type androidEventNativeEvent = {timestamp: option<float>}
+type androidEvent = {
+  @as("type") type_: [#set | #dismissed | #neutralButtonPressed],
+  nativeEvent: androidEventNativeEvent,
+}
+
 @react.component
 let make = () => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
@@ -24,6 +30,38 @@ let make = () => {
   )
   let (showDatetimepicker, showDatetimepicker_set) = React.useState(() => false)
   let allowReminderEditing = settings.notificationsRecurrentRemindersOn && notificationsGranted
+
+  let handleNewReminderValidation = React.useCallback3(date => {
+    let minutes = date->Js.Date.getMinutes->Belt.Float.toInt
+    let hours = date->Js.Date.getHours->Belt.Float.toInt
+    let newReminder = [Some(minutes), Some(hours)]
+    if (
+      settings.notificationsRecurrentReminders
+      ->Array.keep(r => {
+        r[0]
+        ->Option.flatMap(v => v)
+        ->Option.map(v => v === minutes)
+        ->Option.getWithDefault(false) &&
+          r[1]->Option.flatMap(v => v)->Option.map(v => v === hours)->Option.getWithDefault(false)
+      })
+      ->Array.length > 0
+    ) {
+      Alert.alert(
+        ~title="Duplicate Reminder",
+        ~message="You already have a identical reminder. It's not necessary to have it twice.",
+        (),
+      )
+    } else {
+      setSettings(settings => {
+        ...settings,
+        lastUpdated: Js.Date.now(),
+        notificationsRecurrentReminders: settings.notificationsRecurrentReminders->Array.concat([
+          newReminder,
+        ]),
+      })
+      showDatetimepicker_set(_ => false)
+    }
+  }, (settings, setSettings, showDatetimepicker_set))
   <>
     <Spacer size=L />
     <ListSeparator />
@@ -117,18 +155,12 @@ let make = () => {
               },
             },
           ]
-          disabled={false}>
-          <ListItem>
+          disabled={!allowReminderEditing}>
+          <ListItem style={Style.viewStyle(~opacity=!allowReminderEditing ? 0.1 : 1., ())}>
             <ListItemText>
-              {
-                let time =
-                  datetime
-                  ->DateFns.format(ReactNativeLocalize.uses24HourClock() ? "HH:mm" : "h:mm aa")
-                  ->React.string
-                !allowReminderEditing
-                  ? <Text style={theme.styles["textLight2"]}> {time} </Text>
-                  : time
-              }
+              {datetime
+              ->DateFns.format(ReactNativeLocalize.uses24HourClock() ? "HH:mm" : "h:mm aa")
+              ->React.string}
             </ListItemText>
           </ListItem>
         </SwipeableRow>
@@ -145,62 +177,40 @@ let make = () => {
             value={newReminderDate}
             mode={#time}
             is24Hour={ReactNativeLocalize.uses24HourClock()}
-            display=#inline
+            display={Platform.os === Platform.ios ? #inline : #clock}
             minuteInterval=#_5
-            onChange={(_, date) => {
-              newReminderDate_set(_ => date)
-            }}
-            textColor=theme.namedColors.textOnMain
-          />
-          <ListItemContainer
-            left={<TouchableOpacity
-              onPress={_ => {
-                showDatetimepicker_set(_ => false)
-              }}>
-              <Text style={Style.array([Theme.text["body"], theme.styles["textBlue"]])}>
-                {"Cancel"->React.string}
-              </Text>
-            </TouchableOpacity>}
-            leftSpace=M
-            right={<TouchableOpacity
-              onPress={_ => {
-                let minutes = newReminderDate->Js.Date.getMinutes->Belt.Float.toInt
-                let hours = newReminderDate->Js.Date.getHours->Belt.Float.toInt
-                let newReminder = [Some(minutes), Some(hours)]
-                if (
-                  settings.notificationsRecurrentReminders
-                  ->Array.keep(r => {
-                    r[0]
-                    ->Option.flatMap(v => v)
-                    ->Option.map(v => v === minutes)
-                    ->Option.getWithDefault(false) &&
-                      r[1]
-                      ->Option.flatMap(v => v)
-                      ->Option.map(v => v === hours)
-                      ->Option.getWithDefault(false)
-                  })
-                  ->Array.length > 0
-                ) {
-                  Alert.alert(
-                    ~title="Duplicate Reminder",
-                    ~message="You already have a identical reminder. It's not necessary to have it twice.",
-                    (),
-                  )
-                } else {
-                  setSettings(settings => {
-                    ...settings,
-                    lastUpdated: Js.Date.now(),
-                    notificationsRecurrentReminders: settings.notificationsRecurrentReminders->Array.concat([
-                      newReminder,
-                    ]),
-                  })
-                  showDatetimepicker_set(_ => false)
+            onChange={(event, date) => {
+              if Platform.os === Platform.ios {
+                newReminderDate_set(_ => date)
+              } else {
+                let e: androidEvent = event->Obj.magic
+                switch e.type_ {
+                | #neutralButtonPressed => showDatetimepicker_set(_ => false) // unused
+                | #dismissed => showDatetimepicker_set(_ => false)
+                | #set => handleNewReminderValidation(date)
                 }
-              }}>
-              <ListItemText color=theme.colors.blue> {"Add"->React.string} </ListItemText>
-            </TouchableOpacity>}
-            rightSpace=M
+              }
+            }}
+            textColor=theme.namedColors.text
           />
+          {Platform.os === Platform.ios
+            ? <ListItemContainer
+                left={<TouchableOpacity
+                  onPress={_ => {
+                    showDatetimepicker_set(_ => false)
+                  }}>
+                  <Text style={Style.array([Theme.text["body"], theme.styles["textBlue"]])}>
+                    {"Cancel"->React.string}
+                  </Text>
+                </TouchableOpacity>}
+                leftSpace=M
+                right={<TouchableOpacity
+                  onPress={_ => handleNewReminderValidation(newReminderDate)}>
+                  <ListItemText color=theme.colors.blue> {"Add"->React.string} </ListItemText>
+                </TouchableOpacity>}
+                rightSpace=M
+              />
+            : React.null}
         </View>
       : React.null}
     {allowReminderEditing && !showDatetimepicker

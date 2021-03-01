@@ -103,7 +103,7 @@ let make = (
           <Text
             numberOfLines={1}
             style={Style.array([
-              Theme.text["caption2"],
+              Theme.text["subhead"],
               Theme.text["weight500"],
               theme.styles["textOnMain"],
             ])}>
