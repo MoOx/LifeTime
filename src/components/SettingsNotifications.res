@@ -150,6 +150,7 @@ let make = () => {
             onChange={(_, date) => {
               newReminderDate_set(_ => date)
             }}
+            textColor=theme.namedColors.textOnMain
           />
           <ListItemContainer
             left={<TouchableOpacity
