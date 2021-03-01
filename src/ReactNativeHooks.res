@@ -12,3 +12,31 @@ let useAppState = () => {
   }, [appState_set])
   appState
 }
+
+@bs.val external process: 'a = "process"
+
+let useScreenReaderEnabled = () => {
+  let (isScreenReaderEnabled, setScreenReaderState) = React.useState(() => false)
+
+  React.useEffect1(() => {
+    if process["env"]["NODE_ENV"] === "test" {
+      None
+    } else {
+      let change = isScreenReaderEnabled => {
+        setScreenReaderState(_ => isScreenReaderEnabled)
+      }
+      AccessibilityInfo.isScreenReaderEnabled()->FutureJs.fromPromise(e => {
+        Js.Console.warn(e)
+        e
+      })->Future.tapOk(v => change(v))->ignore
+      AccessibilityInfo.addEventListener(#screenReaderChanged(change))
+      Some(
+        () => {
+          AccessibilityInfo.removeEventListener(#screenReaderChanged(change))
+        },
+      )
+    }
+  }, [setScreenReaderState])
+
+  isScreenReaderEnabled
+}

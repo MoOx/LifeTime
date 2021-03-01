@@ -79,19 +79,40 @@ let make = () => {
     ->Array.mapWithIndex((index, notifTime) => {
       let datetime = Notifications.appropriateTimeForNextNotification(Js.Date.now(), notifTime)
       <React.Fragment key={datetime->Js.Date.toISOString}>
-        <ListItem>
-          <ListItemText>
+        <SwipeableRow
+          id={datetime->Js.Date.toISOString}
+          buttons=[
             {
-              let time =
-                datetime
-                ->DateFns.format(ReactNativeLocalize.uses24HourClock() ? "HH:mm" : "h:mm aa")
-                ->React.string
-              !allowReminderEditing
-                ? <Text style={theme.styles["textLight2"]}> {time} </Text>
-                : time
-            }
-          </ListItemText>
-        </ListItem>
+              icon: None,
+              label: "Delete",
+              color: theme.colors.red,
+              onPress: () => {
+                setSettings(settings => {
+                  ...settings,
+                  lastUpdated: Js.Date.now(),
+                  notificationsRecurrentReminders: settings.notificationsRecurrentReminders->Array.keep(
+                    r => r !== notifTime,
+                  ),
+                })
+                ()
+              },
+            },
+          ]
+          disabled={false}>
+          <ListItem>
+            <ListItemText>
+              {
+                let time =
+                  datetime
+                  ->DateFns.format(ReactNativeLocalize.uses24HourClock() ? "HH:mm" : "h:mm aa")
+                  ->React.string
+                !allowReminderEditing
+                  ? <Text style={theme.styles["textLight2"]}> {time} </Text>
+                  : time
+              }
+            </ListItemText>
+          </ListItem>
+        </SwipeableRow>
         {allowReminderEditing || index != settings.notificationsRecurrentReminders->Array.length - 1
           ? <ListSeparator spaceStart={Spacer.size(S)} />
           : React.null}

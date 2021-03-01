@@ -11,6 +11,7 @@ module NativeViewGestureHandler = {
 
 module ScrollView = {
   open ReactNative
+
   // below is a copy of ScrollView
   // https://raw.githubusercontent.com/reason-react-native/reason-react-native/master/src/components/ScrollView.re
   // only the bs.module has been changed
@@ -145,4 +146,107 @@ module Animated = {
     include ScrollView
     let make = ReactNative.Animated.createAnimatedComponent(make)
   }
+}
+
+module HandlerStateChangeEvent = {
+  open ReactNative
+
+  type extraChildStyle = {opacity: option<float>}
+  type extraUnderlayStyle = {backgroundColor: option<Color.t>}
+  type state = {
+    extraChildStyle: Js.nullable<extraChildStyle>,
+    extraUnderlayStyle: Js.nullable<extraUnderlayStyle>,
+  }
+  type payload = {
+    handlerTag: float,
+    numberOfPointers: float,
+    state: state,
+    oldState: state,
+  }
+
+  include Event.SyntheticEvent({
+    type _payload = payload
+  })
+}
+
+module SwipeableMethods = {
+  module Make = (
+    T: {
+      type t
+    },
+  ) => {
+    @send external close: T.t => unit = "close"
+    @send external openLeft: T.t => unit = "openLeft"
+    @send external openRight: T.t => unit = "openRight"
+  }
+}
+
+module SwipeableElement = {
+  open ReactNative
+  type element
+  type ref = Ref.t<element>
+
+  include SwipeableMethods.Make({
+    type t = element
+  })
+}
+
+module Swipeable = {
+  open ReactNative
+
+  include SwipeableElement
+
+  @react.component @module("react-native-gesture-handler")
+  external make: (
+    ~ref: ref=?,
+    // BaseGestureHandle props
+    ~enabled: bool=?,
+    ~hitSlop: View.edgeInsets=?,
+    ~id: string=?,
+    ~minPointers: float=?,
+    ~onActivated: HandlerStateChangeEvent.t => unit=?,
+    ~onBegan: HandlerStateChangeEvent.t => unit=?,
+    ~onCancelled: HandlerStateChangeEvent.t => unit=?,
+    ~onEnded: HandlerStateChangeEvent.t => unit=?,
+    ~onFailed: HandlerStateChangeEvent.t => unit=?,
+    ~shouldCancelWhenOutside: bool=?,
+    ~simultaneousHandlers: array<React.ref<'b>>=?,
+    ~waitFor: array<React.ref<'a>>=?,
+    // PanGestureHandle props
+    ~activeOffsetX: array<float>=?,
+    ~activeOffsetY: array<float>=?,
+    ~avgTouches: bool=?,
+    ~failOffsetX: array<float>=?,
+    ~failOffsetY: array<float>=?,
+    ~maxPointers: float=?,
+    ~minDist: float=?,
+    ~minPointers: float=?,
+    ~minVelocity: float=?,
+    ~minVelocityX: float=?,
+    ~minVelocityY: float=?,
+    // Swipeable props
+    ~animationOptions: Animated.Value.Spring.config=?,
+    ~childrenContainerStyle: Style.t=?,
+    ~containerStyle: Style.t=?,
+    ~enableTrackpadTwoFingerGesture: bool=?,
+    ~friction: float=?,
+    ~leftThreshold: float=?,
+    ~onSwipeStart: unit => unit=?, // patched
+    ~onSwipeableClose: unit => unit=?,
+    ~onSwipeableLeftOpen: unit => unit=?,
+    ~onSwipeableLeftWillOpen: unit => unit=?,
+    ~onSwipeableOpen: unit => unit=?,
+    ~onSwipeableRightOpen: unit => unit=?,
+    ~onSwipeableRightWillOpen: unit => unit=?,
+    ~onSwipeableWillClose: unit => unit=?,
+    ~onSwipeableWillOpen: unit => unit=?,
+    ~overshootFriction: float=?,
+    ~overshootLeft: bool=?,
+    ~overshootRight: bool=?,
+    ~renderLeftActions: (@uncurry Animated.Value.t, Animated.Value.t) => React.element=?,
+    ~renderRightActions: (@uncurry Animated.Value.t, Animated.Value.t) => React.element=?,
+    ~rightThreshold: float=?,
+    ~useNativeAnimations: bool=?,
+    ~children: React.element=?,
+  ) => React.element = "Swipeable"
 }
