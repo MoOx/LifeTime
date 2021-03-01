@@ -72,7 +72,26 @@ let make = () => {
       a[1]
       ->Option.flatMap(v => v)
       ->Option.map(v =>
-        b[1]->Option.flatMap(v2 => v2)->Option.map(v2 => v2 > v ? -1 : 1)->Option.getWithDefault(0)
+        b[1]
+        ->Option.flatMap(v2 => v2)
+        ->Option.map(v2 => {
+          if v2 > v {
+            -1
+          } else if v2 < v {
+            1
+          } else {
+            a[0]
+            ->Option.flatMap(v => v)
+            ->Option.map(v =>
+              b[0]
+              ->Option.flatMap(v2 => v2)
+              ->Option.map(v2 => v2 > v ? -1 : 1)
+              ->Option.getWithDefault(0)
+            )
+            ->Option.getWithDefault(0)
+          }
+        })
+        ->Option.getWithDefault(0)
       )
       ->Option.getWithDefault(0)
     })
