@@ -58,10 +58,12 @@ platform :ios do
     build_app(
       workspace: workspace,
       scheme: appName,
-      export_xcargs: "-allowProvisioningUpdates"
+      export_xcargs: "-allowProvisioningUpdates",
     )
     notification(subtitle: appName+" for iOS", message: "Build complete")
-    upload_to_testflight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: false,
+    )
     notification(subtitle: appName+" for iOS", message: "Upload complete")
   end
 end
