@@ -1,5 +1,7 @@
 open ReactNative
 
+let size = 28.
+
 type t = [
   | #bookmark
   | #broom
@@ -33,7 +35,7 @@ type t = [
 ]
 
 @react.component
-let make = (~name: t, ~width=28.->Style.dp, ~height=28.->Style.dp, ~fill="white") =>
+let make = (~name: t, ~width=size->Style.dp, ~height=size->Style.dp, ~fill="white") =>
   <View
     style={
       open Style

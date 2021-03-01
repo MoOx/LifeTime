@@ -60,43 +60,48 @@ let make = () => {
     ->Option.map(calendars =>
       calendars
       ->Array.mapWithIndex((index, calendar) =>
-        <ListItem
-          key=calendar.id
-          separator={index !== calendars->Array.length - 1}
-          right={settings.calendarsSkipped->Array.some(c => c.id == calendar.id)
-            ? {
-                <SVGCircle width={26.->Style.dp} height={26.->Style.dp} fill=calendar.color />
-              }
-            : {
-                <SVGCheckmarkcircle
-                  width={26.->Style.dp} height={26.->Style.dp} fill=calendar.color
-                />
-              }}
-          onPress={_ =>
-            setSettings(settings => {
-              ...settings,
-              lastUpdated: Js.Date.now(),
-              calendarsSkipped: if settings.calendarsSkipped->Array.some(c => c.id == calendar.id) {
-                settings.calendarsSkipped->Array.keep(c => c.id != calendar.id)
-              } else {
-                settings.calendarsSkipped->Array.concat([
-                  {
-                    open AppSettings
+        <React.Fragment key=calendar.id>
+          <ListItem
+            right={settings.calendarsSkipped->Array.some(c => c.id == calendar.id)
+              ? {
+                  <SVGCircle width={26.->Style.dp} height={26.->Style.dp} fill=calendar.color />
+                }
+              : {
+                  <SVGCheckmarkcircle
+                    width={26.->Style.dp} height={26.->Style.dp} fill=calendar.color
+                  />
+                }}
+            onPress={_ =>
+              setSettings(settings => {
+                ...settings,
+                lastUpdated: Js.Date.now(),
+                calendarsSkipped: if (
+                  settings.calendarsSkipped->Array.some(c => c.id == calendar.id)
+                ) {
+                  settings.calendarsSkipped->Array.keep(c => c.id != calendar.id)
+                } else {
+                  settings.calendarsSkipped->Array.concat([
                     {
-                      id: calendar.id,
-                      title: calendar.title,
-                      source: calendar.source,
-                      color: calendar.color,
-                    }
-                  },
-                ])
-              },
-            })}>
-          <ListItemText> {calendar.title->React.string} </ListItemText>
-          <Text style={Style.array([Theme.text["caption1"], theme.styles["textGray2"]])}>
-            {calendar.source->React.string}
-          </Text>
-        </ListItem>
+                      open AppSettings
+                      {
+                        id: calendar.id,
+                        title: calendar.title,
+                        source: calendar.source,
+                        color: calendar.color,
+                      }
+                    },
+                  ])
+                },
+              })}>
+            <ListItemText> {calendar.title->React.string} </ListItemText>
+            <Text style={Style.array([Theme.text["caption1"], theme.styles["textGray2"]])}>
+              {calendar.source->React.string}
+            </Text>
+          </ListItem>
+          {index !== calendars->Array.length - 1
+            ? <ListSeparator spaceStart={Spacer.size(S)} />
+            : React.null}
+        </React.Fragment>
       )
       ->React.array
     )

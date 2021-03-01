@@ -15,32 +15,35 @@ let make = (~activityTitle, ~onSkipActivity) => {
     {ActivityCategories.defaults
     ->List.mapWithIndex((index, (id, name, colorName, iconName)) => {
       let color = colorName->ActivityCategories.getColor(theme.mode)
-      <ListItem
-        key=id
-        separator={index !== ActivityCategories.defaults->List.length - 1}
-        onPress={_ => {
-          let createdAt = Js.Date.now()
-          setSettings(settings => {
-            ...settings,
-            lastUpdated: Js.Date.now(),
-            activities: settings.activities
-            ->Array.keep(acti => !Activities.isSimilar(acti.title, activityTitle))
-            ->Array.concat([
-              {
-                id: Utils.makeId(activityTitle, createdAt),
-                title: activityTitle,
-                createdAt: createdAt,
-                categoryId: id,
-              },
-            ]),
-          })
-        }}
-        left={<NamedIcon name=iconName fill=color />}
-        right={id != activityTitle->Calendars.categoryIdFromActivityTitle(settings.activities)
-          ? <SVGCircle width={26.->Style.dp} height={26.->Style.dp} fill=color />
-          : <SVGCheckmarkcircle width={26.->Style.dp} height={26.->Style.dp} fill=color />}>
-        <ListItemText> {name->React.string} </ListItemText>
-      </ListItem>
+      <React.Fragment key=id>
+        <ListItem
+          onPress={_ => {
+            let createdAt = Js.Date.now()
+            setSettings(settings => {
+              ...settings,
+              lastUpdated: Js.Date.now(),
+              activities: settings.activities
+              ->Array.keep(acti => !Activities.isSimilar(acti.title, activityTitle))
+              ->Array.concat([
+                {
+                  id: Utils.makeId(activityTitle, createdAt),
+                  title: activityTitle,
+                  createdAt: createdAt,
+                  categoryId: id,
+                },
+              ]),
+            })
+          }}
+          left={<NamedIcon name=iconName fill=color />}
+          right={id != activityTitle->Calendars.categoryIdFromActivityTitle(settings.activities)
+            ? <SVGCircle width={26.->Style.dp} height={26.->Style.dp} fill=color />
+            : <SVGCheckmarkcircle width={26.->Style.dp} height={26.->Style.dp} fill=color />}>
+          <ListItemText> {name->React.string} </ListItemText>
+        </ListItem>
+        {index !== ActivityCategories.defaults->List.length - 1
+          ? <ListSeparator spaceStart={Spacer.size(S) *. 2. +. NamedIcon.size} />
+          : React.null}
+      </React.Fragment>
     })
     ->List.toArray
     ->React.array}

@@ -2,6 +2,8 @@ open ReactNative
 open ReactMultiversal
 
 let title = "Settings"
+let iconSize = 28.
+let spaceStart = Spacer.size(S) *. 2. +. iconSize
 
 @react.component
 let make = (~navigation) => {
@@ -26,7 +28,9 @@ let make = (~navigation) => {
     <ListItem
       onPress={_ =>
         navigation->Navigators.RootStack.Navigation.navigate("SettingsNotificationsScreen")}
-      left={<SVGAppBadge width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
+      left={<SVGAppBadge
+        width={iconSize->Style.dp} height={iconSize->Style.dp} fill=theme.colors.blue
+      />}
       right={<ListItemChevron />}>
       <ListItemText> {SettingsNotificationsScreen.title->React.string} </ListItemText>
     </ListItem>
@@ -35,10 +39,11 @@ let make = (~navigation) => {
     <ListHeader text="Theme" />
     <ListSeparator />
     <ListItem
-      separator=true
       onPress={_ =>
         setSettings(settings => {...settings, lastUpdated: Js.Date.now(), theme: "light"})}
-      left={<SVGSunoutline width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
+      left={<SVGSunoutline
+        width={iconSize->Style.dp} height={iconSize->Style.dp} fill=theme.colors.blue
+      />}
       right={switch themeKey {
       | #light =>
         <SVGCheckmark width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue />
@@ -46,11 +51,13 @@ let make = (~navigation) => {
       }}>
       <ListItemText> {"Light"->React.string} </ListItemText>
     </ListItem>
+    <ListSeparator spaceStart />
     <ListItem
-      separator=true
       onPress={_ =>
         setSettings(settings => {...settings, lastUpdated: Js.Date.now(), theme: "dark"})}
-      left={<SVGMoonsymbol width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.indigo />}
+      left={<SVGMoonsymbol
+        width={iconSize->Style.dp} height={iconSize->Style.dp} fill=theme.colors.indigo
+      />}
       right={switch themeKey {
       | #dark =>
         <SVGCheckmark width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue />
@@ -58,10 +65,13 @@ let make = (~navigation) => {
       }}>
       <ListItemText> {"Dark"->React.string} </ListItemText>
     </ListItem>
+    <ListSeparator spaceStart />
     <ListItem
       onPress={_ =>
         setSettings(settings => {...settings, lastUpdated: Js.Date.now(), theme: "auto"})}
-      left={<SVGMoonshine width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.purple />}
+      left={<SVGMoonshine
+        width={iconSize->Style.dp} height={iconSize->Style.dp} fill=theme.colors.purple
+      />}
       right={switch themeKey {
       | #auto =>
         <SVGCheckmark width={22.->Style.dp} height={22.->Style.dp} fill=theme.colors.blue />
@@ -77,29 +87,37 @@ let make = (~navigation) => {
     <ListHeader text="More" />
     <ListSeparator />
     <ListItem
-      separator=true
       onPress={_ => navigation->Navigators.RootStack.Navigation.navigate("HelpModalScreen")}
-      left={<SVGInfo width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
+      left={<SVGInfo
+        width={iconSize->Style.dp} height={iconSize->Style.dp} fill=theme.colors.blue
+      />}
       right={<ListItemChevron />}>
       <ListItemText> {"Help"->React.string} </ListItemText>
     </ListItem>
+    <ListSeparator spaceStart />
     <ListItem
-      separator=true
       onPress={_ => navigation->Navigators.RootStack.Navigation.navigate("WelcomeModalScreen")}
-      left={<SVGPlaycircle width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
+      left={<SVGPlaycircle
+        width={iconSize->Style.dp} height={iconSize->Style.dp} fill=theme.colors.blue
+      />}
       right={<ListItemChevron />}>
       <ListItemText> {"Welcome Screen"->React.string} </ListItemText>
     </ListItem>
+    <ListSeparator spaceStart />
     <ListItem
-      separator=true
       onPress={_ => Calendars.openCalendarApp()}
-      left={<SVGCalendar width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
+      left={<SVGCalendar
+        width={iconSize->Style.dp} height={iconSize->Style.dp} fill=theme.colors.blue
+      />}
       right={<ListItemChevron />}>
       <ListItemText> {"Calendar App"->React.string} </ListItemText>
     </ListItem>
+    <ListSeparator spaceStart />
     <ListItem
       onPress={_ => ReactNativePermissions.openSettings()->ignore}
-      left={<SVGSettings width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}
+      left={<SVGSettings
+        width={iconSize->Style.dp} height={iconSize->Style.dp} fill=theme.colors.blue
+      />}
       right={<ListItemChevron />}>
       <ListItemText> {"App System Settings"->React.string} </ListItemText>
     </ListItem>
@@ -129,12 +147,12 @@ let make = (~navigation) => {
                   Alert.button(~text="Inject", ~onPress=() => Demo.injectFreshData(), ()),
                 ],
                 (),
-              )}
-            separator={true}>
+              )}>
             <ListItemText color={theme.colors.blue}>
               {"Inject Demo Data"->React.string}
             </ListItemText>
           </ListItem>
+          <ListSeparator spaceStart={Spacer.size(S)} />
           <ListItem
             onPress={_ =>
               Alert.alert(

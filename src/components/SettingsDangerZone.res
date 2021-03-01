@@ -46,7 +46,6 @@ let make = () => {
     <Spacer />
     <ListSeparator />
     <ListItem
-      separator=true
       onPress={_ => {
         Clipboard.setString(
           settings->Js.Json.stringifyAny->Option.getWithDefault("LifeTime export: error"),
@@ -58,9 +57,12 @@ let make = () => {
           (),
         )
       }}
-      left={<SVGExport width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}>
+      left={<SVGExport
+        width={NamedIcon.size->Style.dp} height={NamedIcon.size->Style.dp} fill=theme.colors.blue
+      />}>
       <ListItemText color={theme.colors.blue}> {"Export Backup"->React.string} </ListItemText>
     </ListItem>
+    <ListSeparator spaceStart={Spacer.size(S) *. 2. +. NamedIcon.size} />
     <ListItem
       onPress={_ =>
         Alert.alert(
@@ -72,7 +74,9 @@ let make = () => {
           ],
           (),
         )}
-      left={<SVGImport width={28.->Style.dp} height={28.->Style.dp} fill=theme.colors.blue />}>
+      left={<SVGImport
+        width={NamedIcon.size->Style.dp} height={NamedIcon.size->Style.dp} fill=theme.colors.blue
+      />}>
       <ListItemText color={theme.colors.blue}> {"Import Backup"->React.string} </ListItemText>
     </ListItem>
     <ListSeparator />

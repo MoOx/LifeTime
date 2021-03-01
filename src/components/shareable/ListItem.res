@@ -3,7 +3,7 @@ open ReactNative
 open ReactMultiversal
 
 @react.component
-let make = (~children, ~disabled=?, ~left=?, ~onPress=?, ~right=?, ~separator=false, ~style=?) => {
+let make = (~children, ~disabled=?, ~left=?, ~onPress=?, ~right=?, ~style=?) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
   let child =
     <ListItemContainer
@@ -13,8 +13,7 @@ let make = (~children, ~disabled=?, ~left=?, ~onPress=?, ~right=?, ~separator=fa
       })}
       right=?{right->Option.map(right => {
         <Row.Center> <Spacer size=S /> {right} </Row.Center>
-      })}
-      separator>
+      })}>
       {children}
     </ListItemContainer>
 

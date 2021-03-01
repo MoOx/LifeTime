@@ -43,7 +43,6 @@ let make = () => {
     <Spacer size=L />
     <ListSeparator />
     <ListItem
-      separator=true
       right={<Switch
         disabled={!notificationsGranted}
         value=settings.notificationsRecurrentRemindersOn
@@ -67,6 +66,7 @@ let make = () => {
         }
       </ListItemText>
     </ListItem>
+    <ListSeparator spaceStart={Spacer.size(S)} />
     {settings.notificationsRecurrentReminders
     ->SortArray.stableSortBy((a, b) => {
       a[1]
@@ -78,38 +78,39 @@ let make = () => {
     })
     ->Array.mapWithIndex((index, notifTime) => {
       let datetime = Notifications.appropriateTimeForNextNotification(Js.Date.now(), notifTime)
-      <ListItem
-        separator={allowReminderEditing
-          ? true
-          : index != settings.notificationsRecurrentReminders->Array.length - 1}
-        key={datetime->Js.Date.toISOString}>
-        <ListItemText>
-          {
-            let time =
-              datetime
-              ->DateFns.format(ReactNativeLocalize.uses24HourClock() ? "HH:mm" : "h:mm aa")
-              ->React.string
-            !allowReminderEditing ? <Text style={theme.styles["textLight2"]}> {time} </Text> : time
-          }
-        </ListItemText>
-      </ListItem>
+      <React.Fragment key={datetime->Js.Date.toISOString}>
+        <ListItem>
+          <ListItemText>
+            {
+              let time =
+                datetime
+                ->DateFns.format(ReactNativeLocalize.uses24HourClock() ? "HH:mm" : "h:mm aa")
+                ->React.string
+              !allowReminderEditing
+                ? <Text style={theme.styles["textLight2"]}> {time} </Text>
+                : time
+            }
+          </ListItemText>
+        </ListItem>
+        {allowReminderEditing || index != settings.notificationsRecurrentReminders->Array.length - 1
+          ? <ListSeparator spaceStart={Spacer.size(S)} />
+          : React.null}
+      </React.Fragment>
     })
     ->React.array}
     {allowReminderEditing && showDatetimepicker
-      ? <>
-          <View style={theme.styles["background"]}>
-            <ReactNativeDateTimePicker
-              testID="dateTimePicker"
-              value={newReminderDate}
-              mode={#time}
-              is24Hour={ReactNativeLocalize.uses24HourClock()}
-              display=#inline
-              minuteInterval=#_15
-              onChange={(_, date) => {
-                newReminderDate_set(_ => date)
-              }}
-            />
-          </View>
+      ? <View style={theme.styles["background"]}>
+          <ReactNativeDateTimePicker
+            testID="dateTimePicker"
+            value={newReminderDate}
+            mode={#time}
+            is24Hour={ReactNativeLocalize.uses24HourClock()}
+            display=#inline
+            minuteInterval=#_5
+            onChange={(_, date) => {
+              newReminderDate_set(_ => date)
+            }}
+          />
           <ListItemContainer
             left={<TouchableOpacity
               onPress={_ => {
@@ -159,7 +160,7 @@ let make = () => {
             </TouchableOpacity>}
             rightSpace=M
           />
-        </>
+        </View>
       : React.null}
     {allowReminderEditing && !showDatetimepicker
       ? <ListItem

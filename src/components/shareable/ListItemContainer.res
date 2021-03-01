@@ -8,7 +8,6 @@ let make = (
   ~leftSpace: Spacer.size=Spacer.S,
   ~right=React.null,
   ~rightSpace: Spacer.size=Spacer.S,
-  ~separator=false,
   ~style=?,
 ) => {
   // let theme = Theme.useTheme(AppSettings.useTheme())
@@ -35,7 +34,6 @@ let make = (
           <Spacer size=rightSpace />
         </View>
       </SpacedView>
-      {separator ? <ListSeparator /> : React.null}
     </View>
   </View>
 }

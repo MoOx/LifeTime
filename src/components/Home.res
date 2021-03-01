@@ -12,7 +12,7 @@ external useCallback8: (
 ) => callback<'input, 'output> = "useCallback"
 
 @react.component
-let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
+let make = (~onGetStarted as _, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
   let (getEvents, fetchEvents, updatedAt, requestUpdate) = React.useContext(Calendars.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
@@ -249,10 +249,10 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
         </ScrollView>
       </SpacedView>
       <Spacer size=S />
+      <ListSeparator spaceStart={Spacer.size(S)} />
       <View style={Predefined.styles["row"]}>
         <Spacer size=S />
         <View style={Predefined.styles["flexGrow"]}>
-          <ListSeparator />
           <SpacedView horizontal=None vertical=S style={Predefined.styles["row"]}>
             <View style={Predefined.styles["flexGrow"]}>
               <Text

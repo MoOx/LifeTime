@@ -99,58 +99,60 @@ let make = (
                   ->Calendars.categoryIdFromActivityTitle(activities)
                   ->ActivityCategories.getFromId
                 let color = colorName->ActivityCategories.getColor(theme.mode)
-                <ListItem
-                  key=title
-                  onPress={_ => onActivityPress(title)}
-                  separator={index < mapTitleDuration->Array.length - 1 ||
-                    (shouldShowMore ||
-                    shouldShowLess)}
-                  left={<NamedIcon name=iconName fill=color />}
-                  right={<SVGChevronright
-                    width={14.->Style.dp}
-                    height={14.->Style.dp}
-                    fill=Predefined.Colors.Ios.light.gray4
-                  />}>
-                  <Text
-                    style={
-                      open Style
-                      array([Theme.text["callout"], theme.styles["text"]])
-                    }
-                    numberOfLines=1>
-                    {title->React.string}
-                  </Text>
-                  <Spacer size=XXS />
-                  <Row style={Predefined.styles["alignCenter"]}>
-                    <View
-                      style={
-                        open Style
-                        array([
-                          theme.styles["backgroundGray3"],
-                          viewStyle(
-                            // ~backgroundColor=color,
-
-                            ~width=(totalDurationInMin /. maxDurationInMin *. availableWidthForBar)
-                              ->dp,
-                            ~height=6.->dp,
-                            ~borderRadius=6.,
-                            ~overflow=#hidden,
-                            (),
-                          ),
-                        ])
-                      }
-                    />
-                    <Spacer size=XXS />
+                <React.Fragment key=title>
+                  <ListItem
+                    onPress={_ => onActivityPress(title)}
+                    left={<NamedIcon name=iconName fill=color />}
+                    right={<SVGChevronright
+                      width={14.->Style.dp}
+                      height={14.->Style.dp}
+                      fill=Predefined.Colors.Ios.light.gray4
+                    />}>
                     <Text
                       style={
                         open Style
-                        array([Theme.text["footnote"], theme.styles["textLight2"]])
+                        array([Theme.text["callout"], theme.styles["text"]])
                       }
-                      numberOfLines=1
-                      adjustsFontSizeToFit=true>
-                      {durationString->React.string}
+                      numberOfLines=1>
+                      {title->React.string}
                     </Text>
-                  </Row>
-                </ListItem>
+                    <Spacer size=XXS />
+                    <Row style={Predefined.styles["alignCenter"]}>
+                      <View
+                        style={
+                          open Style
+                          array([
+                            theme.styles["backgroundGray3"],
+                            viewStyle(
+                              // ~backgroundColor=color,
+
+                              ~width=(totalDurationInMin /.
+                              maxDurationInMin *.
+                              availableWidthForBar)->dp,
+                              ~height=6.->dp,
+                              ~borderRadius=6.,
+                              ~overflow=#hidden,
+                              (),
+                            ),
+                          ])
+                        }
+                      />
+                      <Spacer size=XXS />
+                      <Text
+                        style={
+                          open Style
+                          array([Theme.text["footnote"], theme.styles["textLight2"]])
+                        }
+                        numberOfLines=1
+                        adjustsFontSizeToFit=true>
+                        {durationString->React.string}
+                      </Text>
+                    </Row>
+                  </ListItem>
+                  {index < mapTitleDuration->Array.length - 1 || (shouldShowMore || shouldShowLess)
+                    ? <ListSeparator spaceStart={Spacer.size(S) *. 2. +. NamedIcon.size} />
+                    : React.null}
+                </React.Fragment>
               })
               ->React.array}
               {shouldShowMore || shouldShowLess
