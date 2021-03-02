@@ -3,7 +3,7 @@
 import * as React from 'react';
 import {PixelRatio, StyleSheet, View, Image, processColor} from 'react-native';
 import Svg, {Circle, Defs, RadialGradient, Stop} from 'react-native-svg';
-import MaskedView from '@react-native-community/masked-view';
+import MaskedView from '@react-native-masked-view/masked-view';
 import Animated, {
   abs,
   block,
