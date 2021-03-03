@@ -114,7 +114,7 @@ let make = (
     open BsTinycolor.TinyColor
     makeFromString(backgroundColor)->Option.flatMap(color =>
       makeFromRgb({r: 0, g: 0, b: 0})->Option.flatMap(black =>
-        mix(color, black, ~value=30)->Option.map(mixed => mixed->toRgbString)
+        mix(color, black, ~value=40)->Option.map(mixed => mixed->toRgbString)
       )
     )
   }->Option.getWithDefault(backgroundColor)
@@ -151,7 +151,7 @@ let make = (
         makeFromString(backgroundColorAlt)
         ->Option.flatMap(color =>
           makeFromString(startColor)->Option.flatMap(color2 =>
-            mix(color, color2, ~value=20)->Option.map(mixedColor => mixedColor->toRgbString)
+            mix(color, color2, ~value=15)->Option.map(mixedColor => mixedColor->toRgbString)
           )
         )
         ->Option.getWithDefault(backgroundColor)
@@ -336,7 +336,12 @@ let make = (
           array([Predefined.styles["rowSpaceBetween"], Predefined.styles["alignEnd"]])
         }>
         <ActivityRings
-          width=48. strokeWidth=10. spaceBetween=0. backgroundColor=backgroundColorAlt rings=[ring]
+          width=48.
+          strokeWidth=10.
+          spaceBetween=0.
+          backgroundColor=backgroundColorAlt
+          rings=[ring]
+          shadowSolidSize={2.}
         />
         <View
           style={

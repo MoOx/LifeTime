@@ -38,6 +38,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  absolute: {
+    position: 'absolute',
+  },
+  absoluteTopLeft: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
   overflowHidden: {
     overflow: 'hidden',
   },
@@ -138,25 +146,38 @@ const runTiming = (clock, value, config) => {
 
 /*::
 type ring = {|
-  startColor: string,
-  endColor: string,
   backgroundColor: string,
+  endColor: string,
   progress: number,
+  startColor: string,
 |};
 
 type RingProps ={|
+  animationDuration?: number,
+  ring: ring,
+  shadowSolidColor?: string,
+  shadowSolidSize?: number,
   size: number,
   strokeWidth: number,
-  ring: ring,
 |}
 */
-const Ring = ({strokeWidth, ring, size} /*: RingProps*/) => {
+const Ring = (
+  {
+    strokeWidth,
+    ring,
+    size,
+    shadowSolidSize = 1,
+    shadowSolidColor = 'rgba(0,0,0,0.25)',
+    animationDuration = 1500,
+  } /*: RingProps*/,
+) => {
   const clock = React.useRef(new Clock()).current;
   const progress = React.useRef(new Value(0));
+  // const progress = {current: new Value(0)}; // dev help :)
   useCode(() => {
     return runTiming(clock, progress.current, {
       toValue: ring.progress * _360deg,
-      duration: 1500,
+      duration: animationDuration,
       easing,
     });
   }, [ring.progress]);
@@ -165,15 +186,14 @@ const Ring = ({strokeWidth, ring, size} /*: RingProps*/) => {
   const rotateStartingPoint = max(0, sub(absoluteProgress, _360deg));
 
   const offset = PixelRatio.roundToNearestPixel(size / 2) - strokeWidth / 2;
-  const circleStyle = [
-    StyleSheet.absoluteFill,
-    {
-      width: strokeWidth,
-      height: strokeWidth,
-      borderRadius: strokeWidth / 2,
-      top: offset,
-    },
-  ];
+  const circleStyle = {
+    width: strokeWidth,
+    height: strokeWidth,
+    borderRadius: strokeWidth / 2,
+    position: 'absolute',
+    top: offset,
+    left: 0,
+  };
   const circleEndStyle = {
     transform: [
       {translateX: offset},
@@ -210,8 +230,14 @@ const Ring = ({strokeWidth, ring, size} /*: RingProps*/) => {
   const background = (
     <View style={[styles.flex, {backgroundColor: ring.backgroundColor}]} />
   );
+  const shadowWidth = size - strokeWidth * 2;
   return (
-    <Animated.View style={[styles.center, {transform: [{scaleX}, rotate90]}]}>
+    <Animated.View
+      style={[
+        styles.center,
+        {borderRadius: size / 2, transform: [{scaleX}, rotate90]},
+        styles.overflowHidden,
+      ]}>
       {/* circle */}
       <Animated.View
         style={{
@@ -261,42 +287,94 @@ const Ring = ({strokeWidth, ring, size} /*: RingProps*/) => {
           </Animated.View>
         </View>
       </Animated.View>
-      {/* circle start point */}
+      {/* circle start point, visible on start */}
       <Animated.View
         style={[
           circleStyle,
           {
             transform: [{rotate: rotateStartingPoint}],
-            opacity: lessThan(absoluteProgress, _360deg),
             backgroundColor: ring.startColor,
+            // make it invisible as soon as progress to one full circle
+            opacity: lessThan(absoluteProgress, _360deg),
           },
         ]}
       />
-      {/* circle end  point shadow */}
-      <Animated.View style={[circleStyle, circleEndStyle]}>
-        <Svg width={strokeWidth} height={strokeWidth}>
-          <Defs>
-            <RadialGradient
-              cx="50%"
-              cy="50%"
-              fx="50%"
-              fy="50%"
-              r="50%"
-              id="shadow">
-              <Stop offset="0%" stopOpacity={0} stopColor="#000" />
-              <Stop offset="50%" stopOpacity={0.15} stopColor="#000" />
-              <Stop offset="100%" stopOpacity={0} stopColor="#000" />
-            </RadialGradient>
-          </Defs>
-          <Circle
-            cx={strokeWidth / 2}
-            cy={strokeWidth / 2}
-            r={strokeWidth / 2}
-            fill="url(#shadow)"
+      {/* circle end point shadow that create the impression of depth */}
+      <Animated.View
+        style={[
+          circleStyle,
+          circleEndStyle,
+          {
+            // for the first circle, we don't need the same shadow
+            // so we start the shadow only when the stroke is going to overlap the start
+            opacity: interpolate(absoluteProgress, {
+              inputRange: [0, _360deg * 0.8, _360deg],
+              outputRange: [0.5, 0.5, 1],
+            }),
+          },
+        ]}>
+        <View
+          style={[
+            styles.overflowHidden,
+            styles.absolute,
+            {
+              top: strokeWidth / 2 - shadowWidth / 2,
+              left: strokeWidth / 2 - shadowWidth / 2,
+              width: shadowWidth,
+              height: shadowWidth / 2,
+            },
+          ]}>
+          <Svg
+            style={[StyleSheet.absoluteFill]}
+            width={shadowWidth}
+            height={shadowWidth}>
+            <Defs>
+              <RadialGradient
+                cx="50%"
+                cy="50%"
+                fx="50%"
+                fy="50%"
+                r="50%"
+                id="shadow">
+                <Stop offset="10%" stopOpacity={1} stopColor="#000" />
+                <Stop offset="20%" stopOpacity={0.3} stopColor="#000" />
+                <Stop offset="25%" stopOpacity={0.2} stopColor="#000" />
+                <Stop offset="100%" stopOpacity={0} stopColor="#000" />
+              </RadialGradient>
+            </Defs>
+            <Circle
+              cx={shadowWidth / 2}
+              cy={shadowWidth / 2}
+              r={shadowWidth / 2}
+              fill="url(#shadow)"
+            />
+          </Svg>
+        </View>
+        <View
+          style={[
+            styles.overflowHidden,
+            styles.absolute,
+            {
+              top: -shadowSolidSize / 2,
+              left: -shadowSolidSize / 2,
+              width: strokeWidth + shadowSolidSize,
+              height: strokeWidth / 2 + shadowSolidSize,
+            },
+          ]}>
+          <View
+            style={[
+              styles.absoluteTopLeft,
+              {
+                width: strokeWidth + shadowSolidSize,
+                height: strokeWidth + shadowSolidSize,
+                borderRadius: strokeWidth + shadowSolidSize,
+                backgroundColor: shadowSolidColor,
+              },
+            ]}
           />
-        </Svg>
+        </View>
       </Animated.View>
-      {/* circle end point*/}
+      {/* circle end point, follow the progress entirely */}
       <Animated.View
         style={[
           circleStyle,
@@ -315,12 +393,15 @@ const Ring = ({strokeWidth, ring, size} /*: RingProps*/) => {
 
 /*::
 type ActivityRingsProps = {|
-  rings: Array<ring>,
-  width: number,
-  strokeWidth: number,
+  animationDuration?: number,
   backgroundColor: string,
-  spaceBetween: number,
   children?: React.Node,
+  rings: Array<ring>,
+  shadowSolidColor?: string,
+  shadowSolidSize?: number,
+  spaceBetween: number,
+  strokeWidth: number,
+  width: number,
 |};
 */
 
@@ -328,12 +409,15 @@ const easing = Easing.bezier(0.32, 0.12, -0.1, 1);
 
 export default (
   {
-    rings,
-    width,
-    strokeWidth,
+    animationDuration,
     backgroundColor,
-    spaceBetween,
     children,
+    rings,
+    shadowSolidColor,
+    shadowSolidSize,
+    spaceBetween,
+    strokeWidth,
+    width,
   } /*: ActivityRingsProps*/,
 ) => {
   return (
@@ -353,7 +437,14 @@ export default (
                 left: (width - size) / 2,
               },
             ]}>
-            <Ring ring={ring} size={size} strokeWidth={strokeWidth} />
+            <Ring
+              animationDuration={animationDuration}
+              ring={ring}
+              shadowSolidColor={shadowSolidColor}
+              shadowSolidSize={shadowSolidSize}
+              size={size}
+              strokeWidth={strokeWidth}
+            />
             <View style={[StyleSheet.absoluteFill, styles.center]}>
               <View
                 style={[
