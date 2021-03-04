@@ -14,6 +14,7 @@ type androidEvent = {
 let make = () => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
+  let (today, _todayUpdate) = Date.Hooks.useToday()
 
   let (
     notificationStatus,
@@ -157,11 +158,21 @@ let make = () => {
           ]
           disabled={!allowReminderEditing}>
           <ListItem style={Style.viewStyle(~opacity=!allowReminderEditing ? 0.1 : 1., ())}>
-            <ListItemText>
-              {datetime
-              ->DateFns.format(ReactNativeLocalize.uses24HourClock() ? "HH:mm" : "h:mm aa")
-              ->React.string}
-            </ListItemText>
+            <View style={Style.array([Predefined.styles["rowSpaceBetween"]])}>
+              <ListItemText>
+                {datetime
+                ->DateFns.format(ReactNativeLocalize.uses24HourClock() ? "HH:mm" : "h:mm aa")
+                ->React.string}
+              </ListItemText>
+              <View style={Style.viewStyle(~alignItems=#flexEnd, ())}>
+                <Text style={Style.array([Theme.text["caption2"], theme.styles["textLight2"]])}>
+                  {"Next notification"->React.string}
+                </Text>
+                <Text style={Style.array([Theme.text["footnote"], theme.styles["textLight1"]])}>
+                  {Date.formatRelative(datetime, today)->React.string}
+                </Text>
+              </View>
+            </View>
           </ListItem>
         </SwipeableRow>
         {allowReminderEditing || index != settings.notificationsRecurrentReminders->Array.length - 1
@@ -224,6 +235,11 @@ let make = () => {
         </ListItem>
       : React.null}
     <ListSeparator />
+    <BlockFootnote>
+      {("Notifications are skipped if they are planned in less than " ++
+      Notifications.minutesGapToAvoidTooCloseNotif->Js.Float.toFixed ++ "min to avoid unecessary reminder.")
+        ->React.string}
+    </BlockFootnote>
     <Spacer />
   </>
 }

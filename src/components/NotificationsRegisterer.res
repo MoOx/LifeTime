@@ -34,6 +34,9 @@ let make = (~notificationsRecurrentRemindersOn, ~notificationsRecurrentReminders
 
       if notificationsRecurrentRemindersOn {
         notificationsRecurrentReminders->Array.forEach(notifTime => {
+          let date = Notifications.appropriateTimeForNextNotification(Js.Date.now(), notifTime)
+          // let date = (Js.Date.now() +. 1000. *. 20.)->Js.Date.fromFloat
+          Log.info(("Notifications:", notifTime, "planned at", date->Js.Date.toISOString))
           open ReactNativePushNotification
           localNotificationScheduleOptions(
             ~channelId="reminders",
@@ -42,8 +45,7 @@ let make = (~notificationsRecurrentRemindersOn, ~notificationsRecurrentReminders
             ~smallIcon="ic_notification",
             ~largeIcon="ic_launcher",
             // ~bigLargeIcon="ic_launcher",
-            ~date=Notifications.appropriateTimeForNextNotification(Js.Date.now(), notifTime),
-            // ~date=(Js.Date.now() +. 1000. *. 20.)->Js.Date.fromFloat,
+            ~date,
             ~title=Platform.os === Platform.android ? "Reminder" : "",
             ~message=reccurentRemindersCatchPhrases
             ->Array.shuffle
