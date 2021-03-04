@@ -310,7 +310,30 @@ let weekIndices = {
   ->Array.concat(days->Array.slice(~offset=0, ~len=weekStartsOn))
 }
 
-let localeOptions = Some({locale: None, weekStartsOn: Some(weekStartsOn)})
+let defaultLocale: ReactNativeLocalize.locale = {
+  countryCode: "US",
+  isRTL: false,
+  languageCode: "en",
+  languageTag: "en-US",
+  scriptCode: None,
+}
+let userLocales = ReactNativeLocalize.getLocales()
+let userMainLocal = userLocales[0]->Option.getWithDefault(defaultLocale)
+let supportedLocales = [
+  DateFns.Locales.enUS,
+  DateFns.Locales.enGB,
+  DateFns.Locales.enCA,
+  DateFns.Locales.fr,
+]
+let selectedLocale =
+  (
+    supportedLocales->Array.keep(supportedLocale =>
+      (
+        userLocales->Array.keep(userLocale => userLocale.languageCode === supportedLocale.code)
+      )[0]->Option.isSome
+    )
+  )[0]->Option.getWithDefault(DateFns.Locales.enUS)
+let localeOptions = Some({locale: Some(selectedLocale), weekStartsOn: Some(weekStartsOn)})
 
 // DateFns shortcuts
 let formatRelative = (date, baseDate) => date->DateFns.formatRelative(baseDate, localeOptions)
