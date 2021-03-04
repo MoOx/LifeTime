@@ -13,7 +13,7 @@ let make = () => {
     Clipboard.getString()
     ->FutureJs.fromPromise(error => {
       // @todo error!
-      Js.log(("[LifeTime] SettingsDangerZone: import", error))
+      Log.info(("SettingsDangerZone: import", error))
       "Unable to read from clipboard"
     })
     ->Future.get(x =>

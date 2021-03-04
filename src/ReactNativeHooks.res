@@ -4,7 +4,7 @@ let useAppState = () => {
   let (appState, appState_set) = React.useState(() => AppState.currentState)
   React.useEffect1(() => {
     let onChange = state => {
-      Js.log(("[LifeTime] useAppState: ", state))
+      Log.info(("useAppState: ", state))
       appState_set(_ => state)
     }
     AppState.addEventListener(#change(onChange))
@@ -25,10 +25,13 @@ let useScreenReaderEnabled = () => {
       let change = isScreenReaderEnabled => {
         setScreenReaderState(_ => isScreenReaderEnabled)
       }
-      AccessibilityInfo.isScreenReaderEnabled()->FutureJs.fromPromise(e => {
-        Js.Console.warn(e)
+      AccessibilityInfo.isScreenReaderEnabled()
+      ->FutureJs.fromPromise(e => {
+        Log.warn(e)
         e
-      })->Future.tapOk(v => change(v))->ignore
+      })
+      ->Future.tapOk(v => change(v))
+      ->ignore
       AccessibilityInfo.addEventListener(#screenReaderChanged(change))
       Some(
         () => {

@@ -115,13 +115,13 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t<Result.t<t, string>> =>
   ReactNativeCalendarEvents.findCalendars()
   ->FutureJs.fromPromise(error => {
     // @todo error
-    Js.log(("[LifeTime] AppSettings: ReactNativeCalendarEvents.findCalendars error", error))
+    Log.info(("AppSettings: ReactNativeCalendarEvents.findCalendars error", error))
     "Unable to retrieve calendars before parsing settings"
   })
   ->Future.flatMap(calendarsResult =>
     try Ok(json->decodeJsonSettingsOrRaise) catch {
     | Json.Decode.DecodeError(_exn) =>
-      Js.log(("[LifeTime] AppSettings: decodeJsonSettingsOrRaise", _exn))
+      Log.info(("AppSettings: decodeJsonSettingsOrRaise", _exn))
       Error("Ooops! Something went wrong when loading settings")
     }
     ->Result.map(settings => {
@@ -130,7 +130,7 @@ let decodeJsonSettings = (json: Js.Json.t): Future.t<Result.t<t, string>> =>
       // in case we cannot read calendar (eg: permission removed?)
       // we just pass the value along
       | Error(err) =>
-        Js.Console.error(("[LifeTime] AppSettings: calendars results error", err))
+        Log.error(("AppSettings: calendars results error", err))
         settings.calendarsSkipped
       // ensure calendars ids are valid and reconciliate otherwise
       | Ok(calendars) =>
@@ -163,7 +163,7 @@ let getSettings = () =>
   ReactNativeAsyncStorage.getItem(storageKey)
   ->FutureJs.fromPromise(error => {
     // @todo error
-    Js.log(("[LifeTime] AppSettings: getSettings", error))
+    Log.info(("AppSettings: getSettings", error))
     "Unable to access settings from device"
   })
   ->Future.flatMapOk(res =>
@@ -180,7 +180,7 @@ let getSettings = () =>
     switch x {
     | Ok(settings) => settings
     | Error(err) =>
-      Js.log(("[LifeTime] AppSettings: getSettings", err))
+      Log.info(("AppSettings: getSettings", err))
       defaultSettings
     }
   )
@@ -191,12 +191,12 @@ let setSettings = settings =>
     ->Js.Json.stringifyAny
     ->Option.map(stringifiedSettings => {
       ReactNativeAsyncStorage.setItem(storageKey, stringifiedSettings)->ignore
-      Js.log("[LifeTime] App: settings updated")
+      Log.info("App: settings updated")
     })
     ->ignore
     // if (ReactNative.Global.__DEV__) {
-    //   Js.log((
-    //     "[LifeTime] AppSettings: Settings set to",
+    //   Log.info((
+    //     "AppSettings: Settings set to",
     //     settings,
     //     settings->Obj.magic->Js.Json.stringifyWithSpace(2),
     //   ));

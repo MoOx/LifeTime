@@ -33,11 +33,11 @@ let availableCalendars = (
 let useCalendars = updater => {
   let (value, set) = React.useState(() => None)
   React.useEffect2(() => {
-    Js.log("[LifeTime] Calendars: useCalendars request")
+    Log.info("Calendars: useCalendars request")
     findCalendars()
     ->FutureJs.fromPromise(error => {
       // @todo error!
-      Js.log(("[LifeTime] Calendars: useCalendars", error))
+      Log.info(("Calendars: useCalendars", error))
       error
     })
     ->Future.tapOk(res => set(_ => Some(res->sort)))
@@ -94,7 +94,7 @@ let useEventsContext = () => {
   let (eventsMapByRange, eventsMapByRange_set) = React.useState(() => Map.String.empty)
 
   let requestUpdate = React.useCallback2(() => {
-    Js.log("[LifeTime] Calendars: requestUpdate")
+    Log.info("Calendars: requestUpdate")
     updatedAt_set(_ => Date.now())
     eventsMapByRange_set(_ => Map.String.empty)
   }, (updatedAt_set, eventsMapByRange_set))
@@ -106,7 +106,8 @@ let useEventsContext = () => {
   }, [eventsMapByRange])
 
   let fetchEvents = React.useCallback1((startDate, endDate) => {
-    Js.log(("[LifeTime] Calendars: fetchingEvents for", startDate, endDate))
+    let startTime = Js.Date.now()
+    Log.info(("Calendars: fetchingEvents for", startDate, endDate))
     let key = makeMapKey(startDate, endDate)
     // set None as a loading state
     eventsMapByRange_set(eventsMapByRange => eventsMapByRange->Map.String.set(key, Fetching))
@@ -119,7 +120,7 @@ let useEventsContext = () => {
     )
     ->FutureJs.fromPromise(error => {
       // @todo error!
-      Js.log(("[LifeTime] Calendars: useEventsContext/getEvents", startDate, endDate, error))
+      Log.info(("Calendars: useEventsContext/getEvents", startDate, endDate, error))
 
       // eventsMapByRange_set(eventsMapByRange => {
       //   eventsMapByRange->Map.String.set(
@@ -129,9 +130,18 @@ let useEventsContext = () => {
       // });
       error
     })
-    ->Future.tapOk(res =>
+    ->Future.tapOk(res => {
+      let endTime = Js.Date.now()
+      Log.info((
+        "Calendars: fetchingEvents for",
+        startDate,
+        endDate,
+        "done in",
+        ((endTime -. startTime) /. 1000.)->Js.Float.toFixedWithPrecision(~digits=3),
+        "s",
+      ))
       eventsMapByRange_set(eventsMapByRange => eventsMapByRange->Map.String.set(key, Done(res)))
-    )
+    })
     ->ignore
   }, [eventsMapByRange_set])
 

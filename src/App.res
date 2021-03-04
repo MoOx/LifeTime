@@ -13,7 +13,7 @@ let navigatorEmitter = EventEmitter.make()
       ~requestPermissions=false,
       ~popInitialNotification=true,
       ~onNotification=notification => {
-        Js.log(("[LifeTime] App: onNotification ", notification))
+        Log.info(("App: onNotification ", notification))
         switch notification.id {
         | Some(id) when id == Notifications.Ids.reminderDailyCheck =>
           navigatorEmitter->EventEmitter.emit("navigate", "GoalsScreen")
@@ -53,7 +53,7 @@ let rec navigateToIfPossible = (navigation, navigateTo) =>
 let app = () => {
   let navigationRef = React.useRef(None)
   React.useEffect1(() => {
-    Js.log("[LifeTime] App: navigatorEmitter on(navigate) ")
+    Log.info("App: navigatorEmitter on(navigate) ")
     navigatorEmitter->EventEmitter.on("navigate", navigateTo =>
       navigateToIfPossible(navigationRef.current, navigateTo)
     )
@@ -64,15 +64,15 @@ let app = () => {
 
   React.useEffect2(() => {
     if initialStateContainer->Option.isNone {
-      Js.log("[LifeTime] App: Restoring Navigation initialStateContainer is empty")
+      Log.info("App: Restoring Navigation initialStateContainer is empty")
       ReactNativeAsyncStorage.getItem(navigationStateStorageKey)
       ->FutureJs.fromPromise(error => {
         // @todo error
-        Js.log(("[LifeTime] App: Restoring Navigation State: ", error))
+        Log.info(("App: Restoring Navigation State: ", error))
         error
       })
       ->Future.tap(res => {
-        Js.log("[LifeTime] App: Restoring Navigation State")
+        Log.info("App: Restoring Navigation State")
         switch res {
         | Result.Ok(jsonState) =>
           switch jsonState->Js.Null.toOption {
@@ -80,16 +80,13 @@ let app = () => {
             switch Js.Json.parseExn(jsonState) {
             | state => setInitialState(_ => Some(Some(state)))
             | exception _ =>
-              Js.log((
-                "[LifeTime] App: Restoring Navigation State: unable to decode valid json",
-                jsonState,
-              ))
+              Log.info(("App: Restoring Navigation State: unable to decode valid json", jsonState))
               setInitialState(_ => Some(None))
             }
           | None => setInitialState(_ => Some(None))
           }
         | Result.Error(e) =>
-          Js.log(("[LifeTime] App: Restoring Navigation State: unable to get json state", e))
+          Log.info(("App: Restoring Navigation State: unable to get json state", e))
           setInitialState(_ => Some(None))
         }
       })
@@ -104,8 +101,8 @@ let app = () => {
     | Some(jsonState) =>
       ReactNativeAsyncStorage.setItem(navigationStateStorageKey, jsonState)->ignore
     | None =>
-      Js.log(
-        "[LifeTime] App: <Native.NavigationContainer> onStateChange: Unable to stringify navigation state",
+      Log.info(
+        "App: <Native.NavigationContainer> onStateChange: Unable to stringify navigation state",
       )
     }
   })
@@ -113,10 +110,10 @@ let app = () => {
   let calendarsContextValue = Calendars.useEventsContext()
   let onReady = React.useCallback0(() => {
     ReactNativeBootsplash.hide({fade: true})->Js.Promise.then_(() => {
-      Js.log("[LifeTime] BootSplash: fading is over")
+      Log.info("BootSplash: fading is over")
       Js.Promise.resolve()
     }, _)->Js.Promise.catch(error => {
-      Js.log(("[LifeTime] BootSplash: cannot hide splash", error))
+      Log.info(("BootSplash: cannot hide splash", error))
       Js.Promise.resolve()
     }, _)->ignore
     ()
@@ -132,7 +129,7 @@ let app = () => {
   }, [optionalSettings_set])
 
   let settings_set = settingsCallback => {
-    Js.log("[LifeTime] App: Updating settings")
+    Log.info("App: Updating settings")
     InteractionManager.runAfterInteractions(() => {
       Js.Global.setTimeout(() => {
         optionalSettings_set(settings =>
@@ -162,7 +159,7 @@ let app = () => {
             <Native.NavigationContainer
               ref={navigationRef->Obj.magic}
               // doesn't work properly with native-stack
-              // ?initialState
+              ?initialState
               onStateChange
               onReady>
               <Nav.RootNavigator />

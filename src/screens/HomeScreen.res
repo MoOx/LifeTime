@@ -15,9 +15,9 @@ let make = (~navigation, ~route as _) => {
     | os when os == Platform.android => check(Android.read_calendar)
     | _ => Js.Promise.resolve(unavailable)
     }
-    ->FutureJs.fromPromise(error => Js.log(("[LifeTime] HomeScreen: permission check", error)))
+    ->FutureJs.fromPromise(error => Log.info(("HomeScreen: permission check", error)))
     ->Future.tapOk(status => {
-      Js.log(("[LifeTime] HomeScreen: permission check status", status))
+      Log.info(("HomeScreen: permission check status", status))
       if status != granted {
         hasCalendarAccess_set(_ => false)
       }
@@ -141,11 +141,11 @@ let make = (~navigation, ~route as _) => {
                 ReactNativeCalendarEvents.requestPermissions()
                 ->FutureJs.fromPromise(error => {
                   // @todo error!
-                  Js.log(("[LifeTime] HomeScreen: onContinuePress", error))
+                  Log.info(("HomeScreen: onContinuePress", error))
                   error
                 })
                 ->Future.tapOk(status => {
-                  Js.log(("[LifeTime] HomeScreen: onContinuePress new status", status))
+                  Log.info(("HomeScreen: onContinuePress new status", status))
                   switch status {
                   | #authorized => hasCalendarAccess_set(_ => true)
                   | #denied

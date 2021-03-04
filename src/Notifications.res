@@ -44,12 +44,15 @@ let appropriateTimeForNextNotification = (today: float, notifFrequency: array<op
     ~seconds=0.,
     (),
   )
-  Js.log((
-    "[LifeTime] Notifications: ",
-    ("Notification planned at", adjustedNotifTime->toISOString),
-    ("today", today->fromFloat->toISOString),
-    ("supposedDate", supposedDate->toISOString),
-    ("supposedMaxLimitDate", supposedMaxLimitDate->fromFloat->toISOString),
+  Log.info((
+    "Notifications:",
+    notifFrequency,
+    "planned at",
+    adjustedNotifTime->toISOString,
+    "supposedDate",
+    supposedDate->toISOString,
+    "supposedMaxLimitDate",
+    supposedMaxLimitDate->fromFloat->toISOString,
   ))
   adjustedNotifTime
 }

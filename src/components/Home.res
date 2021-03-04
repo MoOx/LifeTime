@@ -34,7 +34,7 @@ let make = (~onGetStarted as _, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~o
 
   React.useEffect4(() => {
     if refreshing {
-      Js.log("[LifeTime] Home: refreshing...")
+      Log.info("Home: refreshing...")
       todayUpdate()
       requestUpdate()
       onRefreshDone()
@@ -48,7 +48,7 @@ let make = (~onGetStarted as _, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~o
     Date.weekDates(today->DateFns.addDays(-7.))
   )
   React.useEffect2(() => {
-    Js.log("[LifeTime] Home: previousDates_set")
+    Log.info("Home: previousDates_set")
     previousDates_set(_ => Date.weekDates(today->DateFns.addDays(-7.)))
     None
   }, (today, previousDates_set))
@@ -66,7 +66,7 @@ let make = (~onGetStarted as _, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~o
         Date.weekDates(today->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
       )
       ->Array.reverse
-    Js.log(("[LifeTime] Home: last5Weeks_set", last5Weeks))
+    Log.info(("Home: last5Weeks_set", last5Weeks))
     last5Weeks_set(_ => last5Weeks)
     None
   }, (today, last5Weeks_set))
