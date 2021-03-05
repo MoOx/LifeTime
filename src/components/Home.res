@@ -12,7 +12,7 @@ external useCallback8: (
 ) => callback<'input, 'output> = "useCallback"
 
 @react.component
-let make = (~onGetStarted as _, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
+let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
   let (getEvents, fetchEvents, updatedAt, requestUpdate) = React.useContext(Calendars.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
@@ -161,6 +161,7 @@ let make = (~onGetStarted as _, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~o
         </View>
       </View>
     </SpacedView>
+    <View> <NoEventBox onGetStarted onFiltersPress today todayDates last5Weeks /> </View>
     <View style={Predefined.styles["rowSpaceBetween"]}>
       <Row> <Spacer size=XS /> <BlockHeading text="Weekly Chart" /> </Row>
       <Row>
