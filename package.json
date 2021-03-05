@@ -59,7 +59,7 @@
     "react-multiversal": "https://github.com/MoOx/react-multiversal#880844e",
     "react-native": "^0.63.0",
     "react-native-bootsplash": "^3.1.0",
-    "react-native-calendar-events": "^2.0.0",
+    "react-native-calendar-events": "^2.2.0",
     "react-native-gesture-handler": "^1.8.0",
     "react-native-localize": "^1.4.0",
     "react-native-permissions": "^2.2.0",

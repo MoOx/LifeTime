@@ -13045,10 +13045,10 @@ react-native-bootsplash@^3.1.0:
     fs-extra "^9.1.0"
     jimp "^0.16.1"
 
-react-native-calendar-events@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/react-native-calendar-events/-/react-native-calendar-events-2.0.0.tgz#908670877e263d3703566e7bfef68ee0f6b96806"
-  integrity sha512-bN8CpJfSk2ii2mxTmdqqqQ+UYovLThdlSuzxIYSznUGv+B0n09SP90IU59rgBPhPWdYQjzuY3USgpsbhObmScQ==
+react-native-calendar-events@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-calendar-events/-/react-native-calendar-events-2.2.0.tgz#6cb78bf712457ca9928dae95b428c91e7b895ae0"
+  integrity sha512-tNUbhT6Ief0JM4OQzQAaz1ri0+MCcAoHptBcEXCz2g7q3A05pg62PR2Dio4F9t2fCAD7Y2+QggdY1ycAsF3Tsg==
 
 react-native-gesture-handler@^1.8.0:
   version "1.8.0"
