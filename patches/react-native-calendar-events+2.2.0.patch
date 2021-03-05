@@ -1,0 +1,365 @@
+diff --git a/node_modules/react-native-calendar-events/android/src/main/java/com/calendarevents/RNCalendarEvents.java b/node_modules/react-native-calendar-events/android/src/main/java/com/calendarevents/RNCalendarEvents.java
+index 782a0da..5dcdb94 100644
+--- a/node_modules/react-native-calendar-events/android/src/main/java/com/calendarevents/RNCalendarEvents.java
++++ b/node_modules/react-native-calendar-events/android/src/main/java/com/calendarevents/RNCalendarEvents.java
+@@ -1076,7 +1076,7 @@ public class RNCalendarEvents extends ReactContextBaseJavaModule implements Perm
+         if (cursor.getString(5) != null) {
+             allDay = cursor.getInt(5) != 0;
+         }
+-
++        /*
+         if (cursor.getString(7) != null) {
+             WritableNativeMap recurrenceRule = new WritableNativeMap();
+             String[] recurrenceRules = cursor.getString(7).split(";");
+@@ -1110,18 +1110,19 @@ public class RNCalendarEvents extends ReactContextBaseJavaModule implements Perm
+ 
+             event.putMap("recurrenceRule", recurrenceRule);
+         }
++        */
+ 
+         event.putString("id", cursor.getString(0));
+         event.putMap("calendar", findCalendarById(cursor.getString(cursor.getColumnIndex("calendar_id"))));
+         event.putString("title", cursor.getString(cursor.getColumnIndex("title")));
+-        event.putString("description", cursor.getString(2));
++        // event.putString("description", cursor.getString(2));
+         event.putString("startDate", startDateUTC);
+         event.putString("endDate", endDateUTC);
+         event.putBoolean("allDay", allDay);
+-        event.putString("location", cursor.getString(6));
+-        event.putString("availability", availabilityStringMatchingConstant(cursor.getInt(9)));
+-        event.putArray("attendees", (WritableArray) findAttendeesByEventId(cursor.getString(0)));
+-
++        // event.putString("location", cursor.getString(6));
++        // event.putString("availability", availabilityStringMatchingConstant(cursor.getInt(9)));
++        // event.putArray("attendees", (WritableArray) findAttendeesByEventId(cursor.getString(0)));
++        /*
+         if (cursor.getInt(10) > 0) {
+             event.putArray("alarms", findReminderByEventId(cursor.getString(0), Long.parseLong(cursor.getString(3))));
+         } else {
+@@ -1136,6 +1137,7 @@ public class RNCalendarEvents extends ReactContextBaseJavaModule implements Perm
+         if (cursor.getColumnIndex(CalendarContract.Instances.ORIGINAL_SYNC_ID) != -1 && cursor.getString(cursor.getColumnIndex(CalendarContract.Instances.ORIGINAL_SYNC_ID)) != null) {
+             event.putString("syncId", cursor.getString(cursor.getColumnIndex(CalendarContract.Instances.ORIGINAL_SYNC_ID)));
+         }
++        */
+ 
+         return event;
+     }
+diff --git a/node_modules/react-native-calendar-events/ios/RNCalendarEvents.m b/node_modules/react-native-calendar-events/ios/RNCalendarEvents.m
+index a85c013..6d27202 100644
+--- a/node_modules/react-native-calendar-events/ios/RNCalendarEvents.m
++++ b/node_modules/react-native-calendar-events/ios/RNCalendarEvents.m
+@@ -495,6 +495,7 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+                                          _location: @"",
+                                          _startDate: @"",
+                                          _endDate: @"",
++                                         /*
+                                          _allDay: @NO,
+                                          _notes: @"",
+                                          _url: @"",
+@@ -509,6 +510,7 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+                                                  },
+                                          _availability: @"",
+                                          _timeZone: @""
++                                         */
+                                          };
+ 
+     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+@@ -539,7 +541,7 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+     if (event.title) {
+         [formedCalendarEvent setValue:event.title forKey:_title];
+     }
+-
++    /*
+     if (event.notes) {
+         [formedCalendarEvent setValue:event.notes forKey:_notes];
+     }
+@@ -662,7 +664,7 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+     @catch (NSException *exception) {
+         NSLog(@"RNCalendarEvents encountered an issue while serializing event (alarms) '%@': %@", event.title, exception.reason);
+     }
+-
++    */
+     if (event.startDate) {
+         [formedCalendarEvent setValue:[dateFormatter stringFromDate:event.startDate] forKey:_startDate];
+     }
+@@ -670,15 +672,15 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+     if (event.endDate) {
+         [formedCalendarEvent setValue:[dateFormatter stringFromDate:event.endDate] forKey:_endDate];
+     }
+-
++    /*
+     if (event.occurrenceDate) {
+         [formedCalendarEvent setValue:[dateFormatter stringFromDate:event.occurrenceDate] forKey:_occurrenceDate];
+     }
+ 
+     [formedCalendarEvent setValue:[NSNumber numberWithBool:event.isDetached] forKey:_isDetached];
+-
++    */
+     [formedCalendarEvent setValue:[NSNumber numberWithBool:event.allDay] forKey:_allDay];
+-    
++    /*
+     @try {
+         if (event.hasRecurrenceRules) {
+             EKRecurrenceRule *rule = [event.recurrenceRules objectAtIndex:0];
+@@ -729,7 +731,7 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+     @catch (NSException *exception) {
+         NSLog(@"RNCalendarEvents encountered an issue while serializing event (structuredLocation) '%@': %@", event.title, exception.reason);
+     }
+-
++    */
+     return [formedCalendarEvent copy];
+ }
+ 
+@@ -778,15 +780,18 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+         return;
+     }
+ 
++    __weak RNCalendarEvents *weakSelf = self;
++    dispatch_async(serialQueue, ^{
+     @try {
+-        NSArray* calendars = [self.eventStore calendarsForEntityType:EKEntityTypeEvent];
++    RNCalendarEvents *strongSelf = weakSelf;
++        NSArray* calendars = [strongSelf.eventStore calendarsForEntityType:EKEntityTypeEvent];
+ 
+         if (!calendars) {
+             reject(@"error", @"error finding calendars", nil);
+         } else {
+             NSMutableArray *eventCalendars = [[NSMutableArray alloc] init];
+             for (EKCalendar *calendar in calendars) {
+-                BOOL isPrimary = [calendar isEqual:[self.eventStore defaultCalendarForNewEvents]];
++                BOOL isPrimary = [calendar isEqual:[strongSelf.eventStore defaultCalendarForNewEvents]];
+                 [eventCalendars addObject:@{
+                                             @"id": calendar.calendarIdentifier,
+                                             @"title": calendar.title ? calendar.title : @"",
+@@ -803,6 +808,7 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+     @catch (NSException *exception) {
+         reject(@"error", @"saveCalendar error", [self exceptionToError:exception]);
+     }
++    });
+ }
+ 
+ RCT_EXPORT_METHOD(saveCalendar:(NSDictionary *)options resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+@@ -810,8 +816,10 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+     if (![self isCalendarAccessGranted]) {
+         return reject(@"error", @"unauthorized to access calendar", nil);
+     }
+-    
++    __weak RNCalendarEvents *weakSelf = self;
++    dispatch_async(serialQueue, ^{
+     @try {
++        RNCalendarEvents *strongSelf = weakSelf;
+         EKCalendar *calendar = nil;
+         EKSource *calendarSource = nil;
+         NSString *title = [RCTConvert NSString:options[@"title"]];
+@@ -819,7 +827,7 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+         NSString *type = [RCTConvert NSString:options[@"entityType"]];
+ 
+         // First: Check if the user has an iCloud source set-up.
+-        for (EKSource *source in self.eventStore.sources) {
++        for (EKSource *source in strongSelf.eventStore.sources) {
+             if (source.sourceType == EKSourceTypeCalDAV && [source.title isEqualToString:@"iCloud"]) {
+                 calendarSource = source;
+                 break;
+@@ -829,9 +837,14 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+         // Second: If no iCloud source is set-up / utilised, then fall back and use the local source.
+         if (calendarSource == nil) {
+             for (EKSource *source in self.eventStore.sources) {
+-                if (source.sourceType == EKSourceTypeLocal) {
++                if (
++                    source.sourceType == EKSourceTypeLocal ||
++                    source.sourceType == EKSourceTypeSubscribed
++                ) {
+                     calendarSource = source;
+-                    break;
++                    if (source.sourceType == EKSourceTypeLocal) {
++                        break;
++                    }
+                 }
+             }
+         }
+@@ -841,9 +854,9 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+         }
+ 
+         if ([type isEqualToString:@"event"]) {
+-        calendar = [EKCalendar calendarForEntityType:EKEntityTypeEvent eventStore:self.eventStore];
++        calendar = [EKCalendar calendarForEntityType:EKEntityTypeEvent eventStore:strongSelf.eventStore];
+         } else if ([type isEqualToString:@"reminder"]) {
+-          calendar = [EKCalendar calendarForEntityType:EKEntityTypeReminder eventStore:self.eventStore];
++          calendar = [EKCalendar calendarForEntityType:EKEntityTypeReminder eventStore:strongSelf.eventStore];
+         } else {
+             return reject(@"error",
+                  [NSString stringWithFormat:@"Calendar entityType %@ is not supported", type],
+@@ -862,7 +875,7 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+         }
+ 
+         NSError *error = nil;
+-        BOOL success = [self.eventStore saveCalendar:calendar commit:YES error:&error];
++        BOOL success = [strongSelf.eventStore saveCalendar:calendar commit:YES error:&error];
+         if (success) {
+             return resolve(calendar.calendarIdentifier);
+         }
+@@ -872,6 +885,7 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+     @catch (NSException *exception) {
+         reject(@"error", @"saveCalendar error", [self exceptionToError:exception]);
+     }
++    });
+ }
+ 
+ RCT_EXPORT_METHOD(removeCalendar:(NSString *)calendarId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+@@ -881,13 +895,14 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+         return;
+     }
+ 
+-
++    __weak RNCalendarEvents *weakSelf = self;
+     dispatch_async(serialQueue, ^{
+-        @try {
+-            EKCalendar *calendar = (EKCalendar *)[self.eventStore calendarWithIdentifier:calendarId];
++    @try {
++    RNCalendarEvents *strongSelf = weakSelf;
++            EKCalendar *calendar = (EKCalendar *)[strongSelf.eventStore calendarWithIdentifier:calendarId];
+             NSError *error = nil;
+ 
+-            BOOL success = [self.eventStore removeCalendar:calendar commit:YES error:&error];
++            BOOL success = [strongSelf.eventStore removeCalendar:calendar commit:YES error:&error];
+             if (error) {
+                 return reject(@"error", [error.userInfo valueForKey:@"NSLocalizedDescription"], nil);
+             }
+@@ -905,12 +920,15 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+         reject(@"error", @"unauthorized to access calendar", nil);
+         return;
+     }
+-
++    __weak RNCalendarEvents *weakSelf = self;
++    dispatch_async(serialQueue, ^{
++    @try {
++    RNCalendarEvents *strongSelf = weakSelf;
+     NSMutableArray *eventCalendars;
+ 
+     if (calendars.count) {
+         eventCalendars = [[NSMutableArray alloc] init];
+-        NSArray *deviceCalendars = [self.eventStore calendarsForEntityType:EKEntityTypeEvent];
++        NSArray *deviceCalendars = [strongSelf.eventStore calendarsForEntityType:EKEntityTypeEvent];
+ 
+         for (EKCalendar *calendar in deviceCalendars) {
+             if ([calendars containsObject:calendar.calendarIdentifier]) {
+@@ -919,14 +937,10 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+         }
+     }
+ 
+-    NSPredicate *predicate = [self.eventStore predicateForEventsWithStartDate:startDate
++    NSPredicate *predicate = [strongSelf.eventStore predicateForEventsWithStartDate:startDate
+                                                                       endDate:endDate
+                                                                     calendars:eventCalendars];
+ 
+-    __weak RNCalendarEvents *weakSelf = self;
+-    dispatch_async(serialQueue, ^{
+-        @try {
+-            RNCalendarEvents *strongSelf = weakSelf;
+             NSArray *calendarEvents = [[strongSelf.eventStore eventsMatchingPredicate:predicate] sortedArrayUsingSelector:@selector(compareStartDateWithEvent:)];
+             if (calendarEvents) {
+                 resolve([strongSelf serializeCalendarEvents:calendarEvents]);
+@@ -951,10 +965,10 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+ 
+     __weak RNCalendarEvents *weakSelf = self;
+     dispatch_async(serialQueue, ^{
+-        @try {
+-            RNCalendarEvents *strongSelf = weakSelf;
++    @try {
++    RNCalendarEvents *strongSelf = weakSelf;
+ 
+-            EKEvent *calendarEvent = (EKEvent *)[self.eventStore calendarItemWithIdentifier:eventId];
++            EKEvent *calendarEvent = (EKEvent *)[strongSelf.eventStore calendarItemWithIdentifier:eventId];
+             if (calendarEvent) {
+                 resolve([strongSelf serializeCalendarEvent:calendarEvent]);
+             } else {
+@@ -978,13 +992,13 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+         return;
+     }
+     
+-    NSMutableDictionary *details = [NSMutableDictionary dictionaryWithDictionary:settings];
+-    [details setValue:title forKey:_title];
+-
+     __weak RNCalendarEvents *weakSelf = self;
+     dispatch_async(serialQueue, ^{
+-        @try {
+-            RNCalendarEvents *strongSelf = weakSelf;
++    @try {
++    RNCalendarEvents *strongSelf = weakSelf;
++    
++    NSMutableDictionary *details = [NSMutableDictionary dictionaryWithDictionary:settings];
++    [details setValue:title forKey:_title];
+ 
+             NSDictionary *response = [strongSelf buildAndSaveEvent:details options:options];
+ 
+@@ -1007,6 +1021,11 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+         return;
+     }
+     
++    __weak RNCalendarEvents *weakSelf = self;
++    dispatch_async(serialQueue, ^{
++    @try {
++    RNCalendarEvents *strongSelf = weakSelf;
++    
+     Boolean futureEvents = [RCTConvert BOOL:options[@"futureEvents"]];
+     NSDate *exceptionDate = [RCTConvert NSDate:options[@"exceptionDate"]];
+ 
+@@ -1017,14 +1036,10 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+                                     toDate:exceptionDate
+                                    options:0];
+ 
+-      NSPredicate *predicate = [self.eventStore predicateForEventsWithStartDate:exceptionDate
++      NSPredicate *predicate = [strongSelf.eventStore predicateForEventsWithStartDate:exceptionDate
+                                                                         endDate:endDate
+                                                                       calendars:nil];
+ 
+-        __weak RNCalendarEvents *weakSelf = self;
+-        dispatch_async(serialQueue, ^{
+-            @try {
+-                RNCalendarEvents *strongSelf = weakSelf;
+                 NSArray *calendarEvents = [strongSelf.eventStore eventsMatchingPredicate:predicate];
+                 EKEvent *eventInstance;
+                 BOOL success;
+@@ -1053,18 +1068,8 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+                 }
+ 
+                 return resolve(@(success));
+-            }
+-            @catch (NSException *exception) {
+-                reject(@"error", @"removeEvent error", [self exceptionToError:exception]);
+-            }
+-        });
+     } else {
+-      __weak RNCalendarEvents *weakSelf = self;
+-      dispatch_async(serialQueue, ^{
+-          @try {
+-              RNCalendarEvents *strongSelf = weakSelf;
+-              
+-              EKEvent *calendarEvent = (EKEvent *)[self.eventStore calendarItemWithIdentifier:eventId];
++              EKEvent *calendarEvent = (EKEvent *)[strongSelf.eventStore calendarItemWithIdentifier:eventId];
+               NSError *error = nil;
+               EKSpan eventSpan = EKSpanThisEvent;
+ 
+@@ -1072,17 +1077,16 @@ - (NSDictionary *)serializeCalendarEvent:(EKEvent *)event
+                   eventSpan = EKSpanFutureEvents;
+               }
+ 
+-              BOOL success = [self.eventStore removeEvent:calendarEvent span:eventSpan commit:YES error:&error];
++              BOOL success = [strongSelf.eventStore removeEvent:calendarEvent span:eventSpan commit:YES error:&error];
+               if (error) {
+                   return reject(@"error", [error.userInfo valueForKey:@"NSLocalizedDescription"], nil);
+               }
+               return resolve(@(success));
+-              }
+-          @catch (NSException *exception) {
+-              reject(@"error", @"removeEvent error", [self exceptionToError:exception]);
+-          }
+-      });
+     }
++    } @catch (NSException *exception) {
++        reject(@"error", @"removeEvent error", [self exceptionToError:exception]);
++    }
++});
+ }
+ 
+ @end
