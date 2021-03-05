@@ -37,33 +37,6 @@ let make = (
     </View>
     <ListSeparator />
     <View onLayout style={theme.styles["background"]}>
-      {calendars
-      ->Option.map(calendars => calendars->Calendars.availableCalendars(calendarsSkipped))
-      ->Option.map(c =>
-        if c->Array.length === 0 {
-          <SpacedView>
-            <Center>
-              <Spacer size=XXL />
-              <Text
-                style={Style.array([
-                  Theme.text["title1"],
-                  Theme.text["weight600"],
-                  theme.styles["text"],
-                ])}>
-                {"No Events"->React.string}
-              </Text>
-              <Spacer />
-              <Text style={theme.styles["textLight2"]}>
-                {"You should select at least a calendar"->React.string}
-              </Text>
-              <Spacer size=XXL />
-            </Center>
-          </SpacedView>
-        } else {
-          React.null
-        }
-      )
-      ->Option.getWithDefault(React.null)}
       {mapTitleDuration
       ->Option.map(mapTitleDuration => {
         let shouldShowMore = mapTitleDuration->Array.length > activitiesToShow
