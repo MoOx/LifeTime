@@ -13,7 +13,7 @@ let reccurentRemindersCatchPhrases = [
 @react.component
 let make = (~notificationsRecurrentRemindersOn, ~notificationsRecurrentReminders) => {
   // clean badges when app is active
-  let appState = ReactNativeHooks.useAppState()
+  let (appState, _previousAppState) = ReactNativeHooks.useAppState()
   React.useEffect1(() => {
     if appState === #active {
       ReactNativePushNotification.setApplicationIconBadgeNumber(0)

@@ -91,61 +91,61 @@ let roundDate = (date: Js.Date.t) => {
 
 let useEventsContext = () => {
   let (updatedAt, updatedAt_set) = React.useState(_ => Date.now())
-  let (eventsMapByRange, eventsMapByRange_set) = React.useState(() => Map.String.empty)
+  let (refreshedAt, refreshedAt_set) = React.useState(_ => Date.now())
+  let eventsMapByRange = React.useRef(Map.String.empty)
 
-  let requestUpdate = React.useCallback2(() => {
+  let requestUpdate = React.useCallback1(() => {
     Log.info("Calendars: requestUpdate")
     updatedAt_set(_ => Date.now())
-    eventsMapByRange_set(_ => Map.String.empty)
-  }, (updatedAt_set, eventsMapByRange_set))
+    eventsMapByRange.current = Map.String.empty
+  }, [updatedAt_set])
 
-  let getEvents = React.useCallback1((startDate, endDate) => {
-    eventsMapByRange
-    ->Map.String.get(makeMapKey(startDate, endDate))
-    ->Option.getWithDefault(NotAsked)
-  }, [eventsMapByRange])
+  let getEvents = React.useCallback0((startDate, endDate) => {
+    let key = makeMapKey(startDate, endDate)
+    eventsMapByRange.current->Map.String.get(key)->Option.getWithDefault(NotAsked)
+  })
 
   let fetchEvents = React.useCallback1((startDate, endDate) => {
     let startTime = Js.Date.now()
-    Log.info(("Calendars: fetchingEvents for", startDate, endDate))
     let key = makeMapKey(startDate, endDate)
-    // set None as a loading state
-    eventsMapByRange_set(eventsMapByRange => eventsMapByRange->Map.String.set(key, Fetching))
-    fetchAllEvents(
-      startDate->Js.Date.toISOString,
-      endDate->Js.Date.toISOString,
-      // we filter calendar later cause if you UNSELECT ALL
-      // this `fetchAllEvents` DEFAULT TO ALL
-      None,
-    )
-    ->FutureJs.fromPromise(error => {
-      // @todo error!
-      Log.info(("Calendars: useEventsContext/getEvents", startDate, endDate, error))
 
-      // eventsMapByRange_set(eventsMapByRange => {
-      //   eventsMapByRange->Map.String.set(
-      //     key,
-      //     None,
-      //   )
-      // });
-      error
-    })
-    ->Future.tapOk(res => {
-      let endTime = Js.Date.now()
-      Log.info((
-        "Calendars: fetchingEvents for",
-        startDate,
-        endDate,
-        "done in",
-        ((endTime -. startTime) /. 1000.)->Js.Float.toFixedWithPrecision(~digits=3),
-        "s",
-      ))
-      eventsMapByRange_set(eventsMapByRange => eventsMapByRange->Map.String.set(key, Done(res)))
-    })
-    ->ignore
-  }, [eventsMapByRange_set])
+    switch eventsMapByRange.current->Map.String.get(key)->Option.getWithDefault(NotAsked) {
+    | NotAsked =>
+      eventsMapByRange.current = eventsMapByRange.current->Map.String.set(key, Fetching)
+      Log.info(("Calendars: fetchingEvents for", startDate, endDate))
+      ReactNative.AnimationFrame.request(() => {
+        fetchAllEvents(
+          startDate->Js.Date.toISOString,
+          endDate->Js.Date.toISOString,
+          // we filter calendar later cause if you UNSELECT ALL
+          // this `fetchAllEvents` DEFAULT TO ALL
+          None,
+        )
+        ->FutureJs.fromPromise(error => {
+          // @todo error!
+          Log.info(("Calendars: useEventsContext/getEvents", startDate, endDate, error))
+          error
+        })
+        ->Future.tapOk(res => {
+          let endTime = Js.Date.now()
+          Log.info((
+            "Calendars: fetchingEvents for",
+            startDate,
+            endDate,
+            "done in",
+            ((endTime -. startTime) /. 1000.)->Js.Float.toFixedWithPrecision(~digits=3),
+            "s",
+          ))
+          eventsMapByRange.current = eventsMapByRange.current->Map.String.set(key, Done(res))
+          refreshedAt_set(_ => Date.now())
+        })
+        ->ignore
+      })->ignore
+    | _ => Log.info(("Calendars: fetchingEvents for", startDate, endDate, "ignored, already asked"))
+    }
+  }, [refreshedAt_set])
 
-  (getEvents, fetchEvents, updatedAt, requestUpdate)
+  (getEvents, fetchEvents, refreshedAt, requestUpdate)
 }
 
 let isAllDayEvent = (evt: calendarEventReadable) => evt.allDay->Option.getWithDefault(false)

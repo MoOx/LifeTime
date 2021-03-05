@@ -1,19 +1,21 @@
 open ReactNative
 
 let useAppState = () => {
-  let (appState, appState_set) = React.useState(() => AppState.currentState)
-  React.useEffect1(() => {
+  let (previous, previous_set) = React.useState(() => AppState.currentState)
+  let (current, current_set) = React.useState(() => AppState.currentState)
+  React.useEffect3(() => {
     let onChange = state => {
-      Log.info(("useAppState: ", state))
-      appState_set(_ => state)
+      previous_set(_ => current)
+      current_set(_ => state)
+      Log.info(("useAppState: ", state, "(was ", current, ")"))
     }
     AppState.addEventListener(#change(onChange))
     Some(() => AppState.removeEventListener(#change(onChange)))
-  }, [appState_set])
-  appState
+  }, (current, previous_set, current_set))
+  (current, previous)
 }
 
-@bs.val external process: 'a = "process"
+@val external process: 'a = "process"
 
 let useScreenReaderEnabled = () => {
   let (isScreenReaderEnabled, setScreenReaderState) = React.useState(() => false)

@@ -5,15 +5,8 @@ open ReactMultiversal
 let numberOfActivitiesToShow = 8
 
 @react.component
-let make = (
-  ~activities,
-  ~calendarsSkipped,
-  ~mapTitleDuration,
-  ~onActivityPress,
-  ~onFiltersPress,
-) => {
+let make = (~activities, ~mapTitleDuration, ~onActivityPress, ~onFiltersPress) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
-  let calendars = Calendars.useCalendars(None)
   let (activitiesToShow, setActivitiesToShow) = React.useState(() => numberOfActivitiesToShow)
 
   let (_, maxDurationInMin) =

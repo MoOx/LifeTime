@@ -27,6 +27,7 @@ let make = (
     (supposedEndDate->Js.Date.getTime -. endDate->Js.Date.getTime)->Date.msToMin
   let fetchedEvents = getEvents(startDate, endDate)
   React.useEffect4(() => {
+    // Log.info(("Goals fetchEvents", startDate, endDate))
     switch fetchedEvents {
     | NotAsked => fetchEvents(startDate, endDate)
     | _ => ()

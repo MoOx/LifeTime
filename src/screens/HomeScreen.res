@@ -9,27 +9,30 @@ let make = (~navigation, ~route as _) => {
 
   let (hasCalendarAccess, hasCalendarAccess_set) = React.useState(() => true)
   React.useEffect1(() => {
-    open ReactNativePermissions
-    switch Platform.os {
-    | os when os == Platform.ios => check(Ios.calendars)
-    | os when os == Platform.android => check(Android.read_calendar)
-    | _ => Js.Promise.resolve(unavailable)
-    }
-    ->FutureJs.fromPromise(error => Log.info(("HomeScreen: permission check", error)))
-    ->Future.tapOk(status => {
-      Log.info(("HomeScreen: permission check status", status))
-      if status != granted {
-        hasCalendarAccess_set(_ => false)
+    // no rush to check permissions
+    AnimationFrame.request(() => {
+      open ReactNativePermissions
+      switch Platform.os {
+      | os when os == Platform.ios => check(Ios.calendars)
+      | os when os == Platform.android => check(Android.read_calendar)
+      | _ => Js.Promise.resolve(unavailable)
       }
-    })
-    ->Future.tapError(_err =>
-      Alert.alert(
-        ~title="Ooops, something bad happened",
-        ~message="Please report us this error with informations about your device so we can improve LifeTime.",
-        (),
+      ->FutureJs.fromPromise(error => Log.info(("HomeScreen: permission check", error)))
+      ->Future.tapOk(status => {
+        Log.info(("HomeScreen: permission check status", status))
+        if status != granted {
+          hasCalendarAccess_set(_ => false)
+        }
+      })
+      ->Future.tapError(_err =>
+        Alert.alert(
+          ~title="Ooops, something bad happened",
+          ~message="Please report us this error with informations about your device so we can improve LifeTime.",
+          (),
+        )
       )
-    )
-    ->ignore
+      ->ignore
+    })->ignore
     None
   }, [hasCalendarAccess_set])
   React.useEffect2(() => {

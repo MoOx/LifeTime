@@ -22,13 +22,13 @@ let make = (~onGetStarted as _, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~o
     style(~width=windowDimensions.width->dp, ())
   }, [windowDimensions.width])
 
-  let appState = ReactNativeHooks.useAppState()
-  React.useEffect2(() => {
-    if appState == #active {
+  let (appState, previousAppState) = ReactNativeHooks.useAppState()
+  React.useEffect3(() => {
+    if appState !== previousAppState && appState === #active {
       requestUpdate()
     }
     None
-  }, (appState, requestUpdate))
+  }, (appState, previousAppState, requestUpdate))
 
   let (today, todayUpdate) = Date.Hooks.useToday()
 
@@ -44,45 +44,28 @@ let make = (~onGetStarted as _, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~o
 
   let todayDates = Date.Hooks.useWeekDates(today)
 
-  let (previousDates, previousDates_set) = React.useState(() =>
-    Date.weekDates(today->DateFns.addDays(-7.))
-  )
-  React.useEffect2(() => {
-    Log.info("Home: previousDates_set")
-    previousDates_set(_ => Date.weekDates(today->DateFns.addDays(-7.)))
-    None
-  }, (today, previousDates_set))
-  let (last5Weeks, last5Weeks_set) = React.useState(() =>
-    Array.range(0, 5)
-    ->Array.map(currentWeekReverseIndex =>
-      Date.weekDates(today->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
-    )
-    ->Array.reverse
-  )
-  React.useEffect2(() => {
-    let last5Weeks =
+  let previousDates = React.useMemo1(() => Date.weekDates(today->DateFns.addDays(-7.)), [today])
+  let last5Weeks = React.useMemo1(
+    () =>
       Array.range(0, 5)
       ->Array.map(currentWeekReverseIndex =>
         Date.weekDates(today->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
       )
-      ->Array.reverse
-    Log.info(("Home: last5Weeks_set", last5Weeks))
-    last5Weeks_set(_ => last5Weeks)
-    None
-  }, (today, last5Weeks_set))
+      ->Array.reverse,
+    [today],
+  )
 
   let (currentDates, currentDates_set) = React.useState(() =>
     last5Weeks[last5Weeks->Array.length - 1]->Option.getWithDefault(todayDates)
   )
   let (startDate, supposedEndDate) = currentDates
-
   let endDate = supposedEndDate->Date.min(today)
-
   let (todayFirst, _) = todayDates
   let (previousFirst, _) = previousDates
 
   let fetchedEvents = getEvents(startDate, endDate)
   React.useEffect4(() => {
+    // Log.info(("Home fetchEvents", startDate, endDate))
     switch fetchedEvents {
     | NotAsked => fetchEvents(startDate, endDate)
     | _ => ()
@@ -292,13 +275,7 @@ let make = (~onGetStarted as _, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~o
       {!refreshing ? React.null : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
     </BlockFootnote>
     <Spacer />
-    <TopActivities
-      activities=settings.activities
-      calendarsSkipped=settings.calendarsSkipped
-      mapTitleDuration
-      onFiltersPress
-      onActivityPress
-    />
+    <TopActivities activities=settings.activities mapTitleDuration onFiltersPress onActivityPress />
     <Spacer />
     <SpacedView horizontal=None>
       <ListSeparator />

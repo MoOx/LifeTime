@@ -1,6 +1,6 @@
 let useNotificationStatus = () => {
   let (notificationStatus, notificationStatus_set) = React.useState(() => None)
-  let appState = ReactNativeHooks.useAppState()
+  let (appState, _previousAppState) = ReactNativeHooks.useAppState()
   React.useEffect2(() => {
     if appState === #active {
       Log.info("NotificationsHooks: checkNotifications request")

@@ -358,7 +358,7 @@ let hasOverlap = (startA, endA, dateB) => {
 module Hooks = {
   let useToday = () => {
     let (today, today_set) = React.useState(() => now())
-    let appState = ReactNativeHooks.useAppState()
+    let (appState, previousAppState) = ReactNativeHooks.useAppState()
     let todayUpdate = React.useCallback2(() => {
       let now = now()
       // only update today when active AND there is an relevant diff
@@ -367,22 +367,28 @@ module Hooks = {
         today_set(_ => now)
       }
     }, (today, today_set))
-    React.useEffect2(() => {
+    React.useEffect3(() => {
       // only update today when active AND there is an relevant diff
-      if appState === #active {
+      if appState !== previousAppState && appState === #active {
         todayUpdate()
       }
       None
-    }, (appState, todayUpdate))
+    }, (appState, previousAppState, todayUpdate))
 
     (today, todayUpdate)
   }
 
   let useWeekDates = date => {
+    // flag to skip unecessary effect (update)
+    let firstRun = React.useRef(true)
     let (dates, dates_set) = React.useState(() => weekDates(date))
     React.useEffect2(() => {
-      Log.info("Date: useWeekDates update")
-      dates_set(_ => weekDates(date))
+      if !firstRun.current {
+        Log.info("Date: useWeekDates update")
+        dates_set(_ => weekDates(date))
+      } else {
+        firstRun.current = false
+      }
       None
     }, (date, dates_set))
     dates
