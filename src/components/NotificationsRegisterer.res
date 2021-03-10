@@ -1,14 +1,21 @@
 open Belt
 open ReactNative
 
-let reccurentRemindersCatchPhrase_default = "Check at your goals progress"
 let reccurentRemindersCatchPhrases = [
-  reccurentRemindersCatchPhrase_default,
-  "Take a look at your progress",
-  "How are your goals rings today?",
+  "What about checking how your time is being spent?",
+  "What about taking a look at your progress?",
   "What about taking a look to your goals and summary?",
-  "It's time to check your rings",
+  "What about checking your rings?",
+  "What about checking your progress?",
+  "Want to know how your time is being spent?",
+  "Want to know if you are doing good with your goals?",
+  "How are your goals rings?",
+  "How is your progress today?",
+  "How is your time being spend this days?",
+  "If you have some time, try to check your progress",
+  "If you have some time, try to check your goals",
 ]
+let reccurentRemindersCatchPhrase_default = reccurentRemindersCatchPhrases->Array.getUnsafe(0)
 
 @react.component
 let make = (~notificationsRecurrentRemindersOn, ~notificationsRecurrentReminders) => {
