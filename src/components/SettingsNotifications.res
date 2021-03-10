@@ -92,9 +92,7 @@ let make = () => {
             notificationsRecurrentRemindersOn: notificationsRecurrentRemindersOn,
           })
           if !notificationsRecurrentRemindersOn {
-            ReactNativePushNotification.cancelLocalNotifications({
-              "id": Notifications.Ids.reminderDailyCheck,
-            })
+            ReactNativePushNotification.cancelAllLocalNotifications()
           }
         }}
       />}>

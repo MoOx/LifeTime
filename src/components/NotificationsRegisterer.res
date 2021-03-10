@@ -27,11 +27,13 @@ let make = (~notificationsRecurrentRemindersOn, ~notificationsRecurrentReminders
     _requestNotificationPermission,
   ) = NotificationsHooks.useNotificationStatus()
   React.useEffect3(() => {
+    Log.info(("Notifications: status", notificationStatus))
     if notificationStatus === Some(ReactNativePermissions.granted) {
-      ReactNativePushNotification.cancelLocalNotifications({
-        "id": Notifications.Ids.reminderDailyCheck,
-      })
-
+      ReactNativePushNotification.cancelAllLocalNotifications()
+      Log.info((
+        "Notifications: notificationsRecurrentRemindersOn",
+        notificationsRecurrentRemindersOn,
+      ))
       if notificationsRecurrentRemindersOn {
         notificationsRecurrentReminders->Array.forEach(notifTime => {
           let date = Notifications.appropriateTimeForNextNotification(Js.Date.now(), notifTime)
@@ -40,8 +42,6 @@ let make = (~notificationsRecurrentRemindersOn, ~notificationsRecurrentReminders
           open ReactNativePushNotification
           localNotificationScheduleOptions(
             ~channelId="reminders",
-            ~id=Notifications.Ids.reminderDailyCheck,
-            ~userInfo={"id": Notifications.Ids.reminderDailyCheck},
             ~smallIcon="ic_notification",
             ~largeIcon="ic_launcher",
             // ~bigLargeIcon="ic_launcher",

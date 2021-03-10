@@ -14,11 +14,11 @@ let navigatorEmitter = EventEmitter.make()
       ~popInitialNotification=true,
       ~onNotification=notification => {
         Log.info(("App: onNotification ", notification))
-        switch notification.id {
-        | Some(id) when id == Notifications.Ids.reminderDailyCheck =>
-          navigatorEmitter->EventEmitter.emit("navigate", "GoalsScreen")
-        | _ => ()
-        }
+        // switch notification.id {
+        // | Some(id) when id == Notifications.Ids.reminderDailyCheck =>
+        //   navigatorEmitter->EventEmitter.emit("navigate", "GoalsScreen")
+        // | _ => ()
+        // }
         notification.finish(ReactNativePushNotificationIOS.FetchResult.noData)
       },
       (),

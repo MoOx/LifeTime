@@ -1,7 +1,4 @@
 open Belt
-module Ids = {
-  let reminderDailyCheck = 1->Js.Int.toString
-}
 
 let minutesGapToAvoidTooCloseNotif = 30.
 let appropriateTimeForNextNotification = (today: float, notifFrequency: array<option<int>>) => {
