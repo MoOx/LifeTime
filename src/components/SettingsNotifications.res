@@ -52,6 +52,9 @@ let make = () => {
         ~message="You already have a identical reminder. It's not necessary to have it twice.",
         (),
       )
+      if Platform.os === Platform.android {
+        showDatetimepicker_set(_ => false)
+      }
     } else {
       setSettings(settings => {
         ...settings,
