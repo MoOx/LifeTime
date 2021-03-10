@@ -166,12 +166,10 @@ let app = () => {
             </Native.NavigationContainer>
           )
           ->Option.getWithDefault(React.null)}
-          {settings.goals->Array.length === 0
-            ? React.null
-            : <NotificationsRegisterer
-                notificationsRecurrentRemindersOn=settings.notificationsRecurrentRemindersOn
-                notificationsRecurrentReminders=settings.notificationsRecurrentReminders
-              />}
+          <NotificationsRegisterer
+            notificationsRecurrentRemindersOn=settings.notificationsRecurrentRemindersOn
+            notificationsRecurrentReminders=settings.notificationsRecurrentReminders
+          />
         </Calendars.ContextProvider>
       </AppSettings.ContextProvider>
     </ReactNativeSafeAreaContext.SafeAreaProvider>
