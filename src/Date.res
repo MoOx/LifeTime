@@ -317,23 +317,30 @@ let defaultLocale: ReactNativeLocalize.locale = {
   languageTag: "en-US",
   scriptCode: None,
 }
-let userLocales = ReactNativeLocalize.getLocales()
-let userMainLocal = userLocales[0]->Option.getWithDefault(defaultLocale)
+let fallbackLocale = DateFns.Locales.enUS
 let supportedLocales = [
   DateFns.Locales.enUS,
   DateFns.Locales.enGB,
   DateFns.Locales.enCA,
   DateFns.Locales.fr,
 ]
-let selectedLocale =
-  (
-    supportedLocales->Array.keep(supportedLocale =>
-      (
-        userLocales->Array.keep(userLocale => userLocale.languageCode === supportedLocale.code)
-      )[0]->Option.isSome
+let bestLanguageTag = ReactNativeLocalize.findBestAvailableLanguage(
+  // dateFns doesn't have "en" locale, but iphone can have mixed things
+  // like "en-FR", if you choose "English" without flavor (US or UK) with a region FR
+  // so we need a "global" languageTag, not provided by DateFns locale
+  ["en"]->Array.concat(supportedLocales->Array.map(l => l.code)),
+)
+let localeOptions = Some({
+  locale: Some(
+    // now we reverse match the languageTag so find the first one that fits supportedLocales
+    bestLanguageTag
+    ->Option.flatMap(({languageTag}) =>
+      (supportedLocales->Array.keep(l => l.code->Js.String2.startsWith(languageTag)))[0]
     )
-  )[0]->Option.getWithDefault(DateFns.Locales.enUS)
-let localeOptions = Some({locale: Some(selectedLocale), weekStartsOn: Some(weekStartsOn)})
+    ->Option.getWithDefault(fallbackLocale),
+  ),
+  weekStartsOn: Some(weekStartsOn),
+})
 
 // DateFns shortcuts
 let formatRelative = (date, baseDate) => date->DateFns.formatRelative(baseDate, localeOptions)
