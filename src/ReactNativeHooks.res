@@ -7,12 +7,24 @@ let useAppState = () => {
     let onChange = state => {
       previous_set(_ => current)
       current_set(_ => state)
-      Log.info(("useAppState: ", state, "(was ", current, ")"))
+      Log.info(("useAppState: ", state, "(was", current, ")"))
     }
     AppState.addEventListener(#change(onChange))
     Some(() => AppState.removeEventListener(#change(onChange)))
   }, (current, previous_set, current_set))
   (current, previous)
+}
+
+let useAppStateUpdateIsActive = () => {
+  let (isActive, isActive_set) = React.useState(() => false)
+  React.useEffect2(() => {
+    let onChange = state => {
+      isActive_set(_ => state === #active)
+    }
+    AppState.addEventListener(#change(onChange))
+    Some(() => AppState.removeEventListener(#change(onChange)))
+  }, (isActive, isActive_set))
+  isActive
 }
 
 @val external process: 'a = "process"

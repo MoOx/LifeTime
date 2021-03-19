@@ -22,13 +22,13 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
     style(~width=windowDimensions.width->dp, ())
   }, [windowDimensions.width])
 
-  let (appState, previousAppState) = ReactNativeHooks.useAppState()
-  React.useEffect3(() => {
-    if appState !== previousAppState && appState === #active {
+  let appStateUpdateIsActive = ReactNativeHooks.useAppStateUpdateIsActive()
+  React.useEffect2(() => {
+    if appStateUpdateIsActive {
       requestUpdate()
     }
     None
-  }, (appState, previousAppState, requestUpdate))
+  }, (appStateUpdateIsActive, requestUpdate))
 
   let (today, todayUpdate) = Date.Hooks.useToday()
 

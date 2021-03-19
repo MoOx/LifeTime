@@ -358,7 +358,6 @@ let hasOverlap = (startA, endA, dateB) => {
 module Hooks = {
   let useToday = () => {
     let (today, today_set) = React.useState(() => now())
-    let (appState, previousAppState) = ReactNativeHooks.useAppState()
     let todayUpdate = React.useCallback2(() => {
       let now = now()
       // only update today when active AND there is an relevant diff
@@ -367,13 +366,13 @@ module Hooks = {
         today_set(_ => now)
       }
     }, (today, today_set))
-    React.useEffect3(() => {
-      // only update today when active AND there is an relevant diff
-      if appState !== previousAppState && appState === #active {
+    let appStateUpdateIsActive = ReactNativeHooks.useAppStateUpdateIsActive()
+    React.useEffect2(() => {
+      if appStateUpdateIsActive {
         todayUpdate()
       }
       None
-    }, (appState, previousAppState, todayUpdate))
+    }, (appStateUpdateIsActive, todayUpdate))
 
     (today, todayUpdate)
   }
