@@ -471,6 +471,9 @@ let make = (
                   <ListSeparator spaceStart />
                   {opened
                     ? categoryActivities
+                      ->SortArray.stableSortBy((a, b) =>
+                        a.title > b.title ? 1 : a.title < b.title ? -1 : 0
+                      )
                       ->Array.mapWithIndex((index, activity) => {
                         let selected =
                           selectedCat || activitiesSelected->Array.some(key => key == activity.id)
