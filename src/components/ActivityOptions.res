@@ -84,7 +84,9 @@ let make = (
 
   let filteredEvents =
     events
-    ->Option.map(event => event->Calendars.filterEventsByTitle(activityTitle))
+    ->Option.map(event =>
+      event->Calendars.filterEventsByTitle(activityTitle)->Calendars.sortEventsByDecreasingStartDate
+    )
     ->Option.getWithDefault([])
 
   let todayDates = Date.weekDates(today)
