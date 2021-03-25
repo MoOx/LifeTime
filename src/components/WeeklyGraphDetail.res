@@ -42,14 +42,22 @@ let make = (
     )
 
   let eventsPerDate = React.useMemo4(() => {
-    let events = events->Calendars.filterEvents(settings)
+    let events =
+      events->Calendars.filterEvents(
+        settings.calendarsSkipped,
+        settings.activitiesSkippedFlag,
+        settings.activitiesSkipped,
+      )
     let minutesInDay = 1440.
     let minUnit = width /. minutesInDay
     dates->Array.map(date => {
       let startOfDate = date->Date.startOfDay
       let startOfDateMin = date->Date.startOfDay->Js.Date.getTime->Date.msToMin
       let endOfDate = date->Date.endOfDay
-      (date, events->Array.map(evt => {
+      (
+        date,
+        events
+        ->Array.map(evt => {
           if (
             Date.hasOverlap(
               evt.startDate->Js.Date.fromString,
@@ -73,7 +81,9 @@ let make = (
           } else {
             ("", 0., 0.)
           }
-        })->Array.keep(((id, _, _)) => id != ""))
+        })
+        ->Array.keep(((id, _, _)) => id != ""),
+      )
     })
   }, (events, settings, dates, width))
 
@@ -103,7 +113,8 @@ let make = (
             viewStyle(~width=width->dp, ()),
           ])
         }>
-        {Array.range(0, supposedNumberOfDays->int_of_float)->Array.map(i =>
+        {Array.range(0, supposedNumberOfDays->int_of_float)
+        ->Array.map(i =>
           <React.Fragment key={i->string_of_int}>
             <SpacedView
               horizontal=XXS
@@ -130,7 +141,8 @@ let make = (
               </Text>
             </SpacedView>
           </React.Fragment>
-        )->React.array}
+        )
+        ->React.array}
       </View>
       <View
         style={
@@ -140,7 +152,8 @@ let make = (
             viewStyle(~width=(width +. 30.)->dp, ~position=#absolute, ~bottom=15.->dp, ()),
           ])
         }>
-        {Array.range(0, slices)->Array.map(i =>
+        {Array.range(0, slices)
+        ->Array.map(i =>
           <View key={i->string_of_int}>
             <SpacedView
               horizontal=XXS
@@ -150,6 +163,7 @@ let make = (
                 viewStyle(~bottom=-15.->dp, ())
               }>
               <Dash
+                length=graphHeight
                 style={
                   open Style
                   array([
@@ -187,7 +201,8 @@ let make = (
               </SpacedView>
             </View>
           </View>
-        )->React.array}
+        )
+        ->React.array}
         <View
           style={
             open Style
@@ -214,7 +229,8 @@ let make = (
         }>
         <Spacer size=XXS />
         {// TODO: handle events
-        eventsPerDate->Array.map(((date, ranges)) =>
+        eventsPerDate
+        ->Array.map(((date, ranges)) =>
           <SpacedView
             key={date->Js.Date.toISOString}
             horizontal=S
@@ -228,7 +244,8 @@ let make = (
                 (),
               )
             }>
-            {ranges->Array.map(((id, rangeFrom, rangeTo)) =>
+            {ranges
+            ->Array.map(((id, rangeFrom, rangeTo)) =>
               <View
                 key=id
                 style={
@@ -246,9 +263,11 @@ let make = (
                   ])
                 }
               />
-            )->React.array}
+            )
+            ->React.array}
           </SpacedView>
-        )->React.array}
+        )
+        ->React.array}
       </View>
     </View>
     <Spacer />

@@ -45,7 +45,7 @@ let make = (
           <Text
             style={Style.array([
               Theme.text["title3"],
-              Theme.text["medium"],
+              Theme.text["weight400"],
               theme.styles["textLight2"],
             ])}>
             {"No events"->React.string}
@@ -71,7 +71,8 @@ let make = (
           />
         </Row>
         <Separator style={theme.styles["separatorOnBackground"]} />
-        {eventsWithDuration->Array.mapWithIndex((index, eventWithDuration) => {
+        {eventsWithDuration
+        ->Array.mapWithIndex((index, eventWithDuration) => {
           let (event, duration) = eventWithDuration
           let durationString = duration->Date.minToString
           <View key=event.id>
@@ -142,7 +143,8 @@ let make = (
               ? <Separator style={theme.styles["separatorOnBackground"]} />
               : React.null}
           </View>
-        })->React.array}
+        })
+        ->React.array}
       </View>
     }}
   </View>

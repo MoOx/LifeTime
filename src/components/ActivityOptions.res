@@ -12,7 +12,7 @@ let make = (
   ~currentWeek: (string, string),
 ) => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
-  let (getEvents, _updatedAt, requestUpdate) = React.useContext(Calendars.context)
+  let (getEvents, fetchEvents, _updatedAt, requestUpdate) = React.useContext(Calendars.context)
 
   let windowDimensions = Dimensions.useWindowDimensions()
 
@@ -30,7 +30,7 @@ let make = (
   }, (refreshing, requestUpdate, onRefreshDone))
 
   let (today, today_set) = React.useState(() => Date.now())
-  let appState = ReactNativeHooks.useAppState()
+  let (appState, _previousAppState) = ReactNativeHooks.useAppState()
   React.useEffect3(() => {
     if appState === #active {
       requestUpdate()
@@ -68,11 +68,23 @@ let make = (
 
   let endDate = supposedEndDate->Date.min(today)
 
-  let events =
-    getEvents(startDate, endDate, true)
-    ->Option.map(event =>
-      event->Calendars.filterEventsByTitle(activityTitle)->Calendars.sortEventsByDecreasingStartDate
-    )
+  let fetchedEvents = getEvents(startDate, endDate)
+  React.useEffect4(() => {
+    // Log.info(("Goals fetchEvents", startDate, endDate))
+    switch fetchedEvents {
+    | NotAsked => fetchEvents(startDate, endDate)
+    | _ => ()
+    }
+    None
+  }, (fetchEvents, fetchedEvents, startDate, endDate))
+  let events = switch fetchedEvents {
+  | Done(evts) => Some(evts)
+  | _ => None
+  }
+
+  let filteredEvents =
+    events
+    ->Option.map(event => event->Calendars.filterEventsByTitle(activityTitle))
     ->Option.getWithDefault([])
 
   let todayDates = Date.weekDates(today)
@@ -161,8 +173,7 @@ let make = (
     })
     ->List.toArray
     ->React.array}
-  <Separator style={theme.styles["separatorOnBackground"]} />
-    </View>
+    <Separator style={theme.styles["separatorOnBackground"]} />
     <Spacer size=S />
     <Row> <Spacer size=XS /> <BlockHeading text="Activity chart" /> </Row>
     <Separator style={theme.styles["separatorOnBackground"]} />
@@ -185,7 +196,9 @@ let make = (
     </View>
     <Row> <Spacer size=XS /> <BlockHeading text="Events" /> </Row>
     <Separator style={theme.styles["separatorOnBackground"]} />
-    <View style={theme.styles["background"]}> <Events startDate endDate events /> </View>
+    <View style={theme.styles["background"]}>
+      <Events startDate endDate events=filteredEvents />
+    </View>
     <Separator style={theme.styles["separatorOnBackground"]} />
     <ListSeparator />
     <Spacer size=L />
