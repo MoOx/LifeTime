@@ -1,25 +1,29 @@
 // @flow
 
 import * as React from 'react';
-import {PixelRatio, StyleSheet, View, Image} from 'react-native';
+import {PixelRatio, StyleSheet, View, Image, processColor} from 'react-native';
 import Svg, {Circle, Defs, RadialGradient, Stop} from 'react-native-svg';
-import MaskedView from '@react-native-community/masked-view';
+import MaskedView from '@react-native-masked-view/masked-view';
 import Animated, {
+  abs,
+  block,
+  Clock,
+  clockRunning,
+  color,
+  cond,
   Easing,
-  Extrapolate,
   interpolate,
   lessThan,
-  abs,
-  cond,
   max,
-  multiply,
+  round,
   set,
+  startClock,
+  stopClock,
   sub,
+  timing,
   useCode,
   Value,
 } from 'react-native-reanimated';
-import {interpolateColor} from 'react-native-redash';
-import {timing} from 'react-native-redash';
 
 const _180deg = Math.PI;
 const _360deg = _180deg * 2;
@@ -34,6 +38,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  absolute: {
+    position: 'absolute',
+  },
+  absoluteTopLeft: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
   overflowHidden: {
     overflow: 'hidden',
   },
@@ -46,53 +58,6 @@ const styles = StyleSheet.create({
 });
 
 /*::
-type AngularGradient2Props = {|
-  size: number,
-  colors: [string, string],
-|}
-*/
-const AngularGradient = (
-  {size, colors: [start, end]} /*: AngularGradient2Props*/,
-) => {
-  let borderRadius = size / 2;
-  return (
-    <View
-      style={{
-        width: size,
-        height: size,
-        backgroundColor: start,
-        borderRadius,
-      }}>
-      <MaskedView
-        style={styles.flex}
-        maskElement={
-          <Image
-            style={[
-              styles.transparent,
-              {
-                width: size,
-                height: size,
-                borderRadius,
-              },
-            ]}
-            source={require('./ActivityRings.mask.png')}
-          />
-        }>
-        <View
-          style={[
-            styles.flex,
-            {
-              backgroundColor: end,
-              borderRadius,
-            },
-          ]}
-        />
-      </MaskedView>
-    </View>
-  );
-};
-
-/*::
 type HalfCircleProps = {|
   children: React.Node,
   size: number,
@@ -101,22 +66,11 @@ type HalfCircleProps = {|
 
 const HalfCircle = ({children, size} /*: HalfCircleProps*/) => {
   return (
-    <View
-      style={[
-        styles.overflowHidden,
-        {
-          width: size,
-          height: size / 2,
-        },
-      ]}>
+    <View style={[styles.overflowHidden, {width: size, height: size / 2}]}>
       <View
         style={[
           styles.overflowHidden,
-          {
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-          },
+          {width: size, height: size, borderRadius: size / 2},
         ]}>
         {children}
       </View>
@@ -124,56 +78,165 @@ const HalfCircle = ({children, size} /*: HalfCircleProps*/) => {
   );
 };
 
+export const opacity = (c /*: number*/) => ((c >> 24) & 255) / 255;
+export const red = (c /*: number*/) => (c >> 16) & 255;
+export const green = (c /*: number*/) => (c >> 8) & 255;
+export const blue = (c /*: number*/) => c & 255;
+
+const interpolateColor = (
+  animationValue /*: Animated.Adaptable<number>*/,
+  config /*: {inputRange: Array<number>, outputRange : Array<string>}*/,
+) => {
+  const colors = config.outputRange.map((c) => processColor(c));
+  return color(
+    round(
+      interpolate(animationValue, {
+        inputRange: config.inputRange,
+        outputRange: colors.map((c) => (typeof c === 'number' ? red(c) : 0)),
+        extrapolate: 'clamp',
+      }),
+    ),
+    round(
+      interpolate(animationValue, {
+        inputRange: config.inputRange,
+        outputRange: colors.map((c) => (typeof c === 'number' ? green(c) : 0)),
+        extrapolate: 'clamp',
+      }),
+    ),
+    round(
+      interpolate(animationValue, {
+        inputRange: config.inputRange,
+        outputRange: colors.map((c) => (typeof c === 'number' ? blue(c) : 0)),
+        extrapolate: 'clamp',
+      }),
+    ),
+    round(
+      interpolate(animationValue, {
+        inputRange: config.inputRange,
+        outputRange: colors.map((c) =>
+          typeof c === 'number' ? opacity(c) : 0,
+        ),
+        extrapolate: 'clamp',
+      }),
+    ),
+  );
+};
+
+const runTiming = (clock, value, config) => {
+  const state = {
+    finished: new Value(0),
+    position: value,
+    time: new Value(0),
+    frameTime: new Value(0),
+  };
+
+  return block([
+    cond(clockRunning(clock), 0, [
+      set(state.finished, 0),
+      set(state.time, 0),
+      set(state.position, value),
+      set(state.frameTime, 0),
+      startClock(clock),
+    ]),
+    timing(clock, state, config),
+    cond(state.finished, stopClock(clock)),
+    state.position,
+  ]);
+};
+
 /*::
 type ring = {|
-  startColor: string,
-  endColor: string,
   backgroundColor: string,
+  endColor: string,
   progress: number,
+  startColor: string,
 |};
 
 type RingProps ={|
+  animationDuration?: number,
+  ring: ring,
+  shadowSolidColor?: string,
+  shadowSolidSize?: number,
   size: number,
   strokeWidth: number,
-  ring: ring,
-  theta: Animated.Node<number>,
 |}
 */
-const Ring = ({strokeWidth, ring, size, theta} /*: RingProps*/) => {
-  const absTheta = abs(theta);
-  const scaleX = cond(lessThan(theta, 0), -1, 1);
-  const strokeWidthBy2 = strokeWidth / 2;
-  const offset = PixelRatio.roundToNearestPixel(size / 2) - strokeWidthBy2;
-  const rotateStartingPoint = max(0, sub(absTheta, _360deg));
-  const circleStyle = [
-    StyleSheet.absoluteFill,
-    {
-      width: strokeWidth,
-      height: strokeWidth,
-      borderRadius: strokeWidthBy2,
-      top: offset,
-    },
-  ];
+const Ring = (
+  {
+    strokeWidth,
+    ring,
+    size,
+    shadowSolidSize = 1,
+    shadowSolidColor = 'rgba(0,0,0,0.25)',
+    animationDuration = 1500,
+  } /*: RingProps*/,
+) => {
+  const clock = React.useRef(new Clock()).current;
+  const progress = React.useRef(new Value(0));
+  // const progress = {current: new Value(0)}; // dev help :)
+  useCode(() => {
+    return runTiming(clock, progress.current, {
+      toValue: ring.progress * _360deg,
+      duration: animationDuration,
+      easing,
+    });
+  }, [ring.progress]);
+  const absoluteProgress = abs(progress.current);
+  const scaleX = cond(lessThan(progress.current, 0), -1, 1);
+  const rotateStartingPoint = max(0, sub(absoluteProgress, _360deg));
+
+  const offset = PixelRatio.roundToNearestPixel(size / 2) - strokeWidth / 2;
+  const circleStyle = {
+    width: strokeWidth,
+    height: strokeWidth,
+    borderRadius: strokeWidth / 2,
+    position: 'absolute',
+    top: offset,
+    left: 0,
+  };
   const circleEndStyle = {
     transform: [
       {translateX: offset},
-      {rotate: absTheta},
+      {rotate: absoluteProgress},
       {translateX: -offset},
     ],
   };
+  const borderRadius = size / 2;
   const foreground = (
-    <AngularGradient colors={[ring.startColor, ring.endColor]} size={size} />
+    <View
+      style={{
+        borderRadius,
+        width: size,
+        height: size,
+        backgroundColor: ring.startColor,
+      }}>
+      <MaskedView
+        style={styles.flex}
+        maskElement={
+          <Image
+            style={[
+              styles.transparent,
+              {width: size, height: size, borderRadius},
+            ]}
+            source={require('./ActivityRings.mask.png')}
+          />
+        }>
+        <View
+          style={[styles.flex, {backgroundColor: ring.endColor, borderRadius}]}
+        />
+      </MaskedView>
+    </View>
   );
   const background = (
     <View style={[styles.flex, {backgroundColor: ring.backgroundColor}]} />
   );
+  const shadowWidth = size - strokeWidth * 2;
   return (
     <Animated.View
       style={[
         styles.center,
-        {
-          transform: [{scaleX}, rotate90],
-        },
+        {borderRadius: size / 2, transform: [{scaleX}, rotate90]},
+        styles.overflowHidden,
       ]}>
       {/* circle */}
       <Animated.View
@@ -192,10 +255,10 @@ const Ring = ({strokeWidth, ring, size, theta} /*: RingProps*/) => {
               {
                 transform: [
                   {translateY: size / 4},
-                  {rotate: absTheta},
+                  {rotate: absoluteProgress},
                   {translateY: -size / 4},
                 ],
-                opacity: lessThan(absTheta, _180deg),
+                opacity: lessThan(absoluteProgress, _180deg),
               },
             ]}>
             <HalfCircle size={size}>{background}</HalfCircle>
@@ -210,10 +273,10 @@ const Ring = ({strokeWidth, ring, size, theta} /*: RingProps*/) => {
                 transform: [
                   {translateY: size / 4},
                   {
-                    rotate: interpolate(absTheta, {
+                    rotate: interpolate(absoluteProgress, {
                       inputRange: [_180deg, _360deg],
                       outputRange: [0, _180deg],
-                      extrapolate: Extrapolate.CLAMP,
+                      extrapolate: 'clamp',
                     }),
                   },
                   {translateY: -size / 4},
@@ -224,48 +287,100 @@ const Ring = ({strokeWidth, ring, size, theta} /*: RingProps*/) => {
           </Animated.View>
         </View>
       </Animated.View>
-      {/* circle start point */}
+      {/* circle start point, visible on start */}
       <Animated.View
         style={[
           circleStyle,
           {
             transform: [{rotate: rotateStartingPoint}],
-            opacity: lessThan(absTheta, _360deg),
             backgroundColor: ring.startColor,
+            // make it invisible as soon as progress to one full circle
+            opacity: lessThan(absoluteProgress, _360deg),
           },
         ]}
       />
-      {/* circle end  point shadow */}
-      <Animated.View style={[circleStyle, circleEndStyle]}>
-        <Svg width={strokeWidth} height={strokeWidth}>
-          <Defs>
-            <RadialGradient
-              cx="50%"
-              cy="50%"
-              fx="50%"
-              fy="50%"
-              r="50%"
-              id="shadow">
-              <Stop offset="0%" stopOpacity={0} stopColor="#000" />
-              <Stop offset="50%" stopOpacity={0.15} stopColor="#000" />
-              <Stop offset="100%" stopOpacity={0} stopColor="#000" />
-            </RadialGradient>
-          </Defs>
-          <Circle
-            cx={strokeWidth / 2}
-            cy={strokeWidth / 2}
-            r={strokeWidth / 2}
-            fill="url(#shadow)"
-          />
-        </Svg>
-      </Animated.View>
-      {/* circle end point*/}
+      {/* circle end point shadow that create the impression of depth */}
       <Animated.View
         style={[
           circleStyle,
           circleEndStyle,
           {
-            backgroundColor: interpolateColor(absTheta, {
+            // for the first circle, we don't need the same shadow
+            // so we start the shadow only when the stroke is going to overlap the start
+            opacity: interpolate(absoluteProgress, {
+              inputRange: [0, _360deg * 0.8, _360deg],
+              outputRange: [0.5, 0.5, 1],
+            }),
+          },
+        ]}>
+        <View
+          style={[
+            styles.overflowHidden,
+            styles.absolute,
+            {
+              top: strokeWidth / 2 - shadowWidth / 2,
+              left: strokeWidth / 2 - shadowWidth / 2,
+              width: shadowWidth,
+              height: shadowWidth / 2,
+            },
+          ]}>
+          <Svg
+            style={[StyleSheet.absoluteFill]}
+            width={shadowWidth}
+            height={shadowWidth}>
+            <Defs>
+              <RadialGradient
+                cx="50%"
+                cy="50%"
+                fx="50%"
+                fy="50%"
+                r="50%"
+                id="shadow">
+                <Stop offset="10%" stopOpacity={1} stopColor="#000" />
+                <Stop offset="20%" stopOpacity={0.3} stopColor="#000" />
+                <Stop offset="25%" stopOpacity={0.2} stopColor="#000" />
+                <Stop offset="100%" stopOpacity={0} stopColor="#000" />
+              </RadialGradient>
+            </Defs>
+            <Circle
+              cx={shadowWidth / 2}
+              cy={shadowWidth / 2}
+              r={shadowWidth / 2}
+              fill="url(#shadow)"
+            />
+          </Svg>
+        </View>
+        <View
+          style={[
+            styles.overflowHidden,
+            styles.absolute,
+            {
+              top: -shadowSolidSize / 2,
+              left: -shadowSolidSize / 2,
+              width: strokeWidth + shadowSolidSize,
+              height: strokeWidth / 2 + shadowSolidSize,
+            },
+          ]}>
+          <View
+            style={[
+              styles.absoluteTopLeft,
+              {
+                width: strokeWidth + shadowSolidSize,
+                height: strokeWidth + shadowSolidSize,
+                borderRadius: strokeWidth + shadowSolidSize,
+                backgroundColor: shadowSolidColor,
+              },
+            ]}
+          />
+        </View>
+      </Animated.View>
+      {/* circle end point, follow the progress entirely */}
+      <Animated.View
+        style={[
+          circleStyle,
+          circleEndStyle,
+          {
+            backgroundColor: interpolateColor(absoluteProgress, {
               inputRange: [0, _360deg],
               outputRange: [ring.startColor, ring.endColor],
             }),
@@ -278,12 +393,15 @@ const Ring = ({strokeWidth, ring, size, theta} /*: RingProps*/) => {
 
 /*::
 type ActivityRingsProps = {|
-  rings: Array<ring>,
-  width: number,
-  strokeWidth: number,
+  animationDuration?: number,
   backgroundColor: string,
-  spaceBetween: number,
   children?: React.Node,
+  rings: Array<ring>,
+  shadowSolidColor?: string,
+  shadowSolidSize?: number,
+  spaceBetween: number,
+  strokeWidth: number,
+  width: number,
 |};
 */
 
@@ -291,26 +409,17 @@ const easing = Easing.bezier(0.32, 0.12, -0.1, 1);
 
 export default (
   {
-    rings,
-    width,
-    strokeWidth,
+    animationDuration,
     backgroundColor,
-    spaceBetween,
     children,
+    rings,
+    shadowSolidColor,
+    shadowSolidSize,
+    spaceBetween,
+    strokeWidth,
+    width,
   } /*: ActivityRingsProps*/,
 ) => {
-  const progress = new Value(0);
-  useCode(
-    () =>
-      set(
-        progress,
-        timing({
-          duration: 1500,
-          easing,
-        }),
-      ),
-    [progress],
-  );
   return (
     <View style={[{width, height: width}]}>
       {rings.map((ring, i) => {
@@ -329,8 +438,10 @@ export default (
               },
             ]}>
             <Ring
-              theta={multiply(ring.progress * _360deg, progress)}
+              animationDuration={animationDuration}
               ring={ring}
+              shadowSolidColor={shadowSolidColor}
+              shadowSolidSize={shadowSolidSize}
               size={size}
               strokeWidth={strokeWidth}
             />

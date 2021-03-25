@@ -12,8 +12,18 @@ let title = "LifeTime & Privacy"
 let make = () => {
   let theme = Theme.useTheme(AppSettings.useTheme())
 
-  <SpacedView horizontal=L vertical=XL style={styles["container"]}>
-    <Center> <Title style={theme.styles["text"]}> {title->React.string} </Title> </Center>
+  <SpacedView horizontal=L vertical=None style={styles["container"]}>
+    <Center>
+      <Text
+        allowFontScaling=false
+        style={Style.array([
+          Theme.text["largeTitle"],
+          Theme.text["weight700"],
+          theme.styles["text"],
+        ])}>
+        {title->React.string}
+      </Text>
+    </Center>
     <Spacer size=L />
     <Text
       style={
@@ -38,6 +48,5 @@ This mean, unless you backup your data, you cannot recover your personal setting
 In the future, if we need to share collect data to improve the application, this will be with your explicit consent and all the data will be anonymised to respect privacy.
 `->React.string}
     </Text>
-    <Spacer size=XXL />
   </SpacedView>
 }

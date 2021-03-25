@@ -4,11 +4,13 @@ open ReactNative
 let calendarDemoTitle = "LifeTime Demo"
 
 let injectFreshData = () => {
-  ReactNativeCalendarEvents.findCalendars()->FutureJs.fromPromise(error => {
+  ReactNativeCalendarEvents.findCalendars()
+  ->FutureJs.fromPromise(error => {
     // @todo error
-    Js.log2("ReactNativeCalendarEvents.findCalendars", error)
+    Log.info(("Demo: ReactNativeCalendarEvents.findCalendars", error))
     "Unable to retrieve calendars before injecting demo data"
-  })->Future.tapOk(calendarsResult => {
+  })
+  ->Future.tapOk(calendarsResult => {
     if calendarsResult->Array.length <= 0 {
       Alert.alert(
         ~title="Cannot Inject Demo Data",
@@ -25,11 +27,13 @@ let injectFreshData = () => {
 
     switch lifeTimeCalendarOptionalId {
     | Some(id) => {
-        Js.log((calendarDemoTitle, id))
+        Log.info(("Demo: injectFreshData", calendarDemoTitle, id))
         Future.value(Some(id))
       }
-    | None => calendarsResult[0]->Option.map(calendar => {
-        Js.log((calendarDemoTitle, "No calendar yet, creating..."))
+    | None =>
+      calendarsResult[0]
+      ->Option.map(calendar => {
+        Log.info(("Demo: injectFreshData", calendarDemoTitle, "No calendar yet, creating..."))
         ReactNativeCalendarEvents.saveCalendar({
           title: calendarDemoTitle,
           name: "LifeTime",
@@ -46,7 +50,7 @@ let injectFreshData = () => {
         })
         ->FutureJs.fromPromise(error => {
           // @todo error
-          Js.log2("ReactNativeCalendarEvents.saveCalendar", error)
+          Log.info(("Demo: ReactNativeCalendarEvents.saveCalendar", error))
           "Unable to create a calendars to injecting demo data"
         })
         ->Future.map(res => {
@@ -55,13 +59,45 @@ let injectFreshData = () => {
           | Error(_) => None
           }
         })
-      })->Option.getWithDefault(Future.value(None))
+      })
+      ->Option.getWithDefault(Future.value(None))
     }->Future.tap(id => {
-      Js.log((calendarDemoTitle, "ready", id))
-      id->Option.map(calendarId => {
+      Log.info(("Demo: ", calendarDemoTitle, "ready", id))
+      id
+      ->Option.map(calendarId => {
         open ReactNativeCalendarEvents
         let today = Date.now()
+        let lastWeekSameDay = today->DateFns.addDays(-7.)
+        let startOfLastWeekDate = Date.startOfWeek(lastWeekSameDay)
         let startOfWeekDate = Date.startOfWeek(today)
+        [
+          (-2., 8.25),
+          (-1., 8.5),
+          (-2.5, 7.),
+          (-1.75, 7.75),
+          (0.5, 8.),
+          (-1.5, 8.75),
+          (0., 7.75),
+        ]->Array.forEachWithIndex((index, (startadd, endadd)) => {
+          open DateFns
+          saveEvent(
+            "Sleep",
+            writableEvent(
+              ~calendarId,
+              ~notes="LifeTime Demo Event",
+              ~startDate=startOfLastWeekDate
+              ->addDays(index->Js.Int.toFloat)
+              ->addHours(startadd)
+              ->Js.Date.getTime,
+              ~endDate=startOfLastWeekDate
+              ->addDays(index->Js.Int.toFloat)
+              ->addHours(endadd)
+              ->Js.Date.getTime,
+              (),
+            ),
+            None,
+          )->ignore
+        })
         [
           (-2., 8.25),
           (-1., 8.5),
@@ -90,18 +126,22 @@ let injectFreshData = () => {
             None,
           )->ignore
         })
-      })->ignore
+      })
+      ->ignore
     })
-  })->ignore
+  })
+  ->ignore
   ()
 }
 
 let removeData = () => {
-  ReactNativeCalendarEvents.findCalendars()->FutureJs.fromPromise(error => {
+  ReactNativeCalendarEvents.findCalendars()
+  ->FutureJs.fromPromise(error => {
     // @todo error
-    Js.log2("ReactNativeCalendarEvents.findCalendars", error)
+    Log.info(("Demo: removeData ReactNativeCalendarEvents.findCalendars", error))
     "Unable to retrieve calendars before injecting demo data"
-  })->Future.tapOk(calendarsResult => {
+  })
+  ->Future.tapOk(calendarsResult => {
     if calendarsResult->Array.length <= 0 {
       Alert.alert(
         ~title="Cannot Remove Demo Data",
@@ -126,6 +166,7 @@ let removeData = () => {
         (),
       )
     }
-  })->ignore
+  })
+  ->ignore
   ()
 }

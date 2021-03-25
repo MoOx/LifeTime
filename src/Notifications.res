@@ -1,7 +1,4 @@
 open Belt
-module Ids = {
-  let reminderDailyCheck = 1->Js.Int.toString
-}
 
 let minutesGapToAvoidTooCloseNotif = 30.
 let appropriateTimeForNextNotification = (today: float, notifFrequency: array<option<int>>) => {
@@ -25,11 +22,11 @@ let appropriateTimeForNextNotification = (today: float, notifFrequency: array<op
 
   let supposedMaxLimitDate = supposedDate->getTime -. 1000. *. 60. *. minutesGapToAvoidTooCloseNotif
   let adjustedDate = if today >= supposedMaxLimitDate {
-    (// date + 1j if...
+    // date + 1j if...
     // - you open the app Xmin before the notification
     //   (eg: you open at 8:30+ => delay to avoid a notification poping at 9:00)
     // - you open the app after the notification hour
-    today +. 1000. *. 60. *. 60. *. 24.)->fromFloat
+    (today +. 1000. *. 60. *. 60. *. 24.)->fromFloat
   } else {
     // current date if we open the app after midnight
     // we still want notif in the morning
@@ -44,11 +41,16 @@ let appropriateTimeForNextNotification = (today: float, notifFrequency: array<op
     ~seconds=0.,
     (),
   )
-  Js.log((
-    ("Notification planned at", adjustedNotifTime->toISOString),
-    ("today", today->fromFloat->toISOString),
-    ("supposedDate", supposedDate->toISOString),
-    ("supposedMaxLimitDate", supposedMaxLimitDate->fromFloat->toISOString),
-  ))
+
+  // Log.info((
+  //   "Notifications:",
+  //   notifFrequency,
+  //   "planned at",
+  //   adjustedNotifTime->toISOString,
+  //   "supposedDate",
+  //   supposedDate->toISOString,
+  //   "supposedMaxLimitDate",
+  //   supposedMaxLimitDate->fromFloat->toISOString,
+  // ))
   adjustedNotifTime
 }

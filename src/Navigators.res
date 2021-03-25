@@ -8,25 +8,26 @@ module StatsStack = {
   module M = {
     type params = {currentActivityTitle: option<string>, currentWeek: (string, string)}
   }
-  include Stack.Make(M)
+  include NativeStack.Make(M)
 }
 
-module GoalsStack = Stack.Make(M)
+module GoalsStack = NativeStack.Make(M)
 
-module SettingsStack = Stack.Make(M)
+module SettingsStack = NativeStack.Make(M)
 
 module Tabs = BottomTabs.Make(M)
 
 module RootStack = {
   module M = {
     type params = {
+      // for Goals*ModalScreen
       newGoalType: option<Goal.Type.serializableT>,
       goalId: option<Goal.id>,
       // react-navigation native params to navigate to a screen if you are in a tab
       screen: option<string>,
     }
 
-    @bs.obj
+    @obj
     external params: (
       ~newGoalType: Goal.Type.serializableT=?,
       ~goalId: Goal.id=?,
@@ -34,5 +35,5 @@ module RootStack = {
       unit,
     ) => params = ""
   }
-  include Stack.Make(M)
+  include NativeStack.Make(M)
 }

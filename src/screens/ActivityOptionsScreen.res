@@ -9,10 +9,6 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.StatsStac
   let onRefresh = React.useCallback1(() => refreshing_set(_ => true), [refreshing_set])
   let onRefreshDone = React.useCallback1(() => refreshing_set(_ => false), [refreshing_set])
   <>
-    <StatusBar
-      barStyle={Theme.statusBarStyle(theme.mode, #darkContent)}
-      backgroundColor={Theme.statusBarColor(theme.mode, #darkContent)}
-    />
     <Animated.ScrollView
       style={Style.array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])}
       refreshControl={<RefreshControl

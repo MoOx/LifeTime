@@ -1,0 +1,55 @@
+diff --git a/node_modules/react-native-gesture-handler/Swipeable.js b/node_modules/react-native-gesture-handler/Swipeable.js
+index 69a569f..2d38cd8 100644
+--- a/node_modules/react-native-gesture-handler/Swipeable.js
++++ b/node_modules/react-native-gesture-handler/Swipeable.js
+@@ -19,6 +19,7 @@ export type PropType = {
+   overshootLeft?: boolean,
+   overshootRight?: boolean,
+   overshootFriction: number,
++  onSwipeStart?: Function,
+   onSwipeableLeftOpen?: Function,
+   onSwipeableRightOpen?: Function,
+   onSwipeableOpen?: Function,
+@@ -160,6 +161,9 @@ export default class Swipeable extends Component<PropType, StateType> {
+   };
+ 
+   _onHandlerStateChange = ({ nativeEvent }) => {
++    if (nativeEvent.state === State.ACTIVE) {
++       this.props.onSwipeStart && this.props.onSwipeStart()
++     }
+     if (nativeEvent.oldState === State.ACTIVE) {
+       this._handleRelease(nativeEvent);
+     }
+diff --git a/node_modules/react-native-gesture-handler/createNativeWrapper.js b/node_modules/react-native-gesture-handler/createNativeWrapper.js
+index 2bce140..9739f24 100644
+--- a/node_modules/react-native-gesture-handler/createNativeWrapper.js
++++ b/node_modules/react-native-gesture-handler/createNativeWrapper.js
+@@ -1,4 +1,4 @@
+-import React from 'react';
++import React, { useImperativeHandle, useRef } from 'react';
+ 
+ import NativeViewGestureHandler from './NativeViewGestureHandler';
+ 
+@@ -42,9 +42,20 @@ export default function createNativeWrapper(Component, config = {}) {
+       },
+       { ...config } // watch out not to modify config
+     );
++    const _ref = useRef();
++    const _gestureHandlerRef = useRef();
++    useImperativeHandle(ref, () => {
++      const node = _gestureHandlerRef.current;
++      // add handlerTag for relations config
++      if (_ref.current && node) {
++        _ref.current._handlerTag = node._handlerTag;
++        return _ref.current;
++      }
++      return null;
++    }, [_ref, _gestureHandlerRef]);
+     return (
+-      <NativeViewGestureHandler {...gestureHandlerProps}>
+-        <Component {...props} ref={ref} />
++      <NativeViewGestureHandler {...gestureHandlerProps} ref={_gestureHandlerRef}>
++        <Component {...props} ref={_ref} />
+       </NativeViewGestureHandler>
+     );
+   });

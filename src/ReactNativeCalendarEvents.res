@@ -4,7 +4,7 @@ type isoDateString = string
 
 type authorizationStatus = [#denied | #restricted | #authorized | #undetermined]
 
-@bs.deriving({jsConverter: newType})
+@deriving({jsConverter: newType})
 type recurrenceFrequency = [#daily | #weekly | #monthly | #yearly]
 
 type coords = {
@@ -64,7 +64,7 @@ type calendar = {
   /* The calendar’s title. */
   title: string,
   /* The calendar’s type. */
-  @bs.as("type")
+  @as("type")
   type_: string,
   /* The source object representing the account to which this calendar belongs. */
   source: string,
@@ -146,7 +146,7 @@ type writableEvent = {
   alarms: option<array<alarm>>,
 }
 
-@bs.obj
+@obj
 external writableEvent: (
   ~alarms: array<alarm>=?,
   ~allDay: bool=?,
@@ -168,7 +168,7 @@ type calendarAccountSourceAndroid = {
   /* The Account name */
   name: string,
   /* The Account type */
-  @bs.as("type")
+  @as("type")
   type_: option<string>,
   /* The source (required if source.type is not used) */
   isLocalAccount: option<bool>,
@@ -192,79 +192,73 @@ type calendarOptions = {
 }
 
 /* Get calendar authorization status. */
-@bs.module("react-native-calendar-events") @bs.scope("default")
+@module("react-native-calendar-events") @scope("default")
 external checkPermissions: bool => Js.Promise.t<authorizationStatus> = "checkPermissions"
 
 /* Request calendar authorization. Authorization must be granted before accessing calendar events. */
-@bs.module("react-native-calendar-events") @bs.scope("default")
+@module("react-native-calendar-events") @scope("default")
 external requestPermissions: unit => Js.Promise.t<authorizationStatus> = "requestPermissions"
 
 /* Finds all the calendars on the device. */
-@bs.module("react-native-calendar-events") @bs.scope("default")
+@module("react-native-calendar-events") @scope("default")
 external findCalendars: unit => Js.Promise.t<array<calendar>> = "findCalendars"
 
 @ocaml.doc("
  * Create a calendar.
  * @param calendar - Calendar to create
  ")
-@bs.module("react-native-calendar-events")
-@bs.scope("default")
+@module("react-native-calendar-events")
+@scope("default")
 external saveCalendar: calendarOptions => Js.Promise.t<string> = "saveCalendar"
 
 @ocaml.doc("
  * Remove a calendar.
  * @param id - Id of the calendar to remove
  ")
-@bs.module("react-native-calendar-events")
-@bs.scope("default")
+@module("react-native-calendar-events")
+@scope("default")
 external removeCalendar: string => Js.Promise.t<bool> = "removeCalendar"
 
 @ocaml.doc("
  * Find calendar event by id.
  * @param id - Event ID
  ")
-@bs.module("react-native-calendar-events")
-@bs.scope("default")
+@module("react-native-calendar-events")
+@scope("default")
 external findEventById: string => Js.Promise.t<Js.Nullable.t<calendarEventReadable>> =
   "findEventById"
 
-@ocaml.doc(
-  "
+@ocaml.doc("
  * Fetch all calendar events.
  * @param startDate - Date string in ISO format
  * @param endDate - Date string in ISO format
  * @param [calendarIds] - List of calendar id strings to specify calendar events. Defaults to all calendars if empty.
- "
-)
-@bs.module("react-native-calendar-events")
-@bs.scope("default")
+ ")
+@module("react-native-calendar-events")
+@scope("default")
 external fetchAllEvents: (
   isoDateString,
   isoDateString,
   option<array<string>>,
 ) => Js.Promise.t<array<calendarEventReadable>> = "fetchAllEvents"
 
-@ocaml.doc(
-  "
+@ocaml.doc("
  * Creates or updates a calendar event. To update an event, the event id must be defined.
  * @param title - The title of the event
  * @param details - Event details
  * @param [options] - Options specific to the saved event.
  * @returns - Promise resolving to saved event's ID.
- "
-)
-@bs.module("react-native-calendar-events")
-@bs.scope("default")
+ ")
+@module("react-native-calendar-events")
+@scope("default")
 external saveEvent: (string, writableEvent, option<options>) => Js.Promise.t<string> = "saveEvent"
 
-@ocaml.doc(
-  "
+@ocaml.doc("
  * Removes calendar event.
  * @param id - The event id
  * @param [options] - Options specific to the saved event.
  * @returns - Promise resolving to bool to indicate if removal succeeded.
- "
-)
-@bs.module("react-native-calendar-events")
-@bs.scope("default")
+ ")
+@module("react-native-calendar-events")
+@scope("default")
 external removeEvent: (string, option<options>) => Js.Promise.t<bool> = "removeEvent"

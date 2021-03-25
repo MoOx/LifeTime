@@ -10,10 +10,11 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets()
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.))
 
-  let goalId = route.params
-  ->Option.flatMap(params => params.goalId)
-  // default to dumb string, as we this id only to filter existing goal when we edit it
-  ->Option.getWithDefault("")
+  let goalId =
+    route.params
+    ->Option.flatMap(params => params.goalId)
+    // default to dumb string, as we this id only to filter existing goal when we edit it
+    ->Option.getWithDefault("")
   let initialGoal =
     (settings.goals->Array.keep(goal => goal.id == goalId))[0]->Option.getWithDefault(
       Goal.undefined,
@@ -22,32 +23,34 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
   let (goal, setGoal) = React.useState(_ => None)
   let handleChange = React.useCallback1(goal => setGoal(_ => goal), [setGoal])
   let handleDelete = React.useCallback3(() => {
+    navigation->Navigators.RootStack.Navigation.goBack()
     setSettings(settings => {
       ...settings,
       goals: settings.goals->Array.keep(goal => goal.id != initialGoal.id),
     })
-    navigation->Navigators.RootStack.Navigation.goBack()
   }, (setSettings, navigation, initialGoal.id))
 
-  let (isReadyToSave, disabled, onPress) = goal->Option.map(goal => (
-    true,
-    false,
-    _ => {
-      setSettings(settings => {
-        ...settings,
-        lastUpdated: Js.Date.now(),
-        goals: settings.goals->Array.map(existingGoal =>
-          // we replace the goal at the same place
-          existingGoal.id != goalId ? existingGoal : goal
-        ),
-      })
-      navigation->Navigators.RootStack.Navigation.goBack()
-    },
-  ))->Option.getWithDefault((false, true, _ => ()))
+  let (isReadyToSave, disabled, onPress) =
+    goal
+    ->Option.map(goal => (
+      true,
+      false,
+      _ => {
+        navigation->Navigators.RootStack.Navigation.goBack()
+        setSettings(settings => {
+          ...settings,
+          lastUpdated: Js.Date.now(),
+          goals: settings.goals->Array.map(existingGoal =>
+            // we replace the goal at the same place
+            existingGoal.id != goalId ? existingGoal : goal
+          ),
+        })
+      },
+    ))
+    ->Option.getWithDefault((false, true, _ => ()))
 
   <>
-    <StatusBar barStyle=#lightContent backgroundColor=Theme.Colors.dark.backgroundDark />
-    <NavigationBar backgroundColor=theme.namedColors.backgroundDark />
+    <StatusBarFormSheet />
     <Animated.ScrollView
       style={
         open Style
@@ -56,8 +59,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
       contentContainerStyle={
         open Style
         viewStyle(
-          // no top, handled by modal
-          // ~paddingTop=safeAreaInsets.top->dp,
+          ~paddingTop=(Theme.isFormSheetSupported ? 0. : safeAreaInsets.top)->dp,
           ~paddingBottom=safeAreaInsets.bottom->dp,
           ~paddingLeft=safeAreaInsets.left->dp,
           ~paddingRight=safeAreaInsets.right->dp,
@@ -84,39 +86,45 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
       }>
       <StickyHeader
         scrollYAnimatedValue=scrollYAnimatedValue.current
-        safeArea=false
+        safeArea={Theme.formSheetSafeArea}
         animateBackgroundOpacity=False
         backgroundElement={<StickyHeaderBackground />}
         color=theme.colors.blue
         color2=theme.colors.blue
         textStyle={theme.styles["text"]}
         title=GoalEdit.title
-        left={({color, defaultStyle}) =>
-          <TouchableOpacity onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
-            <Animated.Text
+        left={({color}) =>
+          <TouchableOpacity
+            hitSlop=HitSlops.m onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
+            <Text
+              allowFontScaling=false
               style={
                 open Style
-                array([defaultStyle, textStyle(~color, ~fontWeight=Theme.fontWeights.regular, ())])
+                array([Theme.text["body"], Theme.text["weight400"], textStyle(~color, ())])
               }>
               {"Cancel"->React.string}
-            </Animated.Text>
+            </Text>
           </TouchableOpacity>}
-        right={({color, defaultStyle}) =>
-          <TouchableOpacity disabled onPress>
-            <Animated.Text
+        right={({color}) =>
+          <TouchableOpacity hitSlop=HitSlops.m disabled onPress>
+            <Text
+              allowFontScaling=false
               style={
                 open Style
                 array([
-                  defaultStyle,
+                  Theme.text["body"],
+                  Theme.text["weight600"],
                   textStyle(~color=isReadyToSave ? color : theme.colors.gray3, ()),
                 ])
               }>
               {"Save"->React.string}
-            </Animated.Text>
+            </Text>
           </TouchableOpacity>}
       />
       <Spacer size=XL />
-      <GoalEdit initialGoal onChange={handleChange} onDelete={handleDelete} />
+      <GoalEdit
+        activities=settings.activities initialGoal onChange={handleChange} onDelete={handleDelete}
+      />
     </Animated.ScrollView>
   </>
 }

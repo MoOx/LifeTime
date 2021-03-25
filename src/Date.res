@@ -1,3 +1,4 @@
+open Belt
 open Js.Date
 open DateFns
 
@@ -301,7 +302,45 @@ let weekStartsOn = {
     1
   }
 }
-let localeOptions = Some({locale: None, weekStartsOn: Some(weekStartsOn)})
+
+let weekIndices = {
+  let days = Array.range(0, 6)
+  days
+  ->Array.sliceToEnd(weekStartsOn)
+  ->Array.concat(days->Array.slice(~offset=0, ~len=weekStartsOn))
+}
+
+let defaultLocale: ReactNativeLocalize.locale = {
+  countryCode: "US",
+  isRTL: false,
+  languageCode: "en",
+  languageTag: "en-US",
+  scriptCode: None,
+}
+let fallbackLocale = DateFns.Locales.enUS
+let supportedLocales = [
+  DateFns.Locales.enUS,
+  DateFns.Locales.enGB,
+  DateFns.Locales.enCA,
+  DateFns.Locales.fr,
+]
+let bestLanguageTag = ReactNativeLocalize.findBestAvailableLanguage(
+  // dateFns doesn't have "en" locale, but iphone can have mixed things
+  // like "en-FR", if you choose "English" without flavor (US or UK) with a region FR
+  // so we need a "global" languageTag, not provided by DateFns locale
+  ["en"]->Array.concat(supportedLocales->Array.map(l => l.code)),
+)
+let localeOptions = Some({
+  locale: Some(
+    // now we reverse match the languageTag so find the first one that fits supportedLocales
+    bestLanguageTag
+    ->Option.flatMap(({languageTag}) =>
+      (supportedLocales->Array.keep(l => l.code->Js.String2.startsWith(languageTag)))[0]
+    )
+    ->Option.getWithDefault(fallbackLocale),
+  ),
+  weekStartsOn: Some(weekStartsOn),
+})
 
 // DateFns shortcuts
 let formatRelative = (date, baseDate) => date->DateFns.formatRelative(baseDate, localeOptions)
@@ -321,4 +360,43 @@ let hasOverlap = (startA, endA, dateB) => {
   let endB = dateB->endOfDay
   // https://stackoverflow.com/a/325964/988941
   startA->getTime <= endB->getTime && endA->getTime >= startB->getTime
+}
+
+module Hooks = {
+  let useToday = () => {
+    let (today, today_set) = React.useState(() => now())
+    let todayUpdate = React.useCallback2(() => {
+      let now = now()
+      // only update today when active AND there is an relevant diff
+      if now->getTime -. today->getTime > 1000. *. 5. {
+        Log.info("Date: useToday update")
+        today_set(_ => now)
+      }
+    }, (today, today_set))
+    let appStateUpdateIsActive = ReactNativeHooks.useAppStateUpdateIsActive()
+    React.useEffect2(() => {
+      if appStateUpdateIsActive {
+        todayUpdate()
+      }
+      None
+    }, (appStateUpdateIsActive, todayUpdate))
+
+    (today, todayUpdate)
+  }
+
+  let useWeekDates = date => {
+    // flag to skip unecessary effect (update)
+    let firstRun = React.useRef(true)
+    let (dates, dates_set) = React.useState(() => weekDates(date))
+    React.useEffect2(() => {
+      if !firstRun.current {
+        Log.info("Date: useWeekDates update")
+        dates_set(_ => weekDates(date))
+      } else {
+        firstRun.current = false
+      }
+      None
+    }, (date, dates_set))
+    dates
+  }
 }

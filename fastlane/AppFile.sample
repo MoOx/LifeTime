@@ -1,6 +1,6 @@
 # Android
 json_key_file("./android/app/google-service-api-key.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
-package_name("io.moox.LifeTime") # e.g. com.krausefx.app
+package_name("io.moox.lifetime") # e.g. com.krausefx.app
 
 # iOS
 app_identifier("io.moox.LifeTime") # The bundle identifier of your app

@@ -19,7 +19,8 @@ let make = () => {
   }, [setOnNotificationPopinHeight])
   let animatedBottomTranslateY = React.useRef(Animated.Value.create(1000.))
   React.useEffect1(() => {
-    onNotificationPopinHeight->Option.map(_height => {
+    onNotificationPopinHeight
+    ->Option.map(_height => {
       open Animated
       spring(
         animatedBottomTranslateY.current,
@@ -31,11 +32,13 @@ let make = () => {
           (),
         ),
       )->Animation.start()
-    })->ignore
+    })
+    ->ignore
     None
   }, [onNotificationPopinHeight])
 
-  notificationStatus->Option.map(status =>
+  notificationStatus
+  ->Option.map(status =>
     status == ReactNativePermissions.granted || status == ReactNativePermissions.unavailable
       ? React.null
       : <Animated.View
@@ -91,8 +94,9 @@ let make = () => {
                       (),
                     )
                   }
-                  hitSlop={View.edgeInsets(~top=10., ~bottom=10., ~left=10., ~right=10., ())}
-                  onPress={_ => setSettings(settings => {
+                  hitSlop=HitSlops.m
+                  onPress={_ =>
+                    setSettings(settings => {
                       ...settings,
                       lastUpdated: Js.Date.now(),
                       notificationsPermissionsDismissed: Js.Date.now(),
@@ -142,7 +146,7 @@ let make = () => {
                 <Text
                   style={
                     open Style
-                    array([Theme.text["title2"], Theme.text["bold"], theme.styles["text"]])
+                    array([Theme.text["title2"], Theme.text["weight700"], theme.styles["text"]])
                   }>
                   {"Set Up Reminders"->React.string}
                 </Text>
@@ -170,5 +174,6 @@ let make = () => {
             </View>
           </SpacedView>
         </Animated.View>
-  )->Option.getWithDefault(React.null)
+  )
+  ->Option.getWithDefault(React.null)
 }

@@ -19,11 +19,23 @@ let make = () => {
           }}
           style=StyleSheet.absoluteFill
         />
+        <View
+          style={
+            open Style
+            array([StyleSheet.absoluteFill, Predefined.styles["justifyEnd"]])
+          }>
+          <Separator style={theme.styles["separatorLightOnBackground"]} />
+        </View>
       </>
     : <View
         style={
           open Style
-          array([StyleSheet.absoluteFill, theme.styles["background"]])
-        }
-      />
+          array([
+            StyleSheet.absoluteFill,
+            Predefined.styles["justifyEnd"],
+            theme.styles["background"],
+          ])
+        }>
+        <Separator style={theme.styles["separatorLightOnBackground"]} />
+      </View>
 }

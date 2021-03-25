@@ -1,293 +1,126 @@
 open Belt
 open ReactNative
 open ReactMultiversal
-open VirtualizedList
 
 let title = "Your LifeTime"
+
+type callback<'input, 'output> = 'input => 'output
+@module("react")
+external useCallback8: (
+  @uncurry ('input => 'output),
+  ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h),
+) => callback<'input, 'output> = "useCallback"
 
 @react.component
 let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActivityPress) => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
-  let (getEvents, updatedAt, requestUpdate) = React.useContext(Calendars.context)
+  let (getEvents, fetchEvents, updatedAt, requestUpdate) = React.useContext(Calendars.context)
   let theme = Theme.useTheme(AppSettings.useTheme())
   let windowDimensions = Dimensions.useWindowDimensions()
-  let styleWidth = {
+  let styleWidth = React.useMemo1(() => {
     open Style
     style(~width=windowDimensions.width->dp, ())
-  }
+  }, [windowDimensions.width])
 
-  React.useEffect3(() => {
+  let appStateUpdateIsActive = ReactNativeHooks.useAppStateUpdateIsActive()
+  React.useEffect2(() => {
+    if appStateUpdateIsActive {
+      requestUpdate()
+    }
+    None
+  }, (appStateUpdateIsActive, requestUpdate))
+
+  let (today, todayUpdate) = Date.Hooks.useToday()
+
+  React.useEffect4(() => {
     if refreshing {
+      Log.info("Home: refreshing...")
+      todayUpdate()
       requestUpdate()
       onRefreshDone()
     }
     None
-  }, (refreshing, requestUpdate, onRefreshDone))
+  }, (refreshing, todayUpdate, requestUpdate, onRefreshDone))
 
-  React.useEffect1(() => {
-    let handleAppStateChange = newAppState =>
-      if newAppState == #active {
-        requestUpdate()
-      }
+  let todayDates = Date.Hooks.useWeekDates(today)
 
-    AppState.addEventListener(#change(state => handleAppStateChange(state)))
-    Some(() => AppState.removeEventListener(#change(state => handleAppStateChange(state))))
-  }, [requestUpdate])
-
-  let (today, today_set) = React.useState(() => Date.now())
-  let appState = ReactNativeHooks.useAppState()
-  React.useEffect2(() => {
-    if appState === #active {
-      today_set(_ => Date.now())
-    }
-    None
-  }, (appState, today_set))
-  let (todayDates, todayDates_set) = React.useState(() => Date.weekDates(today))
-  React.useEffect2(() => {
-    todayDates_set(_ => Date.weekDates(today))
-    None
-  }, (today, todayDates_set))
-  let (previousDates, previousDates_set) = React.useState(() =>
-    Date.weekDates(today->DateFns.addDays(-7.))
-  )
-  React.useEffect2(() => {
-    previousDates_set(_ => Date.weekDates(today->DateFns.addDays(-7.)))
-    None
-  }, (today, previousDates_set))
-  let (last5Weeks, last5Weeks_set) = React.useState(() =>
-    Array.range(0, 5)->Array.map(currentWeekReverseIndex =>
-      Date.weekDates(today->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
-    )
-  )
-  React.useEffect2(() => {
-    last5Weeks_set(_ =>
-      Array.range(0, 5)->Array.map(currentWeekReverseIndex =>
+  let previousDates = React.useMemo1(() => Date.weekDates(today->DateFns.addDays(-7.)), [today])
+  let last5Weeks = React.useMemo1(
+    () =>
+      Array.range(0, 5)
+      ->Array.map(currentWeekReverseIndex =>
         Date.weekDates(today->DateFns.addDays((-currentWeekReverseIndex * 7)->Js.Int.toFloat))
       )
-    )
-    None
-  }, (today, last5Weeks_set))
-
-  let ((startDate, supposedEndDate), currentDates_set) = React.useState(() =>
-    last5Weeks[0]->Option.getWithDefault(todayDates)
+      ->Array.reverse,
+    [today],
   )
 
+  let (currentDates, currentDates_set) = React.useState(() =>
+    last5Weeks[last5Weeks->Array.length - 1]->Option.getWithDefault(todayDates)
+  )
+  let (startDate, supposedEndDate) = currentDates
   let endDate = supposedEndDate->Date.min(today)
-
   let (todayFirst, _) = todayDates
   let (previousFirst, _) = previousDates
 
-  let events = getEvents(startDate, endDate, true)
-  let mapTitleDuration =
-    events->Option.map(es =>
-      es->Calendars.filterEvents(settings)->Calendars.makeMapTitleDuration(startDate, endDate)
-    )
-
-  let flatListRef = React.useRef(Js.Nullable.null)
-
-  let getItemLayout = React.useMemo1(((), _items, index) => {
-    length: windowDimensions.width,
-    offset: windowDimensions.width *. index->float,
-    index: index,
-  }, [windowDimensions.width])
-
-  let renderItem = (renderItemProps: renderItemProps<'a>) => {
-    let (currentStartDate, currentSupposedEndDate) = renderItemProps.item
-    <WeeklyBarChart
-      today
-      todayFirst
-      previousFirst
-      startDate=currentStartDate
-      // isVisible={
-      //   startDate == currentStartDate
-      //   && supposedEndDate == currentSupposedEndDate
-      // }
-      supposedEndDate=currentSupposedEndDate
-      style=styleWidth
-    />
-  }
-
-  let onViewableItemsChanged = React.useRef(itemsChanged =>
-    if itemsChanged.viewableItems->Array.length == 1 {
-      itemsChanged.viewableItems[0]
-      ->Option.map(wrapper => currentDates_set(_ => wrapper.item))
-      ->ignore
-    }
-  ).current
-
-  let onShowThisWeek = React.useCallback0(_ =>
-    // scrollToIndexParams triggers the currentDates_set
-    // currentDates_set(_ => todayDates.current);
-    flatListRef.current
-    ->Js.Nullable.toOption
-    ->Option.map(flatList =>
-      flatList->FlatList.scrollToIndex(FlatList.scrollToIndexParams(~index=0, ()))
-    )
-    ->ignore
-  )
-
-  let (startDate1, supposedEndDate1) = last5Weeks[0]->Option.getWithDefault(todayDates)
-  let endDate1 = supposedEndDate1->Date.min(today)
-  let (startDate2, supposedEndDate2) = last5Weeks[1]->Option.getWithDefault(todayDates)
-  let endDate2 = supposedEndDate2->Date.min(today)
-
-  let events1 = getEvents(startDate1, endDate1, true)
-  let events2 = getEvents(startDate2, endDate2, true)
-
-  let (noEventDuringThisWeek, set_noEventDuringThisWeek) = React.useState(() => None)
-  React.useEffect3(() => {
-    switch events1 {
-    | Some(evts1) => set_noEventDuringThisWeek(_ => Some(Calendars.noEvents(evts1, settings)))
-    | _ => ()
-    }
-    None
-  }, (events1, set_noEventDuringThisWeek, settings))
-  let (noEventDuringLastWeeks, set_noEventDuringLastWeeks) = React.useState(() => None)
+  let fetchedEvents = getEvents(startDate, endDate)
   React.useEffect4(() => {
-    switch (events1, events2) {
-    | (Some(evts1), Some(evts2)) =>
-      set_noEventDuringLastWeeks(_ => Some(
-        Calendars.noEvents(Array.concat(evts1, evts2), settings),
-      ))
+    // Log.info(("Home fetchEvents", startDate, endDate))
+    switch fetchedEvents {
+    | NotAsked => fetchEvents(startDate, endDate)
     | _ => ()
     }
     None
-  }, (events1, events2, set_noEventDuringLastWeeks, settings))
-
-  let longNoEventsExplanation =
-    " " ++
-    ("LifeTime can help you to understand how you use your time and rely on calendar events to learn how you use it. " ++
-    "By saving events into your calendars, you will be able to visualize reports so you can take more informed decisions about how to use your valuable time.")
-
-  let messagesNoEvents = switch (noEventDuringThisWeek, noEventDuringLastWeeks) {
-  | (Some(None), Some(None)) =>
-    Some((
-      "LifeTime could not find any events on the last two weeks." ++ longNoEventsExplanation,
-      [
-        <TouchableButton key="getStarted" text="Get Started" onPress={_ => onGetStarted()} />,
-        <TouchableButton
-          key="openCalendar"
-          text="Open Calendar"
-          onPress={_ => Calendars.openCalendarApp()}
-          mode=TouchableButton.Simple
-        />,
-      ],
-    ))
-  | (Some(OnlyAllDays), Some(None))
-  | (Some(None), Some(OnlyAllDays))
-  | (Some(OnlyAllDays), Some(OnlyAllDays)) =>
-    Some((
-      "LifeTime could not find any relevent events on the last two weeks. All day events are not suitable for time tracking.",
-      [
-        <TouchableButton key="getStarted" text="Get Started" onPress={_ => onGetStarted()} />,
-        <TouchableButton
-          key="openCalendar"
-          text="Open Calendar"
-          onPress={_ => Calendars.openCalendarApp()}
-          mode=TouchableButton.Simple
-        />,
-      ],
-    ))
-  | (Some(OnlySkippedCalendars), Some(None))
-  | (Some(None), Some(OnlySkippedCalendars))
-  | (Some(OnlySkippedCalendars), Some(OnlySkippedCalendars)) =>
-    Some((
-      "LifeTime could not find any recent events that aren't part of skipped calendars.",
-      [
-        <TouchableButton
-          key="helpSkipCal" text="Help me customize settings" onPress={_ => onFiltersPress()}
-        />,
-        <TouchableButton
-          key="openCalendar"
-          text="Open Calendar"
-          onPress={_ => Calendars.openCalendarApp()}
-          mode=TouchableButton.Simple
-        />,
-      ],
-    ))
-  | (Some(OnlySkippedActivities), Some(None))
-  | (Some(None), Some(OnlySkippedActivities))
-  | (Some(OnlySkippedActivities), Some(OnlySkippedActivities))
-    when settings.activitiesSkippedFlag =>
-    Some((
-      "LifeTime could not find any recent events that aren't part of skipped activities.",
-      [
-        <TouchableButton
-          key="helpSkipAct" text="Help me customize settings" onPress={_ => onFiltersPress()}
-        />,
-        <TouchableButton
-          key="openCalendar" text="Toggle Hidden Activities" onPress={_ => setSettings(settings => {
-              ...settings,
-              lastUpdated: Js.Date.now(),
-              activitiesSkippedFlag: !settings.activitiesSkippedFlag,
-            })} mode=TouchableButton.Simple
-        />,
-        <TouchableButton
-          key="openCalendar"
-          text="Open Calendar"
-          onPress={_ => Calendars.openCalendarApp()}
-          mode=TouchableButton.Simple
-        />,
-      ],
-    ))
-  // | (Some(Some), Some(Some)) => None
-  // | (None, None) => None
+  }, (fetchEvents, fetchedEvents, startDate, endDate))
+  let events = switch fetchedEvents {
+  | Done(events) => Some(events)
   | _ => None
   }
+  let mapTitleDuration =
+    events->Option.map(es =>
+      es
+      ->Calendars.filterEvents(
+        settings.calendarsSkipped,
+        settings.activitiesSkippedFlag,
+        settings.activitiesSkipped,
+      )
+      ->Calendars.makeMapTitleDuration(startDate, endDate)
+    )
 
-  let (onMessageNoEventsHeight, setOnMessageNoEventsHeight) = React.useState(() => None)
-  let onMessageNoEventsLayout = React.useCallback1((layoutEvent: Event.layoutEvent) => {
-    let height = layoutEvent.nativeEvent.layout.height
-    setOnMessageNoEventsHeight(_ => Some(height))
-  }, [setOnMessageNoEventsHeight])
-  let animatedMessageNoEventsHeight = React.useRef(Animated.Value.create(0.)).current
-  let animatedMessageNoEventsOpacity = React.useRef(Animated.Value.create(0.)).current
-  let animatedMessageNoEventsScale = React.useRef(Animated.Value.create(0.)).current
-  React.useEffect4(() => {
-    onMessageNoEventsHeight->Option.map(height => {
-      open Animated
-      parallel(
-        [
-          spring(
-            animatedMessageNoEventsHeight,
-            Value.Spring.config(
-              ~useNativeDriver=true,
-              ~toValue=height->Value.Spring.fromRawValue,
-              ~tension=1.,
-              (),
-            ),
-          ),
-          spring(
-            animatedMessageNoEventsScale,
-            Value.Spring.config(
-              ~useNativeDriver=true,
-              ~toValue=1.->Value.Spring.fromRawValue,
-              ~tension=1.,
-              // ~delay=1.,
-              (),
-            ),
-          ),
-          timing(
-            animatedMessageNoEventsOpacity,
-            Value.Timing.config(
-              ~useNativeDriver=true,
-              ~toValue=1.->Value.Timing.fromRawValue,
-              ~duration=1200.,
-              // ~delay=1.,
-              (),
-            ),
-          ),
-        ],
-        {stopTogether: false},
-      )->Animation.start()
+  let scrollViewRef = React.useRef(Js.Nullable.null)
+  let scrollViewSpace = SpacedView.M
+  let scrollViewWidth =
+    windowDimensions.width -. SpacedView.size(scrollViewSpace)->Option.getWithDefault(0.) *. 2.
+
+  let onMomentumScrollEnd = React.useCallback5((event: Event.scrollEvent) => {
+    let x = event.nativeEvent.contentOffset.x
+    let index = (x /. scrollViewWidth)->Js.Math.unsafe_round
+    let dates = last5Weeks[index]->Option.getWithDefault(todayDates)
+    if dates !== currentDates {
+      currentDates_set(_ => dates)
+    }
+  }, (currentDates_set, currentDates, todayDates, scrollViewWidth, last5Weeks))
+
+  let onShowThisWeek = React.useCallback2(_ => {
+    // scrollToIndexParams triggers the currentDates_set
+    // currentDates_set(_ => todayDates.current);
+    scrollViewRef.current
+    ->Js.Nullable.toOption
+    ->Option.map(scrollView => scrollView->ScrollView.scrollToEnd)
+    ->ignore
+    currentDates_set(_ => todayDates)
+  }, (currentDates_set, todayDates))
+
+  // scroll to current week on load
+  React.useEffect0(() => {
+    AnimationFrame.request(() => {
+      scrollViewRef.current
+      ->Js.Nullable.toOption
+      ->Option.map(scrollView => scrollView->ScrollView.scrollToEnd)
+      ->ignore
     })->ignore
     None
-  }, (
-    onMessageNoEventsHeight,
-    animatedMessageNoEventsHeight,
-    animatedMessageNoEventsOpacity,
-    animatedMessageNoEventsScale,
-  ))
+  })
 
   <>
     <SpacedView>
@@ -302,7 +135,15 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
         ->React.string}
       </TitlePre>
       <View style={Predefined.styles["rowSpaceBetween"]}>
-        <Title style={theme.styles["text"]}> {title->React.string} </Title>
+        <Text
+          allowFontScaling=false
+          style={Style.array([
+            Theme.text["largeTitle"],
+            Theme.text["weight700"],
+            theme.styles["text"],
+          ])}>
+          {title->React.string}
+        </Text>
         <View style={Predefined.styles["row"]}>
           {Global.__DEV__
             ? <>
@@ -320,194 +161,140 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
         </View>
       </View>
     </SpacedView>
-    {messagesNoEvents->Option.map(((messageNoEvents, messageNoEventsButtons)) =>
-      <Animated.View
-        onLayout=onMessageNoEventsLayout
-        style={
-          open Style
-          style(
-            // this is what allow to compute height
-            // we put this container in absolute + opacity 0
-            // then we get height via onLayout, then we switch this to relative
-            // and animate the rest
-
-            ~position=onMessageNoEventsHeight->Option.isNone ? #absolute : #relative,
-            ~opacity=animatedMessageNoEventsOpacity->Animated.StyleProp.float,
-            ~transform=[scale(~scale=animatedMessageNoEventsScale->Animated.StyleProp.float)],
-            (),
-          )
-        }>
-        <SpacedView>
-          <View
-            style={
-              open Style
-              viewStyle(
-                ~shadowColor="#000",
-                ~shadowOffset=offset(~height=3., ~width=1.),
-                ~shadowOpacity=0.1,
-                ~shadowRadius=6.,
-                (),
-              )
-            }>
-            <SpacedView
-              horizontal=XS
-              vertical=XXS
-              style={
-                open Style
-                array([
-                  Predefined.styles["rowSpaceBetween"],
-                  theme.styles["backgroundMain"],
-                  viewStyle(
-                    ~borderTopLeftRadius=Theme.Radius.card,
-                    ~borderTopRightRadius=Theme.Radius.card,
-                    (),
-                  ),
-                ])
-              }>
-              <Text
-                style={
-                  open Style
-                  textStyle(~color="#fff", ())
-                }>
-                {"No Events Available"->React.string}
-              </Text>
-              <TouchableOpacity
-                hitSlop={View.edgeInsets(~top=10., ~bottom=10., ~left=10., ~right=10., ())}
-                onPress={_ => {
-                  open Alert
-                  alert(
-                    ~title="Let's stay motivated!",
-                    ~message="LifeTime is here to help you move foward and can give you advices & motivate you to achieve your personal goals." ++
-                    ("\n" ++
-                    "To stop seeing this message, try to fill your calendar with events or adjust settings to reveal some that are currently hidden."),
-                    ~buttons=[button(~text="Got it", ~style=#cancel, ())],
-                    (),
-                  )
-                }}>
-                <SVGXmark width={16.->Style.dp} height={16.->Style.dp} fill="#fff" />
-              </TouchableOpacity>
-            </SpacedView>
-            <SpacedView
-              horizontal=M
-              vertical=XS
-              style={
-                open Style
-                array([
-                  Predefined.styles["alignCenter"],
-                  theme.styles["background"],
-                  viewStyle(
-                    ~borderBottomLeftRadius=Theme.Radius.card,
-                    ~borderBottomRightRadius=Theme.Radius.card,
-                    (),
-                  ),
-                ])
-              }>
-              <Spacer size=S />
-              <Text
-                style={
-                  open Style
-                  array([Theme.text["title1"], Theme.text["heavy"], theme.styles["text"]])
-                }>
-                {"No Events"->React.string}
-              </Text>
-              <Spacer size=XS />
-              <Text
-                style={
-                  open Style
-                  array([Theme.text["subhead"], theme.styles["text"]])
-                }>
-                {messageNoEvents->React.string}
-              </Text>
-              <Spacer size=M />
-              {messageNoEventsButtons->React.array}
-              <Spacer size=S />
-            </SpacedView>
-          </View>
-        </SpacedView>
-      </Animated.View>
-    )->Option.getWithDefault(React.null)}
-    <Animated.View
-      style={
-        open Style
-        arrayOption([onMessageNoEventsHeight->Option.map(height =>
-            style(
-              ~transform=[
-                translateY(
-                  ~translateY={
-                    open Animated.Interpolation
-                    animatedMessageNoEventsHeight->interpolate(
-                      config(
-                        ~inputRange=[0., height],
-                        ~outputRange=[-.height, 0.]->fromFloatArray,
-                        (),
-                      ),
-                    )
-                  }->Animated.StyleProp.float,
-                ),
-              ],
-              (),
-            )
-          )])
-      }>
-      <View style={Predefined.styles["rowSpaceBetween"]}>
-        <Row> <Spacer size=XS /> <BlockHeading text="Weekly Chart" /> </Row>
-        <Row>
-          {todayFirst == startDate
-            ? React.null
-            : <BlockHeadingTouchable onPress=onShowThisWeek text="Show This Week" />}
-          <Spacer size=XS />
-        </Row>
-      </View>
-      <Separator style={theme.styles["separatorOnBackground"]} />
-      <FlatList
-        ref={flatListRef->Ref.value}
-        horizontal=true
-        pagingEnabled=true
-        showsHorizontalScrollIndicator=false
-        inverted=true
-        initialNumToRender=1
-        data=last5Weeks
-        style={Style.array([theme.styles["background"], styleWidth])}
-        getItemLayout
-        keyExtractor={((first, _), _index) => first->Js.Date.toString}
-        renderItem
-        onViewableItemsChanged
-      />
-      <Separator style={theme.styles["separatorOnBackground"]} />
-      <BlockFootnote>
-        {("Updated " ++ Date.formatRelative(updatedAt, today))->React.string}
+    <View> <NoEventBox onGetStarted onFiltersPress today todayDates last5Weeks /> </View>
+    <View style={Predefined.styles["rowSpaceBetween"]}>
+      <Row> <Spacer size=XS /> <BlockHeading text="Weekly Chart" /> </Row>
+      <Row>
+        {todayFirst == startDate
+          ? React.null
+          : <BlockHeadingTouchable onPress=onShowThisWeek text="Show This Week" />}
         <Spacer size=XS />
-        {!refreshing ? React.null : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
-      </BlockFootnote>
+      </Row>
+    </View>
+    <ListSeparator />
+    <View style={Style.array([theme.styles["background"], styleWidth])}>
       <Spacer />
-      <TopActivities mapTitleDuration onFiltersPress onActivityPress startDate endDate />
-      <Spacer />
-      <SpacedView horizontal=None>
-        <TouchableOpacity onPress={_ => setSettings(settings => {
-              ...settings,
-              lastUpdated: Js.Date.now(),
-              activitiesSkippedFlag: !settings.activitiesSkippedFlag,
-            })}>
-          <Separator style={theme.styles["separatorOnBackground"]} />
-          <SpacedView vertical=XS style={theme.styles["background"]}>
-            <Center>
+      <SpacedView vertical=None horizontal=scrollViewSpace>
+        <Text style={theme.styles["textLight2"]}>
+          {if todayFirst == startDate {
+            "Daily Average"
+          } else if previousFirst == startDate {
+            "Last Week's Average"
+          } else {
+            startDate->Js.Date.getDate->Js.Float.toString ++
+              (" - " ++
+              (endDate->Js.Date.getDate->Js.Float.toString ++
+                (" " ++
+                (endDate->Date.monthShortString ++ " Average"))))
+          }->React.string}
+        </Text>
+      </SpacedView>
+      <Spacer size=S />
+      <SpacedView vertical=None>
+        <ScrollView
+          ref={scrollViewRef->Ref.value}
+          horizontal=true
+          pagingEnabled=true
+          showsHorizontalScrollIndicator=false
+          onMomentumScrollEnd
+          style={Style.array([Predefined.styles["row"], Predefined.styles["flexGrow"]])}>
+          {last5Weeks
+          ->Array.map(((currentStartDate, currentSupposedEndDate)) => {
+            let endDate = currentSupposedEndDate->Date.min(today)
+            let fetchedEvents = getEvents(currentStartDate, endDate)
+            let events = switch fetchedEvents {
+            | Done(evts) => Some(evts)
+            | _ => None
+            }
+            let mapCategoryDuration =
+              events->Option.map(es =>
+                es
+                ->Calendars.filterEvents(
+                  settings.calendarsSkipped,
+                  settings.activitiesSkippedFlag,
+                  settings.activitiesSkipped,
+                )
+                ->Calendars.makeMapCategoryDuration(settings.activities, currentStartDate, endDate)
+              )
+            <WeeklyGraph
+              key={currentStartDate->Js.Date.toString}
+              activities=settings.activities
+              activitiesSkipped=settings.activitiesSkipped
+              activitiesSkippedFlag=settings.activitiesSkippedFlag
+              calendarsSkipped=settings.calendarsSkipped
+              events
+              mapCategoryDuration
+              startDate=currentStartDate
+              supposedEndDate=currentSupposedEndDate
+              width=scrollViewWidth
+            />
+          })
+          ->React.array}
+        </ScrollView>
+      </SpacedView>
+      <Spacer size=S />
+      <ListSeparator spaceStart={Spacer.size(S)} />
+      <View style={Predefined.styles["row"]}>
+        <Spacer size=S />
+        <View style={Predefined.styles["flexGrow"]}>
+          <SpacedView horizontal=None vertical=S style={Predefined.styles["row"]}>
+            <View style={Predefined.styles["flexGrow"]}>
               <Text
                 style={
                   open Style
-                  array([Theme.text["callout"], textStyle(~color=theme.colors.blue, ())])
+                  array([Theme.text["callout"], theme.styles["text"]])
                 }>
-                {(
-                  settings.activitiesSkippedFlag
-                    ? "Reveal Hidden Activities"
-                    : "Mask Hidden Activities"
-                )->React.string}
+                {"Total Logged Time"->React.string}
               </Text>
-            </Center>
+            </View>
+            <Text>
+              <Text
+                style={
+                  open Style
+                  array([Theme.text["callout"], theme.styles["textLight1"]])
+                }>
+                {mapTitleDuration
+                ->Option.map(mapTitleDuration =>
+                  mapTitleDuration->Array.reduce(0., (total, (_title, duration)) =>
+                    total +. duration
+                  )
+                )
+                ->Option.getWithDefault(0.)
+                ->Date.minToString
+                ->React.string}
+              </Text>
+            </Text>
+            <Spacer size=S />
           </SpacedView>
-          <Separator style={theme.styles["separatorOnBackground"]} />
-        </TouchableOpacity>
-      </SpacedView>
-      <Spacer />
-    </Animated.View>
+        </View>
+      </View>
+    </View>
+    <ListSeparator />
+    <BlockFootnote>
+      {("Updated " ++ Date.formatRelative(updatedAt, today))->React.string}
+      <Spacer size=XS />
+      {!refreshing ? React.null : <ActivityIndicator size={ActivityIndicator.Size.exact(8.)} />}
+    </BlockFootnote>
+    <Spacer />
+    <TopActivities activities=settings.activities mapTitleDuration onFiltersPress onActivityPress startDate endDate />
+    <Spacer />
+    <SpacedView horizontal=None>
+      <ListSeparator />
+      <ListItem
+        onPress={_ =>
+          setSettings(settings => {
+            ...settings,
+            lastUpdated: Js.Date.now(),
+            activitiesSkippedFlag: !settings.activitiesSkippedFlag,
+          })}>
+        <ListItemText color=theme.colors.blue center=true>
+          {(
+            settings.activitiesSkippedFlag ? "Reveal Hidden Activities" : "Mask Hidden Activities"
+          )->React.string}
+        </ListItemText>
+      </ListItem>
+      <ListSeparator />
+    </SpacedView>
+    <Spacer />
   </>
 }

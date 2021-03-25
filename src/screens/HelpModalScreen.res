@@ -4,13 +4,22 @@ open ReactMultiversal
 @react.component
 let make = (~navigation, ~route as _) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
-
+  let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets()
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.))
   <>
-    <StatusBar barStyle=#lightContent backgroundColor=Theme.Colors.dark.backgroundDark />
-    <NavigationBar backgroundColor=theme.namedColors.background />
+    <StatusBarFormSheet />
     <Animated.ScrollView
       style={Style.array([Predefined.styles["flexGrow"], theme.styles["background"]])}
+      contentContainerStyle={
+        open Style
+        viewStyle(
+          ~paddingTop=(Theme.isFormSheetSupported ? 0. : safeAreaInsets.top)->dp,
+          ~paddingBottom=safeAreaInsets.bottom->dp,
+          ~paddingLeft=safeAreaInsets.left->dp,
+          ~paddingRight=safeAreaInsets.right->dp,
+          (),
+        )
+      }
       showsHorizontalScrollIndicator=false
       showsVerticalScrollIndicator=false
       scrollEventThrottle=16
@@ -32,25 +41,27 @@ let make = (~navigation, ~route as _) => {
       <StickyHeader
         scrollYAnimatedValue=scrollYAnimatedValue.current
         scrollOffsetY=120.
-        safeArea=false
-        animateBackgroundOpacity=False
+        safeArea={Theme.formSheetSafeArea}
         backgroundElement={<StickyHeaderBackground />}
         color=theme.colors.blue
         color2=theme.colors.blue
         textStyle={theme.styles["text"]}
         title=Help.title
-        right={({color, defaultStyle}) =>
-          <TouchableOpacity onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
+        right={({color}) =>
+          <TouchableOpacity
+            hitSlop=HitSlops.m onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
             <Text
+              allowFontScaling=false
               style={
                 open Style
-                array([defaultStyle, style(~color, ())])
+                array([Theme.text["body"], Theme.text["weight600"], style(~color, ())])
               }>
               {"Done"->React.string}
             </Text>
           </TouchableOpacity>}
         rightAlwaysVisible=true
       />
+      <Spacer size=Custom(StickyHeader.size) />
       <Help />
     </Animated.ScrollView>
   </>

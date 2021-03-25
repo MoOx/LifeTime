@@ -5,12 +5,15 @@ type ring = {
   progress: float,
 }
 
-@bs.module("./ActivityRings.js") @react.component
+@module("./ActivityRings.js") @react.component
 external make: (
-  ~rings: array<ring>,
-  ~width: float,
-  ~strokeWidth: float,
-  ~spaceBetween: float,
+  ~animationDuration: float=?,
   ~backgroundColor: string,
   ~children: React.element=?,
+  ~rings: array<ring>,
+  ~shadowSolidColor: string=?,
+  ~shadowSolidSize: float=?,
+  ~spaceBetween: float,
+  ~strokeWidth: float,
+  ~width: float,
 ) => React.element = "default"

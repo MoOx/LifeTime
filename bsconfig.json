@@ -17,17 +17,19 @@
   ],
   "bs-dependencies": [
     "@glennsl/bs-json",
-    "reason-react",
-    "reason-react-native",
-    "reason-react-navigation",
-    "react-multiversal",
-    "reason-future",
-    "@reason-react-native/safe-area-context",
-    "@reason-react-native/permissions",
     "@reason-react-native/async-storage",
+    "@reason-react-native/datetimepicker",
+    "@reason-react-native/permissions",
+    "@reason-react-native/push-notification-ios",
+    "@reason-react-native/safe-area-context",
     "@reason-react-native/slider",
     "@reason-react-native/svg",
-    "@reason-react-native/push-notification-ios",
-    "bs-tinycolor"
+    "bs-tinycolor",
+    "react-multiversal",
+    "react-native-bootsplash",
+    "reason-future",
+    "reason-react-native",
+    "reason-react-navigation",
+    "reason-react"
   ]
 }

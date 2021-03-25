@@ -3,53 +3,32 @@ open ReactNative
 open ReactMultiversal
 
 @react.component
-let make = (
-  ~onPress,
-  ~icon=?,
-  ~separator=false,
-  ~children,
-  ~color=?,
-  ~iconRight=?,
-  ~center=false,
-) => {
+let make = (~children, ~disabled=?, ~left=?, ~onPress=?, ~right=?, ~style=?) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
-  <View style={theme.styles["background"]}>
-    <TouchableWithoutFeedback onPress>
-      <View style={Predefined.styles["rowCenter"]}>
-        <Spacer size=S />
-        {icon->Option.map(icon => {
-          <View style={Predefined.styles["rowCenter"]}> {icon} <Spacer size=S /> </View>
-        })->Option.getWithDefault(React.null)}
-        <View style={Predefined.styles["flex"]}>
-          <SpacedView vertical=XS horizontal=None>
-            <View style={Predefined.styles["row"]}>
-              <View
-                style={
-                  open Style
-                  array([Predefined.styles["flex"], Predefined.styles["justifyCenter"]])
-                }>
-                <Text
-                  style={
-                    open Style
-                    arrayOption([
-                      Some(Theme.text["body"]),
-                      Some(theme.styles["text"]),
-                      center ? Some(textStyle(~textAlign=#center, ())) : None,
-                      color->Option.map(c => textStyle(~color=c, ())),
-                    ])
-                  }>
-                  {children}
-                </Text>
-              </View>
-              {iconRight->Option.map(icon => {
-                <View style={Predefined.styles["rowCenter"]}> <Spacer size=S /> {icon} </View>
-              })->Option.getWithDefault(React.null)}
-              <Spacer size=S />
-            </View>
-          </SpacedView>
-          {separator ? <Separator style={theme.styles["separatorOnBackground"]} /> : React.null}
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
-  </View>
+  let child =
+    <ListItemContainer
+      ?style
+      left=?{left->Option.map(left => {
+        <Row.Center> {left} <Spacer size=S /> </Row.Center>
+      })}
+      right=?{right->Option.map(right => {
+        <Row.Center> <Spacer size=S /> {right} </Row.Center>
+      })}>
+      {children}
+    </ListItemContainer>
+
+  onPress
+  ->Option.map(onPress => {
+    <Pressable_
+      ?disabled
+      onPress
+      style={({pressed}) =>
+        Platform.os === Platform.ios
+          ? !pressed ? theme.styles["background"] : theme.styles["backgroundGray5"]
+          : theme.styles["background"]}
+      android_ripple={Pressable_.rippleConfig(~color=theme.colors.gray4, ())}>
+      {_ => child}
+    </Pressable_>
+  })
+  ->Option.getWithDefault(<View style={theme.styles["background"]}> {child} </View>)
 }

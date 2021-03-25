@@ -1,5 +1,8 @@
 open Belt
+open ReactNative
 open ReactNavigation
+
+NativeStack.enableScreens()
 
 let navigatorEmitter = EventEmitter.make()
 
@@ -10,12 +13,12 @@ let navigatorEmitter = EventEmitter.make()
       ~requestPermissions=false,
       ~popInitialNotification=true,
       ~onNotification=notification => {
-        Js.log(("NOTIFICATION", notification))
-        switch notification.id {
-        | Some(id) when id == Notifications.Ids.reminderDailyCheck =>
-          navigatorEmitter->EventEmitter.emit("navigate", "GoalsScreen")
-        | _ => ()
-        }
+        Log.info(("App: onNotification ", notification))
+        // switch notification.id {
+        // | Some(id) when id == Notifications.Ids.reminderDailyCheck =>
+        //   navigatorEmitter->EventEmitter.emit("navigate", "GoalsScreen")
+        // | _ => ()
+        // }
         notification.finish(ReactNativePushNotificationIOS.FetchResult.noData)
       },
       (),
@@ -34,7 +37,7 @@ let navigatorEmitter = EventEmitter.make()
 type navigationState
 let navigationStateStorageKey = "react-navigation:state:2"
 // remove old entries
-ReactNativeAsyncStorage.removeItem("react-navigation:state")
+ReactNativeAsyncStorage.removeItem("react-navigation:state")->ignore
 
 let rec navigateToIfPossible = (navigation, navigateTo) =>
   switch navigation {
@@ -50,6 +53,7 @@ let rec navigateToIfPossible = (navigation, navigateTo) =>
 let app = () => {
   let navigationRef = React.useRef(None)
   React.useEffect1(() => {
+    Log.info("App: navigatorEmitter on(navigate) ")
     navigatorEmitter->EventEmitter.on("navigate", navigateTo =>
       navigateToIfPossible(navigationRef.current, navigateTo)
     )
@@ -60,11 +64,15 @@ let app = () => {
 
   React.useEffect2(() => {
     if initialStateContainer->Option.isNone {
-      ReactNativeAsyncStorage.getItem(navigationStateStorageKey)->FutureJs.fromPromise(error => {
+      Log.info("App: Restoring Navigation initialStateContainer is empty")
+      ReactNativeAsyncStorage.getItem(navigationStateStorageKey)
+      ->FutureJs.fromPromise(error => {
         // @todo error
-        Js.log2("Restoring Navigation State: ", error)
+        Log.info(("App: Restoring Navigation State: ", error))
         error
-      })->Future.tap(res =>
+      })
+      ->Future.tap(res => {
+        Log.info("App: Restoring Navigation State")
         switch res {
         | Result.Ok(jsonState) =>
           switch jsonState->Js.Null.toOption {
@@ -72,22 +80,44 @@ let app = () => {
             switch Js.Json.parseExn(jsonState) {
             | state => setInitialState(_ => Some(Some(state)))
             | exception _ =>
-              Js.log2("Restoring Navigation State: unable to decode valid json", jsonState)
+              Log.info(("App: Restoring Navigation State: unable to decode valid json", jsonState))
               setInitialState(_ => Some(None))
             }
           | None => setInitialState(_ => Some(None))
           }
         | Result.Error(e) =>
-          Js.log2("Restoring Navigation State: unable to get json state", e)
+          Log.info(("App: Restoring Navigation State: unable to get json state", e))
           setInitialState(_ => Some(None))
         }
-      )->ignore
+      })
+      ->ignore
     }
     None
   }, (initialStateContainer, setInitialState))
 
-  let calendarsContextValue = Calendars.useEvents()
-  let isReady = initialStateContainer->Option.isSome
+  let onStateChange = React.useCallback0(state => {
+    let maybeJsonState = Js.Json.stringifyAny(state)
+    switch maybeJsonState {
+    | Some(jsonState) =>
+      ReactNativeAsyncStorage.setItem(navigationStateStorageKey, jsonState)->ignore
+    | None =>
+      Log.info(
+        "App: <Native.NavigationContainer> onStateChange: Unable to stringify navigation state",
+      )
+    }
+  })
+
+  let calendarsContextValue = Calendars.useEventsContext()
+  let onReady = React.useCallback0(() => {
+    ReactNativeBootsplash.hide({fade: true})->Js.Promise.then_(() => {
+      Log.info("BootSplash: fading is over")
+      Js.Promise.resolve()
+    }, _)->Js.Promise.catch(error => {
+      Log.info(("BootSplash: cannot hide splash", error))
+      Js.Promise.resolve()
+    }, _)->ignore
+    ()
+  })
 
   // let (initialized, initialized_set) = React.useState(() => false);
   let (optionalSettings, optionalSettings_set) = React.useState(() => None)
@@ -98,36 +128,51 @@ let app = () => {
     None
   }, [optionalSettings_set])
 
-  let settings_set = settingsCallback =>
-    optionalSettings_set(settings => settings->Option.map(settings => {
-        let newSettings = settingsCallback(settings)
-        AppSettings.setSettings(newSettings)
-        Some(newSettings)
-      })->Option.getWithDefault(settings))
+  let settings_set = settingsCallback => {
+    Log.info("App: Updating settings")
+    InteractionManager.runAfterInteractions(() => {
+      Js.Global.setTimeout(() => {
+        optionalSettings_set(settings =>
+          settings
+          ->Option.map(settings => {
+            let newSettings = settingsCallback(settings)
+            InteractionManager.runAfterInteractions(() => {
+              Js.Global.setTimeout(() => {
+                AppSettings.setSettings(newSettings)
+              }, 0)->ignore
+            })->ignore
+            Some(newSettings)
+          })
+          ->Option.getWithDefault(settings)
+        )
+      }, 0)->ignore
+    })->ignore
+  }
 
   optionalSettings
   ->Option.map(settings =>
-    <ReactNativeDarkMode.DarkModeProvider>
+    <ReactNativeSafeAreaContext.SafeAreaProvider>
       <AppSettings.ContextProvider value=(settings, settings_set)>
         <Calendars.ContextProvider value=calendarsContextValue>
-          {initialStateContainer->Option.map(initialState =>
+          {initialStateContainer
+          ->Option.map(initialState =>
             <Native.NavigationContainer
               ref={navigationRef->Obj.magic}
+              // doesn't work properly with native-stack
               ?initialState
-              onStateChange={state => {
-                let maybeJsonState = Js.Json.stringifyAny(state)
-                switch maybeJsonState {
-                | Some(jsonState) =>
-                  ReactNativeAsyncStorage.setItem(navigationStateStorageKey, jsonState)->ignore
-                | None => Js.log("Unable to stringify navigation state")
-                }
-              }}>
+              onStateChange
+              onReady>
               <Nav.RootNavigator />
             </Native.NavigationContainer>
-          )->Option.getWithDefault(React.null)} <Bootsplash isReady /> <NotificationsRegisterer />
+          )
+          ->Option.getWithDefault(React.null)}
+          <NotificationsRegisterer
+            notificationsRecurrentRemindersOn=settings.notificationsRecurrentRemindersOn
+            notificationsRecurrentReminders=settings.notificationsRecurrentReminders
+          />
         </Calendars.ContextProvider>
       </AppSettings.ContextProvider>
-    </ReactNativeDarkMode.DarkModeProvider>
+    </ReactNativeSafeAreaContext.SafeAreaProvider>
   )
   ->Option.getWithDefault(React.null)
 }

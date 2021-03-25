@@ -3,7 +3,7 @@ open ReactNative
 open ReactMultiversal
 
 // react-native-web
-@bs.module("react-native")
+@module("react-native")
 external createWebElementFromString: (string, 'props) => React.element = "createElement"
 
 let styles = {
@@ -48,10 +48,12 @@ module H1 = {
     <View accessibilityRole=#header>
       <Spacer />
       <Text
-        style={
-          open Style
-          array([Theme.text["largeTitle"], Theme.text["bold"], theme.styles["text"]])
-        }>
+        allowFontScaling=false
+        style={Style.array([
+          Theme.text["largeTitle"],
+          Theme.text["weight700"],
+          theme.styles["text"],
+        ])}>
         children
       </Text>
       <Spacer />
@@ -69,7 +71,7 @@ module H2 = {
       <Text
         style={
           open Style
-          array([Theme.text["title1"], Theme.text["bold"], theme.styles["text"]])
+          array([Theme.text["title1"], Theme.text["weight700"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -88,7 +90,7 @@ module H3 = {
       <Text
         style={
           open Style
-          array([Theme.text["title2"], Theme.text["bold"], theme.styles["text"]])
+          array([Theme.text["title2"], Theme.text["weight700"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -107,7 +109,7 @@ module H4 = {
       <Text
         style={
           open Style
-          array([Theme.text["title3"], Theme.text["bold"], theme.styles["text"]])
+          array([Theme.text["title3"], Theme.text["weight700"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -126,7 +128,7 @@ module H5 = {
       <Text
         style={
           open Style
-          array([Theme.text["headline"], Theme.text["bold"], theme.styles["text"]])
+          array([Theme.text["headline"], Theme.text["weight700"], theme.styles["text"]])
         }>
         children
       </Text>
@@ -144,7 +146,7 @@ module H6 = {
       <Text
         style={
           open Style
-          array([Theme.text["headline"], Theme.text["semiBold"], theme.styles["text"]])
+          array([Theme.text["headline"], Theme.text["weight600"], theme.styles["text"]])
         }>
         children
       </Text>

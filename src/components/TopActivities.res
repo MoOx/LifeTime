@@ -5,17 +5,8 @@ open ReactMultiversal
 let numberOfActivitiesToShow = 8
 
 @react.component
-let make = (
-  ~mapTitleDuration,
-  ~onFiltersPress,
-  ~onActivityPress,
-  ~startDate,
-  ~endDate,
-) => {
-  let (settings, _setSettings) = React.useContext(AppSettings.context)
-
+let make = (~activities, ~mapTitleDuration, ~onActivityPress, ~onFiltersPress, ~startDate, ~endDate) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
-  let calendars = Calendars.useCalendars(None)
   let (activitiesToShow, setActivitiesToShow) = React.useState(() => numberOfActivitiesToShow)
 
   let (_, maxDurationInMin) =
@@ -37,29 +28,10 @@ let make = (
         <Spacer size=XS />
       </Row>
     </View>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
     <View onLayout style={theme.styles["background"]}>
-      {calendars
-      ->Option.map(calendars => Calendars.availableCalendars(calendars, settings))
-      ->Option.map(c =>
-        if c->Array.length === 0 {
-          <SpacedView>
-            <Center>
-              <Spacer size=XXL />
-              <Title style={theme.styles["text"]}> {"No Events"->React.string} </Title>
-              <Spacer />
-              <Text style={theme.styles["textLight2"]}>
-                {"You should select at least a calendar"->React.string}
-              </Text>
-              <Spacer size=XXL />
-            </Center>
-          </SpacedView>
-        } else {
-          React.null
-        }
-      )
-      ->Option.getWithDefault(React.null)}
-      {mapTitleDuration->Option.map(mapTitleDuration => {
+      {mapTitleDuration
+      ->Option.map(mapTitleDuration => {
         let shouldShowMore = mapTitleDuration->Array.length > activitiesToShow
         let shouldShowLess = activitiesToShow > numberOfActivitiesToShow
         <>
@@ -71,7 +43,7 @@ let make = (
                 <Text
                   style={Style.array([
                     Theme.text["title3"],
-                    Theme.text["medium"],
+                    Theme.text["weight500"],
                     theme.styles["textLight2"],
                   ])}>
                   {"No activities"->React.string}
@@ -89,84 +61,63 @@ let make = (
               ->Array.mapWithIndex((index, (title, totalDurationInMin)) => {
                 let durationString = totalDurationInMin->Date.minToString
                 let (_, _, colorName, iconName) =
-                  settings
-                  ->Calendars.categoryIdFromActivityTitle(title)
+                  title
+                  ->Calendars.categoryIdFromActivityTitle(activities)
                   ->ActivityCategories.getFromId
                 let color = colorName->ActivityCategories.getColor(theme.mode)
-                <TouchableOpacity
-                  key=title
-                  onPress={_ =>
-                    onActivityPress(
-                      title,
-                      (startDate, endDate),
-                    )}>
-                  <View style={Predefined.styles["rowCenter"]}>
-                    <Spacer size=S />
-                    <SpacedView vertical=XS horizontal=None>
-                      <NamedIcon name=iconName fill=color />
-                    </SpacedView>
-                    <Spacer size=XS />
-                    <View style={Predefined.styles["flex"]}>
-                      <SpacedView
-                        vertical=XS horizontal=None style={Predefined.styles["rowCenter"]}>
-                        <View style={Predefined.styles["flex"]}>
-                          <Text
-                            style={
-                              open Style
-                              array([Theme.text["callout"], theme.styles["text"]])
-                            }
-                            numberOfLines=1>
-                            {title->React.string}
-                          </Text>
-                          <Spacer size=XXS />
-                          <Row style={Predefined.styles["alignCenter"]}>
-                            <View
-                              style={
-                                open Style
-                                array([
-                                  theme.styles["backgroundGray3"],
-                                  viewStyle(
-                                    // ~backgroundColor=color,
-
-                                    ~width=(totalDurationInMin /.
-                                    maxDurationInMin *.
-                                    availableWidthForBar)->dp,
-                                    ~height=6.->dp,
-                                    ~borderRadius=6.,
-                                    ~overflow=#hidden,
-                                    (),
-                                  ),
-                                ])
-                              }
-                            />
-                            <Spacer size=XXS />
-                            <Text
-                              style={
-                                open Style
-                                array([Theme.text["footnote"], theme.styles["textLight2"]])
-                              }
-                              numberOfLines=1
-                              adjustsFontSizeToFit=true>
-                              {durationString->React.string}
-                            </Text>
-                          </Row>
-                        </View>
-                        <Spacer size=XS />
-                        <SVGChevronright
-                          width={14.->Style.dp}
-                          height={14.->Style.dp}
-                          fill=Predefined.Colors.Ios.light.gray4
-                        />
-                        <Spacer size=S />
-                      </SpacedView>
-                      {index < mapTitleDuration->Array.length - 1 ||
-                        (shouldShowMore ||
-                        shouldShowLess)
-                        ? <Separator style={theme.styles["separatorOnBackground"]} />
-                        : React.null}
-                    </View>
-                  </View>
-                </TouchableOpacity>
+                <React.Fragment key=title>
+                  <ListItem
+                    onPress={_ => onActivityPress(title, (startDate, endDate))}
+                    left={<NamedIcon name=iconName fill=color />}
+                    right={<SVGChevronright
+                      width={14.->Style.dp}
+                      height={14.->Style.dp}
+                      fill=Predefined.Colors.Ios.light.gray4
+                    />}>
+                    <Text
+                      style={
+                        open Style
+                        array([Theme.text["callout"], theme.styles["text"]])
+                      }
+                      numberOfLines=1>
+                      {title->React.string}
+                    </Text>
+                    <Spacer size=XXS />
+                    <Row style={Predefined.styles["alignCenter"]}>
+                      <View
+                        style={
+                          open Style
+                          array([
+                            theme.styles["backgroundGray3"],
+                            viewStyle(
+                              // ~backgroundColor=color,
+                              ~width=(totalDurationInMin /.
+                              maxDurationInMin *.
+                              availableWidthForBar)->dp,
+                              ~height=6.->dp,
+                              ~borderRadius=6.,
+                              ~overflow=#hidden,
+                              (),
+                            ),
+                          ])
+                        }
+                      />
+                      <Spacer size=XXS />
+                      <Text
+                        style={
+                          open Style
+                          array([Theme.text["footnote"], theme.styles["textLight2"]])
+                        }
+                        numberOfLines=1
+                        adjustsFontSizeToFit=true>
+                        {durationString->React.string}
+                      </Text>
+                    </Row>
+                  </ListItem>
+                  {index < mapTitleDuration->Array.length - 1 || (shouldShowMore || shouldShowLess)
+                    ? <ListSeparator spaceStart={Spacer.size(S) *. 2. +. NamedIcon.size} />
+                    : React.null}
+                </React.Fragment>
               })
               ->React.array}
               {shouldShowMore || shouldShowLess
@@ -213,18 +164,19 @@ let make = (
                           </TouchableOpacity>
                         : React.null}
                     </View>
-                    <Separator style={theme.styles["separatorOnBackground"]} />
+                    <ListSeparator />
                   </Row>
                 : React.null}
             </>
           }}
         </>
-      })->Option.getWithDefault(
+      })
+      ->Option.getWithDefault(
         <SpacedView vertical=XXL>
           <ActivityIndicator size=ActivityIndicator.Size.small />
         </SpacedView>,
       )}
     </View>
-    <Separator style={theme.styles["separatorOnBackground"]} />
+    <ListSeparator />
   </>
 }

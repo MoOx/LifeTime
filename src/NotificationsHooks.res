@@ -1,11 +1,12 @@
 let useNotificationStatus = () => {
   let (notificationStatus, notificationStatus_set) = React.useState(() => None)
-  let appState = ReactNativeHooks.useAppState()
+  let (appState, _previousAppState) = ReactNativeHooks.useAppState()
   React.useEffect2(() => {
     if appState === #active {
+      Log.info("NotificationsHooks: checkNotifications request")
       open ReactNativePermissions
       checkNotifications()
-      ->FutureJs.fromPromise(error => Js.Console.error(error))
+      ->FutureJs.fromPromise(error => Log.error(("NotificationsHooks: checkNotifications", error)))
       ->Future.tapOk(res => notificationStatus_set(_ => Some(res.status)))
       ->ignore
     }
@@ -17,7 +18,9 @@ let useNotificationStatus = () => {
       ? {
           open ReactNativePermissions
           requestNotifications(["alert", "badge", "sound"])
-          ->FutureJs.fromPromise(error => Js.Console.error(error))
+          ->FutureJs.fromPromise(error =>
+            Log.error(("NotificationsHooks: requestNotificationPermission", error))
+          )
           ->Future.tapOk(res => notificationStatus_set(_ => Some(res.status)))
           ->ignore
         }

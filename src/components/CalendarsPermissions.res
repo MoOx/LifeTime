@@ -22,19 +22,17 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
   let animatedBottomTranslateY = React.useRef(Animated.Value.create(1000.))
 
   React.useEffect0(() => {
-    {
-      open Animated
-      spring(
-        animatedBottomTranslateY.current,
-        Value.Spring.config(
-          ~useNativeDriver=true,
-          ~toValue=1.->Value.Spring.fromRawValue,
-          ~tension=1.,
-          ~delay=150.,
-          (),
-        ),
-      )->Animation.start()
-    }
+    open Animated
+    spring(
+      animatedBottomTranslateY.current,
+      Value.Spring.config(
+        ~useNativeDriver=true,
+        ~toValue=1.->Value.Spring.fromRawValue,
+        ~tension=1.,
+        ~delay=150.,
+        (),
+      ),
+    )->Animation.start()
 
     None
   })
@@ -49,36 +47,36 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
           ],
           (),
         ),
+        Predefined.styles["flex"],
       ])
     }>
-    <View
+    <SpacedView
       style={
         open Style
         array([styles["content"], theme.styles["background"]])
       }>
-      <SpacedView>
-        <View style={Predefined.styles["center"]}>
-          <IconCalendar style={styles["iconCalendar"]} />
-        </View>
-        <Spacer />
-        <Text
-          style={
-            open Style
-            array([Theme.text["title2"], Theme.text["bold"], theme.styles["text"]])
-          }>
-          {"Set Up Calendars Access"->React.string}
-        </Text>
-        <Spacer size=S />
+      <View style={Predefined.styles["center"]}>
+        <IconCalendar style={styles["iconCalendar"]} />
+      </View>
+      <Spacer />
+      <Text
+        style={
+          open Style
+          array([Theme.text["title2"], Theme.text["weight700"], theme.styles["text"]])
+        }>
+        {"Set Up Calendars Access"->React.string}
+      </Text>
+      <Spacer size=S />
+      <ScrollView style={Predefined.styles["flex"]}>
         <Text
           style={
             open Style
             array([Theme.text["body"], theme.styles["text"]])
           }>
           {("LifeTime has been designed to protect your personal data and respect your privacy. " ++
-          ("It has been built as an on-device service that you can trust. " ++
-          ("\n" ++
-          ("\n" ++
-          ("We decided to rely on calendars as primary source of informations to follow your activities. " ++ "That's why LifeTime must read your calendars to be able to show you personal summary of your activities. ")))))
+          "It has been built as an on-device service that you can trust. " ++
+          "\n" ++
+          "\n" ++ "Calendars are used as the primary source of informations to follow your activities. LifeTime must have read access to them to be able to show reports and suggestions.")
             ->React.string}
         </Text>
         <Spacer />
@@ -91,16 +89,16 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
             {"Learn more about LifeTime & Privacy..."->React.string}
           </Text>
         </TouchableOpacity>
-        <Spacer />
-        <TouchableButton
-          text="Allow Calendars Access"
-          onPress=onContinuePress
-          styleBackground={
-            open Style
-            viewStyle(~backgroundColor=theme.colors.blue, ())
-          }
-        />
-      </SpacedView>
-    </View>
+      </ScrollView>
+      <Spacer />
+      <TouchableButton
+        text="Allow Calendars Access"
+        onPress=onContinuePress
+        styleBackground={
+          open Style
+          viewStyle(~backgroundColor=theme.colors.blue, ())
+        }
+      />
+    </SpacedView>
   </Animated.View>
 }

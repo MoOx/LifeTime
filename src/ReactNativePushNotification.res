@@ -3,7 +3,7 @@ type permissions = {
   badge: option<bool>,
   sound: option<bool>,
 }
-@bs.obj
+@obj
 external permissions: (~alert: bool=?, ~badge: bool=?, ~sound: bool=?) => permissions = ""
 
 type notification<'data, 'alert> = {
@@ -24,7 +24,7 @@ type tokenData = {
   token: string,
 }
 type configureOptions
-@bs.obj
+@obj
 external configureOptions: (
   ~onRegister: tokenData => unit=?,
   ~onNotification: notification<'data, 'alert> => unit=?,
@@ -37,11 +37,11 @@ external configureOptions: (
   unit,
 ) => configureOptions = ""
 
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external configure: configureOptions => unit = "configure"
 
 type localNotificationOptions
-@bs.obj
+@obj
 external // if you edit any of this below, please report to localNotificationScheduleOptions
 localNotificationOptions: (
   ~id: string=?, // int as string
@@ -86,11 +86,11 @@ localNotificationOptions: (
   unit,
 ) => localNotificationOptions = ""
 
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external localNotification: localNotificationOptions => unit = "localNotification"
 
 type localNotificationScheduleOptions
-@bs.obj
+@obj
 external localNotificationScheduleOptions: (
   ~date: Js.Date.t,
   ~id: // copy of localNotificationOptions below
@@ -105,6 +105,7 @@ external localNotificationScheduleOptions: (
   ~actions: /* Android only properties */
   string=?,
   ~autoCancel: bool=?,
+  ~bigLargeIcon: string=?,
   ~bigPictureUrl: string=?,
   ~bigText: string=?,
   ~channelId: string=?,
@@ -136,11 +137,11 @@ external localNotificationScheduleOptions: (
   unit,
 ) => localNotificationScheduleOptions = ""
 
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external localNotificationSchedule: localNotificationScheduleOptions => unit =
   "localNotificationSchedule"
 
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external popInitialNotification: notification<'data, 'alert> => unit = "popInitialNotification"
 
 type channel = {
@@ -152,7 +153,7 @@ type channel = {
   vibrate: option<bool>,
 }
 
-@bs.obj
+@obj
 external channel: (
   ~channelId: string,
   ~channelName: string,
@@ -163,21 +164,21 @@ external channel: (
   unit,
 ) => channel = ""
 
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external getChannels: (array<string> => unit) => unit = "getChannels"
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external channelExists: (string, bool => unit) => unit = "channelExists"
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external createChannel: channel => unit = "createChannel"
 external createChannelWithCallback: (channel, bool => unit) => unit = "createChannel"
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external channelBlocked: (string, bool => unit) => unit = "channelBlocked"
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external deleteChannel: string => unit = "deleteChannel"
 
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external cancelAllLocalNotifications: unit => unit = "cancelAllLocalNotifications"
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external removeAllDeliveredNotifications: unit => unit = "removeAllDeliveredNotifications"
 
 type deliveredNotification = {
@@ -187,7 +188,7 @@ type deliveredNotification = {
   tag: string,
   group: string,
 }
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external getDeliveredNotifications: (array<deliveredNotification> => unit) => unit =
   "getDeliveredNotifications"
 
@@ -200,38 +201,38 @@ type scheduledNotification = {
   repeatInterval: int,
   number: int,
 }
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external getScheduledLocalNotifications: (array<scheduledNotification> => unit) => unit =
   "getScheduledLocalNotifications"
 
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external removeDeliveredNotifications: array<string> => unit = "removeDeliveredNotifications"
 
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external cancelLocalNotifications: 'userInfo => unit = "cancelLocalNotifications"
 
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external clearLocalNotification: (string, int) => unit = "clearLocalNotification"
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external clearAllNotifications: unit => unit = "clearAllNotifications"
 
-// [@bs.module "react-native-push-notification"] external unregister :unit => unit = "unregister";
-// [@bs.module "react-native-push-notification"] external requestPermissions :(
+// [@module "react-native-push-notification"] external unregister :unit => unit = "unregister";
+// [@module "react-native-push-notification"] external requestPermissions :(
 //     permissions?: Array<"alert" | "badge" | "sound">
 // )=> Promise<PushNotificationPermissions> = "requestPermissions",
-// [@bs.module "react-native-push-notification"] external subscribeToTopic:(topic: string)=> unit = "subscribeToTopic";
-// [@bs.module "react-native-push-notification"] external unsubscribeFromTopic:(topic: string)=> unit = "unsubscribeFromTopic";
-// [@bs.module "react-native-push-notification"] external presentLocalNotification:(notification: PushNotificationObject)=> unit = "presentLocalNotification";
-// [@bs.module "react-native-push-notification"] external scheduleLocalNotification:(notification: PushNotificationScheduleObject)=> unit = "scheduleLocalNotification";
+// [@module "react-native-push-notification"] external subscribeToTopic:(topic: string)=> unit = "subscribeToTopic";
+// [@module "react-native-push-notification"] external unsubscribeFromTopic:(topic: string)=> unit = "unsubscribeFromTopic";
+// [@module "react-native-push-notification"] external presentLocalNotification:(notification: PushNotificationObject)=> unit = "presentLocalNotification";
+// [@module "react-native-push-notification"] external scheduleLocalNotification:(notification: PushNotificationScheduleObject)=> unit = "scheduleLocalNotification";
 
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external setApplicationIconBadgeNumber: int => unit = "setApplicationIconBadgeNumber"
-@bs.module("react-native-push-notification")
+@module("react-native-push-notification")
 external getApplicationIconBadgeNumber: (int => unit) => unit = "getApplicationIconBadgeNumber"
 
-// [@bs.module "react-native-push-notification"] external abandonPermissions:unit => unit = "abandonPermissions";
-// [@bs.module "react-native-push-notification"] external checkPermissions:(
+// [@module "react-native-push-notification"] external abandonPermissions:unit => unit = "abandonPermissions";
+// [@module "react-native-push-notification"] external checkPermissions:(
 //     callback: (permissions: PushNotificationPermissions) => unit
 // )=> unit = "checkPermissions";
 
-// [@bs.module "react-native-push-notification"] external invokeApp:(notification: PushNotificationObject)=> unit ="invokeApp";
+// [@module "react-native-push-notification"] external invokeApp:(notification: PushNotificationObject)=> unit ="invokeApp";
