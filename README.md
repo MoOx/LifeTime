@@ -38,9 +38,9 @@ brew install git
 brew install node
 brew install yarn
 brew install watchman
-brew cask install android-platform-tools
-brew cask install android-sdk
-brew cask install android-studio
+brew install --cask android-platform-tools
+brew install --cask android-sdk
+brew install --cask android-studio
 ```
 
 (Only Xcode is missing with the commands above)
