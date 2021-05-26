@@ -5,7 +5,7 @@ open ReactMultiversal
 let numberOfActivitiesToShow = 8
 
 @react.component
-let make = (~activities, ~mapTitleDuration, ~onActivityPress, ~onFiltersPress) => {
+let make = (~activities, ~mapTitleDuration, ~onActivityPress, ~onFiltersPress, ~startDate, ~endDate) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
   let (activitiesToShow, setActivitiesToShow) = React.useState(() => numberOfActivitiesToShow)
 
@@ -67,7 +67,7 @@ let make = (~activities, ~mapTitleDuration, ~onActivityPress, ~onFiltersPress) =
                 let color = colorName->ActivityCategories.getColor(theme.mode)
                 <React.Fragment key=title>
                   <ListItem
-                    onPress={_ => onActivityPress(title)}
+                    onPress={_ => onActivityPress(title, (startDate, endDate))}
                     left={<NamedIcon name=iconName fill=color />}
                     right={<SVGChevronright
                       width={14.->Style.dp}

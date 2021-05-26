@@ -3,8 +3,70 @@ open ReactNative
 open ReactMultiversal
 
 @react.component
-let make = (~activityTitle, ~onSkipActivity) => {
+let make = (
+  ~activityTitle,
+  ~refreshing,
+  ~onRefreshDone,
+  ~onSkipActivity,
+  ~currentWeek: (string, string),
+) => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
+  let (getEvents, fetchEvents, _updatedAt, requestUpdate) = React.useContext(Calendars.context)
+
+  let appStateUpdateIsActive = ReactNativeHooks.useAppStateUpdateIsActive()
+  React.useEffect2(() => {
+    if appStateUpdateIsActive {
+      requestUpdate()
+    }
+    None
+  }, (appStateUpdateIsActive, requestUpdate))
+
+  let (today, todayUpdate) = Date.Hooks.useToday()
+
+  React.useEffect4(() => {
+    if refreshing {
+      Log.info("ActivityOption: refreshing...")
+      todayUpdate()
+      requestUpdate()
+      onRefreshDone()
+    }
+    None
+  }, (refreshing, todayUpdate, requestUpdate, onRefreshDone))
+
+  let (startDateStr, supposedEndDateStr) = currentWeek
+
+  let (startDate, endDate) = (
+    startDateStr->Js.Date.fromString,
+    supposedEndDateStr->Js.Date.fromString->Date.min(today),
+  )
+
+  let fetchedEvents = getEvents(startDate, endDate)
+  React.useEffect4(() => {
+    switch fetchedEvents {
+    | NotAsked => fetchEvents(startDate, endDate)
+    | _ => ()
+    }
+    None
+  }, (fetchEvents, fetchedEvents, startDate, endDate))
+  let events = switch fetchedEvents {
+  | Done(events) => Some(events)
+  | _ => None
+  }
+
+  let filteredEvents =
+    events
+    ->Option.map(event =>
+      event
+      ->Calendars.filterEvents(
+        settings.calendarsSkipped,
+        settings.activitiesSkippedFlag,
+        settings.activitiesSkipped,
+      )
+      ->Calendars.filterEventsByTitle(activityTitle)
+      ->Calendars.sortEventsByDecreasingStartDate
+    )
+    ->Option.getWithDefault([])
+
   let themeModeKey = AppSettings.useTheme()
   let theme = Theme.useTheme(themeModeKey)
   let isSkipped =
@@ -47,7 +109,14 @@ let make = (~activityTitle, ~onSkipActivity) => {
     })
     ->List.toArray
     ->React.array}
-    <ListSeparator />
+    <Separator style={theme.styles["separatorOnBackground"]} />
+    <Spacer size=S />
+    <Row> <Spacer size=XS /> <BlockHeading text="Events" /> </Row>
+    <Separator style={theme.styles["separatorOnBackground"]} />
+    <View style={theme.styles["background"]}>
+      <Events startDate endDate events=filteredEvents />
+    </View>
+    <Separator style={theme.styles["separatorOnBackground"]} />
     <Spacer size=L />
     <ListSeparator />
     <ListItem
