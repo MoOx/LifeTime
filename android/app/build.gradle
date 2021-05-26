@@ -149,6 +149,11 @@ def getKeychainPassword(String keyChain) {
 def releaseKeystoreAccount = getKeychainAccount("android_keystore")
 def releaseKeystorePassword = getKeychainPassword("android_keystore")
 
+// https://docs.gradle.org/current/userguide/dependency_locking.html
+dependencyLocking {
+    lockAllConfigurations()
+}
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
