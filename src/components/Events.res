@@ -2,10 +2,6 @@ open Belt
 open ReactNative
 open ReactMultiversal
 
-let styles = {
-  open Style
-  {"text": textStyle(~fontSize=16., ~lineHeight=16. *. 1.4, ())}
-}->StyleSheet.create
 
 @react.component
 let make = (
@@ -38,7 +34,7 @@ let make = (
 
   <View onLayout>
     <Row>
-      <Spacer size=S />
+      <Spacer size=XS />
       <BlockHeading
         style={Style.array([theme.styles["background"], theme.styles["text"]])}
         text={startDate->Js.Date.getDate->Belt.Float.toString ++
@@ -82,7 +78,7 @@ let make = (
                 <View>
                   <View style={Predefined.styles["row"]}>
                     <Text
-                      style={Style.array([styles["text"]])}
+                      style={Style.array([Theme.text["callout"], theme.styles["text"]])}
                       numberOfLines=1
                       adjustsFontSizeToFit=true>
                       {(event.startDate
@@ -91,7 +87,7 @@ let make = (
                       ->Date.dayShortString ++ " - ")->React.string}
                     </Text>
                     <Text
-                      style={Style.array([styles["text"], theme.styles["textLight1"]])}
+                      style={Style.array([Theme.text["callout"], theme.styles["textLight1"]])}
                       numberOfLines=1
                       adjustsFontSizeToFit=true>
                       {(event.startDate->Js.Date.fromString->Js.Date.getDate->Belt.Float.toString ++
@@ -132,13 +128,13 @@ let make = (
                 <SpacedView vertical=XS horizontal=None>
                   <View style={Predefined.styles["row"]}>
                     <View style={Predefined.styles["flexGrow"]}>
-                      <Text style={Style.array([styles["text"], theme.styles["textLight1"]])}>
+                      <Text style={Style.array([Theme.text["callout"], theme.styles["textLight1"]])}>
                         {Js.Date.fromString(event.startDate)
                         ->Js.Date.toTimeString
                         ->Js.String2.slice(~from=0, ~to_=5)
                         ->React.string}
                       </Text>
-                      <Text style={Style.array([styles["text"], theme.styles["text"]])}>
+                      <Text style={Style.array([Theme.text["callout"], theme.styles["text"]])}>
                         {Js.Date.fromString(event.endDate)
                         ->Js.Date.toTimeString
                         ->Js.String2.slice(~from=0, ~to_=5)
