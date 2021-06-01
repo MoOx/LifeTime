@@ -23,7 +23,7 @@ type rec t = {
 }
 
 let rec jsTreeToReason = (jsChild: t) =>
-  switch %bs.raw(` Object.prototype.toString.call(jsChild) `) {
+  switch %raw(` Object.prototype.toString.call(jsChild) `) {
   | "[object String]" => String(Js.String.make(jsChild))
   | "[object Object]" =>
     let tag = Js.String.make(jsChild.tag)
@@ -136,15 +136,18 @@ let rec renderChild = (~keepNewlines=false, parentTag, index: int, child) => {
     | "br" => <Html.Br key props />
     | "hr" => <Html.Hr key props />
     | "details" =>
-      let summary = (children->Array.keepMap(child =>
+      let summary =
+        (
+          children->Array.keepMap(child =>
             switch child {
-            | Element(tag, _htmlProps, reasonChildren) when tag == "summary" => Some(reasonChildren)
+            | Element(tag, _htmlProps, reasonChildren) if tag == "summary" => Some(reasonChildren)
             | _ => None
             }
-          ))[0]
+          )
+        )[0]
       let filtredChildren = children->Array.keepMap(child =>
         switch child {
-        | Element(tag, _htmlProps, _reasonChildren) when tag == "summary" => None
+        | Element(tag, _htmlProps, _reasonChildren) if tag == "summary" => None
         | _ => Some(child)
         }
       )
@@ -159,9 +162,7 @@ let rec renderChild = (~keepNewlines=false, parentTag, index: int, child) => {
       Platform.os == Platform.web
         ? ReactDOMRe.createElement(
             tag,
-            ~props=ReactDOMRe.objToDOMProps(
-              Js.Obj.empty()->Js.Obj.assign({"key": key})->Js.Obj.assign(props),
-            ),
+            ~props=Js.Obj.empty()->Js.Obj.assign({"key": key})->Js.Obj.assign(props)->Obj.magic,
             [renderChildren(~keepNewlines, tag, children)],
           )
         : <Text key> {renderChildren(~keepNewlines, tag, children)} </Text>

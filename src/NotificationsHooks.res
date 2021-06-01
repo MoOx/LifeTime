@@ -6,7 +6,8 @@ let useNotificationStatus = () => {
       Log.info("NotificationsHooks: checkNotifications request")
       open ReactNativePermissions
       checkNotifications()
-      ->FutureJs.fromPromise(error => Log.error(("NotificationsHooks: checkNotifications", error)))
+      ->FuturePromise.fromPromise
+      ->Future.mapError(error => Log.error(("NotificationsHooks: checkNotifications", error)))
       ->Future.tapOk(res => notificationStatus_set(_ => Some(res.status)))
       ->ignore
     }
@@ -18,7 +19,8 @@ let useNotificationStatus = () => {
       ? {
           open ReactNativePermissions
           requestNotifications(["alert", "badge", "sound"])
-          ->FutureJs.fromPromise(error =>
+          ->FuturePromise.fromPromise
+          ->Future.mapError(error =>
             Log.error(("NotificationsHooks: requestNotificationPermission", error))
           )
           ->Future.tapOk(res => notificationStatus_set(_ => Some(res.status)))

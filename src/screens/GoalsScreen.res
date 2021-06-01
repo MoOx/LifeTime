@@ -47,7 +47,7 @@ let make = (~navigation, ~route as _) => {
               {
                 "nativeEvent": {
                   "contentOffset": {
-                    y: scrollYAnimatedValue.current,
+                    "y": scrollYAnimatedValue.current,
                   },
                 },
               },

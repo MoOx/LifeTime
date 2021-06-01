@@ -35,7 +35,8 @@ let useCalendars = updater => {
   React.useEffect2(() => {
     Log.info("Calendars: useCalendars request")
     findCalendars()
-    ->FutureJs.fromPromise(error => {
+    ->FuturePromise.fromPromise
+    ->Future.mapError(error => {
       // @todo error!
       Log.info(("Calendars: useCalendars", error))
       error
@@ -121,7 +122,8 @@ let useEventsContext = () => {
           // this `fetchAllEvents` DEFAULT TO ALL
           None,
         )
-        ->FutureJs.fromPromise(error => {
+        ->FuturePromise.fromPromise
+        ->Future.mapError(error => {
           // @todo error!
           Log.info(("Calendars: useEventsContext/getEvents", startDate, endDate, error))
           error
@@ -318,7 +320,8 @@ let filterEventsByTitle = (
 
 let sortEventsByDecreasingStartDate = (
   events: array<ReactNativeCalendarEvents.calendarEventReadable>,
-) => events->SortArray.stableSortBy((a, b) =>
+) =>
+  events->SortArray.stableSortBy((a, b) =>
     a.startDate->Js.Date.fromString->Js.Date.getTime <
       b.startDate->Js.Date.fromString->Js.Date.getTime
       ? 1

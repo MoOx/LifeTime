@@ -76,7 +76,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
             {
               "nativeEvent": {
                 "contentOffset": {
-                  y: scrollYAnimatedValue.current,
+                  "y": scrollYAnimatedValue.current,
                 },
               },
             },

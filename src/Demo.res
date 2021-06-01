@@ -5,7 +5,8 @@ let calendarDemoTitle = "LifeTime Demo"
 
 let injectFreshData = () => {
   ReactNativeCalendarEvents.findCalendars()
-  ->FutureJs.fromPromise(error => {
+  ->FuturePromise.fromPromise
+  ->Future.mapError(error => {
     // @todo error
     Log.info(("Demo: ReactNativeCalendarEvents.findCalendars", error))
     "Unable to retrieve calendars before injecting demo data"
@@ -25,7 +26,7 @@ let injectFreshData = () => {
         calendarsResult->Array.keep(calendar => calendar.title === calendarDemoTitle)
       )[0]->Option.map(lifeTimeCalendar => lifeTimeCalendar.id)
 
-    switch lifeTimeCalendarOptionalId {
+    let futureId = switch lifeTimeCalendarOptionalId {
     | Some(id) => {
         Log.info(("Demo: injectFreshData", calendarDemoTitle, id))
         Future.value(Some(id))
@@ -48,7 +49,8 @@ let injectFreshData = () => {
             // isLocalAccount: Some(true),
           },
         })
-        ->FutureJs.fromPromise(error => {
+        ->FuturePromise.fromPromise
+        ->Future.mapError(error => {
           // @todo error
           Log.info(("Demo: ReactNativeCalendarEvents.saveCalendar", error))
           "Unable to create a calendars to injecting demo data"
@@ -61,7 +63,9 @@ let injectFreshData = () => {
         })
       })
       ->Option.getWithDefault(Future.value(None))
-    }->Future.tap(id => {
+    }
+    futureId
+    ->Future.tap(id => {
       Log.info(("Demo: ", calendarDemoTitle, "ready", id))
       id
       ->Option.map(calendarId => {
@@ -129,14 +133,15 @@ let injectFreshData = () => {
       })
       ->ignore
     })
+    ->ignore
   })
   ->ignore
-  ()
 }
 
 let removeData = () => {
   ReactNativeCalendarEvents.findCalendars()
-  ->FutureJs.fromPromise(error => {
+  ->FuturePromise.fromPromise
+  ->Future.mapError(error => {
     // @todo error
     Log.info(("Demo: removeData ReactNativeCalendarEvents.findCalendars", error))
     "Unable to retrieve calendars before injecting demo data"

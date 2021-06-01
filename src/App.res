@@ -41,7 +41,7 @@ ReactNativeAsyncStorage.removeItem("react-navigation:state")->ignore
 
 let rec navigateToIfPossible = (navigation, navigateTo) =>
   switch navigation {
-  | Some(navigation) when navigateTo == "GoalsScreen" =>
+  | Some(navigation) if navigateTo == "GoalsScreen" =>
     navigation->Navigators.RootStack.Navigation.navigateWithParams(
       "GoalsStack",
       Navigators.RootStack.M.params(~screen="GoalsScreen", ()),
@@ -66,7 +66,8 @@ let app = () => {
     if initialStateContainer->Option.isNone {
       Log.info("App: Restoring Navigation initialStateContainer is empty")
       ReactNativeAsyncStorage.getItem(navigationStateStorageKey)
-      ->FutureJs.fromPromise(error => {
+      ->FuturePromise.fromPromise
+      ->Future.mapError(error => {
         // @todo error
         Log.info(("App: Restoring Navigation State: ", error))
         error

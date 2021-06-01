@@ -40,7 +40,8 @@ let useScreenReaderEnabled = () => {
         setScreenReaderState(_ => isScreenReaderEnabled)
       }
       AccessibilityInfo.isScreenReaderEnabled()
-      ->FutureJs.fromPromise(e => {
+      ->FuturePromise.fromPromise
+      ->Future.mapError(e => {
         Log.warn(e)
         e
       })

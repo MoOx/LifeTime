@@ -76,7 +76,7 @@ let make = (
         categoriesSelected,
         activitiesSelected,
       )
-      when minutes > 0. &&
+      if minutes > 0. &&
         (days->Array.some(day => day) &&
         (categoriesSelected->Array.length > 0 || activitiesSelected->Array.length > 0)) =>
       onChange(Some(Goal.make(title, type_, minutes, days, categoriesSelected, activitiesSelected)))
@@ -209,21 +209,23 @@ let make = (
                       cp
                     })}
                   hitSlop=HitSlops.m>
-                  <View>
-                    <Text style={Style.array([Theme.text["caption1"], theme.styles["textLight2"]])}>
-                      {day->float->Date.dayShortString->React.string}
-                    </Text>
-                    <Spacer size=XXS />
-                    {if !dayOn {
-                      <SVGCircle
-                        width={26.->Style.dp} height={26.->Style.dp} fill=theme.colors.gray
-                      />
-                    } else {
-                      <SVGCheckmarkcircle
-                        width={26.->Style.dp} height={26.->Style.dp} fill=theme.colors.blue
-                      />
-                    }}
-                  </View>
+                  {_ =>
+                    <View>
+                      <Text
+                        style={Style.array([Theme.text["caption1"], theme.styles["textLight2"]])}>
+                        {day->float->Date.dayShortString->React.string}
+                      </Text>
+                      <Spacer size=XXS />
+                      {if !dayOn {
+                        <SVGCircle
+                          width={26.->Style.dp} height={26.->Style.dp} fill=theme.colors.gray
+                        />
+                      } else {
+                        <SVGCheckmarkcircle
+                          width={26.->Style.dp} height={26.->Style.dp} fill=theme.colors.blue
+                        />
+                      }}
+                    </View>}
                 </Pressable>
               })
               ->React.array}
@@ -409,17 +411,18 @@ let make = (
                       <Pressable
                         onPress={_ => handleCategoryCheck(id, selectedCategoryActivities)}
                         hitSlop=HitSlops.xs>
-                        {!selectedCat
-                          ? <SVGCircle
-                              width={checkSize->Style.dp}
-                              height={checkSize->Style.dp}
-                              fill=theme.colors.gray
-                            />
-                          : <SVGCheckmarkcircle
-                              width={checkSize->Style.dp}
-                              height={checkSize->Style.dp}
-                              fill=theme.colors.blue
-                            />}
+                        {_ =>
+                          !selectedCat
+                            ? <SVGCircle
+                                width={checkSize->Style.dp}
+                                height={checkSize->Style.dp}
+                                fill=theme.colors.gray
+                              />
+                            : <SVGCheckmarkcircle
+                                width={checkSize->Style.dp}
+                                height={checkSize->Style.dp}
+                                fill=theme.colors.blue
+                              />}
                       </Pressable>
                       <Spacer size=XS />
                       <NamedIcon name=iconName fill=color />
@@ -485,19 +488,20 @@ let make = (
                               <Pressable
                                 disabled=selectedCat
                                 onPress={_ => handleActivityCheckPress(activity.id)}>
-                                <SpacedView vertical=XS horizontal=None>
-                                  {!selected
-                                    ? <SVGCircle
-                                        width={checkSize->Style.dp}
-                                        height={checkSize->Style.dp}
-                                        fill=theme.colors.gray
-                                      />
-                                    : <SVGCheckmarkcircle
-                                        width={checkSize->Style.dp}
-                                        height={checkSize->Style.dp}
-                                        fill=theme.colors.blue
-                                      />}
-                                </SpacedView>
+                                {_ =>
+                                  <SpacedView vertical=XS horizontal=None>
+                                    {!selected
+                                      ? <SVGCircle
+                                          width={checkSize->Style.dp}
+                                          height={checkSize->Style.dp}
+                                          fill=theme.colors.gray
+                                        />
+                                      : <SVGCheckmarkcircle
+                                          width={checkSize->Style.dp}
+                                          height={checkSize->Style.dp}
+                                          fill=theme.colors.blue
+                                        />}
+                                  </SpacedView>}
                               </Pressable>
                               <Spacer size=Custom(13.) />
                               <NamedIcon

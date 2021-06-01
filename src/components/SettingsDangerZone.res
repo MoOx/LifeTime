@@ -11,7 +11,8 @@ let make = () => {
 
   let handleImport = React.useCallback1(() =>
     Clipboard.getString()
-    ->FutureJs.fromPromise(error => {
+    ->FuturePromise.fromPromise
+    ->Future.mapError(error => {
       // @todo error!
       Log.info(("SettingsDangerZone: import", error))
       "Unable to read from clipboard"
@@ -19,7 +20,7 @@ let make = () => {
     ->Future.get(x =>
       switch x {
       | Error(e) => Alert.alert(~title=e, ())
-      | Ok(clip) when clip === "" => Alert.alert(~title="No data in your clipboard", ())
+      | Ok(clip) if clip === "" => Alert.alert(~title="No data in your clipboard", ())
       | Ok(clip) =>
         let rawJson = try Some(clip->Json.parseOrRaise) catch {
         | Json.ParseError(_) =>

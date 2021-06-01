@@ -1,0 +1,22 @@
+diff --git a/node_modules/react-native-gesture-handler/src/components/Swipeable.tsx b/node_modules/react-native-gesture-handler/src/components/Swipeable.tsx
+index 77c6084..60f15dd 100644
+--- a/node_modules/react-native-gesture-handler/src/components/Swipeable.tsx
++++ b/node_modules/react-native-gesture-handler/src/components/Swipeable.tsx
+@@ -41,6 +41,7 @@ interface SwipeableProps
+   overshootLeft?: boolean;
+   overshootRight?: boolean;
+   overshootFriction?: number;
++  onSwipeStart?: () => void;
+   onSwipeableLeftOpen?: () => void;
+   onSwipeableRightOpen?: () => void;
+   onSwipeableOpen?: () => void;
+@@ -216,6 +217,9 @@ export default class Swipeable extends Component<
+   private onHandlerStateChange = (
+     ev: HandlerStateChangeEvent<PanGestureHandlerEventPayload>
+   ) => {
++    if (ev.nativeEvent.state === State.ACTIVE) {
++      this.props.onSwipeStart && this.props.onSwipeStart()
++    }
+     if (ev.nativeEvent.oldState === State.ACTIVE) {
+       this.handleRelease(ev);
+     }

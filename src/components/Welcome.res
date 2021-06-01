@@ -98,49 +98,51 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
         ])
       }>
       <Pressable onPress=onContinuePress>
-        <Image
-          style={
-            open Style
-            let size = windowDimensions.height > 650. ? 76. : 52.
-            imageStyle(
-              ~width=size->dp,
-              ~height=size->dp,
-              ~borderRadius=size /. 5.,
-              ~alignSelf=#flexStart,
-              (),
-            )
-          }
-          source={icon->Image.Source.fromRequired}
-        />
-        <Spacer size={isWindowTall ? M : XXS} />
-        <Text
-          style={
-            open Style
-            array([styles["title"], theme.styles["text"], Theme.text["weight100"]])
-          }
-          numberOfLines=1
-          adjustsFontSizeToFit=true
-          allowFontScaling=false>
-          {"Welcome to"->React.string}
-        </Text>
-        <Text
-          style={
-            open Style
-            array([styles["appName"], theme.styles["textMain"], Theme.text["weight800"]])
-          }
-          numberOfLines=1
-          adjustsFontSizeToFit=true
-          allowFontScaling=false>
-          {"LifeTime"->React.string}
-        </Text>
-        <Spacer size={isWindowTall ? M : XXS} />
-        <Text
-          style={
-            open Style
-            array([styles["baseline"], theme.styles["text"]])
-          }>
-          {"Your personal coach, helping you to reach your goals and spend your valuable time on things you love."->React.string}
-        </Text>
+        {_ => <>
+          <Image
+            style={
+              open Style
+              let size = windowDimensions.height > 650. ? 76. : 52.
+              imageStyle(
+                ~width=size->dp,
+                ~height=size->dp,
+                ~borderRadius=size /. 5.,
+                ~alignSelf=#flexStart,
+                (),
+              )
+            }
+            source={icon->Image.Source.fromRequired}
+          />
+          <Spacer size={isWindowTall ? M : XXS} />
+          <Text
+            style={
+              open Style
+              array([styles["title"], theme.styles["text"], Theme.text["weight100"]])
+            }
+            numberOfLines=1
+            adjustsFontSizeToFit=true
+            allowFontScaling=false>
+            {"Welcome to"->React.string}
+          </Text>
+          <Text
+            style={
+              open Style
+              array([styles["appName"], theme.styles["textMain"], Theme.text["weight800"]])
+            }
+            numberOfLines=1
+            adjustsFontSizeToFit=true
+            allowFontScaling=false>
+            {"LifeTime"->React.string}
+          </Text>
+          <Spacer size={isWindowTall ? M : XXS} />
+          <Text
+            style={
+              open Style
+              array([styles["baseline"], theme.styles["text"]])
+            }>
+            {"Your personal coach, helping you to reach your goals and spend your valuable time on things you love."->React.string}
+          </Text>
+        </>}
       </Pressable>
     </Animated.View>
     <Spacer />
@@ -159,17 +161,18 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
         ])
       }>
       <Pressable onPress=onContinuePress>
-        <Row>
-          <IconCalendar style={styles["iconCalendar"]} />
-          <Spacer size=S />
-          <Text
-            style={
-              open Style
-              array([styles["permissions"], theme.styles["textGray"]])
-            }>
-            {"LifeTime needs access to your calendar to show activity reports & suggestions. Your data stay on your device."->React.string}
-          </Text>
-        </Row>
+        {_ =>
+          <Row>
+            <IconCalendar style={styles["iconCalendar"]} />
+            <Spacer size=S />
+            <Text
+              style={
+                open Style
+                array([styles["permissions"], theme.styles["textGray"]])
+              }>
+              {"LifeTime needs access to your calendar to show activity reports & suggestions. Your data stay on your device."->React.string}
+            </Text>
+          </Row>}
       </Pressable>
       <TouchableOpacity onPress=onAboutPrivacyPress>
         <SpacedView horizontal=None vertical=S>

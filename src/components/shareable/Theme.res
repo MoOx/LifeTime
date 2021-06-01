@@ -5,7 +5,7 @@ open ReactMultiversal
 type acceptedMode = [#light | #dark | #auto]
 type t = [#light | #dark]
 
-type styleSheet<'a> = Js.t<'a>
+type styleSheet<'a> = 'a
 type styleSheets<'a> = {
   light: styleSheet<'a>,
   dark: styleSheet<'a>,
@@ -58,10 +58,10 @@ external versionAndroid: int = "Version"
 
 let barsStyle = (theme, barStyle) =>
   switch (theme, barStyle) {
-  | (#light, #lightContent) => #\"light-content"
-  | (#light, #darkContent) => #\"dark-content"
-  | (#dark, #darkContent) => #\"light-content"
-  | (#dark, #lightContent) => #\"dark-content"
+  | (#light, #lightContent) => #"light-content"
+  | (#light, #darkContent) => #"dark-content"
+  | (#dark, #darkContent) => #"light-content"
+  | (#dark, #lightContent) => #"dark-content"
   }
 
 let barStyle = (theme, barStyle) =>

@@ -13,11 +13,12 @@ let make = (~navigation, ~route as _) => {
     AnimationFrame.request(() => {
       open ReactNativePermissions
       switch Platform.os {
-      | os when os == Platform.ios => check(Ios.calendars)
-      | os when os == Platform.android => check(Android.read_calendar)
+      | os if os == Platform.ios => check(Ios.calendars)
+      | os if os == Platform.android => check(Android.read_calendar)
       | _ => Js.Promise.resolve(unavailable)
       }
-      ->FutureJs.fromPromise(error => Log.info(("HomeScreen: permission check", error)))
+      ->FuturePromise.fromPromise
+      ->Future.mapError(error => Log.info(("HomeScreen: permission check", error)))
       ->Future.tapOk(status => {
         Log.info(("HomeScreen: permission check status", status))
         if status != granted {
@@ -97,7 +98,7 @@ let make = (~navigation, ~route as _) => {
               {
                 "nativeEvent": {
                   "contentOffset": {
-                    y: scrollYAnimatedValue.current,
+                    "y": scrollYAnimatedValue.current,
                   },
                 },
               },
@@ -147,7 +148,8 @@ let make = (~navigation, ~route as _) => {
                 navigation->Navigators.RootStack.Navigation.navigate("PrivacyModalScreen")}
               onContinuePress={_ =>
                 ReactNativeCalendarEvents.requestPermissions()
-                ->FutureJs.fromPromise(error => {
+                ->FuturePromise.fromPromise
+                ->Future.mapError(error => {
                   // @todo error!
                   Log.info(("HomeScreen: onContinuePress", error))
                   error

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 source "https://rubygems.org"
 
-gem "cocoapods"
+gem "cocoapods", '~>1.10.1'
 gem "fastlane"
 
 plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
