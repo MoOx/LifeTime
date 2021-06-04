@@ -111,4 +111,4 @@ fastlane/Preview.html
 fastlane/screenshots
 
 # iOS Build artifacts (fastlane)
-*.app.dSYM.zip
+*.app.dSYM*
