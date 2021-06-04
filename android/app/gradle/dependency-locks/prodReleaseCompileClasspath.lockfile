@@ -21,7 +21,6 @@ androidx.lifecycle:lifecycle-runtime:2.2.0
 androidx.lifecycle:lifecycle-viewmodel-savedstate:2.2.0
 androidx.lifecycle:lifecycle-viewmodel:2.2.0
 androidx.loader:loader:1.0.0
-androidx.multidex:multidex:2.0.0
 androidx.savedstate:savedstate:1.0.0
 androidx.swiperefreshlayout:swiperefreshlayout:1.0.0
 androidx.vectordrawable:vectordrawable-animated:1.1.0
@@ -38,7 +37,7 @@ com.facebook.fresco:imagepipeline:2.0.0
 com.facebook.fresco:nativeimagefilters:2.0.0
 com.facebook.fresco:nativeimagetranscoder:2.0.0
 com.facebook.infer.annotation:infer-annotation:0.11.2
-com.facebook.react:react-native:0.63.4
+com.facebook.react:react-native:0.64.1
 com.facebook.soloader:annotation:0.9.0
 com.facebook.soloader:nativeloader:0.9.0
 com.facebook.soloader:soloader:0.9.0
@@ -46,9 +45,9 @@ com.facebook.yoga:proguard-annotations:1.14.1
 com.google.code.findbugs:jsr305:3.0.2
 com.squareup.okhttp3:okhttp-urlconnection:3.12.12
 com.squareup.okhttp3:okhttp:3.12.12
-com.squareup.okio:okio:1.15.0
-io.sentry:sentry-android-core:2.2.0
-io.sentry:sentry-android-ndk:2.2.0
-io.sentry:sentry-android:2.2.0
-io.sentry:sentry-core:2.2.0
+com.squareup.okio:okio:1.17.5
+io.sentry:sentry-android-core:2.3.1
+io.sentry:sentry-android-ndk:2.3.1
+io.sentry:sentry-android:2.3.1
+io.sentry:sentry-core:2.3.1
 javax.inject:javax.inject:1
