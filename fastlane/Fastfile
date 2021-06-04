@@ -36,7 +36,7 @@ platform :android do
     )
     notification(subtitle: appName+" for Android", message: "Build complete")
     upload_to_play_store(
-      track: "internal",
+      track: "beta",
     )
     notification(subtitle: appName+" for Android", message: "Upload complete")
   end
