@@ -3,13 +3,7 @@ open ReactNative
 open ReactMultiversal
 
 @react.component
-let make = (
-  ~activityTitle,
-  ~refreshing,
-  ~onRefreshDone,
-  ~onSkipActivity,
-  ~currentWeek: (string, string),
-) => {
+let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity, ~currentWeek) => {
   let (settings, setSettings) = React.useContext(AppSettings.context)
   let (getEvents, fetchEvents, _updatedAt, requestUpdate) = React.useContext(Calendars.context)
 
@@ -33,7 +27,11 @@ let make = (
     None
   }, (refreshing, todayUpdate, requestUpdate, onRefreshDone))
 
-  let (startDateStr, supposedEndDateStr) = currentWeek
+  let (startDateStr, supposedEndDateStr) = currentWeek->Option.getWithDefault({
+    let (start, supposedEnd) = Date.weekDates(today)
+    let end = supposedEnd->Date.min(today)
+    (start->Js.Date.toISOString, end->Js.Date.toISOString)
+  })
 
   let (startDate, endDate) = (
     startDateStr->Js.Date.fromString,

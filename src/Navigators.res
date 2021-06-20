@@ -6,7 +6,7 @@ module M = {
 
 module StatsStack = {
   module M = {
-    type params = {currentActivityTitle: option<string>, currentWeek: (string, string)}
+    type params = {currentActivityTitle: option<string>, currentWeek: option<(string, string)>}
   }
   include NativeStack.Make(M)
 }

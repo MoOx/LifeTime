@@ -119,7 +119,7 @@ let make = (~navigation, ~route as _) => {
               "ActivityOptionsScreen",
               {
                 currentActivityTitle: Some(activity),
-                currentWeek: (start->Js.Date.toISOString, end->Js.Date.toISOString),
+                currentWeek: Some((start->Js.Date.toISOString, end->Js.Date.toISOString)),
               },
             )
           }}
