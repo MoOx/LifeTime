@@ -86,7 +86,7 @@ yarn-error.log*
 
 ## Custom
 
-# Ocaml / Reason / BuckleScript artifacts
+# ReScript artifacts
 *.bs.js
 .bsb.lock
 **/lib/bs
