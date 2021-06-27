@@ -283,7 +283,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "## Node via fnm\nif [[ -x \"$HOME/.fnm/fnm\" ]]; then\n  eval \"$(\"$HOME/.fnm/fnm\" env)\"\nelif [[ -x \"$(command -v brew)\" && -x \"$(brew --prefix fnm)/fnm\" ]]; then\n  eval \"$(\"$(brew --prefix fnm)/fnm\" env)\"\nfi\n\nexport SENTRY_PROPERTIES=sentry.properties\nexport EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh\n\n# skip bundle generation for development\nif [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n  export SKIP_BUNDLING=true\n fi\n";
+			shellScript = "## Node via fnm\nif [[ -x \"$HOME/.fnm/fnm\" ]]; then\n  eval \"$(\"$HOME/.fnm/fnm\" env)\"\nelif [[ -x \"$(command -v brew)\" && -x \"$(brew --prefix fnm)/fnm\" ]]; then\n  eval \"$(\"$(brew --prefix fnm)/fnm\" env)\"\nfi\n\nexport SENTRY_PROPERTIES=sentry.properties\nexport EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nexport NODE_BINARY=node\nif [ \"${CI}\" != \"true\" ]; then\n  ../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh\nelse\n  ../node_modules/react-native/scripts/react-native-xcode.sh\nfi\n\n# skip bundle generation for development\nif [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n  export SKIP_BUNDLING=true\nfi\n";
 		};
 		346C7ED240C5C0DE3FAAB606 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -379,7 +379,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "## Node via fnm\nif [[ -s \"$HOME/.fnm/fnm\" ]]; then\n  eval \"`$HOME/.fnm/fnm env --multi`\"\nfi\n\nexport SENTRY_PROPERTIES=sentry.properties\n../node_modules/@sentry/cli/bin/sentry-cli upload-dsym\n";
+			shellScript = "## Node via fnm\nif [[ -s \"$HOME/.fnm/fnm\" ]]; then\n  eval \"`$HOME/.fnm/fnm env --multi`\"\nfi\n\nif [ \"${CI}\" != \"true\" ]; then\n  export SENTRY_PROPERTIES=sentry.properties\n  ../node_modules/@sentry/cli/bin/sentry-cli upload-dsym\nfi\n";
 		};
 		EC1775F030E0F8A34831D227 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
