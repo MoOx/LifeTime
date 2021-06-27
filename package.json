@@ -26,7 +26,7 @@
     "lint": "eslint src tests",
     "test:native": "jest",
     "test:build": "yarn build:ios && yarn build:android",
-    "test": "yarn lint && yarn res:clean && yarn res:build && yarn test:native && yarn test:bundle",
+    "test": "yarn lint && yarn res:clean && yarn res:build && yarn test:native && yarn test:build",
     "release:bump:patch": "yarn version --patch --no-git-tag-version && bundle exec fastlane versionBump",
     "release:bump:minor": "yarn version --minor --no-git-tag-version && bundle exec fastlane versionBump",
     "release:bump:major": "yarn version --major --no-git-tag-version && bundle exec fastlane versionBump",
