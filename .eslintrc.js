@@ -4,8 +4,9 @@ module.exports = {
   rules: {
     'prettier/prettier': 0,
     // not interesting for rescript generated js
-    'no-shadow': 0,
     'no-bitwise': 0,
+    'no-shadow': 0,
+    'no-unused-vars': 0,
     'no-useless-escape': 0,
   },
   env: {
