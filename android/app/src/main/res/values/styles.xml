@@ -5,7 +5,7 @@
         <!-- we use translucent to ensure no jump and minimal impact on app startup -->
         <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">true</item>
         <item name="android:windowTranslucentNavigation" tools:targetApi="kitkat">true</item>
-        <!-- my splash screen being dark I prefer to have transparency until TransparentStatusAndNavigationBarModule startup-->
+        <!-- my splash screen being dark I prefer to have transparency until RNTransparentStatusAndNavigationBar startup-->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>

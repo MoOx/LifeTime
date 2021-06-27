@@ -13,6 +13,7 @@ import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 
 import com.zoontek.rnbootsplash.RNBootSplash;
 
+import io.moox.rntransparentstatusandnavigationbar.RNTransparentStatusAndNavigationBar;
 public class MainActivity extends ReactActivity {
 
   /**
@@ -43,6 +44,6 @@ public class MainActivity extends ReactActivity {
     
     RNBootSplash.init(R.drawable.bootsplash, MainActivity.this);
     
-    TransparentStatusAndNavigationBarModule.init(MainActivity.this);
+    RNTransparentStatusAndNavigationBar.init(MainActivity.this);
   }
 }

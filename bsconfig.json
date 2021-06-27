@@ -27,6 +27,7 @@
     "react-native-bootsplash",
     "rescript-future",
     "rescript-react-native",
-    "rescript-react-navigation"
+    "rescript-react-navigation",
+    "react-native-transparent-status-and-navigation-bar"
   ]
 }

@@ -12748,6 +12748,11 @@ react-native-svg@^12.0.0:
     css-select "^2.1.0"
     css-tree "^1.0.0-alpha.39"
 
+react-native-transparent-status-and-navigation-bar@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-transparent-status-and-navigation-bar/-/react-native-transparent-status-and-navigation-bar-1.0.1.tgz#da199ae8818b6452581676717b31bfa7f8220781"
+  integrity sha512-4c1rq7MJ2pOfF6aw6pgqXAqunnicpifk3lpjX+x2Px6u5W9m68j/jh9isekUDpkyn8siSmUSuGlHxqpKAw1Rzw==
+
 react-native-web@^0.12.0:
   version "0.12.3"
   resolved "https://registry.yarnpkg.com/react-native-web/-/react-native-web-0.12.3.tgz#9f43301539672d46a302ee642afd29243a4376d5"
