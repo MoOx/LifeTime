@@ -13343,7 +13343,7 @@ rescript-future@^1.1.1:
   resolved "https://registry.yarnpkg.com/rescript-future/-/rescript-future-1.1.2.tgz#fb4e976b47126a0071c81b5da4b71535165ffdcc"
   integrity sha512-8p2m4Fjado2gN8W96/lv1zR9xGgDC3rm6PN0tL2B6oxNW0g2q02tZ6nPNAIuDS1IAxxD1gH6FDhQT91pGplgjw==
 
-rescript-react-native@^0.64.0:
+rescript-react-native@^0.64.3:
   version "0.64.3"
   resolved "https://registry.yarnpkg.com/rescript-react-native/-/rescript-react-native-0.64.3.tgz#8fd11a2681cfdd65c02f0ff620186e5adf0c6854"
   integrity sha512-PjGDkV3RYiCTk4hCZyaKtZJV69By0AmJuzWyuHZONdeCB0q3DwjVJtA73gu6+jBrdl0OWon6UdXaVRXhhR47cQ==

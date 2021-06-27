@@ -19,16 +19,16 @@ let make = (~children, ~disabled=?, ~left=?, ~onPress=?, ~right=?, ~style=?) => 
 
   onPress
   ->Option.map(onPress => {
-    <Pressable_
+    <Pressable
       ?disabled
       onPress
       style={({pressed}) =>
         Platform.os === Platform.ios
           ? !pressed ? theme.styles["background"] : theme.styles["backgroundGray5"]
           : theme.styles["background"]}
-      android_ripple={Pressable_.rippleConfig(~color=theme.colors.gray4, ())}>
+      android_ripple={Pressable.rippleConfig(~color=theme.colors.gray4, ())}>
       {_ => child}
-    </Pressable_>
+    </Pressable>
   })
   ->Option.getWithDefault(<View style={theme.styles["background"]}> {child} </View>)
 }
