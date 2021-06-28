@@ -21,7 +21,7 @@
     "start:android": "react-native run-android",
     "start:ios": "react-native run-ios --simulator=\"iPhone 11\"",
     "start:web": "react-scripts start",
-    "build:android": "cd android && ./gradlew bundleRelease",
+    "build:android": "react-native run-android --variant=release",
     "build:ios": "react-native run-ios --configuration Release",
     "lint": "eslint src tests",
     "test:native": "jest",
