@@ -52,7 +52,7 @@
     "@rescript-react-native/slider": "^3.0.2",
     "@rescript-react-native/svg": "^12.1.7",
     "@rescript/react": "^0.10.0",
-    "@sentry/react-native": "^1.6.2",
+    "@sentry/react-native": "^2.5.2",
     "bs-tinycolor": "^2.0.1",
     "date-fns": "^2.16.0",
     "fbemitter": "^3.0.0",
