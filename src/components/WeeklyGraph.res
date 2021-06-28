@@ -2,10 +2,11 @@ open Belt
 open ReactNative
 open ReactMultiversal
 
+let oneH = 60.
 let slices = 4
 let graphHeight = 140.
 let graphLetterHeight = 16.
-let rightSpace = 26.
+let rightSpace = 28. // Enough for "99m"
 
 let styles = {
   open Style
@@ -56,8 +57,8 @@ module GridXAxis = {
     let theme = Theme.useTheme(AppSettings.useTheme())
     maxDuration
     ->Option.map(maxDuration => {
-      let maxHours = maxDuration /. 60.
-      let nbSlices = maxHours < 2. ? 1 : maxHours < 4. ? 2 : slices
+      let (max, u) = maxDuration > oneH ? (maxDuration /. oneH, "h") : (maxDuration, "m")
+      let nbSlices = maxDuration === 0. ? 1 : slices
       <View
         style={
           open Style
@@ -111,8 +112,7 @@ module GridXAxis = {
                     <Text
                       allowFontScaling=false
                       style={Style.array([theme.styles["textLight2"], Theme.text["caption2"]])}>
-                      {(maxHours /. nbSlices->float *. i->float)->Js.Float.toFixed->React.string}
-                      {"h"->React.string}
+                      {((max /. nbSlices->float *. i->float)->Js.Float.toFixed ++ u)->React.string}
                     </Text>
                   </View>
                 </View>}
@@ -262,7 +262,14 @@ let make = React.memo((
         )
       )[0]
     )
-    ->Option.map(max => (max /. 60. /. 4.)->ceil *. 4. *. 60.)
+    ->Option.map(max => {
+      // the idea here is to avoid when divided for visual slice to have
+      // values with digits
+      // if  max duration is > 1 hour, we round to a a "bundle of hours" scale
+      // otherwise we round to "a small amount of minutes"
+      let roundTo = max > oneH ? oneH *. 4. : 20.
+      (max /. roundTo)->ceil *. roundTo
+    })
 
   <Row>
     <View
