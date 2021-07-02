@@ -1,6 +1,8 @@
 # LifeTime
 
-[![Build Status](https://github.com/MoOx/LifeTime/workflows/Build/badge.svg)](https://github.com/MoOx/LifeTime/actions)
+[![iOS](https://github.com/MoOx/LifeTime/actions/workflows/build-ios.yml/badge.svg)](https://github.com/MoOx/LifeTime/actions/workflows/build-ios.yml)
+[![Android](https://github.com/MoOx/LifeTime/actions/workflows/build-android.yml/badge.svg)](https://github.com/MoOx/LifeTime/actions/workflows/build-android.yml)
+[![Tests](https://github.com/MoOx/LifeTime/actions/workflows/build-tests.yml/badge.svg)](https://github.com/MoOx/LifeTime/actions/workflows/build-tests.yml)
 
 ## Installation
 
