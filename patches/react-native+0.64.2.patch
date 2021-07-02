@@ -1,10 +1,10 @@
 diff --git a/node_modules/react-native/scripts/find-node.sh b/node_modules/react-native/scripts/find-node.sh
-index c111e70..635923e 100755
+index 2ef8cf8..23ebe7f 100755
 --- a/node_modules/react-native/scripts/find-node.sh
 +++ b/node_modules/react-native/scripts/find-node.sh
 @@ -10,8 +10,10 @@ set -e
  [ -z "$NVM_DIR" ] && export NVM_DIR="$HOME/.nvm"
-
+ 
  if [[ -s "$HOME/.nvm/nvm.sh" ]]; then
 +  # shellcheck source=/dev/null
    . "$HOME/.nvm/nvm.sh"
@@ -12,15 +12,18 @@ index c111e70..635923e 100755
 +  # shellcheck source=/dev/null
    . "$(brew --prefix nvm)/nvm.sh"
  fi
-
-@@ -29,3 +31,10 @@ if [[ ! -x node && -d ${HOME}/.anyenv/bin ]]; then
-     eval "$(anyenv init -)"
+ 
+@@ -30,6 +32,13 @@ if [[ ! -x node && -d ${HOME}/.anyenv/bin ]]; then
    fi
  fi
-+
+ 
 +# Set up the fnm node version manager if present
 +if [[ -x "$HOME/.fnm/fnm" ]]; then
 +  eval "$("$HOME/.fnm/fnm" env)"
 +elif [[ -x "$(command -v brew)" && -x "$(brew --prefix fnm)/fnm" ]]; then
 +  eval "$("$(brew --prefix fnm)/fnm" env)"
 +fi
++
+ # Support Homebrew on M1
+ HOMEBREW_M1_BIN=/opt/homebrew/bin
+ if [[ -d $HOMEBREW_M1_BIN && ! $PATH =~ $HOMEBREW_M1_BIN ]]; then
