@@ -18,7 +18,7 @@
     "res:clean": "rescript clean",
     "res:build": "rescript build",
     "md:to-json": "markdown-to-json src/md/*.md",
-    "prepare": "patch-package && npm run svg && npm run md:to-json && npm run res:clean && npm run res:build",
+    "prepare": "patch-package && husky install && npm run svg && npm run md:to-json && npm run res:clean && npm run res:build",
     "start": "react-native start",
     "start:android": "react-native run-android",
     "start:ios": "react-native run-ios --simulator=\"iPhone 11\"",
@@ -85,6 +85,7 @@
     "eslint": "7.14.0",
     "eslint-config-prettier": "^6.10.0",
     "flow-bin": "^0.122.0",
+    "husky": "^7.0.0",
     "jest": "^26.6.3",
     "jetifier": "^1.6.0",
     "lint-staged": "^11.0.0",
@@ -94,15 +95,11 @@
     "react-scripts": "3.2.0",
     "react-test-renderer": "^17.0.1",
     "rescript": "^9.1.0",
-    "simple-git-hooks": "^2.4.1",
     "trash-cli": "^3.0.0"
   },
   "lint-staged": {
     "*.{md,json,js,css}": "prettier --write",
     "*.{res,resi}": "rescript format"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "lint-staged"
   },
   "jest": {
     "preset": "react-native",
