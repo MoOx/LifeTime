@@ -192,7 +192,8 @@ module SwipeableElement = {
 }
 
 module Swipeable = {
-  open ReactNative
+  // Used directly to avoid shadow warning
+  // open ReactNative
 
   include SwipeableElement
 
@@ -201,7 +202,7 @@ module Swipeable = {
     ~ref: ref=?,
     // BaseGestureHandle props
     ~enabled: bool=?,
-    ~hitSlop: View.edgeInsets=?,
+    ~hitSlop: ReactNative.View.edgeInsets=?,
     ~id: string=?,
     ~minPointers: float=?,
     ~onActivated: HandlerStateChangeEvent.t => unit=?,
@@ -225,9 +226,9 @@ module Swipeable = {
     ~minVelocityX: float=?,
     ~minVelocityY: float=?,
     // Swipeable props
-    ~animationOptions: Animated.Value.Spring.config=?,
-    ~childrenContainerStyle: Style.t=?,
-    ~containerStyle: Style.t=?,
+    ~animationOptions: ReactNative.Animated.Value.Spring.config=?,
+    ~childrenContainerStyle: ReactNative.Style.t=?,
+    ~containerStyle: ReactNative.Style.t=?,
     ~enableTrackpadTwoFingerGesture: bool=?,
     ~friction: float=?,
     ~leftThreshold: float=?,
@@ -243,8 +244,14 @@ module Swipeable = {
     ~overshootFriction: float=?,
     ~overshootLeft: bool=?,
     ~overshootRight: bool=?,
-    ~renderLeftActions: (@uncurry Animated.Value.t, Animated.Value.t) => React.element=?,
-    ~renderRightActions: (@uncurry Animated.Value.t, Animated.Value.t) => React.element=?,
+    ~renderLeftActions: (
+      @uncurry ReactNative.Animated.Value.t,
+      ReactNative.Animated.Value.t,
+    ) => React.element=?,
+    ~renderRightActions: (
+      @uncurry ReactNative.Animated.Value.t,
+      ReactNative.Animated.Value.t,
+    ) => React.element=?,
     ~rightThreshold: float=?,
     ~useNativeAnimations: bool=?,
     ~children: React.element=?,

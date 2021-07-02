@@ -91,7 +91,7 @@ let roundDate = (date: Js.Date.t) => {
 }
 
 let useEventsContext = () => {
-  let (updatedAt, updatedAt_set) = React.useState(_ => Date.now())
+  let (_updatedAt, updatedAt_set) = React.useState(_ => Date.now())
   let (refreshedAt, refreshedAt_set) = React.useState(_ => Date.now())
   let eventsMapByRange = React.useRef(Map.String.empty)
 
