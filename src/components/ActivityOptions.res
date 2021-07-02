@@ -27,16 +27,14 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity, ~curre
     None
   }, (refreshing, todayUpdate, requestUpdate, onRefreshDone))
 
-  let (startDateStr, supposedEndDateStr) = currentWeek->Option.getWithDefault({
-    let (start, supposedEnd) = Date.weekDates(today)
-    let end = supposedEnd->Date.min(today)
-    (start->Js.Date.toISOString, end->Js.Date.toISOString)
-  })
-
-  let (startDate, endDate) = (
-    startDateStr->Js.Date.fromString,
-    supposedEndDateStr->Js.Date.fromString->Date.min(today),
-  )
+  let (startDate, endDate) = React.useMemo2(() => {
+    let (startDateStr, supposedEndDateStr) = currentWeek->Option.getWithDefault({
+      let (start, supposedEnd) = Date.weekDates(today)
+      let end = supposedEnd->Date.min(today)
+      (start->Js.Date.toISOString, end->Js.Date.toISOString)
+    })
+    (startDateStr->Js.Date.fromString, supposedEndDateStr->Js.Date.fromString->Date.min(today))
+  }, (currentWeek, today))
 
   let fetchedEvents = getEvents(startDate, endDate)
   React.useEffect4(() => {

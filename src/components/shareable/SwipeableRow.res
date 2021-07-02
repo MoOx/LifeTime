@@ -130,33 +130,32 @@ let make = (
     // adding screenReaderEnabled as a dep to force ... to be visible when screen readers are disabled
   }, (openAnimatedValue, isOpen, screenReaderEnabled))
 
-  let cancel = ref(None)
+  let cancel = React.useRef(None)
   React.useEffect3(() => {
-    cancel :=
-      Some(
-        SwipeableRowEventEmitter.emitter->SwipeableRowEventEmitter.addListener(
-          #autoClose(
-            idToKeep => {
-              if isOpen && idToKeep->Option.getWithDefault("") !== id {
-                swipeableRef.current
-                ->Js.Nullable.toOption
-                ->Option.map(swipeable => {
-                  open ReactNativeGestureHandler
-                  swipeable->Swipeable.close
-                })
-                ->ignore
-                // we cancel removal immediately, otherwise, if auto-close is called more than once
-                // this kills the animation & go directly to close, which is ugly
-                // and auto-close being attached to onScroll, this is kind of mandatory to not call it again
-                cancel.contents->Option.map(c => c->SwipeableRowEventEmitter.remove)->ignore
-              }
-            },
-          ),
+    cancel.current = Some(
+      SwipeableRowEventEmitter.emitter->SwipeableRowEventEmitter.addListener(
+        #autoClose(
+          idToKeep => {
+            if isOpen && idToKeep->Option.getWithDefault("") !== id {
+              swipeableRef.current
+              ->Js.Nullable.toOption
+              ->Option.map(swipeable => {
+                open ReactNativeGestureHandler
+                swipeable->Swipeable.close
+              })
+              ->ignore
+              // we cancel removal immediately, otherwise, if auto-close is called more than once
+              // this kills the animation & go directly to close, which is ugly
+              // and auto-close being attached to onScroll, this is kind of mandatory to not call it again
+              cancel.current->Option.map(c => c->SwipeableRowEventEmitter.remove)->ignore
+            }
+          },
         ),
-      )
+      ),
+    )
     Some(
       () => {
-        cancel.contents->Option.map(c => c->SwipeableRowEventEmitter.remove)->ignore
+        cancel.current->Option.map(c => c->SwipeableRowEventEmitter.remove)->ignore
       },
     )
   }, (isOpen, id, cancel))
