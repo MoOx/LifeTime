@@ -60,7 +60,7 @@ let make = (
   let progressTonight = currentTime /. proportionalGoalTonight
   let proportionalAverageTime = currentTime /. (numberOfDays *. durationProgressTonight)
   let remainingMinLimit = durationPerWeek -. currentTime
-  let (isAlreadyDone, canBeDone) = switch goal.type_->Goal.Type.fromSerialized {
+  let (isAlreadyDone, canBeDone) = switch goal.mode->Goal.Type.fromSerialized {
   | Some(Goal) => (totalProgress > 1., remainingMinLimit < remainingMinThisWeek)
   | Some(Limit) => (remainingMinLimit > remainingMinThisWeek, totalProgress < 1.)
   | _ => (false, false)
@@ -121,22 +121,22 @@ let make = (
 
   let (startColor, endColor) = {
     open Goal.Colors
-    switch goal.type_->Goal.Type.fromSerialized {
-    | Some(_) when !canBeDone && !isAlreadyDone => (danger, bad)
-    | Some(_) when !canBeDone && isAlreadyDone => (ok, good)
+    switch goal.mode->Goal.Type.fromSerialized {
+    | Some(_) if !canBeDone && !isAlreadyDone => (danger, bad)
+    | Some(_) if !canBeDone && isAlreadyDone => (ok, good)
     // Goals
-    | Some(Goal) when progressTonight <= 0.25 => (bad, bad)
-    | Some(Goal) when progressTonight <= 0.5 => (danger, bad)
-    | Some(Goal) when progressTonight <= 0.75 => (alert, danger)
-    | Some(Goal) when progressTonight <= 0.9 => (ok, danger)
-    | Some(Goal) when progressTonight < 1. => (ok, alert)
-    | Some(Goal) when progressTonight > 1. => (ok, good)
+    | Some(Goal) if progressTonight <= 0.25 => (bad, bad)
+    | Some(Goal) if progressTonight <= 0.5 => (danger, bad)
+    | Some(Goal) if progressTonight <= 0.75 => (alert, danger)
+    | Some(Goal) if progressTonight <= 0.9 => (ok, danger)
+    | Some(Goal) if progressTonight < 1. => (ok, alert)
+    | Some(Goal) if progressTonight > 1. => (ok, good)
     //  Limits
-    | Some(Limit) when progressTonight <= 0.75 => (ok, good)
-    | Some(Limit) when progressTonight <= 0.9 => (alert, ok)
-    | Some(Limit) when progressTonight < 1. => (danger, ok)
-    | Some(Limit) when progressTonight >= 1.15 => (alert, bad)
-    | Some(Limit) when progressTonight >= 1. => (alert, danger)
+    | Some(Limit) if progressTonight <= 0.75 => (ok, good)
+    | Some(Limit) if progressTonight <= 0.9 => (alert, ok)
+    | Some(Limit) if progressTonight < 1. => (danger, ok)
+    | Some(Limit) if progressTonight >= 1.15 => (alert, bad)
+    | Some(Limit) if progressTonight >= 1. => (alert, danger)
     | _ => (ok, ok)
     }
   }
@@ -156,7 +156,7 @@ let make = (
         )
         ->Option.getWithDefault(backgroundColor)
       },
-      progress: switch goal.type_->Goal.Type.fromSerialized {
+      progress: switch goal.mode->Goal.Type.fromSerialized {
       | Some(Goal) => progressTonight
       //  | Some(Limit) when progressTonight < 1. =>
       //    1. -. progressTonight
@@ -166,7 +166,7 @@ let make = (
       | _ => 0.
       },
     }
-  }, (startColor, endColor, backgroundColor, backgroundColorAlt, goal.type_, progressTonight))
+  }, (startColor, endColor, backgroundColor, backgroundColorAlt, goal.mode, progressTonight))
 
   <SpacedView key=goal.id horizontal=XS vertical=XS>
     <SpacedView
@@ -256,7 +256,7 @@ let make = (
                 Theme.styleSheets.dark["textOnDarkLight"],
               ])
             }>
-            {switch goal.type_->Goal.Type.fromSerialized {
+            {switch goal.mode->Goal.Type.fromSerialized {
             | Some(Goal) => "Goal"
             | Some(Limit) => "Limit"
             | _ => ""
@@ -352,7 +352,7 @@ let make = (
             let width = 36.->Style.dp
             let height = 36.->Style.dp
             let fill = "rgba(255,255,255,0.1)"
-            switch goal.type_->Goal.Type.fromSerialized {
+            switch goal.mode->Goal.Type.fromSerialized {
             | Some(Goal) => <SVGScope width height fill />
             | Some(Limit) => <SVGHourglass width height fill />
             | _ => <SVGCheckmark width height fill />

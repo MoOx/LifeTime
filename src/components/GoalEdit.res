@@ -20,9 +20,9 @@ let make = (
   let (title, setTitle) = React.useState(() =>
     initialGoal->Option.map(g => g.title)->Option.getWithDefault("")
   )
-  let (type_, setType) = React.useState(() =>
+  let (mode, setType) = React.useState(() =>
     initialGoal
-    ->Option.map(g => g.type_->Goal.Type.fromSerialized)
+    ->Option.map(g => g.mode->Goal.Type.fromSerialized)
     ->Option.getWithDefault(initialType)
   )
   let (days, setDays) = React.useState(() =>
@@ -62,7 +62,7 @@ let make = (
   React.useEffect7(() => {
     switch (
       // title,
-      type_,
+      mode,
       minutes,
       days,
       categoriesSelected,
@@ -70,7 +70,7 @@ let make = (
     ) {
     | (
         // title,
-        Some(type_),
+        Some(mode),
         minutes,
         days,
         categoriesSelected,
@@ -79,11 +79,23 @@ let make = (
       if minutes > 0. &&
         (days->Array.some(day => day) &&
         (categoriesSelected->Array.length > 0 || activitiesSelected->Array.length > 0)) =>
-      onChange(Some(Goal.make(title, type_, minutes, days, categoriesSelected, activitiesSelected)))
+      onChange(
+        Some(
+          Goal.make(
+            ~title,
+            ~mode,
+            ~durationPerDay=minutes,
+            ~days,
+            ~categoriesId=categoriesSelected,
+            ~activitiesId=activitiesSelected,
+            ~period=#week, // @todo: make this a setting
+          ),
+        ),
+      )
     | _ => onChange(None)
     }
     None
-  }, (title, type_, minutes, days, categoriesSelected, activitiesSelected, onChange))
+  }, (title, mode, minutes, days, categoriesSelected, activitiesSelected, onChange))
 
   let dash =
     <View
@@ -166,7 +178,7 @@ let make = (
     <ListItem
       onPress={_ => setType(_ => Some(Goal.Type.Goal))}
       left={<NamedIcon name=#scope fill=theme.colors.green />}
-      right={switch type_ {
+      right={switch mode {
       | Some(Goal) =>
         <SVGCheckmark
           width={checkSize->Style.dp} height={checkSize->Style.dp} fill=theme.colors.blue
@@ -179,7 +191,7 @@ let make = (
     <ListItem
       onPress={_ => setType(_ => Some(Goal.Type.Limit))}
       left={<NamedIcon name=#hourglass fill=theme.colors.orange />}
-      right={switch type_ {
+      right={switch mode {
       | Some(Limit) =>
         <SVGCheckmark
           width={checkSize->Style.dp} height={checkSize->Style.dp} fill=theme.colors.blue

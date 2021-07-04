@@ -29,7 +29,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
     ))
     ->Option.getWithDefault((false, true, _ => ()))
 
-  let type_ =
+  let mode =
     route.params
     ->Option.flatMap(params => params.newGoalType)
     ->Option.getWithDefault(Goal.Type.Goal->Goal.Type.toSerialized)
@@ -108,7 +108,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
       <Spacer size=XL />
       <GoalEdit
         activities=settings.activities
-        initialGoal={...Goal.undefined, type_: type_}
+        initialGoal={...Goal.undefined, mode: mode}
         onChange={handleChange}
       />
     </Animated.ScrollView>

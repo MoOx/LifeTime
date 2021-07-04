@@ -100,11 +100,20 @@ let decodeJsonSettingsOrRaise = (json: Js.Json.t): t => {
         id: json |> field("id", string),
         title: json |> field("title", string),
         createdAt: json |> field("createdAt", Json.Decode.float),
-        type_: json |> field("type_", int),
+        mode: try json |> field("mode", int) catch {
+        | _ =>
+          // retrocompatibility
+          try json |> field("type_", int) catch {
+          | _ => Goal.Type.serializedGoal
+          }
+        },
         days: json |> field("days", array(bool)),
         durationPerDay: json |> field("durationPerDay", Json.Decode.float),
         categoriesId: json |> field("categoriesId", array(string)),
         activitiesId: json |> field("activitiesId", array(string)),
+        period: try json |> field("period", int) catch {
+        | _ => Goal.serialisedPeriodWeek
+        },
       }),
     ) catch {
     | _ => []
