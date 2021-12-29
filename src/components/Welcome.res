@@ -187,7 +187,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
       </TouchableOpacity>
       <Spacer size=S />
       <Spacer size=XS />
-      <TouchableButton text="Continue" onPress=onContinuePress />
+      <TouchableButton testID="WelcomeContinue" text="Continue" onPress=onContinuePress />
       <Spacer />
     </Animated.View>
   </SpacedView>

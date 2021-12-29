@@ -92,7 +92,9 @@ let make = (
               </>
             : React.null}
           <TouchableOpacity
-            hitSlop=HitSlops.m onPress={_ => onNewGoalPress(Goal.Type.serializedGoal)}>
+            testID="Goals_Button_AddAGoal"
+            hitSlop=HitSlops.m
+            onPress={_ => onNewGoalPress(Goal.Type.serializedGoal)}>
             <SVGPlus width={24.->Style.dp} height={24.->Style.dp} fill=theme.namedColors.text />
           </TouchableOpacity>
         </View>

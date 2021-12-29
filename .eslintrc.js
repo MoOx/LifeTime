@@ -12,4 +12,15 @@ module.exports = {
   env: {
     'jest/globals': true,
   },
+  plugins: ['detox'],
+  overrides: [
+    {
+      files: ['*.e2e.js'],
+      env: {
+        'detox/detox': true,
+        jest: true,
+        'jest/globals': true,
+      },
+    },
+  ],
 };

@@ -7,6 +7,8 @@ appName = app["name"]
 xcodeproj = "./ios/" + appName +".xcodeproj"
 workspace = "./ios/" + appName +".xcworkspace"
 
+ENV["DEVELOPER_DIR"] = "/Applications/Xcode.app"
+
 platform :android do
   desc "Submit a new Beta Build to Google Play Store Beta"
   lane :beta do
@@ -37,7 +39,7 @@ platform :android do
 end
 
 platform :ios do
- 
+  
   desc "iOS: Push a new beta build to TestFlight"
   lane :beta do
     sync_code_signing(type: "appstore")
@@ -54,6 +56,17 @@ platform :ios do
       skip_waiting_for_build_processing: false,
     )
     notification(subtitle: appName+" for iOS", message: "Upload complete")
+  end
+  
+  lane :screenshots do
+    # reset_simulators
+    capture_screenshots(
+      reinstall_app: true,
+      stop_after_first_error: true,
+      workspace: workspace,
+    )
+    frame_screenshots
+    # upload_to_app_store
   end
 end
 

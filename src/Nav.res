@@ -107,6 +107,7 @@ module TabsScreen = {
         component=StatsStackScreen.make
         options={_props =>
           Tabs.options(
+            ~tabBarTestID="tabSummary",
             ~title="Summary",
             ~tabBarIcon=tabBarIconProps =>
               <SVGTimeline
@@ -122,6 +123,7 @@ module TabsScreen = {
         component=GoalsStackScreen.make
         options={_props =>
           Tabs.options(
+            ~tabBarTestID="tabGoals",
             ~title="Goals",
             ~tabBarIcon=tabBarIconProps =>
               <SVGPennant
@@ -137,6 +139,7 @@ module TabsScreen = {
         component=SettingsStackScreen.make
         options={_props =>
           Tabs.options(
+            ~tabBarTestID="tabSettings",
             ~title=SettingsScreen.title,
             ~tabBarIcon=tabBarIconProps =>
               <SVGSettings

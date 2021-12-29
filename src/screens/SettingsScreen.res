@@ -24,6 +24,7 @@ let make = (~navigation, ~route as _) => {
         title=SettingsView.title
       />
       <Animated.ScrollView
+        testID="SettingsScreen_ScrollView"
         style={
           open Style
           array([

@@ -137,6 +137,7 @@ let make = (~navigation) => {
           <ListHeader text="__DEV__ Demo Data" />
           <ListSeparator />
           <ListItem
+            testID="DemoDataInject"
             onPress={_ =>
               Alert.alert(
                 ~title="Inject Demo Data",
@@ -154,6 +155,7 @@ let make = (~navigation) => {
           </ListItem>
           <ListSeparator spaceStart={Spacer.size(S)} />
           <ListItem
+            testID="DemoDataRemove"
             onPress={_ =>
               Alert.alert(
                 ~title="Remove Demo Data",

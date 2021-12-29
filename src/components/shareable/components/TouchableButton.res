@@ -19,10 +19,10 @@ type mode =
   | Simple
 
 @react.component
-let make = (~onPress, ~text, ~styleBackground=?, ~styleText=?, ~mode=Contained) => {
+let make = (~onPress, ~text, ~styleBackground=?, ~styleText=?, ~mode=Contained, ~testID=?) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
 
-  <TouchableOpacity onPress>
+  <TouchableOpacity onPress ?testID>
     <SpacedView
       vertical=S
       style={

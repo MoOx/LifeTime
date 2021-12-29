@@ -1,7 +1,8 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-platform :ios, '10.0'
+$iOSMinimumDeployVersion = '10.0'
+platform :ios, $iOSMinimumDeployVersion
 
 target 'LifeTime' do
   config = use_native_modules!
@@ -28,6 +29,13 @@ target 'LifeTime' do
 
   post_install do |installer|
     react_native_post_install(installer)
+    
+    # We support a smaller range of deployment than some libraries, eliminate related noise
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSMinimumDeployVersion
+      end
+    end
     
     # M1 fix https://github.com/facebook/react-native/issues/31941
     installer.aggregate_targets.each do |aggregate_target|

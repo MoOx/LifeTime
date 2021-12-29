@@ -92,6 +92,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
       </ScrollView>
       <Spacer />
       <TouchableButton
+        testID="AllowCalendarsAccess"
         text="Allow Calendars Access"
         onPress=onContinuePress
         styleBackground={

@@ -215,6 +215,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1310;
 				LastUpgradeCheck = 1150;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
@@ -379,7 +380,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "## Node via fnm\nif [[ -s \"$HOME/.fnm/fnm\" ]]; then\n  eval \"`$HOME/.fnm/fnm env --multi`\"\nfi\n\nif [ \"${CI}\" != \"true\" ]; then\n  export SENTRY_PROPERTIES=sentry.properties\n  ../node_modules/@sentry/cli/bin/sentry-cli upload-dsym\nfi\n";
+			shellScript = "## Node via fnm\nif [[ -s \"$HOME/.fnm/fnm\" ]]; then\n  eval \"`$HOME/.fnm/fnm env --multi`\"\nfi\n\nif [ \"${CI}\" != \"true\" ]; then\n  if [ \"${CONFIGURATION}\" = \"Release\" ]; then\n    export SENTRY_PROPERTIES=sentry.properties\n  ../node_modules/@sentry/cli/bin/sentry-cli upload-dsym\n  fi\nfi\n";
 		};
 		EC1775F030E0F8A34831D227 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -480,7 +481,6 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = LifeTimeTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
@@ -505,7 +505,6 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = LifeTimeTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
@@ -539,7 +538,6 @@
 					"FB_SONARKIT_ENABLED=1",
 				);
 				INFOPLIST_FILE = LifeTime/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
@@ -557,7 +555,6 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "LifeTime-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -575,7 +572,6 @@
 				DEVELOPMENT_TEAM = DHLLCP4Q6E;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = LifeTime/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
@@ -592,7 +588,6 @@
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore io.moox.LifeTime";
 				SWIFT_OBJC_BRIDGING_HEADER = "LifeTime-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -690,6 +685,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
