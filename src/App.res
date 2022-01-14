@@ -110,7 +110,7 @@ let app = () => {
 
   let calendarsContextValue = Calendars.useEventsContext()
   let onReady = React.useCallback0(() => {
-    ReactNativeBootsplash.hide({fade: true})->Js.Promise.then_(() => {
+    RNBootsplash.hide({fade: true})->Js.Promise.then_(() => {
       Log.info("BootSplash: fading is over")
       Js.Promise.resolve()
     }, _)->Js.Promise.catch(error => {

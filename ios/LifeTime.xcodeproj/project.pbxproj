@@ -13,8 +13,8 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		22AA6D95A2FA8B149FD99C4F /* libPods-LifeTime-LifeTimeTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7400B171A26F61BB093FE1DF /* libPods-LifeTime-LifeTimeTests.a */; };
 		64AA001D65274E86C70727D4 /* libPods-LifeTime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CF9C661A53A1D74910D3874 /* libPods-LifeTime.a */; };
+		7E069BCE2791F2C90054ADF2 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E069BCD2791F2C90054ADF2 /* BootSplash.storyboard */; };
 		7E44D65F24C1D4990052B1A3 /* Gradient.png in Resources */ = {isa = PBXBuildFile; fileRef = 7E44D65D24C1D4990052B1A3 /* Gradient.png */; };
-		7E44D66124C1D5470052B1A3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E44D66024C1D5470052B1A3 /* LaunchScreen.storyboard */; };
 		7EF095F423A2D5CE0030AFF6 /* Icon-transparent.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EF095F323A2D5CE0030AFF6 /* Icon-transparent.png */; };
 /* End PBXBuildFile section */
 
@@ -44,9 +44,9 @@
 		408021321C30B4A98AE24CE4 /* Pods-LifeTime.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime.debug.xcconfig"; path = "Target Support Files/Pods-LifeTime/Pods-LifeTime.debug.xcconfig"; sourceTree = "<group>"; };
 		6E96C932B3892BA8B27D96D4 /* Pods-LifeTime-LifeTimeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LifeTime-LifeTimeTests.debug.xcconfig"; path = "Target Support Files/Pods-LifeTime-LifeTimeTests/Pods-LifeTime-LifeTimeTests.debug.xcconfig"; sourceTree = "<group>"; };
 		7400B171A26F61BB093FE1DF /* libPods-LifeTime-LifeTimeTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LifeTime-LifeTimeTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E069BCD2791F2C90054ADF2 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = LifeTime/BootSplash.storyboard; sourceTree = "<group>"; };
 		7E343613250B9BA500BF3AA4 /* LifeTime.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = LifeTime.entitlements; path = LifeTime/LifeTime.entitlements; sourceTree = "<group>"; };
 		7E44D65D24C1D4990052B1A3 /* Gradient.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Gradient.png; path = LifeTime/Gradient.png; sourceTree = "<group>"; };
-		7E44D66024C1D5470052B1A3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = LifeTime/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7E4A430B245C81460005A203 /* LifeTime-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "LifeTime-Bridging-Header.h"; sourceTree = "<group>"; };
 		7EF095F323A2D5CE0030AFF6 /* Icon-transparent.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon-transparent.png"; path = "LifeTime/Icon-transparent.png"; sourceTree = "<group>"; };
 		9CF9C661A53A1D74910D3874 /* libPods-LifeTime.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LifeTime.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,8 +94,8 @@
 		13B07FAE1A68108700A75B9A /* LifeTime */ = {
 			isa = PBXGroup;
 			children = (
+				7E069BCD2791F2C90054ADF2 /* BootSplash.storyboard */,
 				7E343613250B9BA500BF3AA4 /* LifeTime.entitlements */,
-				7E44D66024C1D5470052B1A3 /* LaunchScreen.storyboard */,
 				7E44D65D24C1D4990052B1A3 /* Gradient.png */,
 				7EF095F323A2D5CE0030AFF6 /* Icon-transparent.png */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
@@ -264,8 +264,8 @@
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				7E44D65F24C1D4990052B1A3 /* Gradient.png in Resources */,
-				7E44D66124C1D5470052B1A3 /* LaunchScreen.storyboard in Resources */,
 				7EF095F423A2D5CE0030AFF6 /* Icon-transparent.png in Resources */,
+				7E069BCE2791F2C90054ADF2 /* BootSplash.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -355,13 +355,15 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-LifeTime-LifeTimeTests/Pods-LifeTime-LifeTimeTests-frameworks.sh",
-				"${PODS_ROOT}/hermes-engine/destroot/Library/Frameworks/iphoneos/hermes.framework",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL/OpenSSL.framework/OpenSSL",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Flipper-DoubleConversion/double-conversion.framework/double-conversion",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL-Universal/OpenSSL.framework/OpenSSL",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/hermes.framework/hermes",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/double-conversion.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -389,13 +391,15 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-LifeTime/Pods-LifeTime-frameworks.sh",
-				"${PODS_ROOT}/hermes-engine/destroot/Library/Frameworks/iphoneos/hermes.framework",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL/OpenSSL.framework/OpenSSL",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Flipper-DoubleConversion/double-conversion.framework/double-conversion",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL-Universal/OpenSSL.framework/OpenSSL",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/hermes.framework/hermes",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/double-conversion.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -624,7 +628,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -640,11 +644,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
 				LIBRARY_SEARCH_PATHS = (
+					"$(SDKROOT)/usr/lib/swift",
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
-					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)\"",
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -685,7 +689,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -694,11 +698,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
 				LIBRARY_SEARCH_PATHS = (
+					"$(SDKROOT)/usr/lib/swift",
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
-					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)\"",
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;

@@ -30,6 +30,7 @@ build/
 .gradle
 local.properties
 *.iml
+*.hprof
 
 # node.js
 #
@@ -58,6 +59,7 @@ buck-out/
 *.jsbundle
 
 # CocoaPods
+/vendor/bundle
 /ios/Pods/
 
 ## React Web
@@ -112,3 +114,9 @@ fastlane/screenshots
 
 # iOS Build artifacts (fastlane)
 *.app.dSYM*
+
+# react-native-bootsplash artifacts
+android/app/src/main/res/values/colors.xml
+android/app/src/main/res/mipmap-*/bootsplash_logo.png
+ios/*/BootSplash.storyboard
+ios/*/Images.xcassets/BootSplashLogo.imageset

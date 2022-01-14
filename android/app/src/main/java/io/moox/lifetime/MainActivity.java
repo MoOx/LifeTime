@@ -12,8 +12,8 @@ import com.facebook.react.ReactRootView;
 import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 
 import com.zoontek.rnbootsplash.RNBootSplash;
+import com.zoontek.rnbars.RNBars;
 
-import io.moox.rntransparentstatusandnavigationbar.RNTransparentStatusAndNavigationBar;
 public class MainActivity extends ReactActivity {
 
   /**
@@ -32,6 +32,12 @@ public class MainActivity extends ReactActivity {
       protected ReactRootView createRootView() {
        return new RNGestureHandlerEnabledRootView(MainActivity.this);
       }
+      @Override
+      protected void loadApp(String appKey) {
+        RNBootSplash.init(MainActivity.this);
+        super.loadApp(appKey);
+        RNBars.init(MainActivity.this, "dark-content");
+      }
     };
   }
   
@@ -41,9 +47,5 @@ public class MainActivity extends ReactActivity {
     // https://github.com/software-mansion/react-native-screens#android
     // super.onCreate(savedInstanceState);
     super.onCreate(null);
-    
-    RNBootSplash.init(R.drawable.bootsplash, MainActivity.this);
-    
-    RNTransparentStatusAndNavigationBar.init(MainActivity.this);
   }
 }

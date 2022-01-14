@@ -146,7 +146,7 @@ let make = (
       <SpacedView vertical=S>
         <TextInput
           autoCapitalize=#words
-          autoCompleteType=#off
+          autoComplete=#off
           autoCorrect=true
           clearButtonMode=#whileEditing
           keyboardAppearance={switch theme.mode {

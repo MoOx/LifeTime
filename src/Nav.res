@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 // open ReactMultiversal
 
 open Navigators
@@ -14,7 +15,7 @@ module StatsStackScreen = {
           ~headerTintColor=theme.namedColors.text,
           ~headerStyle={
             backgroundColor: Some(theme.namedColors.background),
-            blurEffect: None,
+            // blurEffect: None,
           },
           (),
         )}>
@@ -61,7 +62,7 @@ module SettingsStackScreen = {
           ~headerTintColor=theme.namedColors.text,
           ~headerStyle={
             backgroundColor: Some(theme.namedColors.background),
-            blurEffect: None,
+            // blurEffect: None,
           },
           (),
         )}>
@@ -93,20 +94,21 @@ module TabsScreen = {
     let theme = Theme.useTheme(AppSettings.useTheme())
     <Tabs.Navigator
       initialRouteName="StatsStack"
-      tabBarOptions={Tabs.bottomTabBarOptions(
-        ~activeTintColor=theme.colors.blue,
-        ~inactiveTintColor=theme.colors.gray,
-        ~style={
-          open Style
-          array([theme.styles["background"], viewStyle(~borderTopColor=theme.colors.gray4, ())])
-        },
-        (),
-      )}>
+      screenOptions={_ =>
+        Tabs.options(
+          ~tabBarActiveTintColor=theme.colors.blue,
+          ~tabBarInactiveTintColor=theme.colors.gray,
+          ~tabBarStyle={
+            array([theme.styles["background"], viewStyle(~borderTopColor=theme.colors.gray4, ())])
+          },
+          (),
+        )}>
       <Tabs.Screen
         name="StatsStack"
         component=StatsStackScreen.make
         options={_props =>
           Tabs.options(
+            ~headerShown=false,
             ~tabBarTestID="tabSummary",
             ~title="Summary",
             ~tabBarIcon=tabBarIconProps =>
@@ -123,6 +125,7 @@ module TabsScreen = {
         component=GoalsStackScreen.make
         options={_props =>
           Tabs.options(
+            ~headerShown=false,
             ~tabBarTestID="tabGoals",
             ~title="Goals",
             ~tabBarIcon=tabBarIconProps =>
@@ -139,6 +142,7 @@ module TabsScreen = {
         component=SettingsStackScreen.make
         options={_props =>
           Tabs.options(
+            ~headerShown=false,
             ~tabBarTestID="tabSettings",
             ~title=SettingsScreen.title,
             ~tabBarIcon=tabBarIconProps =>
@@ -154,32 +158,44 @@ module TabsScreen = {
   }
 }
 
+module SystemBars = {
+  @module("react-native-bars") @react.component
+  external make: (
+    ~animated: bool=?,
+    ~barStyle: [#"light-content" | #"dark-content"]=?,
+  ) => React.element = "SystemBars"
+}
+
 module RootNavigator = {
   @react.component
   let make = () => {
-    React.useEffect1(() => {
-      TransparentStatusAndNavigationBar.init()
-      None
-    }, [])
+    // React.useEffect1(() => {
+    //   TransparentStatusAndNavigationBar.init()
+    //   None
+    // }, [])
     let mode = Theme.useTheme(AppSettings.useTheme()).mode
-    React.useEffect1(() => {
-      TransparentStatusAndNavigationBar.setBarsStyle(Theme.barsStyle(mode, #darkContent))
-      None
-    }, [mode])
-    <RootStack.Navigator
-      initialRouteName="Tabs"
-      screenOptions={_ => RootStack.options(~stackPresentation=#formSheet, ~headerShown=false, ())}>
-      <RootStack.Screen name="Tabs" component=TabsScreen.make />
-      <RootStack.Screen
-        name="WelcomeModalScreen"
-        component=WelcomeScreen.make
-        options={_ => RootStack.options(~gestureEnabled=false, ())}
-      />
-      <RootStack.Screen name="PrivacyModalScreen" component=PrivacyModalScreen.make />
-      <RootStack.Screen name="FiltersModalScreen" component=FiltersModalScreen.make />
-      <RootStack.Screen name="GoalNewModalScreen" component=GoalNewModalScreen.make />
-      <RootStack.Screen name="GoalEditModalScreen" component=GoalEditModalScreen.make />
-      <RootStack.Screen name="HelpModalScreen" component=HelpModalScreen.make />
-    </RootStack.Navigator>
+    // React.useEffect1(() => {
+    //   // TransparentStatusAndNavigationBar.setBarsStyle(Theme.barsStyle(mode, #darkContent))
+    //   None
+    // }, [mode])
+    let barStyle = Theme.barsStyle(mode, #darkContent)
+    <>
+      <SystemBars animated={true} barStyle />
+      <RootStack.Navigator
+        initialRouteName="Tabs"
+        screenOptions={_ => RootStack.options(~presentation=#formSheet, ~headerShown=false, ())}>
+        <RootStack.Screen name="Tabs" component=TabsScreen.make />
+        <RootStack.Screen
+          name="WelcomeModalScreen"
+          component=WelcomeScreen.make
+          options={_ => RootStack.options(~gestureEnabled=false, ())}
+        />
+        <RootStack.Screen name="PrivacyModalScreen" component=PrivacyModalScreen.make />
+        <RootStack.Screen name="FiltersModalScreen" component=FiltersModalScreen.make />
+        <RootStack.Screen name="GoalNewModalScreen" component=GoalNewModalScreen.make />
+        <RootStack.Screen name="GoalEditModalScreen" component=GoalEditModalScreen.make />
+        <RootStack.Screen name="HelpModalScreen" component=HelpModalScreen.make />
+      </RootStack.Navigator>
+    </>
   }
 }

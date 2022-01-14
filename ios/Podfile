@@ -1,8 +1,7 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-$iOSMinimumDeployVersion = '10.0'
-platform :ios, $iOSMinimumDeployVersion
+platform :ios, '11.0'
 
 target 'LifeTime' do
   config = use_native_modules!
@@ -14,28 +13,19 @@ target 'LifeTime' do
   
   # https://github.com/react-native-community/react-native-permissions
   permissions_path = '../node_modules/react-native-permissions/ios'
-  pod 'Permission-Calendars', :path => "#{permissions_path}/Calendars.podspec"
-  pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications.podspec"
+  pod 'Permission-Calendars', :path => "#{permissions_path}/Calendars"
+  pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications"
   
   target 'LifeTimeTests' do
     inherit! :complete
     # Pods for testing
   end
-
-  use_native_modules!
   
   # Enables Flipper
-  use_flipper!('Flipper' => '0.75.1', 'Flipper-Folly' => '2.5.3', 'Flipper-RSocket' => '1.3.1')
+  use_flipper!()
 
   post_install do |installer|
     react_native_post_install(installer)
-    
-    # We support a smaller range of deployment than some libraries, eliminate related noise
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSMinimumDeployVersion
-      end
-    end
     
     # M1 fix https://github.com/facebook/react-native/issues/31941
     installer.aggregate_targets.each do |aggregate_target|
@@ -46,8 +36,15 @@ target 'LifeTime' do
       end
       aggregate_target.user_project.save
     end
-    installer.pods_project.build_configurations.each do |config|
-      config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+    # installer.pods_project.build_configurations.each do |config|
+    #   config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+    # end
+    installer.pods_project.targets.each do |target|
+        target.build_configurations.each do |config|
+          config.build_settings["ONLY_ACTIVE_ARCH"] = "NO"
+        end
     end
+    
+    __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end
 end

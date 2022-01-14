@@ -1,0 +1,15 @@
+diff --git a/node_modules/react-native/scripts/find-node.sh b/node_modules/react-native/scripts/find-node.sh
+index 84e930a..62d4130 100755
+--- a/node_modules/react-native/scripts/find-node.sh
++++ b/node_modules/react-native/scripts/find-node.sh
+@@ -50,3 +50,10 @@ elif [[ -x "$(command -v brew)" && -f "$(brew --prefix asdf)/asdf.sh" ]]; then
+   # shellcheck source=/dev/null
+   . "$(brew --prefix asdf)/asdf.sh"
+ fi
++
++# Set up the fnm node version manager if present
++if [[ -x "$HOME/.fnm/fnm" ]]; then
++  eval "$("$HOME/.fnm/fnm" env)"
++elif [[ -x "$(command -v brew)" && -x "$(brew --prefix fnm)/bin/fnm" ]]; then
++  eval "$("$(brew --prefix fnm)/bin/fnm" env)"
++fi

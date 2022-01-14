@@ -59,7 +59,7 @@ static void InitializeFlipper(UIApplication *application) {
   [self.window makeKeyAndVisible];
 
   // react-native-bootsplash
-  [RNBootSplash initWithStoryboard:@"LaunchScreen" rootView:rootView];
+  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
   
   // react-native-push-notification
   // Define UNUserNotificationCenter

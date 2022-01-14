@@ -11,8 +11,8 @@ import Animated, {
   clockRunning,
   color,
   cond,
-  Easing,
-  interpolate,
+  EasingNode,
+  interpolateNode,
   lessThan,
   max,
   round,
@@ -71,51 +71,50 @@ const HalfCircle = ({children, size} /*: HalfCircleProps*/) => {
         style={[
           styles.overflowHidden,
           {width: size, height: size, borderRadius: size / 2},
-        ]}>
+        ]}
+      >
         {children}
       </View>
     </View>
   );
 };
 
-export const opacity = (c /*: number*/) => ((c >> 24) & 255) / 255;
-export const red = (c /*: number*/) => (c >> 16) & 255;
-export const green = (c /*: number*/) => (c >> 8) & 255;
-export const blue = (c /*: number*/) => c & 255;
+export const opacity = (c /*: number*/) /*: number*/ => ((c >> 24) & 255) / 255;
+export const red = (c /*: number*/) /*: number*/ => (c >> 16) & 255;
+export const green = (c /*: number*/) /*: number*/ => (c >> 8) & 255;
+export const blue = (c /*: number*/) /*: number*/ => c & 255;
 
-const interpolateColor = (
+const interpolateNodeColor = (
   animationValue /*: Animated.Adaptable<number>*/,
   config /*: {inputRange: Array<number>, outputRange : Array<string>}*/,
 ) => {
-  const colors = config.outputRange.map((c) => processColor(c));
+  const colors = config.outputRange.map(c => processColor(c));
   return color(
     round(
-      interpolate(animationValue, {
+      interpolateNode(animationValue, {
         inputRange: config.inputRange,
-        outputRange: colors.map((c) => (typeof c === 'number' ? red(c) : 0)),
+        outputRange: colors.map(c => (typeof c === 'number' ? red(c) : 0)),
         extrapolate: 'clamp',
       }),
     ),
     round(
-      interpolate(animationValue, {
+      interpolateNode(animationValue, {
         inputRange: config.inputRange,
-        outputRange: colors.map((c) => (typeof c === 'number' ? green(c) : 0)),
+        outputRange: colors.map(c => (typeof c === 'number' ? green(c) : 0)),
         extrapolate: 'clamp',
       }),
     ),
     round(
-      interpolate(animationValue, {
+      interpolateNode(animationValue, {
         inputRange: config.inputRange,
-        outputRange: colors.map((c) => (typeof c === 'number' ? blue(c) : 0)),
+        outputRange: colors.map(c => (typeof c === 'number' ? blue(c) : 0)),
         extrapolate: 'clamp',
       }),
     ),
     round(
-      interpolate(animationValue, {
+      interpolateNode(animationValue, {
         inputRange: config.inputRange,
-        outputRange: colors.map((c) =>
-          typeof c === 'number' ? opacity(c) : 0,
-        ),
+        outputRange: colors.map(c => (typeof c === 'number' ? opacity(c) : 0)),
         extrapolate: 'clamp',
       }),
     ),
@@ -209,7 +208,8 @@ const Ring = (
         width: size,
         height: size,
         backgroundColor: ring.startColor,
-      }}>
+      }}
+    >
       <MaskedView
         style={styles.flex}
         maskElement={
@@ -220,7 +220,8 @@ const Ring = (
             ]}
             source={require('./ActivityRings.mask.png')}
           />
-        }>
+        }
+      >
         <View
           style={[styles.flex, {backgroundColor: ring.endColor, borderRadius}]}
         />
@@ -237,14 +238,16 @@ const Ring = (
         styles.center,
         {borderRadius: size / 2, transform: [{scaleX}, rotate90]},
         styles.overflowHidden,
-      ]}>
+      ]}
+    >
       {/* circle */}
       <Animated.View
         style={{
           width: size,
           height: size,
           transform: [{rotate: rotateStartingPoint}],
-        }}>
+        }}
+      >
         <View style={styles.zIndex1}>
           <HalfCircle size={size}>
             <View style={{transform: [rotate180]}}>{foreground}</View>
@@ -260,7 +263,8 @@ const Ring = (
                 ],
                 opacity: lessThan(absoluteProgress, _180deg),
               },
-            ]}>
+            ]}
+          >
             <HalfCircle size={size}>{background}</HalfCircle>
           </Animated.View>
         </View>
@@ -273,7 +277,7 @@ const Ring = (
                 transform: [
                   {translateY: size / 4},
                   {
-                    rotate: interpolate(absoluteProgress, {
+                    rotate: interpolateNode(absoluteProgress, {
                       inputRange: [_180deg, _360deg],
                       outputRange: [0, _180deg],
                       extrapolate: 'clamp',
@@ -282,7 +286,8 @@ const Ring = (
                   {translateY: -size / 4},
                 ],
               },
-            ]}>
+            ]}
+          >
             <HalfCircle size={size}>{background}</HalfCircle>
           </Animated.View>
         </View>
@@ -307,12 +312,13 @@ const Ring = (
           {
             // for the first circle, we don't need the same shadow
             // so we start the shadow only when the stroke is going to overlap the start
-            opacity: interpolate(absoluteProgress, {
+            opacity: interpolateNode(absoluteProgress, {
               inputRange: [0, _360deg * 0.8, _360deg],
               outputRange: [0.5, 0.5, 1],
             }),
           },
-        ]}>
+        ]}
+      >
         <View
           style={[
             styles.overflowHidden,
@@ -323,11 +329,13 @@ const Ring = (
               width: shadowWidth,
               height: shadowWidth / 2,
             },
-          ]}>
+          ]}
+        >
           <Svg
             style={[StyleSheet.absoluteFill]}
             width={shadowWidth}
-            height={shadowWidth}>
+            height={shadowWidth}
+          >
             <Defs>
               <RadialGradient
                 cx="50%"
@@ -335,7 +343,8 @@ const Ring = (
                 fx="50%"
                 fy="50%"
                 r="50%"
-                id="shadow">
+                id="shadow"
+              >
                 <Stop offset="10%" stopOpacity={1} stopColor="#000" />
                 <Stop offset="20%" stopOpacity={0.3} stopColor="#000" />
                 <Stop offset="25%" stopOpacity={0.2} stopColor="#000" />
@@ -360,7 +369,8 @@ const Ring = (
               width: strokeWidth + shadowSolidSize,
               height: strokeWidth / 2 + shadowSolidSize,
             },
-          ]}>
+          ]}
+        >
           <View
             style={[
               styles.absoluteTopLeft,
@@ -380,7 +390,7 @@ const Ring = (
           circleStyle,
           circleEndStyle,
           {
-            backgroundColor: interpolateColor(absoluteProgress, {
+            backgroundColor: interpolateNodeColor(absoluteProgress, {
               inputRange: [0, _360deg],
               outputRange: [ring.startColor, ring.endColor],
             }),
@@ -405,7 +415,7 @@ type ActivityRingsProps = {|
 |};
 */
 
-const easing = Easing.bezier(0.32, 0.12, -0.1, 1);
+const easing = EasingNode.bezier(0.32, 0.12, -0.1, 1);
 
 export default (
   {
@@ -419,7 +429,7 @@ export default (
     strokeWidth,
     width,
   } /*: ActivityRingsProps*/,
-) => {
+) /*: React.Node */ => {
   return (
     <View style={[{width, height: width}]}>
       {rings.map((ring, i) => {
@@ -436,7 +446,8 @@ export default (
                 top: (width - size) / 2,
                 left: (width - size) / 2,
               },
-            ]}>
+            ]}
+          >
             <Ring
               animationDuration={animationDuration}
               ring={ring}
