@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let oneH = 60.
@@ -9,7 +10,6 @@ let graphLetterHeight = 16.
 let rightSpace = 28. // Enough for "99m"
 
 let styles = {
-  open Style
   {
     "container": viewStyle(
       ~flexDirection=#row,
@@ -59,59 +59,46 @@ module GridXAxis = {
     ->Option.map(maxDuration => {
       let (max, u) = maxDuration > oneH ? (maxDuration /. oneH, "h") : (maxDuration, "m")
       let nbSlices = maxDuration === 0. ? 1 : slices
-      <View
-        style={
-          open Style
-          array([StyleSheet.absoluteFill, styles["content"]])
-        }>
+      <View style={array([StyleSheet.absoluteFill, styles["content"]])}>
         {Array.range(0, nbSlices)
         ->Array.reverse
         ->Array.map(i =>
           <React.Fragment key={i->string_of_int}>
             <View
-              style={
-                open Style
-                array([
-                  styles["axisX"],
-                  viewStyle(
-                    ~marginTop=(i === nbSlices ? 0. : 1.)->dp,
-                    ~top=(100. -. 100. /. nbSlices->float *. i->float)->pct,
-                    ~backgroundColor=theme.colors.gray5,
-                    (),
-                  ),
-                ])
-              }
+              style={array([
+                styles["axisX"],
+                viewStyle(
+                  ~marginTop=(i === nbSlices ? 0. : 1.)->dp,
+                  ~top=(100. -. 100. /. nbSlices->float *. i->float)->pct,
+                  ~backgroundColor=theme.colors.gray5,
+                  (),
+                ),
+              ])}
             />
             {i === 0 || i === nbSlices
               ? React.null
               : <View
-                  style={
-                    open Style
-                    viewStyle(
-                      ~position=#absolute,
-                      ~right=0.->dp,
-                      ~bottom=(100. /. nbSlices->float *. i->float)->pct,
-                      (),
-                    )
-                  }>
+                  style={viewStyle(
+                    ~position=#absolute,
+                    ~right=0.->dp,
+                    ~bottom=(100. /. nbSlices->float *. i->float)->pct,
+                    (),
+                  )}>
                   <View
-                    style={
-                      open Style
-                      array([
-                        viewStyle(
-                          ~position=#absolute,
-                          ~top=-6.->dp,
-                          ~right=-.rightSpace->dp,
-                          ~width=rightSpace->dp,
-                          ~flexDirection=#row,
-                          (),
-                        ),
-                      ])
-                    }>
+                    style={array([
+                      viewStyle(
+                        ~position=#absolute,
+                        ~top=-6.->dp,
+                        ~right=-.rightSpace->dp,
+                        ~width=rightSpace->dp,
+                        ~flexDirection=#row,
+                        (),
+                      ),
+                    ])}>
                     <Spacer size=XXS />
                     <Text
                       allowFontScaling=false
-                      style={Style.array([theme.styles["textLight2"], Theme.text["caption2"]])}>
+                      style={array([theme.styles["textLight2"], Theme.text["caption2"]])}>
                       {((max /. nbSlices->float *. i->float)->Js.Float.toFixed ++ u)->React.string}
                     </Text>
                   </View>
@@ -135,22 +122,15 @@ module GridYAxis = {
 
     let nbDash = supposedNumberOfDays->int_of_float + 1
 
-    <View
-      style={
-        open Style
-        array([StyleSheet.absoluteFill, Predefined.styles["rowSpaceBetween"]])
-      }>
+    <View style={array([StyleSheet.absoluteFill, Predefined.styles["rowSpaceBetween"]])}>
       {Array.range(0, nbDash)
       ->Array.map(i =>
         <React.Fragment key={i->string_of_int}>
           <View
-            style={
-              open Style
-              array([
-                styles["axisY"],
-                viewStyle(~left=(100. /. supposedNumberOfDays *. i->float)->pct, ()),
-              ])
-            }>
+            style={array([
+              styles["axisY"],
+              viewStyle(~left=(100. /. supposedNumberOfDays *. i->float)->pct, ()),
+            ])}>
             {dash}
           </View>
           {i === nbDash
@@ -158,21 +138,15 @@ module GridYAxis = {
             : <SpacedView
                 horizontal=XXS
                 vertical=None
-                style={
-                  open Style
-                  viewStyle(
-                    ~position=#absolute,
-                    ~bottom=0.->dp,
-                    ~left=(100. /. supposedNumberOfDays *. i->float)->pct,
-                    (),
-                  )
-                }>
+                style={viewStyle(
+                  ~position=#absolute,
+                  ~bottom=0.->dp,
+                  ~left=(100. /. supposedNumberOfDays *. i->float)->pct,
+                  (),
+                )}>
                 <Text
                   allowFontScaling=false
-                  style={
-                    open Style
-                    array([theme.styles["textLight2"], textStyle(~fontSize=10., ())])
-                  }>
+                  style={array([theme.styles["textLight2"], textStyle(~fontSize=10., ())])}>
                   {startDate
                   ->DateFns.addDays(i->Js.Int.toFloat)
                   ->Js.Date.getDay
@@ -272,11 +246,7 @@ let make = React.memo((
     })
 
   <Row>
-    <View
-      style={
-        open Style
-        array([styles["container"], viewStyle(~width=(width -. rightSpace)->dp, ())])
-      }>
+    <View style={array([styles["container"], viewStyle(~width=(width -. rightSpace)->dp, ())])}>
       {width == 0.
         ? React.null
         : <>
@@ -288,10 +258,7 @@ let make = React.memo((
               ->Array.map(((date, mapPerCategories)) =>
                 <View
                   key={date->Js.Date.toISOString}
-                  style={
-                    open Style
-                    array([styles["barContainer"], viewStyle(~width=(100. /. nb)->pct, ())])
-                  }>
+                  style={array([styles["barContainer"], viewStyle(~width=(100. /. nb)->pct, ())])}>
                   <View style={styles["bar"]}>
                     {mapCategoryDuration
                     ->Option.map(mapCategoryDuration =>
@@ -307,16 +274,13 @@ let make = React.memo((
                             ? React.null
                             : <View
                                 key
-                                style={
-                                  open Style
-                                  viewStyle(
-                                    ~backgroundColor,
-                                    ~height=(graphHeight /.
-                                    maxDuration->Option.getWithDefault(0.) *.
-                                    value)->dp,
-                                    (),
-                                  )
-                                }
+                                style={viewStyle(
+                                  ~backgroundColor,
+                                  ~height=(graphHeight /.
+                                  maxDuration->Option.getWithDefault(0.) *.
+                                  value)->dp,
+                                  (),
+                                )}
                               />
                         })
                         ->React.array

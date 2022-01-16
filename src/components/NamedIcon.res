@@ -1,4 +1,5 @@
 open ReactNative
+open ReactNative.Style
 
 let size = 28.
 
@@ -12,11 +13,11 @@ type t = [
   | #chevronright
   | #circle
   | #edit
-  | #\"export"
+  | #"export"
   | #heart
   | #heartoutline
   | #hourglass
-  | #\"import"
+  | #"import"
   | #info
   | #meditation
   | #moonshine
@@ -35,22 +36,18 @@ type t = [
 ]
 
 @react.component
-let make = (~name: t, ~width=size->Style.dp, ~height=size->Style.dp, ~fill="white") =>
+let make = (~name: t, ~width=size->dp, ~height=size->dp, ~fill="white") =>
   <View
-    style={
-      open Style
-      viewStyle(
-        ~justifyContent=#center,
-        ~alignItems=#center,
-        ~borderRadius=6.,
-        ~backgroundColor=fill,
-        ~width,
-        ~height,
-        (),
-      )
-    }>
+    style={viewStyle(
+      ~justifyContent=#center,
+      ~alignItems=#center,
+      ~borderRadius=6.,
+      ~backgroundColor=fill,
+      ~width,
+      ~height,
+      (),
+    )}>
     {
-      open Style
       let width = 80.->pct
       let height = 80.->pct
       let fill = "#fff"
@@ -64,11 +61,11 @@ let make = (~name: t, ~width=size->Style.dp, ~height=size->Style.dp, ~fill="whit
       | #chevronright => <SVGChevronright width height fill />
       | #circle => <SVGCircle width height fill />
       | #edit => <SVGEdit width height fill />
-      | #\"export" => <SVGExport width height fill />
+      | #"export" => <SVGExport width height fill />
       | #heart => <SVGHeart width height fill />
       | #heartoutline => <SVGHeartoutline width height fill />
       | #hourglass => <SVGHourglass width height fill />
-      | #\"import" => <SVGImport width height fill />
+      | #"import" => <SVGImport width height fill />
       | #info => <SVGInfo width height fill />
       | #meditation => <SVGMeditation width height fill />
       | #moonshine => <SVGMoonshine width height fill />

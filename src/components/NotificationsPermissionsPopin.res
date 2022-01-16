@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 @react.component
@@ -43,57 +44,45 @@ let make = () => {
       ? React.null
       : <Animated.View
           onLayout=onNotificationPopinLayout
-          style={
-            open Style
-            style(
-              // this is what allow to compute height
-              // we put this container in absolute + opacity 0
-              // then we get height via onLayout, then we switch this to relative
-              // and animate the rest
-              ~position=#absolute,
-              ~bottom=0.->dp,
-              ~left=0.->dp,
-              ~right=0.->dp,
-              ~zIndex=1,
-              ~transform=[
-                translateY(~translateY=animatedBottomTranslateY.current->Animated.StyleProp.float),
-              ],
-              (),
-            )
-          }>
+          style={style(
+            // this is what allow to compute height
+            // we put this container in absolute + opacity 0
+            // then we get height via onLayout, then we switch this to relative
+            // and animate the rest
+            ~position=#absolute,
+            ~bottom=0.->dp,
+            ~left=0.->dp,
+            ~right=0.->dp,
+            ~zIndex=1,
+            ~transform=[
+              translateY(~translateY=animatedBottomTranslateY.current->Animated.StyleProp.float),
+            ],
+            (),
+          )}>
           <SpacedView vertical=S horizontal=S>
             <View
-              style={
-                open Style
-                viewStyle(
-                  ~shadowColor="#000",
-                  ~shadowOffset=offset(~height=3., ~width=1.),
-                  ~shadowOpacity=0.25,
-                  ~shadowRadius=6.,
-                  (),
-                )
-              }>
+              style={viewStyle(
+                ~shadowColor="#000",
+                ~shadowOffset=offset(~height=3., ~width=1.),
+                ~shadowOpacity=0.25,
+                ~shadowRadius=6.,
+                (),
+              )}>
               <SpacedView
                 horizontal=M
                 vertical=XS
-                style={
-                  open Style
-                  array([
-                    theme.styles["background"],
-                    viewStyle(~borderRadius=Theme.Radius.card, ()),
-                  ])
-                }>
+                style={array([
+                  theme.styles["background"],
+                  viewStyle(~borderRadius=Theme.Radius.card, ()),
+                ])}>
                 <TouchableOpacity
-                  style={
-                    open Style
-                    viewStyle(
-                      ~position=#absolute,
-                      ~top=(Spacer.space /. 1.5)->dp,
-                      ~right=(Spacer.space /. 1.5)->dp,
-                      ~zIndex=1,
-                      (),
-                    )
-                  }
+                  style={viewStyle(
+                    ~position=#absolute,
+                    ~top=(Spacer.space /. 1.5)->dp,
+                    ~right=(Spacer.space /. 1.5)->dp,
+                    ~zIndex=1,
+                    (),
+                  )}
                   hitSlop=HitSlops.m
                   onPress={_ =>
                     setSettings(settings => {
@@ -101,61 +90,44 @@ let make = () => {
                       lastUpdated: Js.Date.now(),
                       notificationsPermissionsDismissed: Js.Date.now(),
                     })}>
-                  <SVGXmarkSemibold
-                    width={14.->Style.dp} height={14.->Style.dp} fill=theme.colors.gray
-                  />
+                  <SVGXmarkSemibold width={14.->dp} height={14.->dp} fill=theme.colors.gray />
                 </TouchableOpacity>
-                <View
-                  style={
-                    open Style
-                    viewStyle(~alignItems=#center, ())
-                  }>
+                <View style={viewStyle(~alignItems=#center, ())}>
                   <SpacedView
-                    style={
-                      open Style
-                      array([
-                        switch theme.mode {
-                        | #light => theme.styles["backgroundGray6"]
-                        | #dark => theme.styles["backgroundGray5"]
-                        },
-                        viewStyle(~borderRadius=1000., ()),
-                      ])
-                    }>
-                    <SVGBellFill
-                      fill=theme.colors.blue width={48.->Style.dp} height={48.->Style.dp}
-                    />
+                    style={array([
+                      switch theme.mode {
+                      | #light => theme.styles["backgroundGray6"]
+                      | #dark => theme.styles["backgroundGray5"]
+                      },
+                      viewStyle(~borderRadius=1000., ()),
+                    ])}>
+                    <SVGBellFill fill=theme.colors.blue width={48.->dp} height={48.->dp} />
                     <View
-                      style={
-                        open Style
-                        viewStyle(
-                          ~position=#absolute,
-                          ~top=20.->dp,
-                          ~right=20.->dp,
-                          ~width=17.->dp,
-                          ~height=17.->dp,
-                          ~borderRadius=17.,
-                          ~zIndex=1,
-                          ~backgroundColor=theme.colors.red,
-                          (),
-                        )
-                      }
+                      style={viewStyle(
+                        ~position=#absolute,
+                        ~top=20.->dp,
+                        ~right=20.->dp,
+                        ~width=17.->dp,
+                        ~height=17.->dp,
+                        ~borderRadius=17.,
+                        ~zIndex=1,
+                        ~backgroundColor=theme.colors.red,
+                        (),
+                      )}
                     />
                   </SpacedView>
                 </View>
                 <Spacer size=S />
                 <Text
-                  style={
-                    open Style
-                    array([Theme.text["title2"], Theme.text["weight700"], theme.styles["text"]])
-                  }>
+                  style={array([
+                    Theme.text["title2"],
+                    Theme.text["weight700"],
+                    theme.styles["text"],
+                  ])}>
                   {"Set Up Reminders"->React.string}
                 </Text>
                 <Spacer size=XS />
-                <Text
-                  style={
-                    open Style
-                    array([Theme.text["body"], theme.styles["text"]])
-                  }>
+                <Text style={array([Theme.text["body"], theme.styles["text"]])}>
                   {("Enabling notifications can help you to stay motivated by giving you quick recap of your progress goals when necessary. " ++
                   ("\n" ++
                   "Notifications are generated on device."))->React.string}
@@ -164,10 +136,7 @@ let make = () => {
                 <TouchableButton
                   text="Allow Notifications"
                   onPress={_ => requestNotificationPermission()}
-                  styleBackground={
-                    open Style
-                    viewStyle(~backgroundColor=theme.colors.blue, ())
-                  }
+                  styleBackground={viewStyle(~backgroundColor=theme.colors.blue, ())}
                 />
                 <Spacer size=XS />
               </SpacedView>

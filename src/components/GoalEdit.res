@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let title = "Edit Goal"
@@ -99,10 +100,7 @@ let make = (
 
   let dash =
     <View
-      style={
-        open Style
-        viewStyle(~width=1.->dp, ~height=12.->dp, ~backgroundColor=theme.colors.gray5, ())
-      }
+      style={viewStyle(~width=1.->dp, ~height=12.->dp, ~backgroundColor=theme.colors.gray5, ())}
     />
 
   let handleCategoryCheck = React.useCallback2((id, selectedCategoryActivities) => {
@@ -159,15 +157,12 @@ let make = (
           placeholderTextColor=theme.colors.gray3
           returnKeyType=#done_
           value=title
-          style={
-            open Style
-            array([
-              Predefined.styles["flex"],
-              Theme.text["body"],
-              theme.styles["text"],
-              textStyle(~padding=0.->dp, ()),
-            ])
-          }
+          style={array([
+            Predefined.styles["flex"],
+            Theme.text["body"],
+            theme.styles["text"],
+            textStyle(~padding=0.->dp, ()),
+          ])}
         />
       </SpacedView>
     </View>
@@ -180,9 +175,7 @@ let make = (
       left={<NamedIcon name=#scope fill=theme.colors.green />}
       right={switch mode {
       | Some(Goal) =>
-        <SVGCheckmark
-          width={checkSize->Style.dp} height={checkSize->Style.dp} fill=theme.colors.blue
-        />
+        <SVGCheckmark width={checkSize->dp} height={checkSize->dp} fill=theme.colors.blue />
       | _ => React.null
       }}>
       <ListItemText> {"Goal to Reach"->React.string} </ListItemText>
@@ -193,9 +186,7 @@ let make = (
       left={<NamedIcon name=#hourglass fill=theme.colors.orange />}
       right={switch mode {
       | Some(Limit) =>
-        <SVGCheckmark
-          width={checkSize->Style.dp} height={checkSize->Style.dp} fill=theme.colors.blue
-        />
+        <SVGCheckmark width={checkSize->dp} height={checkSize->dp} fill=theme.colors.blue />
       | _ => React.null
       }}>
       <ListItemText> {"Limit to Respect"->React.string} </ListItemText>
@@ -223,18 +214,15 @@ let make = (
                   hitSlop=HitSlops.m>
                   {_ =>
                     <View>
-                      <Text
-                        style={Style.array([Theme.text["caption1"], theme.styles["textLight2"]])}>
+                      <Text style={array([Theme.text["caption1"], theme.styles["textLight2"]])}>
                         {day->float->Date.dayShortString->React.string}
                       </Text>
                       <Spacer size=XXS />
                       {if !dayOn {
-                        <SVGCircle
-                          width={26.->Style.dp} height={26.->Style.dp} fill=theme.colors.gray
-                        />
+                        <SVGCircle width={26.->dp} height={26.->dp} fill=theme.colors.gray />
                       } else {
                         <SVGCheckmarkcircle
-                          width={26.->Style.dp} height={26.->Style.dp} fill=theme.colors.blue
+                          width={26.->dp} height={26.->dp} fill=theme.colors.blue
                         />
                       }}
                     </View>}
@@ -262,14 +250,11 @@ let make = (
                   style={Predefined.styles["flexGrow"]}>
                   <SpacedView vertical=XS horizontal=XS style={Predefined.styles["center"]}>
                     <Text
-                      style={
-                        open Style
-                        array([
-                          Theme.text["subhead"],
-                          Theme.text["weight600"],
-                          textStyle(~color=theme.colors.blue, ()),
-                        ])
-                      }
+                      style={array([
+                        Theme.text["subhead"],
+                        Theme.text["weight600"],
+                        textStyle(~color=theme.colors.blue, ()),
+                      ])}
                       numberOfLines=1
                       adjustsFontSizeToFit=true>
                       {(quickDuration->Js.Float.toFixed ++ "min")->React.string}
@@ -282,27 +267,21 @@ let make = (
             </View>
             <SpacedView vertical=XS>
               <View style={Predefined.styles["rowCenter"]}>
-                <Text style={Style.array([Theme.text["caption1"], theme.styles["textLight2"]])}>
+                <Text style={array([Theme.text["caption1"], theme.styles["textLight2"]])}>
                   {"0"->React.string}
                 </Text>
                 <Spacer size=XS />
                 <View style={Predefined.styles["flex"]}>
                   <View
-                    style={
-                      open Style
-                      array([
-                        StyleSheet.absoluteFill,
-                        viewStyle(~marginHorizontal=15.->dp, ()),
-                        Predefined.styles["rowSpaceBetween"],
-                      ])
-                    }>
+                    style={array([
+                      StyleSheet.absoluteFill,
+                      viewStyle(~marginHorizontal=15.->dp, ()),
+                      Predefined.styles["rowSpaceBetween"],
+                    ])}>
                     dash dash dash dash dash
                   </View>
                   <ReactNativeSlider
-                    style={
-                      open Style
-                      array([Predefined.styles["flexGrow"], style(~minHeight=40.->dp, ())])
-                    }
+                    style={array([Predefined.styles["flexGrow"], style(~minHeight=40.->dp, ())])}
                     minimumValue=0.
                     maximumValue={24. *. 60.}
                     step=15.
@@ -311,7 +290,7 @@ let make = (
                   />
                 </View>
                 <Spacer size=XS />
-                <Text style={Style.array([Theme.text["caption1"], theme.styles["textLight2"]])}>
+                <Text style={array([Theme.text["caption1"], theme.styles["textLight2"]])}>
                   {"24"->React.string}
                 </Text>
               </View>
@@ -322,21 +301,15 @@ let make = (
               <View style={Predefined.styles["flex"]}>
                 <SpacedView horizontal=None vertical=S style={Predefined.styles["row"]}>
                   <Text
-                    style={
-                      open Style
-                      array([
-                        Predefined.styles["flex"],
-                        Theme.text["callout"],
-                        theme.styles["text"],
-                      ])
-                    }>
+                    style={array([
+                      Predefined.styles["flex"],
+                      Theme.text["callout"],
+                      theme.styles["text"],
+                    ])}>
                     {"Average Time per Day"->React.string}
                   </Text>
                   <Text
-                    style={
-                      open Style
-                      array([Theme.text["callout"], theme.styles["textLight1"]])
-                    }
+                    style={array([Theme.text["callout"], theme.styles["textLight1"]])}
                     numberOfLines=1
                     adjustsFontSizeToFit=true>
                     {(durationInMinutes /. numberOfDays)->Date.minToString->React.string}
@@ -351,26 +324,20 @@ let make = (
               <View style={Predefined.styles["flex"]}>
                 <SpacedView horizontal=None vertical=S style={Predefined.styles["row"]}>
                   <Text
-                    style={
-                      open Style
-                      array([
-                        Predefined.styles["flex"],
-                        Theme.text["callout"],
-                        Theme.text["weight500"],
-                        theme.styles["text"],
-                      ])
-                    }>
+                    style={array([
+                      Predefined.styles["flex"],
+                      Theme.text["callout"],
+                      Theme.text["weight500"],
+                      theme.styles["text"],
+                    ])}>
                     {"Weekly Goal"->React.string}
                   </Text>
                   <Text
-                    style={
-                      open Style
-                      array([
-                        Theme.text["callout"],
-                        Theme.text["weight600"],
-                        theme.styles["textLight1"],
-                      ])
-                    }
+                    style={array([
+                      Theme.text["callout"],
+                      Theme.text["weight600"],
+                      theme.styles["textLight1"],
+                    ])}
                     numberOfLines=1
                     adjustsFontSizeToFit=true>
                     {durationInMinutes->Date.minToString->React.string}
@@ -426,14 +393,10 @@ let make = (
                         {_ =>
                           !selectedCat
                             ? <SVGCircle
-                                width={checkSize->Style.dp}
-                                height={checkSize->Style.dp}
-                                fill=theme.colors.gray
+                                width={checkSize->dp} height={checkSize->dp} fill=theme.colors.gray
                               />
                             : <SVGCheckmarkcircle
-                                width={checkSize->Style.dp}
-                                height={checkSize->Style.dp}
-                                fill=theme.colors.blue
+                                width={checkSize->dp} height={checkSize->dp} fill=theme.colors.blue
                               />}
                       </Pressable>
                       <Spacer size=XS />
@@ -443,10 +406,7 @@ let make = (
                       {selectedCat || selectedCategoryActivities->Array.length > 0
                         ? <>
                             <Text
-                              style={Style.array([
-                                Theme.text["subhead"],
-                                theme.styles["textLight2"],
-                              ])}>
+                              style={array([Theme.text["subhead"], theme.styles["textLight2"]])}>
                               {(
                                 selectedCat
                                   ? "All"
@@ -466,18 +426,13 @@ let make = (
                       // using a key because (at least in simulator, it seems to be buggy)
                       <Animated.View
                         key={opened ? "opened" : "unopened"}
-                        style={
-                          open Style
-                          viewStyle(
-                            ~opacity=canOpenCategory ? 1. : 0.05,
-                            ~transform=[rotate(~rotate=(opened ? 90. : 0.)->deg)],
-                            (),
-                          )
-                        }>
+                        style={viewStyle(
+                          ~opacity=canOpenCategory ? 1. : 0.05,
+                          ~transform=[rotate(~rotate=(opened ? 90. : 0.)->deg)],
+                          (),
+                        )}>
                         <SVGChevronright
-                          width={14.->Style.dp}
-                          height={14.->Style.dp}
-                          fill=Predefined.Colors.Ios.light.gray4
+                          width={14.->dp} height={14.->dp} fill=Predefined.Colors.Ios.light.gray4
                         />
                       </Animated.View>
                     </>}>
@@ -504,13 +459,13 @@ let make = (
                                   <SpacedView vertical=XS horizontal=None>
                                     {!selected
                                       ? <SVGCircle
-                                          width={checkSize->Style.dp}
-                                          height={checkSize->Style.dp}
+                                          width={checkSize->dp}
+                                          height={checkSize->dp}
                                           fill=theme.colors.gray
                                         />
                                       : <SVGCheckmarkcircle
-                                          width={checkSize->Style.dp}
-                                          height={checkSize->Style.dp}
+                                          width={checkSize->dp}
+                                          height={checkSize->dp}
                                           fill=theme.colors.blue
                                         />}
                                   </SpacedView>}
@@ -519,8 +474,8 @@ let make = (
                               <NamedIcon
                                 name=iconName
                                 fill=color
-                                width={checkSize->Style.dp}
-                                height={checkSize->Style.dp}
+                                width={checkSize->dp}
+                                height={checkSize->dp}
                               />
                               <Spacer size=Custom(3.) />
                             </>}

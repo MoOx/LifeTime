@@ -1,4 +1,5 @@
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let title = "Notifications"
@@ -10,10 +11,7 @@ let make = (~navigation as _, ~route as _) => {
     SwipeableRowEventEmitter.emitter->SwipeableRowEventEmitter.emit(#autoClose(None))
   })
   <ScrollView
-    style={
-      open Style
-      array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])
-    }
+    style={array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])}
     onScrollBeginDrag>
     <SettingsNotifications />
   </ScrollView>

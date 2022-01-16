@@ -1,8 +1,8 @@
 open Belt
+open ReactNative
 open ReactNativeCalendarEvents
 
 let openCalendarApp = () => {
-  open ReactNative
   if Platform.os == Platform.ios {
     Linking.openURL("calshow:")->ignore
   } else if Platform.os == Platform.android {

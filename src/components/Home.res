@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let title = "Your LifeTime"
@@ -18,7 +19,6 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
   let theme = Theme.useTheme(AppSettings.useTheme())
   let windowDimensions = Dimensions.useWindowDimensions()
   let styleWidth = React.useMemo1(() => {
-    open Style
     style(~width=windowDimensions.width->dp, ())
   }, [windowDimensions.width])
 
@@ -137,22 +137,14 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
       <View style={Predefined.styles["rowSpaceBetween"]}>
         <Text
           allowFontScaling=false
-          style={Style.array([
-            Theme.text["largeTitle"],
-            Theme.text["weight700"],
-            theme.styles["text"],
-          ])}>
+          style={array([Theme.text["largeTitle"], Theme.text["weight700"], theme.styles["text"]])}>
           {title->React.string}
         </Text>
         <View style={Predefined.styles["row"]}>
           {Global.__DEV__
             ? <>
                 {Global.hermesInternal != None
-                  ? <Text
-                      style={
-                        open Style
-                        array([theme.styles["textOnDarkLight"], Theme.text["caption2"]])
-                      }>
+                  ? <Text style={array([theme.styles["textOnDarkLight"], Theme.text["caption2"]])}>
                       {"Hermes on"->React.string}
                     </Text>
                   : React.null}
@@ -172,7 +164,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
       </Row>
     </View>
     <ListSeparator />
-    <View style={Style.array([theme.styles["background"], styleWidth])}>
+    <View style={array([theme.styles["background"], styleWidth])}>
       <Spacer />
       <SpacedView vertical=None horizontal=scrollViewSpace>
         <Text style={theme.styles["textLight2"]}>
@@ -197,7 +189,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
           pagingEnabled=true
           showsHorizontalScrollIndicator=false
           onMomentumScrollEnd
-          style={Style.array([Predefined.styles["row"], Predefined.styles["flexGrow"]])}>
+          style={array([Predefined.styles["row"], Predefined.styles["flexGrow"]])}>
           {last5Weeks
           ->Array.map(((currentStartDate, currentSupposedEndDate)) => {
             let endDate = currentSupposedEndDate->Date.min(today)
@@ -239,20 +231,12 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
         <View style={Predefined.styles["flexGrow"]}>
           <SpacedView horizontal=None vertical=S style={Predefined.styles["row"]}>
             <View style={Predefined.styles["flexGrow"]}>
-              <Text
-                style={
-                  open Style
-                  array([Theme.text["callout"], theme.styles["text"]])
-                }>
+              <Text style={array([Theme.text["callout"], theme.styles["text"]])}>
                 {"Total Logged Time"->React.string}
               </Text>
             </View>
             <Text>
-              <Text
-                style={
-                  open Style
-                  array([Theme.text["callout"], theme.styles["textLight1"]])
-                }>
+              <Text style={array([Theme.text["callout"], theme.styles["textLight1"]])}>
                 {mapTitleDuration
                 ->Option.map(mapTitleDuration =>
                   mapTitleDuration->Array.reduce(0., (total, (_title, duration)) =>

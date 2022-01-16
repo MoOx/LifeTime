@@ -1,4 +1,5 @@
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 @react.component
@@ -54,11 +55,7 @@ let make = (~navigation, ~route as _) => {
 
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.))
   <>
-    <View
-      style={
-        open Style
-        array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])
-      }>
+    <View style={array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])}>
       <StickyHeader
         scrollYAnimatedValue=scrollYAnimatedValue.current
         scrollOffsetY=80.
@@ -69,19 +66,16 @@ let make = (~navigation, ~route as _) => {
         title=Home.title
       />
       <Animated.ScrollView
-        style={
-          open Style
-          array([
-            Predefined.styles["flexGrow"],
-            viewStyle(
-              ~marginTop=safeAreaInsets.top->dp,
-              // no bottom, handled by bottom tabs
-              ~paddingLeft=safeAreaInsets.left->dp,
-              ~paddingRight=safeAreaInsets.right->dp,
-              (),
-            ),
-          ])
-        }
+        style={array([
+          Predefined.styles["flexGrow"],
+          viewStyle(
+            ~marginTop=safeAreaInsets.top->dp,
+            // no bottom, handled by bottom tabs
+            ~paddingLeft=safeAreaInsets.left->dp,
+            ~paddingRight=safeAreaInsets.right->dp,
+            (),
+          ),
+        ])}
         refreshControl={<RefreshControl
           refreshing
           onRefresh
@@ -128,20 +122,17 @@ let make = (~navigation, ~route as _) => {
     </View>
     {hasCalendarAccess == false
       ? <View
-          style={
-            open Style
-            style(
-              ~paddingTop=safeAreaInsets.top->dp,
-              ~position=#absolute,
-              ~top=0.->dp,
-              ~bottom=0.->dp,
-              ~left=0.->dp,
-              ~right=0.->dp,
-              ~backgroundColor="rgba(0,0,0,0.2)",
-              ~justifyContent=#flexEnd,
-              (),
-            )
-          }>
+          style={style(
+            ~paddingTop=safeAreaInsets.top->dp,
+            ~position=#absolute,
+            ~top=0.->dp,
+            ~bottom=0.->dp,
+            ~left=0.->dp,
+            ~right=0.->dp,
+            ~backgroundColor="rgba(0,0,0,0.2)",
+            ~justifyContent=#flexEnd,
+            (),
+          )}>
           <SpacedView vertical=S horizontal=S style={Predefined.styles["flexShrink"]}>
             <CalendarsPermissions
               onAboutPrivacyPress={_ =>

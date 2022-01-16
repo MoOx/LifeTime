@@ -1,8 +1,8 @@
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let styles = {
-  open Style
   {
     "container": viewStyle(
       ~paddingTop=4.->dp,
@@ -30,11 +30,7 @@ let styles = {
 @react.component
 let make = (~style as s=?) => {
   let today = Date.now()
-  <View
-    style={
-      open Style
-      arrayOption([Some(styles["container"]), s])
-    }>
+  <View style={arrayOption([Some(styles["container"]), s])}>
     <Text style={styles["text"]} numberOfLines=1 adjustsFontSizeToFit=true>
       {today->Js.Date.getDay->Date.dayShortString->Js.String2.toUpperCase->React.string}
     </Text>

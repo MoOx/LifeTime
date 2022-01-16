@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 @react.component
@@ -94,8 +95,8 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity, ~curre
           }}
           left={<NamedIcon name=iconName fill=color />}
           right={id != activityTitle->Calendars.categoryIdFromActivityTitle(settings.activities)
-            ? <SVGCircle width={26.->Style.dp} height={26.->Style.dp} fill=color />
-            : <SVGCheckmarkcircle width={26.->Style.dp} height={26.->Style.dp} fill=color />}>
+            ? <SVGCircle width={26.->dp} height={26.->dp} fill=color />
+            : <SVGCheckmarkcircle width={26.->dp} height={26.->dp} fill=color />}>
           <ListItemText> {name->React.string} </ListItemText>
         </ListItem>
         {index !== ActivityCategories.defaults->List.length - 1

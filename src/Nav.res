@@ -1,7 +1,5 @@
 open Belt
-open ReactNative
 open ReactNative.Style
-// open ReactMultiversal
 
 open Navigators
 
@@ -113,8 +111,8 @@ module TabsScreen = {
             ~title="Summary",
             ~tabBarIcon=tabBarIconProps =>
               <SVGTimeline
-                width={tabBarIconProps.size->Style.dp}
-                height={tabBarIconProps.size->Style.dp}
+                width={tabBarIconProps.size->dp}
+                height={tabBarIconProps.size->dp}
                 fill=tabBarIconProps.color
               />,
             (),
@@ -130,8 +128,8 @@ module TabsScreen = {
             ~title="Goals",
             ~tabBarIcon=tabBarIconProps =>
               <SVGPennant
-                width={tabBarIconProps.size->Style.dp}
-                height={tabBarIconProps.size->Style.dp}
+                width={tabBarIconProps.size->dp}
+                height={tabBarIconProps.size->dp}
                 fill=tabBarIconProps.color
               />,
             (),
@@ -147,8 +145,8 @@ module TabsScreen = {
             ~title=SettingsScreen.title,
             ~tabBarIcon=tabBarIconProps =>
               <SVGSettings
-                width={tabBarIconProps.size->Style.dp}
-                height={tabBarIconProps.size->Style.dp}
+                width={tabBarIconProps.size->dp}
+                height={tabBarIconProps.size->dp}
                 fill=tabBarIconProps.color
               />,
             (),

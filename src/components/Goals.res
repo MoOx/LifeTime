@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let title = "Goals"
@@ -60,11 +61,7 @@ let make = (
       <View style={Predefined.styles["rowSpaceBetween"]}>
         <Text
           allowFontScaling=false
-          style={Style.array([
-            Theme.text["largeTitle"],
-            Theme.text["weight700"],
-            theme.styles["text"],
-          ])}>
+          style={array([Theme.text["largeTitle"], Theme.text["weight700"], theme.styles["text"]])}>
           {title->React.string}
         </Text>
         <View style={Predefined.styles["row"]}>
@@ -75,17 +72,13 @@ let make = (
                   onPress={_ =>
                     forceWelcomeContent_set(forceWelcomeContent => !forceWelcomeContent)}>
                   <View style={Style.style(~opacity=0.10, ())}>
-                    <SVGInfo
-                      width={24.->Style.dp} height={24.->Style.dp} fill=theme.namedColors.text
-                    />
+                    <SVGInfo width={24.->dp} height={24.->dp} fill=theme.namedColors.text />
                   </View>
                 </TouchableOpacity>
                 <Spacer size=S />
                 <TouchableOpacity hitSlop=HitSlops.m onPress={_ => debug_set(debug => !debug)}>
                   <View style={Style.style(~opacity=0.10, ())}>
-                    <SVGScope
-                      width={24.->Style.dp} height={24.->Style.dp} fill=theme.namedColors.text
-                    />
+                    <SVGScope width={24.->dp} height={24.->dp} fill=theme.namedColors.text />
                   </View>
                 </TouchableOpacity>
                 <Spacer size=S />
@@ -95,7 +88,7 @@ let make = (
             testID="Goals_Button_AddAGoal"
             hitSlop=HitSlops.m
             onPress={_ => onNewGoalPress(Goal.Type.serializedGoal)}>
-            <SVGPlus width={24.->Style.dp} height={24.->Style.dp} fill=theme.namedColors.text />
+            <SVGPlus width={24.->dp} height={24.->dp} fill=theme.namedColors.text />
           </TouchableOpacity>
         </View>
       </View>
@@ -104,19 +97,11 @@ let make = (
       ? React.null
       : <>
           <SpacedView vertical=None horizontal=S>
-            <Text
-              style={
-                open Style
-                array([Theme.text["subhead"], theme.styles["textOnDarkLight"]])
-              }>
+            <Text style={array([Theme.text["subhead"], theme.styles["textOnDarkLight"]])}>
               {j`LifeTime lets you visualize the time you spend on everything. This allows you to take more informed decisions about how to use your valuable time.`->React.string}
             </Text>
             <Spacer size=XS />
-            <Text
-              style={
-                open Style
-                array([Theme.text["subhead"], theme.styles["textOnDarkLight"]])
-              }>
+            <Text style={array([Theme.text["subhead"], theme.styles["textOnDarkLight"]])}>
               {j`You can help yourself by adding goals & limits you would like to respect. LifeTime will try to remind you when you successfully achieve your goals & respect your limits and can help your to improve your self-discipline if needed.`->React.string}
             </Text>
           </SpacedView>
@@ -135,11 +120,7 @@ let make = (
                 </SpacedView>
                 <Spacer size=XS />
                 <View style={Predefined.styles["flexGrow"]}>
-                  <Text
-                    style={
-                      open Style
-                      array([Theme.text["body"], theme.styles["text"]])
-                    }>
+                  <Text style={array([Theme.text["body"], theme.styles["text"]])}>
                     {"Add a Goal"->React.string}
                   </Text>
                 </View>
@@ -162,11 +143,7 @@ let make = (
                 </SpacedView>
                 <Spacer size=XS />
                 <View style={Predefined.styles["flexGrow"]}>
-                  <Text
-                    style={
-                      open Style
-                      array([Theme.text["body"], theme.styles["text"]])
-                    }>
+                  <Text style={array([Theme.text["body"], theme.styles["text"]])}>
                     {"Add a Limit"->React.string}
                   </Text>
                 </View>
@@ -178,11 +155,7 @@ let make = (
     <SpacedView horizontal=XS vertical=None>
       {!debug
         ? React.null
-        : <Text
-            style={
-              open Style
-              array([theme.styles["textOnDarkLight"], textStyle(~fontSize=7.5, ())])
-            }>
+        : <Text style={array([theme.styles["textOnDarkLight"], textStyle(~fontSize=7.5, ())])}>
             {"remainingMinThisWeek: "->React.string}
             {remainingMinThisWeek->Date.minToString->React.string}
             {"\n"->React.string}

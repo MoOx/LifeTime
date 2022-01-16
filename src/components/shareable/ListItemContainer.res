@@ -1,4 +1,5 @@
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 @react.component
@@ -12,7 +13,7 @@ let make = (
 ) => {
   // let theme = Theme.useTheme(AppSettings.useTheme())
   <View
-    style={Style.arrayOption([
+    style={arrayOption([
       Some(Predefined.styles["flexGrow"]),
       Some(Predefined.styles["rowCenter"]),
       // Some(theme.styles["background"]),
@@ -22,12 +23,8 @@ let make = (
     {left}
     <View style={Predefined.styles["flex"]}>
       <SpacedView vertical=XS horizontal=None style={Predefined.styles["flex"]}>
-        <View style={Style.array([Predefined.styles["flexGrow"], Predefined.styles["row"]])}>
-          <View
-            style={
-              open Style
-              array([Predefined.styles["flex"], Predefined.styles["justifyCenter"]])
-            }>
+        <View style={array([Predefined.styles["flexGrow"], Predefined.styles["row"]])}>
+          <View style={array([Predefined.styles["flex"], Predefined.styles["justifyCenter"]])}>
             {children}
           </View>
           {right}

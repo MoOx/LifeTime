@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let title = "Settings"
@@ -59,7 +60,7 @@ let make = () => {
         )
       }}
       left={<SVGExport
-        width={NamedIcon.size->Style.dp} height={NamedIcon.size->Style.dp} fill=theme.colors.blue
+        width={NamedIcon.size->dp} height={NamedIcon.size->dp} fill=theme.colors.blue
       />}>
       <ListItemText color={theme.colors.blue}> {"Export Backup"->React.string} </ListItemText>
     </ListItem>
@@ -76,7 +77,7 @@ let make = () => {
           (),
         )}
       left={<SVGImport
-        width={NamedIcon.size->Style.dp} height={NamedIcon.size->Style.dp} fill=theme.colors.blue
+        width={NamedIcon.size->dp} height={NamedIcon.size->dp} fill=theme.colors.blue
       />}>
       <ListItemText color={theme.colors.blue}> {"Import Backup"->React.string} </ListItemText>
     </ListItem>

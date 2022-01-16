@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 @react.component
@@ -52,20 +53,14 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
   <>
     <StatusBarFormSheet />
     <Animated.ScrollView
-      style={
-        open Style
-        array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])
-      }
-      contentContainerStyle={
-        open Style
-        viewStyle(
-          ~paddingTop=(Theme.isFormSheetSupported ? 0. : safeAreaInsets.top)->dp,
-          ~paddingBottom=safeAreaInsets.bottom->dp,
-          ~paddingLeft=safeAreaInsets.left->dp,
-          ~paddingRight=safeAreaInsets.right->dp,
-          (),
-        )
-      }
+      style={array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])}
+      contentContainerStyle={viewStyle(
+        ~paddingTop=(Theme.isFormSheetSupported ? 0. : safeAreaInsets.top)->dp,
+        ~paddingBottom=safeAreaInsets.bottom->dp,
+        ~paddingLeft=safeAreaInsets.left->dp,
+        ~paddingRight=safeAreaInsets.right->dp,
+        (),
+      )}
       showsHorizontalScrollIndicator=false
       showsVerticalScrollIndicator=false
       scrollEventThrottle=16
@@ -98,10 +93,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
             hitSlop=HitSlops.m onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
             <Text
               allowFontScaling=false
-              style={
-                open Style
-                array([Theme.text["body"], Theme.text["weight400"], textStyle(~color, ())])
-              }>
+              style={array([Theme.text["body"], Theme.text["weight400"], textStyle(~color, ())])}>
               {"Cancel"->React.string}
             </Text>
           </TouchableOpacity>}
@@ -109,14 +101,11 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
           <TouchableOpacity hitSlop=HitSlops.m disabled onPress>
             <Text
               allowFontScaling=false
-              style={
-                open Style
-                array([
-                  Theme.text["body"],
-                  Theme.text["weight600"],
-                  textStyle(~color=isReadyToSave ? color : theme.colors.gray3, ()),
-                ])
-              }>
+              style={array([
+                Theme.text["body"],
+                Theme.text["weight600"],
+                textStyle(~color=isReadyToSave ? color : theme.colors.gray3, ()),
+              ])}>
               {"Save"->React.string}
             </Text>
           </TouchableOpacity>}

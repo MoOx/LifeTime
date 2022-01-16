@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 // react-native-web
@@ -7,7 +8,6 @@ open ReactMultiversal
 external createWebElementFromString: (string, 'props) => React.element = "createElement"
 
 let styles = {
-  open Style
   StyleSheet.create({
     "aText": textStyle(~textDecorationLine=#underline, ()),
     "image": imageStyle(~maxWidth=100.->pct, ()),
@@ -29,13 +29,7 @@ module A = {
     let theme = Theme.useTheme(AppSettings.useTheme())
 
     <Link href={props["href"]}>
-      <Text
-        style={
-          open Style
-          array([styles["aText"], theme.styles["textMain"]])
-        }>
-        children
-      </Text>
+      <Text style={array([styles["aText"], theme.styles["textMain"]])}> children </Text>
     </Link>
   }
 }
@@ -49,11 +43,7 @@ module H1 = {
       <Spacer />
       <Text
         allowFontScaling=false
-        style={Style.array([
-          Theme.text["largeTitle"],
-          Theme.text["weight700"],
-          theme.styles["text"],
-        ])}>
+        style={array([Theme.text["largeTitle"], Theme.text["weight700"], theme.styles["text"]])}>
         children
       </Text>
       <Spacer />
@@ -68,11 +58,7 @@ module H2 = {
 
     <View accessibilityRole=#header>
       <Spacer size=S />
-      <Text
-        style={
-          open Style
-          array([Theme.text["title1"], Theme.text["weight700"], theme.styles["text"]])
-        }>
+      <Text style={array([Theme.text["title1"], Theme.text["weight700"], theme.styles["text"]])}>
         children
       </Text>
       <Spacer size=S />
@@ -87,11 +73,7 @@ module H3 = {
 
     <View accessibilityRole=#header>
       <Spacer size=XS />
-      <Text
-        style={
-          open Style
-          array([Theme.text["title2"], Theme.text["weight700"], theme.styles["text"]])
-        }>
+      <Text style={array([Theme.text["title2"], Theme.text["weight700"], theme.styles["text"]])}>
         children
       </Text>
       <Spacer size=XS />
@@ -106,11 +88,7 @@ module H4 = {
 
     <View accessibilityRole=#header>
       <Spacer size=XXS />
-      <Text
-        style={
-          open Style
-          array([Theme.text["title3"], Theme.text["weight700"], theme.styles["text"]])
-        }>
+      <Text style={array([Theme.text["title3"], Theme.text["weight700"], theme.styles["text"]])}>
         children
       </Text>
       <Spacer size=XXS />
@@ -125,11 +103,7 @@ module H5 = {
 
     <View accessibilityRole=#header>
       <Spacer size=XXS />
-      <Text
-        style={
-          open Style
-          array([Theme.text["headline"], Theme.text["weight700"], theme.styles["text"]])
-        }>
+      <Text style={array([Theme.text["headline"], Theme.text["weight700"], theme.styles["text"]])}>
         children
       </Text>
       <Spacer size=XXS />
@@ -143,11 +117,7 @@ module H6 = {
     let theme = Theme.useTheme(AppSettings.useTheme())
 
     <View accessibilityRole=#header>
-      <Text
-        style={
-          open Style
-          array([Theme.text["headline"], Theme.text["weight600"], theme.styles["text"]])
-        }>
+      <Text style={array([Theme.text["headline"], Theme.text["weight600"], theme.styles["text"]])}>
         children
       </Text>
       <Spacer size=XXS />
@@ -161,14 +131,7 @@ module P = {
     let theme = Theme.useTheme(AppSettings.useTheme())
 
     <View>
-      <Text
-        style={
-          open Style
-          array([Theme.text["body"], theme.styles["text"]])
-        }>
-        children
-      </Text>
-      <Spacer />
+      <Text style={array([Theme.text["body"], theme.styles["text"]])}> children </Text> <Spacer />
     </View>
   }
 }
@@ -178,13 +141,7 @@ module TextNode = {
   let make = (~props as _=Js.Obj.empty(), ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme())
 
-    <Text
-      style={
-        open Style
-        array([Theme.text["body"], theme.styles["text"]])
-      }>
-      children
-    </Text>
+    <Text style={array([Theme.text["body"], theme.styles["text"]])}> children </Text>
   }
 }
 
@@ -196,19 +153,12 @@ module Image = {
           "img",
           {
             "style": {
-              open Style
               array([styles["image"]])
             },
             "src": props["src"],
           },
         )
-      : <ImageFromUri
-          style={
-            open Style
-            array([styles["image"]])
-          }
-          uri={props["src"]}
-        />
+      : <ImageFromUri style={array([styles["image"]])} uri={props["src"]} />
 }
 
 module Ul = {
@@ -221,16 +171,10 @@ module Li = {
   let make = (~props as _=Js.Obj.empty(), ~bullet=j`•`, ~children) => {
     let theme = Theme.useTheme(AppSettings.useTheme())
     <View style={styles["liWrapper"]}>
-      <Text style={Style.array([styles["liBullet"], Theme.text["body"], theme.styles["text"]])}>
+      <Text style={array([styles["liBullet"], Theme.text["body"], theme.styles["text"]])}>
         {bullet->React.string}
       </Text>
-      <Text
-        style={
-          open Style
-          array([Theme.text["body"], theme.styles["text"]])
-        }>
-        children
-      </Text>
+      <Text style={array([Theme.text["body"], theme.styles["text"]])}> children </Text>
     </View>
   }
 }
@@ -258,11 +202,7 @@ module Details = {
 
     <View>
       <TouchableOpacity onPress=handleClick>
-        <Text
-          style={
-            open Style
-            array([Theme.text["callout"], theme.styles["text"]])
-          }>
+        <Text style={array([Theme.text["callout"], theme.styles["text"]])}>
           {(isExpanded ? j`▼ ` : j`▶ `)->React.string}
           {summary->Option.getWithDefault("Click to see details"->React.string)}
         </Text>

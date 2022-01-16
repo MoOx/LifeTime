@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 @react.component
@@ -127,8 +128,7 @@ let make = (~onGetStarted, ~onFiltersPress, ~today, ~todayDates, ~last5Weeks) =>
     ))
   | (Some(OnlySkippedActivities), Some(None))
   | (Some(None), Some(OnlySkippedActivities))
-  | (Some(OnlySkippedActivities), Some(OnlySkippedActivities))
-    when settings.activitiesSkippedFlag =>
+  | (Some(OnlySkippedActivities), Some(OnlySkippedActivities)) if settings.activitiesSkippedFlag =>
     Some((
       "LifeTime could not find any recent events that aren't part of skipped activities.",
       [
@@ -180,46 +180,33 @@ let make = (~onGetStarted, ~onFiltersPress, ~today, ~todayDates, ~last5Weeks) =>
   messagesNoEvents
   ->Option.map(((messageNoEvents, messageNoEventsButtons)) =>
     <Animated.View
-      style={
-        open Style
-        viewStyle(
-          ~transform=[scale(~scale=animatedMessageNoEvents.current->Animated.StyleProp.float)],
-          ~opacity=animatedMessageNoEvents.current->Animated.StyleProp.float,
-          (),
-        )
-      }>
+      style={viewStyle(
+        ~transform=[scale(~scale=animatedMessageNoEvents.current->Animated.StyleProp.float)],
+        ~opacity=animatedMessageNoEvents.current->Animated.StyleProp.float,
+        (),
+      )}>
       <SpacedView>
         <View
-          style={
-            open Style
-            viewStyle(
-              ~shadowColor="#000",
-              ~shadowOffset=offset(~height=3., ~width=1.),
-              ~shadowOpacity=0.1,
-              ~shadowRadius=6.,
-              (),
-            )
-          }>
+          style={viewStyle(
+            ~shadowColor="#000",
+            ~shadowOffset=offset(~height=3., ~width=1.),
+            ~shadowOpacity=0.1,
+            ~shadowRadius=6.,
+            (),
+          )}>
           <SpacedView
             horizontal=XS
             vertical=XXS
-            style={
-              open Style
-              array([
-                Predefined.styles["rowSpaceBetween"],
-                theme.styles["backgroundMain"],
-                viewStyle(
-                  ~borderTopLeftRadius=Theme.Radius.card,
-                  ~borderTopRightRadius=Theme.Radius.card,
-                  (),
-                ),
-              ])
-            }>
-            <Text
-              style={
-                open Style
-                textStyle(~color="#fff", ())
-              }>
+            style={array([
+              Predefined.styles["rowSpaceBetween"],
+              theme.styles["backgroundMain"],
+              viewStyle(
+                ~borderTopLeftRadius=Theme.Radius.card,
+                ~borderTopRightRadius=Theme.Radius.card,
+                (),
+              ),
+            ])}>
+            <Text style={textStyle(~color="#fff", ())}>
               {"No Events Available"->React.string}
             </Text>
             <TouchableOpacity
@@ -235,38 +222,28 @@ let make = (~onGetStarted, ~onFiltersPress, ~today, ~todayDates, ~last5Weeks) =>
                   (),
                 )
               }}>
-              <SVGXmark width={16.->Style.dp} height={16.->Style.dp} fill="#fff" />
+              <SVGXmark width={16.->dp} height={16.->dp} fill="#fff" />
             </TouchableOpacity>
           </SpacedView>
           <SpacedView
             horizontal=M
             vertical=XS
-            style={
-              open Style
-              array([
-                Predefined.styles["alignCenter"],
-                theme.styles["background"],
-                viewStyle(
-                  ~borderBottomLeftRadius=Theme.Radius.card,
-                  ~borderBottomRightRadius=Theme.Radius.card,
-                  (),
-                ),
-              ])
-            }>
+            style={array([
+              Predefined.styles["alignCenter"],
+              theme.styles["background"],
+              viewStyle(
+                ~borderBottomLeftRadius=Theme.Radius.card,
+                ~borderBottomRightRadius=Theme.Radius.card,
+                (),
+              ),
+            ])}>
             <Spacer size=S />
             <Text
-              style={
-                open Style
-                array([Theme.text["title1"], Theme.text["weight700"], theme.styles["text"]])
-              }>
+              style={array([Theme.text["title1"], Theme.text["weight700"], theme.styles["text"]])}>
               {"No Events"->React.string}
             </Text>
             <Spacer size=XS />
-            <Text
-              style={
-                open Style
-                array([Theme.text["subhead"], theme.styles["text"]])
-              }>
+            <Text style={array([Theme.text["subhead"], theme.styles["text"]])}>
               {messageNoEvents->React.string}
             </Text>
             <Spacer size=M />

@@ -1,11 +1,19 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let numberOfActivitiesToShow = 8
 
 @react.component
-let make = (~activities, ~mapTitleDuration, ~onActivityPress, ~onFiltersPress, ~startDate, ~endDate) => {
+let make = (
+  ~activities,
+  ~mapTitleDuration,
+  ~onActivityPress,
+  ~onFiltersPress,
+  ~startDate,
+  ~endDate,
+) => {
   let theme = Theme.useTheme(AppSettings.useTheme())
   let (activitiesToShow, setActivitiesToShow) = React.useState(() => numberOfActivitiesToShow)
 
@@ -41,7 +49,7 @@ let make = (~activities, ~mapTitleDuration, ~onActivityPress, ~onFiltersPress, ~
               <Center>
                 <Spacer />
                 <Text
-                  style={Style.array([
+                  style={array([
                     Theme.text["title3"],
                     Theme.text["weight500"],
                     theme.styles["textLight2"],
@@ -49,7 +57,7 @@ let make = (~activities, ~mapTitleDuration, ~onActivityPress, ~onFiltersPress, ~
                   {"No activities"->React.string}
                 </Text>
                 <Spacer size=XXS />
-                <Text style={Style.array([Theme.text["footnote"], theme.styles["textLight2"]])}>
+                <Text style={array([Theme.text["footnote"], theme.styles["textLight2"]])}>
                   {"You should add some events to your calendar or activate more calendars."->React.string}
                 </Text>
                 <Spacer />
@@ -70,45 +78,32 @@ let make = (~activities, ~mapTitleDuration, ~onActivityPress, ~onFiltersPress, ~
                     onPress={_ => onActivityPress(title, (startDate, endDate))}
                     left={<NamedIcon name=iconName fill=color />}
                     right={<SVGChevronright
-                      width={14.->Style.dp}
-                      height={14.->Style.dp}
-                      fill=Predefined.Colors.Ios.light.gray4
+                      width={14.->dp} height={14.->dp} fill=Predefined.Colors.Ios.light.gray4
                     />}>
                     <Text
-                      style={
-                        open Style
-                        array([Theme.text["callout"], theme.styles["text"]])
-                      }
-                      numberOfLines=1>
+                      style={array([Theme.text["callout"], theme.styles["text"]])} numberOfLines=1>
                       {title->React.string}
                     </Text>
                     <Spacer size=XXS />
                     <Row style={Predefined.styles["alignCenter"]}>
                       <View
-                        style={
-                          open Style
-                          array([
-                            theme.styles["backgroundGray3"],
-                            viewStyle(
-                              // ~backgroundColor=color,
+                        style={array([
+                          theme.styles["backgroundGray3"],
+                          viewStyle(
+                            // ~backgroundColor=color,
 
-                              ~width=(totalDurationInMin /.
-                              maxDurationInMin *.
-                              availableWidthForBar)->dp,
-                              ~height=6.->dp,
-                              ~borderRadius=6.,
-                              ~overflow=#hidden,
-                              (),
-                            ),
-                          ])
-                        }
+                            ~width=(totalDurationInMin /. maxDurationInMin *. availableWidthForBar)
+                              ->dp,
+                            ~height=6.->dp,
+                            ~borderRadius=6.,
+                            ~overflow=#hidden,
+                            (),
+                          ),
+                        ])}
                       />
                       <Spacer size=XXS />
                       <Text
-                        style={
-                          open Style
-                          array([Theme.text["footnote"], theme.styles["textLight2"]])
-                        }
+                        style={array([Theme.text["footnote"], theme.styles["textLight2"]])}
                         numberOfLines=1
                         adjustsFontSizeToFit=true>
                         {durationString->React.string}
@@ -125,10 +120,10 @@ let make = (~activities, ~mapTitleDuration, ~onActivityPress, ~onFiltersPress, ~
                 ? <Row>
                     <Spacer size=L />
                     <View
-                      style={
-                        open Style
-                        array([Predefined.styles["rowSpaceBetween"], Predefined.styles["flexGrow"]])
-                      }>
+                      style={array([
+                        Predefined.styles["rowSpaceBetween"],
+                        Predefined.styles["flexGrow"],
+                      ])}>
                       {mapTitleDuration->Array.length > activitiesToShow
                         ? <TouchableOpacity
                             onPress={_ =>
@@ -137,10 +132,7 @@ let make = (~activities, ~mapTitleDuration, ~onActivityPress, ~onFiltersPress, ~
                               )}>
                             <SpacedView vertical=XS horizontal=S>
                               <Text
-                                style={
-                                  open Style
-                                  array([Theme.text["callout"], theme.styles["textBlue"]])
-                                }>
+                                style={array([Theme.text["callout"], theme.styles["textBlue"]])}>
                                 {"Show More"->React.string}
                               </Text>
                             </SpacedView>
@@ -155,10 +147,7 @@ let make = (~activities, ~mapTitleDuration, ~onActivityPress, ~onFiltersPress, ~
                               )}>
                             <SpacedView vertical=XS horizontal=S>
                               <Text
-                                style={
-                                  open Style
-                                  array([Theme.text["callout"], theme.styles["textBlue"]])
-                                }>
+                                style={array([Theme.text["callout"], theme.styles["textBlue"]])}>
                                 {"Show Less"->React.string}
                               </Text>
                             </SpacedView>

@@ -1,4 +1,5 @@
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 @react.component
@@ -9,17 +10,14 @@ let make = (~navigation, ~route as _) => {
   <>
     <StatusBarFormSheet />
     <Animated.ScrollView
-      style={Style.array([Predefined.styles["flexGrow"], theme.styles["background"]])}
-      contentContainerStyle={
-        open Style
-        viewStyle(
-          ~paddingTop=(Theme.isFormSheetSupported ? 0. : safeAreaInsets.top)->dp,
-          ~paddingBottom=safeAreaInsets.bottom->dp,
-          ~paddingLeft=safeAreaInsets.left->dp,
-          ~paddingRight=safeAreaInsets.right->dp,
-          (),
-        )
-      }
+      style={array([Predefined.styles["flexGrow"], theme.styles["background"]])}
+      contentContainerStyle={viewStyle(
+        ~paddingTop=(Theme.isFormSheetSupported ? 0. : safeAreaInsets.top)->dp,
+        ~paddingBottom=safeAreaInsets.bottom->dp,
+        ~paddingLeft=safeAreaInsets.left->dp,
+        ~paddingRight=safeAreaInsets.right->dp,
+        (),
+      )}
       showsHorizontalScrollIndicator=false
       showsVerticalScrollIndicator=false
       scrollEventThrottle=16
@@ -52,10 +50,7 @@ let make = (~navigation, ~route as _) => {
             hitSlop=HitSlops.m onPress={_ => navigation->Navigators.RootStack.Navigation.goBack()}>
             <Text
               allowFontScaling=false
-              style={
-                open Style
-                array([Theme.text["body"], Theme.text["weight600"], style(~color, ())])
-              }>
+              style={array([Theme.text["body"], Theme.text["weight600"], style(~color, ())])}>
               {"Done"->React.string}
             </Text>
           </TouchableOpacity>}

@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 type button = {
   icon: option<React.element>,
   label: string,
@@ -10,18 +11,15 @@ type button = {
 let buttonWidth = 80.
 
 let styles = {
-  open Style
-  {
-    "container": viewStyle(~flexGrow=1., ~flexShrink=1., ()),
-    "button": viewStyle(
-      ~flex=1.,
-      ~alignItems=#center,
-      ~justifyContent=#center,
-      ~width=buttonWidth->dp,
-      (),
-    ),
-    "swipeHandleContainer": viewStyle(~justifyContent=#center, ~alignItems=#center, ()),
-  }
+  "container": viewStyle(~flexGrow=1., ~flexShrink=1., ()),
+  "button": viewStyle(
+    ~flex=1.,
+    ~alignItems=#center,
+    ~justifyContent=#center,
+    ~width=buttonWidth->dp,
+    (),
+  ),
+  "swipeHandleContainer": viewStyle(~justifyContent=#center, ~alignItems=#center, ()),
 }->StyleSheet.create
 
 @react.component
@@ -85,24 +83,24 @@ let make = (
         }}
         style={Style.viewStyle(~zIndex=buttons->Array.length - index, ())}>
         <Animated.View
-          style={Style.array([
+          style={array([
             StyleSheet.absoluteFill,
             Style.viewStyle(
               ~backgroundColor=button.color,
               ~transform=[{translateX}],
               // width => cheating max level
               // we stretch the background color to the max possible width of the item
-              ~width=widthRef.current->Style.dp,
+              ~width=widthRef.current->dp,
               (),
             ),
           ])}
         />
         <Animated.View
-          style={Style.array([styles["button"], Style.viewStyle(~transform=[{translateX}], ())])}>
+          style={array([styles["button"], Style.viewStyle(~transform=[{translateX}], ())])}>
           {button.icon->Option.getWithDefault(React.null)}
           <Text
             numberOfLines={1}
-            style={Style.array([
+            style={array([
               Theme.text["subhead"],
               Theme.text["weight500"],
               theme.styles["textOnMain"],
@@ -140,8 +138,7 @@ let make = (
               swipeableRef.current
               ->Js.Nullable.toOption
               ->Option.map(swipeable => {
-                open ReactNativeGestureHandler
-                swipeable->Swipeable.close
+                swipeable->ReactNativeGestureHandler.Swipeable.close
               })
               ->ignore
               // we cancel removal immediately, otherwise, if auto-close is called more than once

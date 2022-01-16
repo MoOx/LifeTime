@@ -1,4 +1,5 @@
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let title = "Settings"
@@ -9,11 +10,7 @@ let make = (~navigation, ~route as _) => {
   let safeAreaInsets = ReactNativeSafeAreaContext.useSafeAreaInsets()
   let scrollYAnimatedValue = React.useRef(Animated.Value.create(0.))
   <>
-    <View
-      style={
-        open Style
-        array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])
-      }>
+    <View style={array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])}>
       <StickyHeader
         scrollYAnimatedValue=scrollYAnimatedValue.current
         scrollOffsetY=80.
@@ -25,19 +22,16 @@ let make = (~navigation, ~route as _) => {
       />
       <Animated.ScrollView
         testID="SettingsScreen_ScrollView"
-        style={
-          open Style
-          array([
-            Predefined.styles["flexGrow"],
-            viewStyle(
-              ~marginTop=safeAreaInsets.top->dp,
-              // no bottom, handled by bottom tabs
-              ~paddingLeft=safeAreaInsets.left->dp,
-              ~paddingRight=safeAreaInsets.right->dp,
-              (),
-            ),
-          ])
-        }
+        style={array([
+          Predefined.styles["flexGrow"],
+          viewStyle(
+            ~marginTop=safeAreaInsets.top->dp,
+            // no bottom, handled by bottom tabs
+            ~paddingLeft=safeAreaInsets.left->dp,
+            ~paddingRight=safeAreaInsets.right->dp,
+            (),
+          ),
+        ])}
         showsHorizontalScrollIndicator=false
         showsVerticalScrollIndicator=false
         scrollEventThrottle=16

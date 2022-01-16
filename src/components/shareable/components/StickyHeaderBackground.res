@@ -1,4 +1,5 @@
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 @react.component
@@ -7,10 +8,11 @@ let make = () => {
   Platform.os === Platform.ios
     ? <>
         <View
-          style={
-            open Style
-            array([StyleSheet.absoluteFill, theme.styles["background"], style(~opacity=0.8, ())])
-          }
+          style={array([
+            StyleSheet.absoluteFill,
+            theme.styles["background"],
+            style(~opacity=0.8, ()),
+          ])}
         />
         <BlurView
           nativeBlurType={switch theme.mode {
@@ -19,23 +21,16 @@ let make = () => {
           }}
           style=StyleSheet.absoluteFill
         />
-        <View
-          style={
-            open Style
-            array([StyleSheet.absoluteFill, Predefined.styles["justifyEnd"]])
-          }>
+        <View style={array([StyleSheet.absoluteFill, Predefined.styles["justifyEnd"]])}>
           <Separator style={theme.styles["separatorLightOnBackground"]} />
         </View>
       </>
     : <View
-        style={
-          open Style
-          array([
-            StyleSheet.absoluteFill,
-            Predefined.styles["justifyEnd"],
-            theme.styles["background"],
-          ])
-        }>
+        style={array([
+          StyleSheet.absoluteFill,
+          Predefined.styles["justifyEnd"],
+          theme.styles["background"],
+        ])}>
         <Separator style={theme.styles["separatorLightOnBackground"]} />
       </View>
 }

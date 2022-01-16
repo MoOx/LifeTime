@@ -1,7 +1,7 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
-
 
 @react.component
 let make = (
@@ -36,7 +36,7 @@ let make = (
     <Row>
       <Spacer size=XS />
       <BlockHeading
-        style={Style.array([theme.styles["background"], theme.styles["text"]])}
+        style={array([theme.styles["background"], theme.styles["text"]])}
         text={startDate->Js.Date.getDate->Belt.Float.toString ++
         " - " ++
         endDate->Js.Date.getDate->Belt.Float.toString ++
@@ -51,7 +51,7 @@ let make = (
         <Center>
           <Spacer />
           <Text
-            style={Style.array([
+            style={array([
               Theme.text["title3"],
               Theme.text["weight400"],
               theme.styles["textLight2"],
@@ -59,7 +59,7 @@ let make = (
             {"No events"->React.string}
           </Text>
           <Spacer size=XXS />
-          <Text style={Style.array([Theme.text["footnote"], theme.styles["textLight2"]])}>
+          <Text style={array([Theme.text["footnote"], theme.styles["textLight2"]])}>
             {"You should add some events to your calendar or activate more calendars."->React.string}
           </Text>
           <Spacer />
@@ -78,7 +78,7 @@ let make = (
                 <View>
                   <View style={Predefined.styles["row"]}>
                     <Text
-                      style={Style.array([Theme.text["callout"], theme.styles["text"]])}
+                      style={array([Theme.text["callout"], theme.styles["text"]])}
                       numberOfLines=1
                       adjustsFontSizeToFit=true>
                       {(event.startDate
@@ -87,7 +87,7 @@ let make = (
                       ->Date.dayShortString ++ " - ")->React.string}
                     </Text>
                     <Text
-                      style={Style.array([Theme.text["callout"], theme.styles["textLight1"]])}
+                      style={array([Theme.text["callout"], theme.styles["textLight1"]])}
                       numberOfLines=1
                       adjustsFontSizeToFit=true>
                       {(event.startDate->Js.Date.fromString->Js.Date.getDate->Belt.Float.toString ++
@@ -97,26 +97,20 @@ let make = (
                   </View>
                   <Row style={Predefined.styles["alignCenter"]}>
                     <View
-                      style={
-                        open Style
-                        array([
-                          theme.styles["backgroundGray3"],
-                          viewStyle(
-                            ~width=(duration /. maxDuration *. availableWidthForBar)->dp,
-                            ~height=6.->dp,
-                            ~borderRadius=6.,
-                            ~overflow=#hidden,
-                            (),
-                          ),
-                        ])
-                      }
+                      style={array([
+                        theme.styles["backgroundGray3"],
+                        viewStyle(
+                          ~width=(duration /. maxDuration *. availableWidthForBar)->dp,
+                          ~height=6.->dp,
+                          ~borderRadius=6.,
+                          ~overflow=#hidden,
+                          (),
+                        ),
+                      ])}
                     />
                     <Spacer size=XXS />
                     <Text
-                      style={
-                        open Style
-                        array([Theme.text["footnote"], theme.styles["textLight1"]])
-                      }
+                      style={array([Theme.text["footnote"], theme.styles["textLight1"]])}
                       numberOfLines=1
                       adjustsFontSizeToFit=true>
                       {durationString->React.string}
@@ -128,13 +122,13 @@ let make = (
                 <SpacedView vertical=XS horizontal=None>
                   <View style={Predefined.styles["row"]}>
                     <View style={Predefined.styles["flexGrow"]}>
-                      <Text style={Style.array([Theme.text["callout"], theme.styles["textLight1"]])}>
+                      <Text style={array([Theme.text["callout"], theme.styles["textLight1"]])}>
                         {Js.Date.fromString(event.startDate)
                         ->Js.Date.toTimeString
                         ->Js.String2.slice(~from=0, ~to_=5)
                         ->React.string}
                       </Text>
-                      <Text style={Style.array([Theme.text["callout"], theme.styles["text"]])}>
+                      <Text style={array([Theme.text["callout"], theme.styles["text"]])}>
                         {Js.Date.fromString(event.endDate)
                         ->Js.Date.toTimeString
                         ->Js.String2.slice(~from=0, ~to_=5)

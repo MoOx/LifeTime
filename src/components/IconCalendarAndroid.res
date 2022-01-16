@@ -1,4 +1,5 @@
 open ReactNative
+open ReactNative.Style
 open ReactNativeSvg
 
 @react.component
@@ -20,11 +21,11 @@ let make = (~style=?) => {
       <ReactNativeSvg.Text
         fill="#4285F4"
         fontFamily="Roboto"
-        fontSize={32.->Style.dp}
-        letterSpacing={-1.->Style.dp}
+        fontSize={32.->dp}
+        letterSpacing={-1.->dp}
         fontWeight=#_500
-        x={50.->Style.pct}
-        y={54.->Style.pct}
+        x={50.->pct}
+        y={54.->pct}
         alignmentBaseline=#middle
         textAnchor=#middle>
         {today->Date.dateString->React.string}

@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let title = "Goals"
@@ -170,24 +171,17 @@ let make = (
 
   <SpacedView key=goal.id horizontal=XS vertical=XS>
     <SpacedView
-      style={
-        open Style
-        viewStyle(~backgroundColor, ~borderRadius=Theme.Radius.button, ~overflow=#hidden, ())
-      }
+      style={viewStyle(~backgroundColor, ~borderRadius=Theme.Radius.button, ~overflow=#hidden, ())}
       horizontal=M
       vertical=S>
       {!debug
         ? React.null
-        : <View
-            style={
-              open Style
-              viewStyle(~position=#absolute, ~bottom=5.->dp, ~left=30.->pct, ())
-            }>
+        : <View style={viewStyle(~position=#absolute, ~bottom=5.->dp, ~left=30.->pct, ())}>
             <Text
-              style={
-                open Style
-                array([Theme.styleSheets.dark["textOnDarkLight"], textStyle(~fontSize=7.5, ())])
-              }>
+              style={array([
+                Theme.styleSheets.dark["textOnDarkLight"],
+                textStyle(~fontSize=7.5, ()),
+              ])}>
               {"currentTime: "->React.string}
               {currentTime->Date.minToString->React.string}
               {"\n"->React.string}
@@ -219,43 +213,32 @@ let make = (
               {canBeDone->string_of_bool->React.string}
             </Text>
           </View>}
-      <View
-        style={
-          open Style
-          array([StyleSheet.absoluteFill])
-        }>
+      <View style={array([StyleSheet.absoluteFill])}>
         <LinearGradientView
-          width={100.->Style.pct}
-          height={100.->Style.pct}
+          width={100.->pct}
+          height={100.->pct}
           stops=[
             {
-              offset: 0.->Style.dp,
+              offset: 0.->dp,
               stopColor: "#000",
               stopOpacity: 0.->ReactNativeSvg.opacity,
             },
             {
-              offset: 1.->Style.dp,
+              offset: 1.->dp,
               stopColor: "#000",
               stopOpacity: 0.5->ReactNativeSvg.opacity,
             },
           ]
         />
       </View>
-      <View
-        style={
-          open Style
-          array([Predefined.styles["rowSpaceBetween"], Predefined.styles["alignStart"]])
-        }>
+      <View style={array([Predefined.styles["rowSpaceBetween"], Predefined.styles["alignStart"]])}>
         <View style={Predefined.styles["flex"]}>
           <Text
-            style={
-              open Style
-              array([
-                Theme.text["caption1"],
-                Theme.text["weight700"],
-                Theme.styleSheets.dark["textOnDarkLight"],
-              ])
-            }>
+            style={array([
+              Theme.text["caption1"],
+              Theme.text["weight700"],
+              Theme.styleSheets.dark["textOnDarkLight"],
+            ])}>
             {switch goal.mode->Goal.Type.fromSerialized {
             | Some(Goal) => "Goal"
             | Some(Limit) => "Limit"
@@ -265,18 +248,15 @@ let make = (
             ->React.string}
           </Text>
           <Text
-            style={
-              open Style
-              array([Theme.text["title1"], Theme.text["weight500"], Theme.styleSheets.dark["text"]])
-            }
+            style={array([
+              Theme.text["title1"],
+              Theme.text["weight500"],
+              Theme.styleSheets.dark["text"],
+            ])}
             numberOfLines=1>
             {goalTitle->React.string}
           </Text>
-          <Text
-            style={
-              open Style
-              array([Theme.text["footnote"], Theme.styleSheets.dark["textOnDarkLight"]])
-            }>
+          <Text style={array([Theme.text["footnote"], Theme.styleSheets.dark["textOnDarkLight"]])}>
             {{
               let durationInMinutes =
                 Js.Date.makeWithYMDHM(
@@ -317,24 +297,17 @@ let make = (
         <TouchableOpacity
           hitSlop=HitSlops.m
           onPress={_ => onEditGoalPress(goal.id)}
-          style={
-            open Style
-            viewStyle(
-              ~backgroundColor="rgba(255,255,255,0.1)",
-              ~borderRadius=100.,
-              ~padding=2.->dp,
-              (),
-            )
-          }>
-          <SVGMore width={24.->Style.dp} height={24.->Style.dp} fill="rgba(255,255,255,0.75)" />
+          style={viewStyle(
+            ~backgroundColor="rgba(255,255,255,0.1)",
+            ~borderRadius=100.,
+            ~padding=2.->dp,
+            (),
+          )}>
+          <SVGMore width={24.->dp} height={24.->dp} fill="rgba(255,255,255,0.75)" />
         </TouchableOpacity>
       </View>
       <Spacer />
-      <View
-        style={
-          open Style
-          array([Predefined.styles["rowSpaceBetween"], Predefined.styles["alignEnd"]])
-        }>
+      <View style={array([Predefined.styles["rowSpaceBetween"], Predefined.styles["alignEnd"]])}>
         <ActivityRings
           width=48.
           strokeWidth=10.
@@ -343,14 +316,10 @@ let make = (
           rings=[ring]
           shadowSolidSize={2.}
         />
-        <View
-          style={
-            open Style
-            array([Predefined.styles["row"], Predefined.styles["alignCenter"]])
-          }>
+        <View style={array([Predefined.styles["row"], Predefined.styles["alignCenter"]])}>
           {
-            let width = 36.->Style.dp
-            let height = 36.->Style.dp
+            let width = 36.->dp
+            let height = 36.->dp
             let fill = "rgba(255,255,255,0.1)"
             switch goal.mode->Goal.Type.fromSerialized {
             | Some(Goal) => <SVGScope width height fill />
@@ -361,26 +330,20 @@ let make = (
           <Spacer size=XS />
           <View>
             <Text
-              style={
-                open Style
-                array([
-                  Theme.text["caption1"],
-                  Theme.text["weight300"],
-                  Theme.styleSheets.dark["textOnDarkLight"],
-                ])
-              }>
+              style={array([
+                Theme.text["caption1"],
+                Theme.text["weight300"],
+                Theme.styleSheets.dark["textOnDarkLight"],
+              ])}>
               {"Daily Average"->React.string}
             </Text>
             <Text
-              style={
-                open Style
-                array([
-                  Theme.text["title2"],
-                  Theme.text["weight500"],
-                  Theme.styleSheets.dark["text"],
-                  textStyle(~textAlign=#right, ()),
-                ])
-              }>
+              style={array([
+                Theme.text["title2"],
+                Theme.text["weight500"],
+                Theme.styleSheets.dark["text"],
+                textStyle(~textAlign=#right, ()),
+              ])}>
               {switch proportionalAverageTime {
               | 0. => "-"->React.string
               | _ => proportionalAverageTime->Date.minToString->React.string

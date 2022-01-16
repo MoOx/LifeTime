@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let title = "Settings"
@@ -159,17 +160,17 @@ let make = () => {
           ]
           disabled={!allowReminderEditing}>
           <ListItem style={Style.viewStyle(~opacity=!allowReminderEditing ? 0.1 : 1., ())}>
-            <View style={Style.array([Predefined.styles["rowSpaceBetween"]])}>
+            <View style={array([Predefined.styles["rowSpaceBetween"]])}>
               <ListItemText>
                 {datetime
                 ->DateFns.format(ReactNativeLocalize.uses24HourClock() ? "HH:mm" : "h:mm aa")
                 ->React.string}
               </ListItemText>
               <View style={Style.viewStyle(~alignItems=#flexEnd, ())}>
-                <Text style={Style.array([Theme.text["caption2"], theme.styles["textLight2"]])}>
+                <Text style={array([Theme.text["caption2"], theme.styles["textLight2"]])}>
                   {"Next notification"->React.string}
                 </Text>
-                <Text style={Style.array([Theme.text["footnote"], theme.styles["textLight1"]])}>
+                <Text style={array([Theme.text["footnote"], theme.styles["textLight1"]])}>
                   {Date.formatRelative(datetime, today)->React.string}
                 </Text>
               </View>
@@ -211,7 +212,7 @@ let make = () => {
                   onPress={_ => {
                     showDatetimepicker_set(_ => false)
                   }}>
-                  <Text style={Style.array([Theme.text["body"], theme.styles["textBlue"]])}>
+                  <Text style={array([Theme.text["body"], theme.styles["textBlue"]])}>
                     {"Cancel"->React.string}
                   </Text>
                 </TouchableOpacity>}

@@ -1,12 +1,10 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let styles = {
-  open Style
-  {
-    "container": viewStyle(~flexGrow=1., ()),
-  }
+  "container": viewStyle(~flexGrow=1., ()),
 }->StyleSheet.create
 
 let title = "Filters"
@@ -64,12 +62,10 @@ let make = () => {
           <ListItem
             right={settings.calendarsSkipped->Array.some(c => c.id == calendar.id)
               ? {
-                  <SVGCircle width={26.->Style.dp} height={26.->Style.dp} fill=calendar.color />
+                  <SVGCircle width={26.->dp} height={26.->dp} fill=calendar.color />
                 }
               : {
-                  <SVGCheckmarkcircle
-                    width={26.->Style.dp} height={26.->Style.dp} fill=calendar.color
-                  />
+                  <SVGCheckmarkcircle width={26.->dp} height={26.->dp} fill=calendar.color />
                 }}
             onPress={_ =>
               setSettings(settings => {
@@ -94,7 +90,7 @@ let make = () => {
                 },
               })}>
             <ListItemText> {calendar.title->React.string} </ListItemText>
-            <Text style={Style.array([Theme.text["caption1"], theme.styles["textGray2"]])}>
+            <Text style={array([Theme.text["caption1"], theme.styles["textGray2"]])}>
               {calendar.source->React.string}
             </Text>
           </ListItem>

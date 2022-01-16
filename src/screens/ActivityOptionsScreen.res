@@ -1,5 +1,6 @@
 open Belt
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 @react.component
@@ -10,7 +11,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.StatsStac
   let onRefreshDone = React.useCallback1(() => refreshing_set(_ => false), [refreshing_set])
   <>
     <Animated.ScrollView
-      style={Style.array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])}
+      style={array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])}
       refreshControl={<RefreshControl
         refreshing
         onRefresh

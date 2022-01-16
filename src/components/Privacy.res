@@ -1,8 +1,8 @@
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let styles = {
-  open Style
   {"container": viewStyle(~flexGrow=1., ())}
 }->StyleSheet.create
 
@@ -16,20 +16,12 @@ let make = () => {
     <Center>
       <Text
         allowFontScaling=false
-        style={Style.array([
-          Theme.text["largeTitle"],
-          Theme.text["weight700"],
-          theme.styles["text"],
-        ])}>
+        style={array([Theme.text["largeTitle"], Theme.text["weight700"], theme.styles["text"]])}>
         {title->React.string}
       </Text>
     </Center>
     <Spacer size=L />
-    <Text
-      style={
-        open Style
-        array([Theme.text["body"], theme.styles["text"]])
-      }>
+    <Text style={array([Theme.text["body"], theme.styles["text"]])}>
       {j`LifeTime is designed to protect your information. It only runs computation on your device and does not share your information anywhere.
 
 The calendars access we need to run our computation is mostly read-only. All the informations retrieved from your calendars are only used on your device, to generate reports & offers you suggestions.

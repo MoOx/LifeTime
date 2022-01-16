@@ -1,17 +1,15 @@
 open ReactNative
+open ReactNative.Style
 open ReactMultiversal
 
 let styles = {
-  open Style
-  {
-    "content": viewStyle(
-      ~flexShrink=1.,
-      ~justifyContent=#center,
-      ~borderRadius=Theme.Radius.card,
-      (),
-    ),
-    "iconCalendar": imageStyle(~width=48.->dp, ~height=48.->dp, ()),
-  }
+  "content": viewStyle(
+    ~flexShrink=1.,
+    ~justifyContent=#center,
+    ~borderRadius=Theme.Radius.card,
+    (),
+  ),
+  "iconCalendar": imageStyle(~width=48.->dp, ~height=48.->dp, ()),
 }->StyleSheet.create
 
 let icon = Packager.require("../../public/Icon.png")
@@ -38,41 +36,26 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
   })
 
   <Animated.View
-    style={
-      open Style
-      array([
-        style(
-          ~transform=[
-            translateY(~translateY=animatedBottomTranslateY.current->Animated.StyleProp.float),
-          ],
-          (),
-        ),
-        Predefined.styles["flex"],
-      ])
-    }>
-    <SpacedView
-      style={
-        open Style
-        array([styles["content"], theme.styles["background"]])
-      }>
+    style={array([
+      style(
+        ~transform=[
+          translateY(~translateY=animatedBottomTranslateY.current->Animated.StyleProp.float),
+        ],
+        (),
+      ),
+      Predefined.styles["flex"],
+    ])}>
+    <SpacedView style={array([styles["content"], theme.styles["background"]])}>
       <View style={Predefined.styles["center"]}>
         <IconCalendar style={styles["iconCalendar"]} />
       </View>
       <Spacer />
-      <Text
-        style={
-          open Style
-          array([Theme.text["title2"], Theme.text["weight700"], theme.styles["text"]])
-        }>
+      <Text style={array([Theme.text["title2"], Theme.text["weight700"], theme.styles["text"]])}>
         {"Set Up Calendars Access"->React.string}
       </Text>
       <Spacer size=S />
       <ScrollView style={Predefined.styles["flex"]}>
-        <Text
-          style={
-            open Style
-            array([Theme.text["body"], theme.styles["text"]])
-          }>
+        <Text style={array([Theme.text["body"], theme.styles["text"]])}>
           {("LifeTime has been designed to protect your personal data and respect your privacy. " ++
           "It has been built as an on-device service that you can trust. " ++
           "\n" ++
@@ -81,11 +64,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
         </Text>
         <Spacer />
         <TouchableOpacity onPress=onAboutPrivacyPress>
-          <Text
-            style={
-              open Style
-              array([Theme.text["body"], theme.styles["textBlue"]])
-            }>
+          <Text style={array([Theme.text["body"], theme.styles["textBlue"]])}>
             {"Learn more about LifeTime & Privacy..."->React.string}
           </Text>
         </TouchableOpacity>
@@ -95,10 +74,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
         testID="AllowCalendarsAccess"
         text="Allow Calendars Access"
         onPress=onContinuePress
-        styleBackground={
-          open Style
-          viewStyle(~backgroundColor=theme.colors.blue, ())
-        }
+        styleBackground={viewStyle(~backgroundColor=theme.colors.blue, ())}
       />
     </SpacedView>
   </Animated.View>
