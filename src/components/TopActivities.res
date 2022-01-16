@@ -86,21 +86,26 @@ let make = (
                     </Text>
                     <Spacer size=XXS />
                     <Row style={Predefined.styles["alignCenter"]}>
-                      <View
-                        style={array([
-                          theme.styles["backgroundGray3"],
-                          viewStyle(
-                            // ~backgroundColor=color,
-
-                            ~width=(totalDurationInMin /. maxDurationInMin *. availableWidthForBar)
-                              ->dp,
-                            ~height=6.->dp,
-                            ~borderRadius=6.,
-                            ~overflow=#hidden,
-                            (),
-                          ),
-                        ])}
-                      />
+                      {
+                        let width = totalDurationInMin /. maxDurationInMin *. availableWidthForBar
+                        width > 0.
+                          ? <View
+                              style={array([
+                                theme.styles["backgroundGray3"],
+                                viewStyle(
+                                  ~backgroundColor=color,
+                                  ~width=(totalDurationInMin /.
+                                  maxDurationInMin *.
+                                  availableWidthForBar)->dp,
+                                  ~height=6.->dp,
+                                  ~borderRadius=6.,
+                                  ~overflow=#hidden,
+                                  (),
+                                ),
+                              ])}
+                            />
+                          : React.null
+                      }
                       <Spacer size=XXS />
                       <Text
                         style={array([Theme.text["footnote"], theme.styles["textLight2"]])}

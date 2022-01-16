@@ -272,16 +272,16 @@ let make = React.memo((
                           let backgroundColor = colorName->ActivityCategories.getColor(theme.mode)
                           key != catId
                             ? React.null
-                            : <View
-                                key
-                                style={viewStyle(
-                                  ~backgroundColor,
-                                  ~height=(graphHeight /.
-                                  maxDuration->Option.getWithDefault(0.) *.
-                                  value)->dp,
-                                  (),
-                                )}
-                              />
+                            : {
+                                let height =
+                                  graphHeight /. maxDuration->Option.getWithDefault(0.) *. value
+                                height > 0.
+                                  ? <View
+                                      key
+                                      style={viewStyle(~backgroundColor, ~height=height->dp, ())}
+                                    />
+                                  : React.null
+                              }
                         })
                         ->React.array
                       )
