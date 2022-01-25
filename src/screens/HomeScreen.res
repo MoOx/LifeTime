@@ -66,6 +66,7 @@ let make = (~navigation, ~route as _) => {
         title=Home.title
       />
       <Animated.ScrollView
+        testID="HomeScreen_ScrollView"
         style={array([
           Predefined.styles["flexGrow"],
           viewStyle(

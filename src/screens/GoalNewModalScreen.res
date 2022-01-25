@@ -37,6 +37,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
   <>
     <StatusBarFormSheet />
     <Animated.ScrollView
+      testID="GoalNewModalScreen_ScrollView"
       style={array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])}
       contentContainerStyle={viewStyle(
         ~paddingTop=(Theme.isFormSheetSupported ? 0. : safeAreaInsets.top)->dp,
@@ -82,7 +83,8 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
             </Text>
           </TouchableOpacity>}
         right={({color}) =>
-          <TouchableOpacity hitSlop=HitSlops.m disabled onPress>
+          <TouchableOpacity
+            testID="GoalNewModalScreen_Button_Add" hitSlop=HitSlops.m disabled onPress>
             <Text
               allowFontScaling=false
               style={array([

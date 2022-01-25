@@ -57,17 +57,18 @@ platform :ios do
     )
     notification(subtitle: appName+" for iOS", message: "Upload complete")
   end
-  
-  lane :screenshots do
-    # reset_simulators
-    capture_screenshots(
-      reinstall_app: true,
-      stop_after_first_error: true,
-      workspace: workspace,
-    )
-    frame_screenshots
-    # upload_to_app_store
-  end
+end
+
+desc "Take and frame screenshots"
+lane :screenshots do
+  frame_screenshots(
+    path: "./fastlane/screenshots",
+  )
+  upload_to_app_store(
+    skip_binary_upload: true,
+    skip_metadata: true,
+    skip_app_version_update: true,
+  )
 end
 
 desc "iOS: Bump version"

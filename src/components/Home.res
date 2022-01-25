@@ -124,16 +124,18 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
 
   <>
     <SpacedView>
-      <TitlePre style={theme.styles["textOnDarkLight"]}>
-        {{
-          open Date
-          today->Js.Date.getDay->dayLongString ++
-            (" " ++
-            (today->dateString ++ (" " ++ today->monthLongString)))
-        }
-        ->Js.String.toUpperCase
-        ->React.string}
-      </TitlePre>
+      <View testID="Home_TitlePre">
+        <TitlePre style={theme.styles["textOnDarkLight"]}>
+          {{
+            open Date
+            today->Js.Date.getDay->dayLongString ++
+              (" " ++
+              (today->dateString ++ (" " ++ today->monthLongString)))
+          }
+          ->Js.String.toUpperCase
+          ->React.string}
+        </TitlePre>
+      </View>
       <View style={Predefined.styles["rowSpaceBetween"]}>
         <Text
           allowFontScaling=false
@@ -148,6 +150,17 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
                       {"Hermes on"->React.string}
                     </Text>
                   : React.null}
+                <Spacer size=XS />
+                <TouchableOpacity
+                  testID="Home_DemoFullRefresh"
+                  hitSlop=HitSlops.m
+                  onPress={_ => {
+                    Demo.fullRefresh()->ignore
+                  }}>
+                  <View style={Style.style(~opacity=0.10, ())}>
+                    <SVGBroom width={24.->dp} height={24.->dp} fill=theme.namedColors.text />
+                  </View>
+                </TouchableOpacity>
               </>
             : React.null}
         </View>
@@ -184,6 +197,7 @@ let make = (~onGetStarted, ~refreshing, ~onRefreshDone, ~onFiltersPress, ~onActi
       <Spacer size=S />
       <SpacedView vertical=None>
         <ScrollView
+          testID="Home_ScrollView_WeeklyGraph"
           ref={scrollViewRef->Ref.value}
           horizontal=true
           pagingEnabled=true

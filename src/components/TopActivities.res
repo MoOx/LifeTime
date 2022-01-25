@@ -75,6 +75,7 @@ let make = (
                 let color = colorName->ActivityCategories.getColor(theme.mode)
                 <React.Fragment key=title>
                   <ListItem
+                    testID={"TopActivities_" ++ title}
                     onPress={_ => onActivityPress(title, (startDate, endDate))}
                     left={<NamedIcon name=iconName fill=color />}
                     right={<SVGChevronright

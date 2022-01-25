@@ -3,10 +3,15 @@
   "runnerConfig": "e2e/config.json",
   "skipLegacyWorkersInjection": true,
   "apps": {
-    "ios": {
+    "app:debug:ios": {
       "type": "ios.app",
       "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/LifeTime.Dev.app",
       "build": "xcodebuild -workspace ios/LifeTime.xcworkspace -scheme LifeTime -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build -quiet"
+    },
+    "app:release:ios": {
+      "type": "ios.app",
+      "binaryPath": "ios/build/Build/Products/Release-iphonesimulator/LifeTime.app",
+      "build": "xcodebuild -workspace ios/LifeTime.xcworkspace -scheme LifeTime -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -quiet"
     },
     "android": {
       "type": "android.apk",
@@ -14,10 +19,28 @@
     }
   },
   "devices": {
-    "simulator": {
+    "iPhone 6.5": {
       "type": "ios.simulator",
       "device": {
-        "type": "iPhone 13"
+        "type": "iPhone 13 Pro Max"
+      }
+    },
+    "iPhone 5.5 legacy": {
+      "type": "ios.simulator",
+      "device": {
+        "type": "iPhone 8 Plus"
+      }
+    },
+    "iPad 12.9": {
+      "type": "ios.simulator",
+      "device": {
+        "type": "iPad Pro (12.9-inch) (5th generation)"
+      }
+    },
+    "iPad 12.9 legacy": {
+      "type": "ios.simulator",
+      "device": {
+        "type": "iPad Pro (12.9-inch) (2nd generation)"
       }
     },
     "emulator": {
@@ -29,8 +52,24 @@
   },
   "configurations": {
     "ios": {
-      "device": "simulator",
-      "app": "ios"
+      "device": "iPhone 5.5",
+      "app": "app:debug:ios"
+    },
+    "ios-6.5": {
+      "device": "iPhone 6.5",
+      "app": "app:release:ios"
+    },
+    "ios-5.5-legacy": {
+      "device": "iPhone 5.5 legacy",
+      "app": "app:release:ios"
+    },
+    "ios-12.9": {
+      "device": "iPad 12.9",
+      "app": "app:release:ios"
+    },
+    "ios-12.9-legacy": {
+      "device": "iPad 12.9 legacy",
+      "app": "app:release:ios"
     },
     "android": {
       "device": "emulator",

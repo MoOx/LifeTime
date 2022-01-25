@@ -76,6 +76,7 @@ let make = (~activityTitle, ~refreshing, ~onRefreshDone, ~onSkipActivity, ~curre
       let color = colorName->ActivityCategories.getColor(theme.mode)
       <React.Fragment key=id>
         <ListItem
+          testID={"ActivityOption_Category_" ++ id}
           onPress={_ => {
             let createdAt = Js.Date.now()
             setSettings(settings => {

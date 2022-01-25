@@ -134,6 +134,7 @@ let make = () => {
                 </Text>
                 <Spacer size=M />
                 <TouchableButton
+                  testID="NotificationsPermissionsPopin_Button_request"
                   text="Allow Notifications"
                   onPress={_ => requestNotificationPermission()}
                   styleBackground={viewStyle(~backgroundColor=theme.colors.blue, ())}

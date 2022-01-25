@@ -1,5 +1,5 @@
-open ReactNative
 open ReactNative.Style
+open ReactNative
 open ReactMultiversal
 
 let title = "Settings"
@@ -103,60 +103,13 @@ let make = (~navigation) => {
     <Spacer size=L />
     <ListSeparator />
     <ListItem
+      testID="Settings_To_SettingsDangerZoneScreen"
       onPress={_ =>
         navigation->Navigators.RootStack.Navigation.navigate("SettingsDangerZoneScreen")}
       right={<ListItemChevron />}>
       <ListItemText> {SettingsDangerZoneScreen.title->React.string} </ListItemText>
     </ListItem>
     <ListSeparator />
-    {Global.__DEV__ == true
-      ? <>
-          <Spacer size=S />
-          <ListHeader text="__DEV__ Demo Data" />
-          <ListSeparator />
-          <ListItem
-            testID="DemoDataInject"
-            onPress={_ =>
-              Alert.alert(
-                ~title="Inject Demo Data",
-                ~message="This will create a specific calendar called '" ++
-                Demo.calendarDemoTitle ++ "' and will inject some data.",
-                ~buttons=[
-                  Alert.button(~text="Cancel", ~style=#default, ()),
-                  Alert.button(~text="Inject", ~onPress=() => Demo.injectFreshData(), ()),
-                ],
-                (),
-              )}>
-            <ListItemText color={theme.colors.blue}>
-              {"Inject Demo Data"->React.string}
-            </ListItemText>
-          </ListItem>
-          <ListSeparator spaceStart={Spacer.size(S)} />
-          <ListItem
-            testID="DemoDataRemove"
-            onPress={_ =>
-              Alert.alert(
-                ~title="Remove Demo Data",
-                ~message="This will remove the calendar called '" ++
-                Demo.calendarDemoTitle ++ "' and all the data in it.",
-                ~buttons=[
-                  Alert.button(~text="Keep", ~style=#default, ()),
-                  Alert.button(
-                    ~text="Remove",
-                    ~style=#destructive,
-                    ~onPress=() => Demo.removeData(),
-                    (),
-                  ),
-                ],
-                (),
-              )}>
-            <ListItemText color={theme.colors.red}>
-              {"Remove Demo Data"->React.string}
-            </ListItemText>
-          </ListItem>
-          <ListSeparator />
-        </>
-      : React.null}
     <Spacer size=L />
   </>
 }

@@ -53,6 +53,7 @@ let make = (~navigation, ~route: ReactNavigation.Core.route<Navigators.RootStack
   <>
     <StatusBarFormSheet />
     <Animated.ScrollView
+      testID="GoalEditModalScreen_ScrollView"
       style={array([Predefined.styles["flexGrow"], theme.styles["backgroundDark"]])}
       contentContainerStyle={viewStyle(
         ~paddingTop=(Theme.isFormSheetSupported ? 0. : safeAreaInsets.top)->dp,

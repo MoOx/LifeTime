@@ -46,6 +46,7 @@ let make = () => {
 
   <>
     <Spacer />
+    <ListHeader text="Metadata" />
     <ListSeparator />
     <ListItem
       onPress={_ => {
@@ -83,7 +84,53 @@ let make = () => {
     </ListItem>
     <ListSeparator />
     <BlockFootnote>
-      {"Export is placing data into your clipboard. Import assume that you have your export in the clipboard."->React.string}
+      {"Export contains events metadata including categories & goals that are not stored into your calendars. "->React.string}
+      {"Export copy raw metadata into your clipboard. Import assume that you have your export in your clipboard, ready to be injected."->React.string}
+    </BlockFootnote>
+    <Spacer size=M />
+    <ListHeader text="Demo Calendar" />
+    <ListSeparator />
+    <ListItem
+      testID="SettingsDangerZone_CalendarInject"
+      onPress={_ =>
+        Alert.alert(
+          ~title="Inject Demo Calendar",
+          ~message="This will create a specific calendar called '" ++
+          Demo.calendarDemoTitle ++ "' and will inject some data.",
+          ~buttons=[
+            Alert.button(~text="Cancel", ~style=#default, ()),
+            Alert.button(~text="Inject", ~onPress=() => Demo.fullRefresh()->ignore, ()),
+          ],
+          (),
+        )}>
+      <ListItemText color={theme.colors.blue}>
+        {"Create Demo Calendar"->React.string}
+      </ListItemText>
+    </ListItem>
+    <ListSeparator spaceStart={Spacer.size(S)} />
+    <ListItem
+      testID="SettingsDangerZone_CalendarRemove"
+      onPress={_ =>
+        Alert.alert(
+          ~title="Remove Demo Calendar",
+          ~message="This will remove the calendar called '" ++
+          Demo.calendarDemoTitle ++ "' and all the data in it.",
+          ~buttons=[
+            Alert.button(~text="Keep", ~style=#default, ()),
+            Alert.button(
+              ~text="Remove",
+              ~style=#destructive,
+              ~onPress=() => Demo.removeData()->ignore,
+              (),
+            ),
+          ],
+          (),
+        )}>
+      <ListItemText color={theme.colors.red}> {"Remove Demo Calendar"->React.string} </ListItemText>
+    </ListItem>
+    <ListSeparator />
+    <BlockFootnote>
+      {"Demo data allows you to quickly test the app if you have currently not enough data in your actual calendars. It can be safely removed without affecting your personal calendars."->React.string}
     </BlockFootnote>
     <Spacer size=L />
     <ListSeparator />
@@ -104,12 +151,12 @@ let make = () => {
           (),
         )}>
       <ListItemText color={theme.colors.red} center=true>
-        {"Reset Settings & Erase All Data"->React.string}
+        {"Reset Settings & Erase All Metadata"->React.string}
       </ListItemText>
     </ListItem>
     <ListSeparator />
     <BlockFootnote>
-      {"This is a destructive operation and will delete all application data. All your calendars and events are safe and untouched."->React.string}
+      {"This is a destructive operation and will delete all application metadata. Note: All your calendars and events are safe and are not affected by this operation."->React.string}
     </BlockFootnote>
   </>
 }

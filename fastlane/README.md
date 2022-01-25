@@ -12,6 +12,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
+### screenshots
+
+```sh
+[bundle exec] fastlane screenshots
+```
+
+Take and frame screenshots
+
 ### versionBump
 
 ```sh
@@ -44,12 +52,6 @@ Deploy a new version to the Google Play
 
 ## iOS
 
-### ios build
-
-```sh
-[bundle exec] fastlane ios build
-```
-
 ### ios beta
 
 ```sh
@@ -57,12 +59,6 @@ Deploy a new version to the Google Play
 ```
 
 iOS: Push a new beta build to TestFlight
-
-### ios screenshots
-
-```sh
-[bundle exec] fastlane ios screenshots
-```
 
 ---
 

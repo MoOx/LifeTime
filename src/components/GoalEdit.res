@@ -143,6 +143,7 @@ let make = (
     <View style={theme.styles["background"]}>
       <SpacedView vertical=S>
         <TextInput
+          testID={"GoalEdit_title"}
           autoCapitalize=#words
           autoComplete=#off
           autoCorrect=true
@@ -171,6 +172,7 @@ let make = (
     <Row> <Spacer size=XS /> <BlockHeading text="Type" /> </Row>
     <ListSeparator />
     <ListItem
+      testID="GoalEdit_type_goal"
       onPress={_ => setType(_ => Some(Goal.Type.Goal))}
       left={<NamedIcon name=#scope fill=theme.colors.green />}
       right={switch mode {
@@ -182,6 +184,7 @@ let make = (
     </ListItem>
     <ListSeparator spaceStart={Spacer.size(S) *. 2. +. NamedIcon.size} />
     <ListItem
+      testID="GoalEdit_type_limit"
       onPress={_ => setType(_ => Some(Goal.Type.Limit))}
       left={<NamedIcon name=#hourglass fill=theme.colors.orange />}
       right={switch mode {
@@ -245,6 +248,7 @@ let make = (
               {quickDurations
               ->Array.map(quickDuration =>
                 <TouchableOpacity
+                  testID={"GoalEdit_quickDuration_" ++ quickDuration->Js.Float.toString}
                   key={quickDuration->Js.Float.toString}
                   onPress={_ => setMinutes(_ => quickDuration)}
                   style={Predefined.styles["flexGrow"]}>
@@ -281,11 +285,13 @@ let make = (
                     dash dash dash dash dash
                   </View>
                   <ReactNativeSlider
+                    testID="GoalEdit_durationSlider"
                     style={array([Predefined.styles["flexGrow"], style(~minHeight=40.->dp, ())])}
                     minimumValue=0.
                     maximumValue={24. *. 60.}
                     step=15.
                     value=minutes
+                    onSlidingComplete=handleSliderMinutesChange
                     onValueChange=handleSliderMinutesChange
                   />
                 </View>
@@ -382,12 +388,14 @@ let make = (
                   id != ActivityCategories.unknown && categoryActivities->Array.length > 0
                 <React.Fragment key=id>
                   <ListItem
+                    testID={"GoalEdit_category_" ++ id}
                     onPress={_ =>
                       canOpenCategory
                         ? handleCategoryOpen(id)
                         : handleCategoryCheck(id, selectedCategoryActivities)}
                     left={<>
                       <Pressable
+                        testID={"GoalEdit_category_bullet_" ++ id}
                         onPress={_ => handleCategoryCheck(id, selectedCategoryActivities)}
                         hitSlop=HitSlops.xs>
                         {_ =>
