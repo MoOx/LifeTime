@@ -72,7 +72,7 @@ let make = (~onAboutPrivacyPress, ~onContinuePress) => {
       <Spacer />
       <TouchableButton
         testID="AllowCalendarsAccess"
-        text="Allow Calendars Access"
+        text="Continue"
         onPress=onContinuePress
         styleBackground={viewStyle(~backgroundColor=theme.colors.blue, ())}
       />
