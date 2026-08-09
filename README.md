@@ -4,7 +4,29 @@
 [![Android](https://github.com/MoOx/LifeTime/actions/workflows/build-android.yml/badge.svg)](https://github.com/MoOx/LifeTime/actions/workflows/build-android.yml)
 [![Tests](https://github.com/MoOx/LifeTime/actions/workflows/build-tests.yml/badge.svg)](https://github.com/MoOx/LifeTime/actions/workflows/build-tests.yml)
 
-## Installation
+LifeTime turns the calendars already on your phone into a report of where your time goes,
+entirely on-device. No account, no server, nothing logged by hand.
+
+## Where things are
+
+This repository currently holds two codebases side by side:
+
+- **`src/`** — v1: ReScript + React Native 0.67, last touched in March 2022. Still the
+  reference for behaviour.
+- **`next/`** — v2: a fresh [Expo SDK 57](next/README.md) codebase built on native
+  components (Liquid Glass tabs on iOS 26, Material 3 on Android). Work in progress.
+
+And a set of documents describing both:
+
+| Document | What it covers |
+|---|---|
+| [docs/SPEC.md](docs/SPEC.md) | Full functional & technical spec of v1, reverse-engineered from the code |
+| [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md) | Prioritised proposals — correctness fixes, product, engineering |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | The v2 stack, and how each screen maps onto native components |
+| [docs/CALENDAR.md](docs/CALENDAR.md) | Why the old calendar library blocked the project, and what replaces it |
+| [docs/RELEASE.md](docs/RELEASE.md) | Building, distributing and testing with EAS |
+
+## Installation (v1)
 
 Before installing the project, you have to verify that you have on you machine
 all requirements

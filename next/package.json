@@ -1,0 +1,61 @@
+{
+  "name": "lifetime",
+  "version": "2.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "typecheck": "tsc --noEmit",
+    "lint": "expo lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "check": "npm run typecheck && npm run test",
+    "build:dev": "eas build --profile development --platform all",
+    "build:preview": "eas build --profile preview --platform all",
+    "build:prod": "eas build --profile production --platform all",
+    "update": "eas update --branch preview"
+  },
+  "dependencies": {
+    "@expo/ui": "~57.0.9",
+    "expo": "~57.0.11",
+    "expo-calendar": "~57.0.1",
+    "expo-constants": "~57.0.9",
+    "expo-glass-effect": "~57.0.1",
+    "expo-linking": "~57.0.5",
+    "expo-localization": "~57.0.1",
+    "expo-router": "~57.0.11",
+    "expo-splash-screen": "~57.0.5",
+    "expo-status-bar": "~57.0.1",
+    "expo-symbols": "~57.0.2",
+    "expo-system-ui": "~57.0.2",
+    "react": "19.2.8",
+    "react-native": "0.86.2",
+    "react-native-safe-area-context": "~5.8.1",
+    "react-native-screens": "~4.27.0",
+    "expo-sqlite": "~57.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/react": "~19.2.2",
+    "jest": "^30.0.0",
+    "ts-jest": "^29.4.0",
+    "typescript": "~6.0.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.test.json"
+        }
+      ]
+    }
+  }
+}

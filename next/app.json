@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "LifeTime",
+    "slug": "lifetime",
+    "scheme": "lifetime",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "io.moox.lifetime"
+    },
+    "android": {
+      "package": "io.moox.lifetime",
+      "edgeToEdgeEnabled": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundColor": "#3023AE"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "LifeTime reads your calendars to build your time reports. Your data never leaves your device."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "backgroundColor": "#3023AE",
+          "imageWidth": 160
+        }
+      ],
+      "expo-localization"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
