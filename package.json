@@ -12,11 +12,13 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "check": "npm run check:sdk && npm run typecheck && npm run test",
-    "build:dev": "eas build --profile development --platform all",
-    "build:preview": "eas build --profile preview --platform all",
-    "build:prod": "eas build --profile production --platform all",
-    "update": "eas update --branch preview",
-    "check:sdk": "node scripts/check-sdk-versions.mjs"
+    "build:dev": "npx --yes eas-cli@latest build --profile development --platform all",
+    "build:preview": "npx --yes eas-cli@latest build --profile preview --platform all",
+    "build:prod": "npx --yes eas-cli@latest build --profile production --platform all",
+    "update": "npx --yes eas-cli@latest update --branch preview",
+    "check:sdk": "node scripts/check-sdk-versions.mjs",
+    "testflight": "bundle exec fastlane ios beta",
+    "eas": "npx --yes eas-cli@latest"
   },
   "dependencies": {
     "@expo/ui": "~57.0.9",

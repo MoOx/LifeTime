@@ -52,12 +52,35 @@ progress ring, notifications, and the i18n catalogue.
 
 Requires Node (see [.node-version](.node-version)). `@expo/ui`, `expo-glass-effect` and
 `expo-calendar` all contain native code, so **Expo Go will not run this app** — you need a
-development build.
+real build.
+
+**On a Mac, build and run locally — nothing else to install:**
 
 ```sh
 npm install
-npm run build:dev     # eas build --profile development --platform all
-npm start             # expo start --dev-client
+npm run ios           # expo run:ios — prebuild, pod install, Xcode, launch
+npm start             # expo start --dev-client, once a build is installed
+```
+
+`npm run ios` produces a **Debug** build, which matters more than it sounds: assertions
+are compiled in, so a missing native component names itself instead of segfaulting. It is
+the fastest loop by a wide margin — no queue, no upload, no TestFlight.
+
+**Shipping to TestFlight** goes through Fastlane and
+[`MoOx/certificates`](https://github.com/MoOx/certificates):
+
+```sh
+npm run testflight    # bundle exec fastlane ios beta
+```
+
+**EAS is optional here** — signing already goes through `match`, so `eas-cli` is
+deliberately *not* a dependency: it pulls 337 packages and 141 MB that every `npm ci`
+would pay for, including on the macOS runner. The scripts fetch it on demand instead, so
+they work with no global install:
+
+```sh
+npm run build:preview # npx eas-cli build --profile preview --platform all
+npm run eas -- whoami # any other eas command
 ```
 
 Checks, the same ones CI runs:

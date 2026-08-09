@@ -53,10 +53,34 @@ want to own the signing material).
 Both can coexist: they build the same project, and `expo prebuild` is what the
 Fastlane lane uses to produce the Xcode project EAS would otherwise generate for you.
 
+## 1ter. Building locally, which needs neither
+
+On a Mac with Xcode, the shortest loop does not involve EAS *or* Fastlane:
+
+```sh
+npm run ios      # expo run:ios — prebuild, pod install, build, launch
+```
+
+This is a **Debug** build, and that difference is not cosmetic: `RCTAssert` and friends are
+compiled in, so a Fabric component with no registered native class prints its own name
+instead of segfaulting in a factory. Reach for this *first* when something crashes at
+launch — §10's post-mortem cost two TestFlight round-trips to learn what a Debug build
+says out loud.
+
 ## 2. Setup (once)
+
+`eas-cli` is deliberately **not** a project dependency: it pulls 337 packages and 141 MB
+that every `npm ci` would pay for, including on the macOS runner, for a CLI this project's
+release path does not use. The `npm run build:*` scripts fetch it through `npx`, so they
+work with no global install. If you would rather have `eas` on your PATH:
 
 ```bash
 npm i -g eas-cli
+```
+
+Then, only if you want the EAS path at all:
+
+```bash
 eas login
 eas init            # links the project, writes projectId into app.json
 eas build:configure # creates eas.json
