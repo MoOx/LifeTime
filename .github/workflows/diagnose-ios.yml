@@ -1,0 +1,98 @@
+name: iOS diagnosis
+
+# Prints what actually ends up linked into the app, and builds it unsigned for the
+# simulator. Roughly 6 minutes, no Apple account, no TestFlight round-trip.
+#
+# Written to settle a launch crash that survived two TestFlight builds:
+#
+#   EXC_BAD_ACCESS at 0x18 in
+#   -[RCTComponentViewFactory createComponentViewWithComponentHandle:]
+#
+# which is what a Fabric component with no registered native class looks like in a
+# Release build (the RCTAssert that would have named it is compiled out). The two
+# generated files below are the ground truth for "what is registered":
+#
+#   ExpoModulesProvider.swift          every linked Expo module (@expo/ui, expo-calendar…)
+#   RCTThirdPartyComponentsProvider.mm every codegen'd third-party Fabric component
+#                                      (react-native-screens, safe-area-context…)
+#
+# Trigger: Actions > iOS diagnosis > Run workflow, or a [diagnose] commit marker.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["**"]
+
+concurrency:
+  group: diagnose-ios
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, '[diagnose]')
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - run: npm ci
+
+      - name: Generate the native project
+        run: npx expo prebuild --platform ios --no-install
+
+      - name: CocoaPods
+        run: npx pod-install
+
+      - name: Linked Expo modules
+        run: |
+          echo "::group::ExpoModulesProvider.swift"
+          find ios -name 'ExpoModulesProvider.swift' -exec cat {} \;
+          echo "::endgroup::"
+
+      - name: Registered third-party Fabric components
+        run: |
+          echo "::group::RCTThirdPartyComponentsProvider.mm"
+          find ios -name 'RCTThirdPartyComponentsProvider.mm' -exec cat {} \; || \
+            echo "NOT GENERATED — no third-party Fabric component is registered at all"
+          echo "::endgroup::"
+
+      - name: Pods actually installed
+        run: |
+          echo "::group::Podfile.lock"
+          sed -n '/^PODS:/,/^DEPENDENCIES:/p' ios/Podfile.lock
+          echo "::endgroup::"
+
+      # If this fails, the problem is the build, not the runtime.
+      - name: Build for the simulator
+        run: |
+          set -eo pipefail
+          WORKSPACE=$(ls -d ios/*.xcworkspace | head -1)
+          SCHEME=$(basename "$WORKSPACE" .xcworkspace)
+          xcodebuild \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -derivedDataPath ios/build \
+            CODE_SIGNING_ALLOWED=NO \
+            build | tail -40
+
+      - name: Keep the generated sources on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-generated
+          path: |
+            ios/Podfile.lock
+            ios/Pods/Target Support Files/**/ExpoModulesProvider.swift
+            ios/build/Build/Intermediates.noindex/**/RCTThirdPartyComponentsProvider.*
+          if-no-files-found: ignore
+          retention-days: 7

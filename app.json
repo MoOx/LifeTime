@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "io.moox.LifeTime"
+      "bundleIdentifier": "io.moox.LifeTime",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "io.moox.lifetime",
@@ -18,14 +21,20 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundColor": "#3023AE"
-      }
+      },
+      "blockedPermissions": [
+        "android.permission.WRITE_CALENDAR",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "plugins": [
       "expo-router",
       [
         "expo-calendar",
         {
-          "calendarPermission": "LifeTime reads your calendars to build your time reports. Your data never leaves your device."
+          "calendarPermission": "LifeTime reads your calendars to build your time reports. Your data never leaves your device.",
+          "remindersPermission": false
         }
       ],
       [
