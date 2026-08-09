@@ -401,6 +401,31 @@ bundle exec fastlane ios beta
 The workflow runs `npm run check` (typecheck + tests) before the build, so a broken commit
 fails in one minute instead of twenty.
 
+### First run, for reference
+
+Run [31320473641](https://github.com/MoOx/LifeTime/actions/runs/31320473641) on `ab1a659`,
+`macos-latest`, **11 min 24 s** end to end, concluding with *"Successfully uploaded the new
+binary to App Store Connect"*. Where the time goes, per fastlane's own summary:
+
+| Step | Time |
+|---|---|
+| `match` (certificate + profile) | 4 s |
+| `expo prebuild --platform ios --clean` | 51 s |
+| `build_app` (archive + export) | 464 s |
+| `upload_to_testflight` | 83 s |
+
+So the archive is ~70 % of the wall clock, and the `npm run check` gate ahead of it costs
+about a minute — a good trade against discovering a type error after eight minutes of
+Xcode.
+
+Two follow-ups worth doing at some point:
+
+- **Pin the Xcode version.** The run recorded which one the image defaulted to (step
+  *"Xcode version in use"*). Pinning it explicitly stops the build from drifting the day
+  GitHub updates the image — without going back to `latest-stable`, which is broken.
+- `webfactory/ssh-agent@v0.9.1` still targets Node 20 and is being force-run on Node 24.
+  Harmless today, worth watching.
+
 ### Prerequisite outside of git
 
 **The app must exist on App Store Connect before the first upload**, with the bundle ID
