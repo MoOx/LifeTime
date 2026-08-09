@@ -1,0 +1,273 @@
+# frozen_string_literal: true
+#
+# Fastfile: build and ship to TestFlight (and, later, to Google Play).
+#
+# Targets an Expo project using `expo prebuild`: the ios/ and android/
+# directories are regenerated on every build and are not tracked.
+#
+# Every secret comes from the private MoOx/certificates repository:
+#   - iOS certificates and provisioning profiles: fastlane match
+#   - App Store Connect API key: secrets/ios/*.enc, decrypted on the fly
+#
+# Expected environment variables: see .env.example
+
+require "fileutils"
+require "json"
+
+ROOT        = File.expand_path("..", __dir__)
+CERTS_REPO  = ENV.fetch("CERTS_REPO_URL", "git@github.com:MoOx/certificates.git")
+CERTS_DIR   = File.join(ROOT, ".certificates")
+# fastlane defaults its match storage branch to "master". Ours is "main".
+MATCH_BRANCH = ENV.fetch("MATCH_GIT_BRANCH", "main")
+SECRETS_DIR = File.join(ROOT, ".secrets")
+
+# --- configuration ---------------------------------------------------------
+# Read lazily so that `fastlane lanes` does not require a complete .env.
+
+def env!(key)
+  value = ENV[key].to_s
+  UI.user_error!("#{key} is not set, see .env.example") if value.empty?
+  value
+end
+
+def bundle_id
+  env!("APP_IDENTIFIER")
+end
+
+def apple_team
+  env!("APPLE_TEAM_ID")
+end
+
+def android_package
+  value = ENV["ANDROID_PACKAGE_NAME"].to_s
+  value.empty? ? bundle_id : value
+end
+
+# --- access to the shared secrets ------------------------------------------
+
+# Clones (or updates) the certificates repository, shallow.
+def certificates_repo
+  if Dir.exist?(File.join(CERTS_DIR, ".git"))
+    sh("git", "-C", CERTS_DIR, "fetch", "--depth", "1", "origin", "HEAD")
+    sh("git", "-C", CERTS_DIR, "reset", "--hard", "FETCH_HEAD")
+  else
+    sh("git", "clone", "--depth", "1", CERTS_REPO, CERTS_DIR)
+  end
+  CERTS_DIR
+end
+
+# Decrypts secrets/**.enc into .secrets/ (wiped at the end of the lane).
+def decrypt_secrets!
+  env!("SECRETS_PASSPHRASE")
+  sh(File.join(certificates_repo, "scripts", "secrets"), "decrypt-all", SECRETS_DIR)
+  SECRETS_DIR
+end
+
+def secret(relative_path)
+  path = File.join(SECRETS_DIR, relative_path)
+  UI.user_error!("secret not found: #{relative_path}") unless File.exist?(path)
+  path
+end
+
+def wipe_secrets!
+  FileUtils.rm_rf(SECRETS_DIR)
+end
+
+# Loads the App Store Connect API key from the shared encrypted JSON.
+def asc_api_key
+  data = JSON.parse(File.read(secret("ios/app-store-connect-api-key.json")))
+  app_store_connect_api_key(
+    key_id: data.fetch("key_id"),
+    issuer_id: data.fetch("issuer_id"),
+    key_content: data.fetch("key"),
+    duration: 1200,
+    in_house: false
+  )
+end
+
+# --- native project --------------------------------------------------------
+
+# `expo prebuild --clean` fully regenerates the native project.
+# The chdir is explicit: `sh` runs from the fastlane/ directory.
+def expo_prebuild(platform)
+  Dir.chdir(ROOT) do
+    sh("npx", "expo", "prebuild", "--platform", platform, "--clean")
+  end
+end
+
+# The Xcode project name derives from `expo.name`, so auto-detect it rather
+# than hardcoding it (it changes whenever the app is renamed).
+def ios_paths
+  workspace = Dir[File.join(ROOT, "ios", "*.xcworkspace")].first
+  UI.user_error!("no .xcworkspace in ios/, did the prebuild fail?") unless workspace
+
+  name = File.basename(workspace, ".xcworkspace")
+  {
+    workspace: workspace,
+    xcodeproj: File.join(ROOT, "ios", "#{name}.xcodeproj"),
+    scheme: name
+  }
+end
+
+def load_properties(path)
+  File.readlines(path).each_with_object({}) do |line, acc|
+    next if line.strip.empty? || line.strip.start_with?("#")
+
+    key, value = line.split("=", 2)
+    acc[key.strip] = value.to_s.strip
+  end
+end
+
+# --- iOS -------------------------------------------------------------------
+
+platform :ios do
+  desc "Build the app and ship it to TestFlight"
+  lane :beta do
+    app_id = bundle_id
+
+    # Dedicated temporary keychain. Without it, `match` cannot install the
+    # certificates on a CI runner.
+    setup_ci if is_ci
+
+    decrypt_secrets!
+    api_key = asc_api_key
+
+    # readonly in CI: the runner consumes certificates, it never creates any.
+    match(
+      type: "appstore",
+      app_identifier: app_id,
+      git_url: CERTS_REPO,
+      git_branch: MATCH_BRANCH,
+      storage_mode: "git",
+      # match would otherwise rewrite the storage repository's README.md
+      skip_docs: true,
+      readonly: is_ci,
+      api_key: api_key
+    )
+
+    expo_prebuild("ios")
+    paths = ios_paths
+
+    profile_name = ENV.fetch("sigh_#{app_id}_appstore_profile-name") do
+      lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING][app_id]
+    end
+
+    # The prebuild resets the project to automatic signing, so force manual
+    # signing with the profile match just installed.
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: paths[:xcodeproj],
+      team_id: apple_team,
+      code_sign_identity: "Apple Distribution",
+      profile_name: profile_name,
+      targets: [paths[:scheme]],
+      build_configurations: ["Release"]
+    )
+
+    increment_build_number(
+      xcodeproj: paths[:xcodeproj],
+      build_number: latest_testflight_build_number(
+        app_identifier: app_id,
+        api_key: api_key,
+        initial_build_number: 0
+      ) + 1
+    )
+
+    build_app(
+      workspace: paths[:workspace],
+      scheme: paths[:scheme],
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: File.join(ROOT, "build"),
+      clean: true,
+      export_options: {
+        signingStyle: "manual",
+        teamID: apple_team,
+        provisioningProfiles: { app_id => profile_name }
+      }
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      app_identifier: app_id,
+      skip_waiting_for_build_processing: true,
+      distribute_external: false
+    )
+  end
+
+  desc "Create or renew the certificates and profiles (local only)"
+  lane :certificates do
+    UI.user_error!("run this from your machine, not from CI") if is_ci
+
+    decrypt_secrets!
+    match(
+      type: "appstore",
+      app_identifier: bundle_id,
+      git_url: CERTS_REPO,
+      git_branch: MATCH_BRANCH,
+      storage_mode: "git",
+      # match would otherwise rewrite the storage repository's README.md
+      skip_docs: true,
+      readonly: false,
+      api_key: asc_api_key
+    )
+  end
+end
+
+# --- Android ---------------------------------------------------------------
+# Not enabled yet: the Android secrets are missing from the shared repository.
+# See docs/90-android-later.md. This lane stays inert unless it is called.
+
+platform :android do
+  desc "Build the AAB and ship it to the Google Play internal track"
+  lane :beta do
+    decrypt_secrets!
+    expo_prebuild("android")
+
+    props = load_properties(secret("android/keystore.properties"))
+    json_key = secret("android/play-service-account.json")
+
+    # Injected through -P so it survives `expo prebuild --clean`, which
+    # rewrites build.gradle.
+    version_code = google_play_track_version_codes(
+      package_name: android_package,
+      track: "internal",
+      json_key: json_key
+    ).max.to_i + 1
+
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: File.join(ROOT, "android"),
+      properties: {
+        "android.injected.version.code" => version_code,
+        "android.injected.signing.store.file" => secret("android/release.keystore"),
+        "android.injected.signing.store.password" => props.fetch("storePassword"),
+        "android.injected.signing.key.alias" => props.fetch("keyAlias"),
+        "android.injected.signing.key.password" => props.fetch("keyPassword")
+      }
+    )
+
+    upload_to_play_store(
+      package_name: android_package,
+      track: "internal",
+      json_key: json_key,
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: true
+    )
+  end
+end
+
+# --- hygiene ---------------------------------------------------------------
+# Decrypted secrets never outlive the lane, on success or on failure.
+
+after_all do |_lane|
+  wipe_secrets!
+end
+
+error do |_lane, _exception|
+  wipe_secrets!
+end

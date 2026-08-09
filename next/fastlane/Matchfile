@@ -1,0 +1,21 @@
+# fastlane match configuration: iOS certificate storage.
+#
+# This file only serves manual invocations (`bundle exec fastlane match ...`).
+# The Fastfile already passes all of these options explicitly.
+
+git_url(ENV.fetch("CERTS_REPO_URL", "git@github.com:MoOx/certificates.git"))
+storage_mode("git")
+
+# fastlane defaults this to "master". The certificates repository uses "main".
+git_branch(ENV.fetch("MATCH_GIT_BRANCH", "main"))
+
+# match rewrites a README.md at the storage repository root on every run, which
+# would clobber the one documenting this setup.
+skip_docs(true)
+
+type("appstore")
+app_identifier([ENV.fetch("APP_IDENTIFIER")])
+team_id(ENV["APPLE_TEAM_ID"])
+
+# In CI we never create a new certificate, we consume the existing one.
+readonly(ENV["CI"] == "true")

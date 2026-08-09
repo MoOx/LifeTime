@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "io.moox.lifetime"
+      "bundleIdentifier": "io.moox.LifeTime"
     },
     "android": {
       "package": "io.moox.lifetime",

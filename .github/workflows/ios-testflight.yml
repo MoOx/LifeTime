@@ -1,0 +1,76 @@
+name: iOS to TestFlight
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+# One iOS build at a time: two concurrent `match` runs can stomp on each other
+# in the certificates repository.
+concurrency:
+  group: ios-testflight
+  cancel-in-progress: false
+
+jobs:
+  testflight:
+    runs-on: macos-15
+    timeout-minutes: 90
+    # The Expo project lives in next/, not at the repository root.
+    defaults:
+      run:
+        working-directory: next
+    env:
+      # Capitalised on purpose: the profile stored in MoOx/certificates is
+      # `AppStore_io.moox.LifeTime`, and Apple bundle IDs are case-sensitive.
+      APP_IDENTIFIER: io.moox.LifeTime
+      ANDROID_PACKAGE_NAME: io.moox.lifetime
+      APPLE_TEAM_ID: DHLLCP4Q6E
+      CERTS_REPO_URL: git@github.com:MoOx/certificates.git
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      SECRETS_PASSPHRASE: ${{ secrets.SECRETS_PASSPHRASE }}
+      FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: "120"
+      FASTLANE_SKIP_UPDATE_CHECK: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Grants the runner read access to the private certificates repository.
+      # The deploy key belongs to this project alone, so it can be revoked on
+      # its own.
+      - name: Access the certificates repository
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.CERTIFICATES_DEPLOY_KEY }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: next/.node-version
+          cache: npm
+          cache-dependency-path: next/package-lock.json
+      - run: npm ci
+
+      - name: Check types and tests before spending 20 minutes on a build
+        run: npm run check
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          working-directory: next
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build and upload to TestFlight
+        run: bundle exec fastlane ios beta
+
+      - name: Keep the logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastlane-logs
+          path: |
+            ~/Library/Logs/gym
+            ~/Library/Logs/fastlane
+          if-no-files-found: ignore
+          retention-days: 7

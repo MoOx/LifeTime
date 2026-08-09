@@ -1,0 +1,7 @@
+app_identifier(ENV.fetch("APP_IDENTIFIER"))
+apple_id(ENV["APPLE_ID"])            # optional, the ASC API key is enough
+team_id(ENV["APPLE_TEAM_ID"])
+
+for_platform :android do
+  package_name(ENV.fetch("ANDROID_PACKAGE_NAME", ENV.fetch("APP_IDENTIFIER")))
+end

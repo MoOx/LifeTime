@@ -21,10 +21,37 @@ a Mac, with three GitHub Actions workflows pinned to `@v2` actions:
 Every one of those is a reason not to touch the project after a few months away. **That is
 the actual root cause of "non maintenu par faute de temps"** — not the code.
 
-With EAS the whole chain is `eas build` + `eas submit`, credentials are managed for you,
-and builds run on Expo's macOS/Linux workers.
+Two things fix it, independently:
+
+- **EAS** removes the local toolchain entirely: the whole chain becomes `eas build` +
+  `eas submit`, credentials are managed for you, and builds run on Expo's workers.
+- **[`MoOx/certificates`](https://github.com/MoOx/certificates)** fixes the *other* half —
+  the part that made the old Fastlane setup unmaintainable. The signing material is
+  encrypted in a repository instead of living on one Mac, the App Store Connect API key
+  replaces the Apple ID and its 2FA prompts, and a project needs exactly three GitHub
+  secrets to ship. That is a genuinely different proposition from v1's `match` setup, and
+  it is worth keeping — see §10.
 
 ---
+
+## 1bis. Two paths, and when to use which
+
+There are now **two** ways to ship this app, and they are complementary rather than
+competing:
+
+| | **EAS** (§2–§6) | **Fastlane + match** (§10) |
+|---|---|---|
+| Credentials | managed by Expo | your own, in [`MoOx/certificates`](https://github.com/MoOx/certificates) |
+| Runs on | Expo's macOS workers | GitHub Actions `macos-15` |
+| Best for | the daily loop: dev builds, internal distribution, `eas update` | the release path: signed App Store builds → TestFlight |
+| Cost | free tier queues, ~$19/mo for priority | GitHub Actions minutes |
+
+**Recommended split:** EAS for development and internal distribution (§4.1, §4.2 — the
+fast feedback loop), Fastlane + match for TestFlight and the App Store (§10 — where you
+want to own the signing material).
+
+Both can coexist: they build the same `next/` project, and `expo prebuild` is what the
+Fastlane lane uses to produce the Xcode project EAS would otherwise generate for you.
 
 ## 2. Setup (once)
 
@@ -262,7 +289,95 @@ eas build --profile production --platform all --auto-submit
 
 ---
 
-## 10. Sources
+## 10. TestFlight through `MoOx/certificates`
+
+The private [`MoOx/certificates`](https://github.com/MoOx/certificates) repository holds the
+iOS signing material and is already wired up for this project. It is **Expo-aware**: its
+Fastfile runs `expo prebuild --clean` and then re-applies manual signing, which is exactly
+what a managed project needs.
+
+### What is already in place
+
+- **A distribution certificate** and an **App Store provisioning profile for
+  `io.moox.LifeTime`** — `make status` in that repo reports `ready`.
+- An **App Store Connect API key**, encrypted (`secrets/ios/app-store-connect-api-key.json.enc`),
+  so no Apple ID password or 2FA dance in CI.
+- Templates, copied into this project:
+
+| File | Role |
+|---|---|
+| `next/fastlane/Fastfile` | the `ios beta` lane: match → prebuild → sign → build → TestFlight |
+| `next/fastlane/Appfile`, `Matchfile` | identity and match storage config |
+| `next/Gemfile` | fastlane, cocoapods, xcodeproj |
+| `next/.env.example` | the values to fill locally |
+| `.github/workflows/ios-testflight.yml` | the CI job |
+
+### Bundle identifiers — read this before the first run
+
+Apple bundle IDs are **case-sensitive**, and the stored profile is
+`AppStore_io.moox.LifeTime`. So:
+
+- **iOS**: `io.moox.LifeTime` — set in `next/app.json` (`ios.bundleIdentifier`) and
+  verified against the generated Xcode project.
+- **Android**: `io.moox.lifetime`, lowercase, matching the package already on Play. The
+  Appfile keeps them separate via `ANDROID_PACKAGE_NAME`.
+
+Getting this wrong produces `No profile for team 'XXX' matching '...' found`, which is the
+first entry in that repo's troubleshooting list for good reason.
+
+### The three GitHub secrets
+
+On `MoOx/LifeTime` → *Settings → Secrets and variables → Actions*:
+
+| Secret | Value |
+|---|---|
+| `CERTIFICATES_DEPLOY_KEY` | ed25519 **private** key of a read-only deploy key registered on `MoOx/certificates`, including the trailing newline |
+| `MATCH_PASSWORD` | the match passphrase |
+| `SECRETS_PASSPHRASE` | the `secrets/` passphrase |
+
+Generating the deploy key (from `docs/03-sharing-access.md` in that repo):
+
+```sh
+ssh-keygen -t ed25519 -N "" \
+  -C "deploy key: LifeTime -> MoOx/certificates" \
+  -f ~/.ssh/certificates_lifetime
+```
+
+Public half → `MoOx/certificates` → *Settings → Deploy keys*, **without** write access.
+Private half → the `CERTIFICATES_DEPLOY_KEY` secret above.
+
+### Running it
+
+Manually: *Actions → iOS to TestFlight → Run workflow*. Or on a tag:
+
+```sh
+git tag v2.0.0 && git push --tags
+```
+
+Locally (needs macOS + Xcode):
+
+```sh
+cd next
+cp .env.example .env      # fill MATCH_PASSWORD and SECRETS_PASSPHRASE
+bundle install
+bundle exec fastlane ios beta
+```
+
+The workflow runs `npm run check` (typecheck + tests) before the build, so a broken commit
+fails in one minute instead of twenty.
+
+### Prerequisite outside of git
+
+**The app must exist on App Store Connect before the first upload**, with the bundle ID
+`io.moox.LifeTime`. v1 shipped under that identifier, so the record should already be
+there — worth confirming on
+[appstoreconnect.apple.com](https://appstoreconnect.apple.com/apps) before the first run.
+
+Note also that `latest_testflight_build_number + 1` means the new build number continues
+from v1's series (v1 shipped build 13), which is what you want — App Store Connect rejects
+a build number it has already seen.
+
+## 11. Sources
 
 - [Internal distribution — Expo](https://docs.expo.dev/build/internal-distribution/)
 - [Create and share internal distribution build](https://docs.expo.dev/tutorial/eas/internal-distribution-builds/)
