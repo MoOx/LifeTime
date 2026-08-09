@@ -426,6 +426,61 @@ Two follow-ups worth doing at some point:
 - `webfactory/ssh-agent@v0.9.1` still targets Node 20 and is being force-run on Node 24.
   Harmless today, worth watching.
 
+### Post-mortem: build 2 crashed on launch
+
+Build 2 uploaded cleanly and then segfaulted the moment it opened, on an iPhone 17 Pro
+running iOS 27 beta:
+
+```
+Exception Type:  EXC_BAD_ACCESS (SIGSEGV)
+Exception Subtype: KERN_INVALID_ADDRESS at 0x0000000000000018
+
+Thread 0 Crashed:
+0  React  -[RCTComponentViewFactory createComponentViewWithComponentHandle:] + 172
+1  React  -[RCTComponentViewRegistry _dequeueComponentViewWithComponentHandle:]
+3  React  RCTPerformMountInstructions(...)
+```
+
+**Cause: dependency drift.** Three packages were pinned by hand rather than by
+`npx expo install`, because `api.expo.dev` was unreachable from the machine that scaffolded
+the project:
+
+| Package | Shipped | Expo SDK 57 expects |
+|---|---|---|
+| `react-native-screens` | 4.27.0 | 4.26.0 |
+| `react-native-safe-area-context` | 5.8.1 | 5.7.0 |
+| `react` | 19.2.8 | 19.2.3 |
+
+Two of those own the components on the very first mount: `safe-area-context` provides
+`RNCSafeAreaProvider`, `screens` provides the stack and the native tabs. React Native 0.86
+ships React as a **prebuilt** framework, so a third-party Fabric component compiled against
+different codegen output never registers with the component view factory — and the factory
+dereferences a missing map entry rather than failing gracefully. Hence a null-pointer read
+at offset `0x18`, during the first mounting transaction, before a single pixel.
+
+Note what *did not* catch it: the build succeeded, the archive signed, the upload passed,
+`tsc` was clean and 62 tests were green. Nothing short of launching the binary would have
+surfaced it.
+
+**Guard added.** `npm run check:sdk` (`scripts/check-sdk-versions.mjs`) diffs `package.json`
+against `expo/bundledNativeModules.json`, the reference list `expo` already ships. It is
+part of `npm run check`, so it runs in CI *and* in the TestFlight job before the archive.
+Unlike `npx expo install --check` it needs no network, which is precisely the condition
+under which this bug was introduced.
+
+```
+✘ Versions do not match what this Expo SDK expects:
+
+  react-native-screens
+      declared: ~4.27.0
+      expected: ~4.26.0
+```
+
+**Rule of thumb:** never hand-pin anything listed in `bundledNativeModules.json`. If a peer
+conflict forces your hand — here `@expo/ui` pulled `react-dom@19.2.8` against
+`react@19.2.3` — pin the *offending transitive* package (adding `react-dom@19.2.3` as a
+direct dependency), never the SDK-managed one.
+
 ### Prerequisite outside of git
 
 **The app must exist on App Store Connect before the first upload**, with the bundle ID

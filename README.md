@@ -63,8 +63,12 @@ npm start             # expo start --dev-client
 Checks, the same ones CI runs:
 
 ```sh
-npm run check         # tsc --noEmit + jest
+npm run check         # SDK version drift + tsc --noEmit + jest
 ```
+
+`check:sdk` is not ceremony: hand-pinning `react-native-screens` one minor ahead of what
+the SDK expects is what crashed build 2 on launch. See
+[docs/RELEASE.md](docs/RELEASE.md) §10, "Post-mortem".
 
 ---
 

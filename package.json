@@ -11,11 +11,12 @@
     "lint": "expo lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "check": "npm run typecheck && npm run test",
+    "check": "npm run check:sdk && npm run typecheck && npm run test",
     "build:dev": "eas build --profile development --platform all",
     "build:preview": "eas build --profile preview --platform all",
     "build:prod": "eas build --profile production --platform all",
-    "update": "eas update --branch preview"
+    "update": "eas update --branch preview",
+    "check:sdk": "node scripts/check-sdk-versions.mjs"
   },
   "dependencies": {
     "@expo/ui": "~57.0.9",
@@ -27,14 +28,15 @@
     "expo-localization": "~57.0.1",
     "expo-router": "~57.0.11",
     "expo-splash-screen": "~57.0.5",
+    "expo-sqlite": "~57.0.1",
     "expo-status-bar": "~57.0.1",
     "expo-symbols": "~57.0.2",
     "expo-system-ui": "~57.0.2",
-    "react": "19.2.8",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-native": "0.86.2",
-    "react-native-safe-area-context": "~5.8.1",
-    "react-native-screens": "~4.27.0",
-    "expo-sqlite": "~57.0.1"
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
