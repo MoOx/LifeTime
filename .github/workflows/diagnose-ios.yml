@@ -81,7 +81,13 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             build 2>&1 | tail -5
 
-      # The point of the whole job: does it survive launch?
+      # The point of the whole job: does it survive launch, and if not, what does a
+      # Debug build say? In Debug, RCTAssert is compiled in, so an unregistered Fabric
+      # component names itself instead of segfaulting in the factory.
+      #
+      # No `timeout` here: macOS does not ship it (that is GNU coreutils' `gtimeout`),
+      # and its absence previously made this step report a crash for an app it had
+      # never actually launched.
       - name: Launch it in a simulator
         run: |
           set -eo pipefail
@@ -95,38 +101,70 @@ jobs:
           xcrun simctl bootstatus "$UDID" -b
 
           xcrun simctl install "$UDID" "$APP"
-          # --console-pty surfaces the JS logs, and exits when the app dies.
-          set +e
-          timeout 60 xcrun simctl launch --console-pty "$UDID" io.moox.LifeTime 2>&1 | tail -60
-          set -e
 
-          sleep 5
-          if xcrun simctl spawn "$UDID" launchctl list 2>/dev/null | grep -q io.moox.LifeTime; then
-            echo "RESULT: still running — no launch crash"
+          # --console-pty streams the app's stdout/stderr and exits when it dies.
+          # Backgrounded with a manual deadline so a healthy app does not hang the job.
+          xcrun simctl launch --console-pty "$UDID" io.moox.LifeTime > launch.log 2>&1 &
+          LPID=$!
+          ALIVE=0
+          for _ in $(seq 1 45); do
+            sleep 1
+            if ! kill -0 "$LPID" 2>/dev/null; then ALIVE=0; break; fi
+            ALIVE=1
+          done
+          kill "$LPID" 2>/dev/null || true
+
+          echo "--- app output ---"
+          tail -80 launch.log || true
+          echo "------------------"
+
+          if [ "$ALIVE" = "1" ]; then
+            echo "RESULT: still running after 45s — no launch crash"
           else
-            echo "RESULT: the process is gone — it crashed on launch"
+            echo "RESULT: the app exited — it crashed on launch"
           fi
+
+      # The Debug assertion, if there was one, lands in the device log rather than on
+      # the app's stdout.
+      - name: Device log for the app
+        if: always()
+        run: |
+          UDID=$(xcrun simctl list devices booted -j \
+            | python3 -c "import json,sys;d=json.load(sys.stdin)['devices'];print(([x['udid'] for r in d.values() for x in r] or [''])[0])")
+          [ -n "$UDID" ] || { echo "no booted simulator"; exit 0; }
+          xcrun simctl spawn "$UDID" log show --last 5m --style compact \
+            --predicate 'processImagePath CONTAINS "LifeTime"' 2>/dev/null \
+            | grep -viE "^Timestamp|^Filtering|signpost" | tail -60 || echo "(empty)"
 
       - name: Crash report, if any
         if: always()
         run: |
-          D=~/Library/Logs/DiagnosticReports
-          LATEST=$(ls -t "$D"/LifeTime*.ips 2>/dev/null | head -1)
-          if [ -z "$LATEST" ]; then echo "no crash report"; exit 0; fi
-          echo "--- $LATEST ---"
-          python3 - "$LATEST" <<'PY'
+          sleep 5
+          for D in ~/Library/Logs/DiagnosticReports \
+                   ~/Library/Developer/CoreSimulator/Devices/*/data/Library/Logs/DiagnosticReports; do
+            for F in $D/LifeTime*.ips; do
+              [ -e "$F" ] || continue
+              echo "--- $F ---"
+              python3 - "$F" <<'PY'
           import json, sys
           raw = open(sys.argv[1]).read()
-          head, _, body = raw.partition("\n")
+          _, _, body = raw.partition("\n")
           d = json.loads(body)
           print("exception:", d.get("exception"))
           print("termination:", d.get("termination"))
-          frames = d.get("threads", [{}])[0].get("frames", [])
           images = d.get("usedImages", [])
-          for f in frames[:14]:
-              name = images[f["imageIndex"]].get("name", "?") if f.get("imageIndex", -1) < len(images) else "?"
-              print(f"  {name:28} {f.get('symbol') or hex(f.get('imageOffset', 0))}")
+          for t in d.get("threads", []):
+              if not t.get("triggered"):
+                  continue
+              for f in t.get("frames", [])[:16]:
+                  i = f.get("imageIndex", -1)
+                  name = images[i].get("name", "?") if 0 <= i < len(images) else "?"
+                  print(f"  {name:28} {f.get('symbol') or hex(f.get('imageOffset', 0))}")
           PY
+              exit 0
+            done
+          done
+          echo "no crash report found"
 
       - name: Keep everything on failure
         if: failure()
