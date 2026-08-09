@@ -1,8 +1,13 @@
 # LifeTime — Functional & Technical Specification
 
-> Reverse-engineered from the existing codebase (last commit `dd90c0d`, 2022-03-07,
-> React Native 0.67 + ReScript 9). This document describes **what the app does today**,
-> not what it should do. Improvement proposals live in [IMPROVEMENTS.md](./IMPROVEMENTS.md).
+> Reverse-engineered from the v1 codebase (last commit `dd90c0d`, 2022-03-07,
+> React Native 0.67 + ReScript 9). This document describes **what v1 does**, not what it
+> should do. Improvement proposals live in [IMPROVEMENTS.md](./IMPROVEMENTS.md).
+>
+> **Every `src/*.res` path quoted below refers to v1**, which now lives on the `main`
+> branch — the v2 tree replaced it at the repository root. To follow along:
+> `git show main:src/components/GoalCard.res`, or `git checkout main -- src` in a
+> scratch clone.
 
 ---
 

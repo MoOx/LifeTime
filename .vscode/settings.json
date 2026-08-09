@@ -1,7 +1,0 @@
-{
-  "eslint.lintTask.enable": true,
-  "triggerTaskOnSave.tasks": {
-    "eslint-rescript": ["src/**/*.res"]
-  },
-  "triggerTaskOnSave.delay": 1000
-}

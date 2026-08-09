@@ -1,122 +1,61 @@
-## React Native
-
-# OSX
-#
-.DS_Store
-
-# Xcode
-#
-build/
-*.pbxuser
-!default.pbxuser
-*.mode1v3
-!default.mode1v3
-*.mode2v3
-!default.mode2v3
-*.perspectivev3
-!default.perspectivev3
-xcuserdata
-*.xccheckout
-*.moved-aside
-DerivedData
-*.hmap
-*.ipa
-*.xcuserstate
-
-# Android/IntelliJ
-#
-build/
-.idea
-.gradle
-local.properties
-*.iml
-*.hprof
-
-# node.js
-#
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# BUCK
-buck-out/
-\.buckd/
-*.keystore
-!debug.keystore
-
-# fastlane
-#
-# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
-# screenshots whenever they are needed.
-# For more information about the recommended setup visit:
-# https://docs.fastlane.tools/best-practices/source-control/
-
-*/fastlane/report.xml
-*/fastlane/Preview.html
-*/fastlane/screenshots
-
-# Bundle artifact
-*.jsbundle
-
-# CocoaPods
-/vendor/bundle
-/ios/Pods/
-
-## React Web
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
 # dependencies
-/node_modules
-/.pnp
-.pnp.js
+node_modules/
 
-# testing
-/coverage
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
 
-# production
-/build
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
 
-# misc
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
 .DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+*.pem
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# local env files
+.env*.local
 
-## Custom
+# typescript
+*.tsbuildinfo
 
-# ReScript artifacts
-*.bs.js
-.bsb.lock
-**/lib/bs
-**/lib/ocaml
-**/.merlin
+# generated native folders
+/ios
+/android
 
-# react-from-svg artifacts
-src/SVGs/components
-
-# markdown-to-json compiled json
-src/md/*.json
-
-# sensitive information
-android/app/google-service-api-key.json
-sentry.properties
-fastlane/AppFile
-fastlane/MatchFile
-
-# useless
+# --- mobile builds (shared certificates repository) -------------------------
+# Local clone of the certificates repository
+.certificates/
+# Secrets decrypted on the fly by the Fastfile
+.secrets/
+# Local variables (holds MATCH_PASSWORD / SECRETS_PASSPHRASE)
+.env
+!.env.example
+# Build outputs
+build/
+*.ipa
+*.dSYM.zip
+*.aab
+*.apk
+# fastlane
 fastlane/report.xml
 fastlane/Preview.html
-fastlane/screenshots
-
-# iOS Build artifacts (fastlane)
-*.app.dSYM*
-
-# react-native-bootsplash artifacts
-android/app/src/main/res/values/colors.xml
-android/app/src/main/res/mipmap-*/bootsplash_logo.png
-ios/*/BootSplash.storyboard
-ios/*/Images.xcassets/BootSplashLogo.imageset
+fastlane/screenshots/**/*.png
+fastlane/test_output

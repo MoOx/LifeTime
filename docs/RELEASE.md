@@ -50,7 +50,7 @@ competing:
 fast feedback loop), Fastlane + match for TestFlight and the App Store (§10 — where you
 want to own the signing material).
 
-Both can coexist: they build the same `next/` project, and `expo prebuild` is what the
+Both can coexist: they build the same project, and `expo prebuild` is what the
 Fastlane lane uses to produce the Xcode project EAS would otherwise generate for you.
 
 ## 2. Setup (once)
@@ -198,24 +198,20 @@ without going through App Review (for JS-only changes, within Apple's rules).
 
 ## 6. CI
 
-Replace the three current workflows with:
+v1's three workflows (`build-ios.yml`, `build-android.yml`, `build-tests.yml`, all pinned
+to `@v2` actions and requiring a macOS runner for iOS) are replaced by two:
 
-```yaml
-# .github/workflows/ci.yml
-name: CI
-on: [push, pull_request]
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with: { node-version-file: .node-version, cache: npm }
-      - run: npm ci
-      - run: npx tsc --noEmit
-      - run: npm run lint
-      - run: npm test
-```
+| Workflow | Runs on | What it does |
+|---|---|---|
+| `.github/workflows/ci.yml` | `ubuntu-latest` | `tsc --noEmit`, `jest`, and an `expo export` for both platforms |
+| `.github/workflows/ios-testflight.yml` | `macos-15` | the signed TestFlight build (§10) |
+
+The `bundle` job in `ci.yml` is worth the extra minute: `expo export` resolves the whole
+module graph and runs every config plugin, so a broken `app.json` or a missing native
+dependency fails on a Linux runner in ~2 minutes instead of 20 minutes into an Xcode
+archive.
+
+If you also want cloud builds on every push to `main`, add:
 
 ```yaml
 # .github/workflows/build.yml
@@ -227,8 +223,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with: { node-version-file: .node-version, cache: npm }
       - uses: expo/expo-github-action@v8
         with: { eas-version: latest, token: '${{ secrets.EXPO_TOKEN }}' }
@@ -237,7 +233,6 @@ jobs:
 ```
 
 Note this runs on `ubuntu-latest` even for iOS — the macOS worker is EAS's, not GitHub's.
-That alone removes the most expensive and most fragile part of the current CI.
 
 `EXPO_TOKEN` comes from `eas whoami`/expo.dev account settings.
 
@@ -250,8 +245,14 @@ lighter path is **Maestro** flows producing screenshots on both platforms
 (see [IMPROVEMENTS.md](./IMPROVEMENTS.md) §C.2), with `eas submit`'s metadata support (or
 `fastlane deliver`, kept solely for metadata) for upload.
 
-Keep the existing `fastlane/screenshot-background.heic` and the Open Sans frame assets —
-they are the app's store identity and are still perfectly usable.
+v1's frame assets (`fastlane/screenshot-background.heic` and the bundled Open Sans family,
+~2.2 MB) went out with the rest of v1 when the tree was flattened. They are still the
+app's store identity and remain perfectly usable — recover them from `main` when you get
+to store screenshots:
+
+```sh
+git checkout main -- fastlane/screenshot-background.heic fastlane/screenshot-font-open-sans
+```
 
 ---
 
@@ -306,10 +307,10 @@ what a managed project needs.
 
 | File | Role |
 |---|---|
-| `next/fastlane/Fastfile` | the `ios beta` lane: match → prebuild → sign → build → TestFlight |
-| `next/fastlane/Appfile`, `Matchfile` | identity and match storage config |
-| `next/Gemfile` | fastlane, cocoapods, xcodeproj |
-| `next/.env.example` | the values to fill locally |
+| `fastlane/Fastfile` | the `ios beta` lane: match → prebuild → sign → build → TestFlight |
+| `fastlane/Appfile`, `Matchfile` | identity and match storage config |
+| `Gemfile` | fastlane, cocoapods, xcodeproj |
+| `.env.example` | the values to fill locally |
 | `.github/workflows/ios-testflight.yml` | the CI job |
 
 ### Bundle identifiers — read this before the first run
@@ -317,7 +318,7 @@ what a managed project needs.
 Apple bundle IDs are **case-sensitive**, and the stored profile is
 `AppStore_io.moox.LifeTime`. So:
 
-- **iOS**: `io.moox.LifeTime` — set in `next/app.json` (`ios.bundleIdentifier`) and
+- **iOS**: `io.moox.LifeTime` — set in `app.json` (`ios.bundleIdentifier`) and
   verified against the generated Xcode project.
 - **Android**: `io.moox.lifetime`, lowercase, matching the package already on Play. The
   Appfile keeps them separate via `ANDROID_PACKAGE_NAME`.
