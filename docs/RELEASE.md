@@ -450,6 +450,51 @@ Two follow-ups worth doing at some point:
 - `webfactory/ssh-agent@v0.9.1` still targets Node 20 and is being force-run on Node 24.
   Harmless today, worth watching.
 
+### Status: the launch crash is NOT solved
+
+> Read this before the post-mortem below. The version-drift fix it describes was real and
+> worth keeping, but **it was not the cause** — build 3 crashed with a byte-identical
+> stack.
+
+Where the evidence stands after four builds and five CI diagnoses:
+
+| Configuration | Result |
+|---|---|
+| Release, **simulator** (iOS 26.5, Xcode 26.6) | **runs** — UI renders, `calaccessd` and `remindd` connect, no crash |
+| Release, **device** (iPhone 17 Pro, **iOS 27.0 beta**), via TestFlight | crashes at the first mounting transaction |
+
+Ruled out, each with evidence rather than reasoning:
+
+- **`@expo/ui`** — `ExpoModulesProvider.swift` registers `ExpoUIModule` alongside every
+  other Expo module.
+- **Autolinking** — resolves all five native packages with correct podspecs.
+- **Version drift** — all six SDK-managed native modules now match, and the crash survived.
+- **Component registration generally** — the same Release binary mounts and renders in a
+  simulator, so the components *are* registered.
+- **The build itself** — builds, links, archives, signs and uploads clean.
+
+What is left, in order of likelihood:
+
+1. **iOS 27.0 beta.** The binary is built against the iOS 26 SDK (`AppVariant: 1:iPhone18,2:26`)
+   and the device runs an OS that postdates React Native 0.86 and Expo SDK 57. This is the
+   only axis the simulator cannot test, since no runner ships an iOS 27 simulator.
+2. **The archive/export/thinning path** — TestFlight binaries are archived, exported for
+   `app-store`, thinned per device and re-signed; a plain `xcodebuild build` is none of
+   those.
+3. Something device-only in `react-native-screens`, which HideTheNotch — running on the
+   same phone, same OS, same toolchain — does not use.
+
+**The experiment that settles it** needs the device, and takes about five minutes: plug the
+iPhone into the Mac and run `npm run ios`. That is a Debug build on the real OS, with
+`RCTAssert` compiled in, so an unregistered Fabric component prints
+
+```
+ComponentView with componentHandle ... is not registered.
+```
+
+instead of segfaulting. Everything above is an attempt to obtain that one line without the
+device; the device makes it free.
+
 ### Post-mortem: build 2 crashed on launch
 
 Build 2 uploaded cleanly and then segfaulted the moment it opened, on an iPhone 17 Pro
