@@ -22,9 +22,13 @@ on:
   push:
     branches: ["**"]
 
+# NOT cancel-in-progress: GitHub evaluates concurrency before the job's `if:`, so a
+# later push whose run is skipped still joins the group — and with cancellation on, it
+# killed a diagnosis that was 12 minutes into a simulator build. A skipped run costs
+# seconds, so queueing is free.
 concurrency:
   group: diagnose-ios
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   diagnose:
