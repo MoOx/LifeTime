@@ -1,20 +1,19 @@
 name: iOS diagnosis
 
-# Prints what actually ends up linked into the app, and builds it unsigned for the
-# simulator. Roughly 6 minutes, no Apple account, no TestFlight round-trip.
+# Reproduces the launch crash in CI instead of on someone's phone, and prints what is
+# actually registered. ~16 minutes, no Apple account, no TestFlight round-trip.
 #
-# Written to settle a launch crash that survived two TestFlight builds:
+# Two TestFlight builds died identically at launch:
 #
 #   EXC_BAD_ACCESS at 0x18 in
 #   -[RCTComponentViewFactory createComponentViewWithComponentHandle:]
 #
 # which is what a Fabric component with no registered native class looks like in a
-# Release build (the RCTAssert that would have named it is compiled out). The two
-# generated files below are the ground truth for "what is registered":
+# Release build — the RCTAssert that would have named it is compiled out.
 #
-#   ExpoModulesProvider.swift          every linked Expo module (@expo/ui, expo-calendar…)
-#   RCTThirdPartyComponentsProvider.mm every codegen'd third-party Fabric component
-#                                      (react-native-screens, safe-area-context…)
+# Already ruled out: every Expo module is registered (ExpoModulesProvider lists
+# ExpoUIModule, CalendarModule and the rest), autolinking resolves all five native
+# packages with correct podspecs, and the app builds and links clean.
 #
 # Trigger: Actions > iOS diagnosis > Run workflow, or a [diagnose] commit marker.
 
@@ -51,26 +50,19 @@ jobs:
       - name: CocoaPods
         run: npx pod-install
 
-      - name: Linked Expo modules
-        run: |
-          echo "::group::ExpoModulesProvider.swift"
-          find ios -name 'ExpoModulesProvider.swift' -exec cat {} \;
-          echo "::endgroup::"
-
+      # Compact on purpose: the component names are the answer, the file is noise.
       - name: Registered third-party Fabric components
         run: |
-          echo "::group::RCTThirdPartyComponentsProvider.mm"
-          find ios -name 'RCTThirdPartyComponentsProvider.mm' -exec cat {} \; || \
-            echo "NOT GENERATED — no third-party Fabric component is registered at all"
-          echo "::endgroup::"
+          F=$(find ios -name 'RCTThirdPartyComponentsProvider.mm' | head -1)
+          if [ -z "$F" ]; then
+            echo "RCTThirdPartyComponentsProvider.mm NOT GENERATED"
+            echo "=> no third-party Fabric component is registered at all"
+            exit 0
+          fi
+          echo "Found: $F"
+          echo "--- registered components ---"
+          grep -oE '@"[A-Za-z0-9_]+"' "$F" | tr -d '@"' | sort -u
 
-      - name: Pods actually installed
-        run: |
-          echo "::group::Podfile.lock"
-          sed -n '/^PODS:/,/^DEPENDENCIES:/p' ios/Podfile.lock
-          echo "::endgroup::"
-
-      # If this fails, the problem is the build, not the runtime.
       - name: Build for the simulator
         run: |
           set -eo pipefail
@@ -83,16 +75,62 @@ jobs:
             -sdk iphonesimulator \
             -derivedDataPath ios/build \
             CODE_SIGNING_ALLOWED=NO \
-            build | tail -40
+            build 2>&1 | tail -5
 
-      - name: Keep the generated sources on failure
+      # The point of the whole job: does it survive launch?
+      - name: Launch it in a simulator
+        run: |
+          set -eo pipefail
+          APP=$(find ios/build/Build/Products -name '*.app' -maxdepth 2 | head -1)
+          echo "App: $APP"
+
+          UDID=$(xcrun simctl list devices available -j \
+            | python3 -c "import json,sys;d=json.load(sys.stdin)['devices'];print([x['udid'] for r in d.values() for x in r if x['isAvailable']][0])")
+          echo "Simulator: $UDID"
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+
+          xcrun simctl install "$UDID" "$APP"
+          # --console-pty surfaces the JS logs, and exits when the app dies.
+          set +e
+          timeout 60 xcrun simctl launch --console-pty "$UDID" io.moox.LifeTime 2>&1 | tail -60
+          set -e
+
+          sleep 5
+          if xcrun simctl spawn "$UDID" launchctl list 2>/dev/null | grep -q io.moox.LifeTime; then
+            echo "RESULT: still running — no launch crash"
+          else
+            echo "RESULT: the process is gone — it crashed on launch"
+          fi
+
+      - name: Crash report, if any
+        if: always()
+        run: |
+          D=~/Library/Logs/DiagnosticReports
+          LATEST=$(ls -t "$D"/LifeTime*.ips 2>/dev/null | head -1)
+          if [ -z "$LATEST" ]; then echo "no crash report"; exit 0; fi
+          echo "--- $LATEST ---"
+          python3 - "$LATEST" <<'PY'
+          import json, sys
+          raw = open(sys.argv[1]).read()
+          head, _, body = raw.partition("\n")
+          d = json.loads(body)
+          print("exception:", d.get("exception"))
+          print("termination:", d.get("termination"))
+          frames = d.get("threads", [{}])[0].get("frames", [])
+          images = d.get("usedImages", [])
+          for f in frames[:14]:
+              name = images[f["imageIndex"]].get("name", "?") if f.get("imageIndex", -1) < len(images) else "?"
+              print(f"  {name:28} {f.get('symbol') or hex(f.get('imageOffset', 0))}")
+          PY
+
+      - name: Keep everything on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ios-generated
+          name: ios-diagnosis
           path: |
             ios/Podfile.lock
-            ios/Pods/Target Support Files/**/ExpoModulesProvider.swift
-            ios/build/Build/Intermediates.noindex/**/RCTThirdPartyComponentsProvider.*
+            ~/Library/Logs/DiagnosticReports/LifeTime*.ips
           if-no-files-found: ignore
           retention-days: 7
