@@ -462,19 +462,39 @@ Note what *did not* catch it: the build succeeded, the archive signed, the uploa
 `tsc` was clean and 62 tests were green. Nothing short of launching the binary would have
 surfaced it.
 
-**Guard added.** `npm run check:sdk` (`scripts/check-sdk-versions.mjs`) diffs `package.json`
+**Guard added.** `npm run check:sdk` (`scripts/check-sdk-versions.mjs`) diffs the project
 against `expo/bundledNativeModules.json`, the reference list `expo` already ships. It is
 part of `npm run check`, so it runs in CI *and* in the TestFlight job before the archive.
 Unlike `npx expo install --check` it needs no network, which is precisely the condition
 under which this bug was introduced.
 
-```
-✘ Versions do not match what this Expo SDK expects:
+It checks **two** things, and the second one only exists because the first version of this
+script was not enough:
 
-  react-native-screens
-      declared: ~4.27.0
-      expected: ~4.26.0
-```
+- declared ranges in `package.json` against the SDK's,
+- **installed** versions in `node_modules` against the SDK's range — including packages
+  nothing declares.
+
+That second check immediately turned up a drift nobody had noticed:
+`react-native-gesture-handler` **3.1.0** installed against an SDK expecting **~2.32.0** —
+a major version ahead, on yet another module that registers Fabric components, pulled in
+purely transitively. Along with `react-native-reanimated` (4.5.3 vs 4.5.1) and
+`react-native-worklets` (0.11.3 vs 0.10.1), which additionally made `npm ci` refuse the
+lockfile since `expo-modules-core` peer-requires worklets `<= 0.10.x`.
+
+Final state, all six aligned:
+
+| Package | Installed | SDK expects |
+|---|---|---|
+| `react` / `react-dom` | 19.2.3 | 19.2.3 |
+| `react-native-screens` | 4.26.2 | ~4.26.0 |
+| `react-native-safe-area-context` | 5.7.0 | ~5.7.0 |
+| `react-native-gesture-handler` | 2.32.0 | ~2.32.0 |
+| `react-native-reanimated` | 4.5.1 | 4.5.1 |
+| `react-native-worklets` | 0.10.1 | 0.10.1 |
+
+Transitive native modules are pinned as direct dependencies deliberately: it is the only
+way to hold them, and being explicit is the point.
 
 **Rule of thumb:** never hand-pin anything listed in `bundledNativeModules.json`. If a peer
 conflict forces your hand — here `@expo/ui` pulled `react-dom@19.2.8` against
