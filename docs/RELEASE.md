@@ -349,11 +349,45 @@ Private half → the `CERTIFICATES_DEPLOY_KEY` secret above.
 
 ### Running it
 
-Manually: *Actions → iOS to TestFlight → Run workflow*. Or on a tag:
+Three ways, and the first one only works once this is on `main`:
 
 ```sh
+# 1. Actions → iOS to TestFlight → Run workflow   (needs the workflow on main)
+# 2. a release tag
 git tag v2.0.0 && git push --tags
+# 3. from any branch, before the merge:
+git commit --allow-empty -m "Ship a build [testflight]" && git push
 ```
+
+**Why the marker.** GitHub only registers a `workflow_dispatch` workflow that exists on
+the **default branch**; dispatching from a feature branch returns `404 Not Found`. So the
+workflow also listens to `push` on `branches: ["**"]` and gates itself on an `if:` that
+requires either a `v*` tag or `[testflight]` in the commit message — otherwise every push
+would trigger a 20-minute signed build. Drop the marker once this is merged. This is the
+same arrangement as `MoOx/HideTheNotch`.
+
+### Xcode version — do not add `setup-xcode`
+
+The workflow deliberately uses the runner image's **default** Xcode. Selecting
+`latest-stable` via `maxim-lobanov/setup-xcode` picks Xcode 26.3, whose Swift compiler
+fails on Expo's own code:
+
+```
+expo-modules-jsi/.../JavaScriptCodable+Date.swift:53:50:
+error: type of expression is ambiguous without a type annotation
+```
+
+`MoOx/HideTheNotch` hit this and reverted to the image default, which compiles. Pin an
+explicit known-good version here rather than reintroducing `latest-stable`.
+
+### `APPLE_TEAM_ID` is a repository *variable*, not a secret
+
+Team IDs are not secret — they appear in every provisioning profile. Following the
+HideTheNotch convention, the workflow reads `${{ vars.APPLE_TEAM_ID }}` from
+*Settings → Secrets and variables → Actions → Variables*. The preflight step reports it as
+missing within 30 seconds rather than letting fastlane fail obscurely ten minutes in.
+
+(For reference, v1 built against team `DHLLCP4Q6E`, per its `project.pbxproj`.)
 
 Locally (needs macOS + Xcode):
 

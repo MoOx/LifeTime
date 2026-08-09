@@ -1,8 +1,9 @@
 name: CI
 
 on:
+  # Every branch: this is the feedback loop while the rewrite lives outside main.
   push:
-    branches: [main]
+    branches: ["**"]
   pull_request:
   workflow_dispatch:
 
@@ -10,11 +11,12 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version-file: .node-version
           cache: npm
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - run: npx tsc --noEmit
       - run: npm test
@@ -24,11 +26,12 @@ jobs:
   bundle:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version-file: .node-version
           cache: npm
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - run: npx expo export --platform ios --output-dir /tmp/export-ios
       - run: npx expo export --platform android --output-dir /tmp/export-android

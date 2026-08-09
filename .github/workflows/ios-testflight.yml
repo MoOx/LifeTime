@@ -1,9 +1,27 @@
 name: iOS to TestFlight
 
+# Adapted from MoOx/certificates templates/github-workflows/ios-testflight.yml,
+# with the deviations already validated on MoOx/HideTheNotch.
+#
+# Repository secrets required (Settings > Secrets and variables > Actions):
+#
+#   CERTIFICATES_DEPLOY_KEY   read-only ed25519 deploy key for MoOx/certificates
+#   MATCH_PASSWORD            match passphrase
+#   SECRETS_PASSPHRASE        passphrase for the certificates repo secrets/
+#
+# Repository variable required (same page, "Variables" tab):
+#
+#   APPLE_TEAM_ID             developer.apple.com > Membership
+#
+# The [testflight] commit marker exists only because workflow_dispatch cannot be
+# triggered from a branch that is not the default one. Drop it once this is on
+# main.
+
 on:
   workflow_dispatch:
   push:
     tags: ["v*"]
+    branches: ["**"]
 
 # One iOS build at a time: two concurrent `match` runs can stomp on each other
 # in the certificates repository.
@@ -13,14 +31,23 @@ concurrency:
 
 jobs:
   testflight:
-    runs-on: macos-15
+    # Deliberately the image default Xcode. HideTheNotch established that
+    # setup-xcode with latest-stable picks Xcode 26.3, whose Swift compiler
+    # rejects expo-modules-jsi:
+    #   JavaScriptCodable+Date.swift:53:50: error: type of expression is
+    #   ambiguous without a type annotation
+    runs-on: macos-latest
     timeout-minutes: 90
+    if: >-
+      github.event_name != 'push' ||
+      startsWith(github.ref, 'refs/tags/v') ||
+      contains(github.event.head_commit.message, '[testflight]')
     env:
       # Capitalised on purpose: the profile stored in MoOx/certificates is
       # `AppStore_io.moox.LifeTime`, and Apple bundle IDs are case-sensitive.
       APP_IDENTIFIER: io.moox.LifeTime
       ANDROID_PACKAGE_NAME: io.moox.lifetime
-      APPLE_TEAM_ID: DHLLCP4Q6E
+      APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
       CERTS_REPO_URL: git@github.com:MoOx/certificates.git
       MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       SECRETS_PASSPHRASE: ${{ secrets.SECRETS_PASSPHRASE }}
@@ -28,20 +55,35 @@ jobs:
       FASTLANE_SKIP_UPDATE_CHECK: "1"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+
+      # Fail here with a readable message rather than deep inside fastlane.
+      - name: Check the configuration is complete
+        run: |
+          missing=""
+          [ -n "$APPLE_TEAM_ID" ] || missing="$missing APPLE_TEAM_ID(variable)"
+          [ -n "$MATCH_PASSWORD" ] || missing="$missing MATCH_PASSWORD"
+          [ -n "$SECRETS_PASSPHRASE" ] || missing="$missing SECRETS_PASSPHRASE"
+          [ -n "${{ secrets.CERTIFICATES_DEPLOY_KEY }}" ] || missing="$missing CERTIFICATES_DEPLOY_KEY"
+          if [ -n "$missing" ]; then
+            echo "Missing:$missing"
+            echo "See docs/RELEASE.md, section 10."
+            exit 1
+          fi
+          echo "All four values are present."
 
       # Grants the runner read access to the private certificates repository.
-      # The deploy key belongs to this project alone, so it can be revoked on
-      # its own.
       - name: Access the certificates repository
         uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.CERTIFICATES_DEPLOY_KEY }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version-file: .node-version
           cache: npm
+          cache-dependency-path: package-lock.json
+
       - run: npm ci
 
       - name: Check types and tests before spending 20 minutes on a build
@@ -49,12 +91,15 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         with:
+          ruby-version: "3.3"
           bundler-cache: true
 
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
+      # Recorded so the version can be pinned explicitly once one is known good.
+      - name: Xcode version in use
+        run: xcodebuild -version
 
+      # The lane runs `expo prebuild --clean` and pod install itself, so there
+      # is nothing to prepare beforehand.
       - name: Build and upload to TestFlight
         run: bundle exec fastlane ios beta
 
@@ -66,5 +111,6 @@ jobs:
           path: |
             ~/Library/Logs/gym
             ~/Library/Logs/fastlane
+            fastlane/report.xml
           if-no-files-found: ignore
           retention-days: 7
