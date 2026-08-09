@@ -67,6 +67,11 @@ jobs:
           echo "--- registered components ---"
           grep -oE '@"[A-Za-z0-9_]+"' "$F" | tr -d '@"' | sort -u
 
+      # Release, deliberately. A Debug build does not embed the JS bundle: without a
+      # Metro server the app shows a connection error and never executes any of our
+      # code, so it never reaches the mounting transaction that crashes — which is
+      # exactly how the previous run "passed" while proving nothing.
+      # Release also matches the configuration that actually fails.
       - name: Build for the simulator
         run: |
           set -eo pipefail
@@ -75,11 +80,21 @@ jobs:
           xcodebuild \
             -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
-            -configuration Debug \
+            -configuration Release \
             -sdk iphonesimulator \
             -derivedDataPath ios/build \
             CODE_SIGNING_ALLOWED=NO \
             build 2>&1 | tail -5
+
+      - name: Confirm the JS bundle is embedded
+        run: |
+          APP=$(find ios/build/Build/Products -name '*.app' -maxdepth 2 | head -1)
+          if [ -f "$APP/main.jsbundle" ]; then
+            echo "main.jsbundle embedded ($(du -h "$APP/main.jsbundle" | cut -f1)) — the app runs standalone"
+          else
+            echo "NO main.jsbundle — the app would need Metro, the launch test below is meaningless"
+            exit 1
+          fi
 
       # The point of the whole job: does it survive launch, and if not, what does a
       # Debug build say? In Debug, RCTAssert is compiled in, so an unregistered Fabric
