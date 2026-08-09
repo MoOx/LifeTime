@@ -212,6 +212,36 @@ platform :ios do
       api_key: asc_api_key
     )
   end
+
+  # Added on top of the MoOx/certificates template. That repository is App Store
+  # only — `grep -i development` finds nothing in it — so running the app on a
+  # physical device fails with:
+  #
+  #   CommandError: No code signing certificates are available to use.
+  #
+  # A distribution certificate cannot sign a development build. This creates the
+  # development certificate and profile once, stores them alongside the others,
+  # and registers the device. After it, `npm run ios -- --device` works on any
+  # machine that can decrypt the repository.
+  desc "Create or fetch the development certificate and profile (local only)"
+  lane :development do
+    UI.user_error!("run this from your machine, not from CI") if is_ci
+
+    decrypt_secrets!
+    match(
+      type: "development",
+      app_identifier: bundle_id,
+      git_url: CERTS_REPO,
+      git_branch: MATCH_BRANCH,
+      storage_mode: "git",
+      skip_docs: true,
+      readonly: false,
+      # Adds the plugged-in device to the provisioning profile, which is the
+      # other half of why a device build fails.
+      force_for_new_devices: true,
+      api_key: asc_api_key
+    )
+  end
 end
 
 # --- Android ---------------------------------------------------------------

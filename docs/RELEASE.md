@@ -58,8 +58,39 @@ Fastlane lane uses to produce the Xcode project EAS would otherwise generate for
 On a Mac with Xcode, the shortest loop does not involve EAS *or* Fastlane:
 
 ```sh
-npm run ios      # expo run:ios — prebuild, pod install, build, launch
+npm run ios      # expo run:ios — prebuild, pod install, build, launch (simulator)
 ```
+
+### Running on a physical device
+
+```
+CommandError: No code signing certificates are available to use.
+```
+
+`MoOx/certificates` is **App Store only** — `grep -i development` finds nothing in it. A
+distribution certificate cannot sign a development build, and the App Store profile does
+not list your device, so a device build has neither half of what it needs.
+
+Two ways out.
+
+**Once, through match** (the durable one, and it benefits every machine afterwards):
+
+```sh
+npm run signing:dev     # bundle exec fastlane ios development
+npm run ios:device      # expo run:ios --device
+```
+
+The `ios development` lane is this project's addition on top of the template. It creates a
+development certificate and profile, registers the plugged-in device
+(`force_for_new_devices`), and stores all of it in the certificates repository next to the
+App Store material. It needs `MATCH_PASSWORD`, `SECRETS_PASSPHRASE` and write access — so
+run it locally, never in CI, which is why the lane refuses when `is_ci`.
+
+**Or, for a one-off**, let Xcode do it: sign in under *Xcode → Settings → Accounts*, open
+`ios/LifeTime.xcworkspace`, and in *Signing & Capabilities* tick "Automatically manage
+signing" and pick your team. Xcode issues a development certificate itself. Nothing is
+written to the certificates repository — and nothing survives the next
+`expo prebuild --clean`, which regenerates `ios/`.
 
 This is a **Debug** build, and that difference is not cosmetic: `RCTAssert` and friends are
 compiled in, so a Fabric component with no registered native class prints its own name

@@ -18,7 +18,9 @@
     "update": "npx --yes eas-cli@latest update --branch preview",
     "check:sdk": "node scripts/check-sdk-versions.mjs",
     "testflight": "bundle exec fastlane ios beta",
-    "eas": "npx --yes eas-cli@latest"
+    "eas": "npx --yes eas-cli@latest",
+    "signing:dev": "bundle exec fastlane ios development",
+    "ios:device": "expo run:ios --device"
   },
   "dependencies": {
     "@expo/ui": "~57.0.9",
