@@ -15,6 +15,7 @@ import type { EmptyReason } from '@/domain/events'
 import { AppText } from '@/ui/AppText'
 import { Symbol, type SymbolName } from '@/ui/Symbol'
 import { colors } from '@/ui/theme/colors'
+import { space } from '@/ui/theme/space'
 
 type Copy = {
   symbol: SymbolName
@@ -83,17 +84,17 @@ export function EmptyState({ reason }: EmptyStateProps) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 28,
-    paddingVertical: 36,
+    gap: space.sm,
+    paddingHorizontal: space.xxl,
+    paddingVertical: space.section,
   },
   centered: {
     textAlign: 'center',
   },
   action: {
-    marginTop: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    marginTop: space.sm,
+    paddingVertical: space.md,
+    paddingHorizontal: space.xl,
     borderRadius: 999,
     backgroundColor: colors.selection,
   },

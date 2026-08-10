@@ -1,25 +1,28 @@
 /**
  * "Customize report" — one place for every rule that decides what a week looks like.
  *
- * v1's equivalent was a list of calendars with a switch each. Two things are added, and
- * they are the two the app most needed:
+ * Two details are lifted straight from v1's `Filters.res`, because it had thought them
+ * through:
+ *
+ *   • **A "Show All" / "Hide All" action in the section heading.** With eight calendars,
+ *     the common move is "only this one" — eight taps without it, two with.
+ *   • **The check mark is tinted with the calendar's own colour.** That is the colour the
+ *     user sees in Calendar.app, so the row is recognisable before the title is read. It
+ *     costs nothing and no generic accent tick can do it.
+ *
+ * What v1 could not do, and this can:
  *
  *   • **A calendar can carry a category.** "Everything in my work calendar is Work" is
- *     one tap and categorises hundreds of events. For anyone whose work already lives in
- *     its own calendar, that is the entire setup.
- *
- *   • **Rules can be broader than an exact title.** "Anything starting with `1:1`" —
- *     issue #13, promised in v1's own help text and never built.
- *
- * Everything here is `@expo/ui`: a real inset-grouped list on iOS, a Material 3 list on
- * Android. Row heights, separator insets, press states, section headers and footers all
- * come from the OS, so this screen is one of the places the hybrid split pays off most.
+ *     one tap and categorises hundreds of events — for anyone whose work already lives in
+ *     its own calendar, that is the whole setup.
+ *   • **Rules broader than an exact title** — issue #13, promised in v1's own help text.
  */
 
-import { Button, Host, List, ListItem, Picker, Switch } from '@expo/ui'
+import { Host, Picker } from '@expo/ui'
 import { useRouter } from 'expo-router'
 import { useCallback, useMemo } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { ScrollView, StyleSheet, View, useColorScheme } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useCalendarPermissions } from '@/data/calendars'
 import { useSettings, useUpdateSettings } from '@/data/settingsStore'
@@ -27,9 +30,12 @@ import { useCalendarList } from '@/data/useCalendarList'
 import { invalidateEvents } from '@/data/useEvents'
 import { describeMatch } from '@/domain/activities'
 import { DEFAULT_CATEGORIES, UNKNOWN_CATEGORY_ID, getCategory } from '@/domain/categories'
-import { colors } from '@/ui/theme/colors'
+import { ListFootnote, ListGroup, ListHeader, ListRow } from '@/ui/List'
+import { RawSymbol, Symbol } from '@/ui/Symbol'
+import { categoryColor, colors } from '@/ui/theme/colors'
+import { layout, space } from '@/ui/theme/space'
 
-/** "No category" first, then the real ones, so the picker can also clear a rule. */
+/** "No category" first, so the picker can also clear a rule. */
 const PICKER_ITEMS = [
   { label: 'No category', value: UNKNOWN_CATEGORY_ID },
   ...DEFAULT_CATEGORIES.filter((c) => c.id !== UNKNOWN_CATEGORY_ID).map((c) => ({
@@ -38,31 +44,19 @@ const PICKER_ITEMS = [
   })),
 ]
 
-function CategoryPicker({
-  value,
-  onChange,
-}: {
-  value: string
-  onChange: (categoryId: string) => void
-}) {
-  return (
-    <Picker selectedValue={value} onValueChange={(v) => onChange(String(v))}>
-      {PICKER_ITEMS.map((item) => (
-        <Picker.Item key={item.value} label={item.label} value={item.value} />
-      ))}
-    </Picker>
-  )
-}
-
 export default function FiltersScreen() {
+  const insets = useSafeAreaInsets()
   const settings = useSettings()
   const update = useUpdateSettings()
   const router = useRouter()
+  const scheme = useColorScheme() === 'dark' ? 'dark' : 'light'
   const [permission] = useCalendarPermissions()
   const calendars = useCalendarList(permission?.granted ?? false)
 
-  const countedCalendars = useMemo(
-    () => calendars.filter((c) => !settings.skippedCalendars.some((s) => s.id === c.id)),
+  const allHidden = useMemo(
+    () =>
+      calendars.length > 0 &&
+      calendars.every((c) => settings.skippedCalendars.some((s) => s.id === c.id)),
     [calendars, settings.skippedCalendars],
   )
 
@@ -83,6 +77,17 @@ export default function FiltersScreen() {
     [calendars, update],
   )
 
+  const setAll = useCallback(
+    (counted: boolean) => {
+      update((current) => ({
+        ...current,
+        skippedCalendars: counted ? [] : calendars,
+      }))
+      invalidateEvents()
+    },
+    [calendars, update],
+  )
+
   const setCalendarCategory = useCallback(
     (calendarId: string, categoryId: string) => {
       update((current) => {
@@ -91,6 +96,7 @@ export default function FiltersScreen() {
         else next[calendarId] = categoryId
         return { ...current, calendarCategories: next }
       })
+      invalidateEvents()
     },
     [update],
   )
@@ -101,88 +107,136 @@ export default function FiltersScreen() {
         ...current,
         activities: current.activities.filter((a) => a.id !== id),
       }))
+      invalidateEvents()
     },
     [update],
   )
 
+  const rules = useMemo(
+    () =>
+      [...settings.activities].sort(
+        (a, b) =>
+          getCategory(a.categoryId).name.localeCompare(getCategory(b.categoryId).name) ||
+          a.title.localeCompare(b.title),
+      ),
+    [settings.activities],
+  )
+
   return (
-    <View style={styles.screen}>
-      <Host style={styles.list} useViewportSizeMeasurement>
-        <List>
-          <ListItem supportingText="Turn a calendar off to leave its events out of every report. Give it a category to file everything in it at once.">
-            Calendars
-          </ListItem>
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={{ paddingBottom: insets.bottom + space.section }}
+      contentInsetAdjustmentBehavior="automatic">
+      <ListHeader
+        title="Calendars"
+        action={{
+          label: allHidden ? 'Show all' : 'Hide all',
+          onPress: () => setAll(allHidden),
+        }}
+      />
+      <ListGroup separatorInset="text">
+        {calendars.map((calendar) => {
+          const counted = !settings.skippedCalendars.some((c) => c.id === calendar.id)
+          const categoryId =
+            settings.calendarCategories[calendar.id] ?? UNKNOWN_CATEGORY_ID
+          return (
+            <ListRow
+              key={calendar.id}
+              title={calendar.title}
+              subtitle={
+                counted && categoryId !== UNKNOWN_CATEGORY_ID
+                  ? `${calendar.source} · everything is ${getCategory(categoryId).name}`
+                  : calendar.source
+              }
+              onPress={() => toggleCalendar(calendar.id, !counted)}
+              leading={
+                // Tinted with the calendar's own colour, as in v1 — recognisable before
+                // the title is read.
+                <View
+                  style={[
+                    styles.tick,
+                    { borderColor: calendar.color },
+                    counted && { backgroundColor: calendar.color },
+                  ]}>
+                  {counted && (
+                    <Symbol name="checkmark" size={13} color={colors.onAccent} />
+                  )}
+                </View>
+              }
+              accessory={
+                counted ? (
+                  <Host matchContents>
+                    <Picker
+                      selectedValue={categoryId}
+                      onValueChange={(value) =>
+                        setCalendarCategory(calendar.id, String(value))
+                      }>
+                      {PICKER_ITEMS.map((item) => (
+                        <Picker.Item
+                          key={item.value}
+                          label={item.label}
+                          value={item.value}
+                        />
+                      ))}
+                    </Picker>
+                  </Host>
+                ) : undefined
+              }
+            />
+          )
+        })}
+      </ListGroup>
+      <ListFootnote>
+        Turn a calendar off to leave its events out of every report. Give one a category to
+        file everything in it at once — a rule on a title still wins over it.
+      </ListFootnote>
 
-          {calendars.map((calendar) => {
-            const counted = !settings.skippedCalendars.some((c) => c.id === calendar.id)
-            const categoryId =
-              settings.calendarCategories[calendar.id] ?? UNKNOWN_CATEGORY_ID
+      <ListHeader title="Rules" />
+      <ListGroup separatorInset={rules.length > 0 ? 'text' : 'full'}>
+        {rules.length === 0 ? (
+          <ListRow
+            title="No rules yet"
+            subtitle="Sorting your activities creates one per activity."
+          />
+        ) : (
+          rules.map((activity) => {
+            const category = getCategory(activity.categoryId)
+            const color = categoryColor(category.color, scheme)
             return (
-              <ListItem
-                key={calendar.id}
-                supportingText={
-                  counted
-                    ? categoryId === UNKNOWN_CATEGORY_ID
-                      ? calendar.source
-                      : `${calendar.source} · everything is ${getCategory(categoryId).name}`
-                    : 'Not counted'
-                }
-                trailing={
-                  counted ? (
-                    <CategoryPicker
-                      value={categoryId}
-                      onChange={(next) => setCalendarCategory(calendar.id, next)}
+              <ListRow
+                key={activity.id}
+                title={category.name}
+                subtitle={describeMatch(activity)}
+                leading={
+                  <View style={[styles.icon, { backgroundColor: color }]}>
+                    <RawSymbol
+                      pair={{ ios: category.sf, android: category.material }}
+                      size={15}
+                      color={colors.onAccent}
                     />
-                  ) : (
-                    <Switch
-                      value={false}
-                      onValueChange={() => toggleCalendar(calendar.id, true)}
-                    />
-                  )
+                  </View>
                 }
-                onPress={() => toggleCalendar(calendar.id, !counted)}>
-                {calendar.title}
-              </ListItem>
+                accessory={<Symbol name="remove" size={20} color={colors.destructive} />}
+                onPress={() => removeRule(activity.id)}
+                accessibilityLabel={`Remove rule: ${describeMatch(activity)} is ${category.name}`}
+              />
             )
-          })}
+          })
+        )}
+      </ListGroup>
+      <ListFootnote>
+        More specific rules win, so an exact title always beats a broad match. Open an
+        activity to widen its rule.
+      </ListFootnote>
 
-          <ListItem supportingText="A rule matches event titles and files them automatically. More specific rules win, so an exact match always beats a broad one.">
-            Rules
-          </ListItem>
-
-          {settings.activities.length === 0 && (
-            <ListItem supportingText="Sort your activities to create some.">
-              No rules yet
-            </ListItem>
-          )}
-
-          {settings.activities.map((activity) => (
-            <ListItem
-              key={activity.id}
-              supportingText={describeMatch(activity)}
-              trailing={
-                <Button
-                  variant="text"
-                  label="Remove"
-                  onPress={() => removeRule(activity.id)}
-                />
-              }>
-              {getCategory(activity.categoryId).name}
-            </ListItem>
-          ))}
-
-          <ListItem
-            supportingText={`Go through everything from the last ${settings.categorisationWeeks} weeks, biggest first.`}
-            onPress={() => router.push('/categorize')}>
-            Sort my activities
-          </ListItem>
-
-          <ListItem supportingText={`${countedCalendars.length} of ${calendars.length} calendars counted`}>
-            Summary
-          </ListItem>
-        </List>
-      </Host>
-    </View>
+      <ListGroup style={styles.spaced}>
+        <ListRow
+          centeredAction
+          title="Sort my activities"
+          onPress={() => router.push('/categorize')}
+        />
+      </ListGroup>
+    </ScrollView>
   )
 }
 
@@ -191,7 +245,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  list: {
-    flex: 1,
+  tick: {
+    width: layout.iconSize,
+    height: layout.iconSize,
+    borderRadius: layout.iconSize / 2,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icon: {
+    width: layout.iconSize,
+    height: layout.iconSize,
+    borderRadius: layout.iconSize / 3.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  spaced: {
+    marginTop: space.xl,
   },
 })

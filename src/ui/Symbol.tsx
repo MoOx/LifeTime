@@ -31,6 +31,8 @@ export const SYMBOLS = {
   hidden: { ios: 'eye.slash', android: 'visibility_off' },
   reminder: { ios: 'bell', android: 'notifications' },
   appearance: { ios: 'circle.lefthalf.filled', android: 'contrast' },
+  themeLight: { ios: 'sun.max', android: 'light_mode' },
+  themeDark: { ios: 'moon', android: 'dark_mode' },
   backup: { ios: 'arrow.up.doc', android: 'backup' },
   help: { ios: 'questionmark.circle', android: 'help' },
   privacy: { ios: 'hand.raised', android: 'privacy_tip' },
@@ -39,6 +41,7 @@ export const SYMBOLS = {
   chevronRight: { ios: 'chevron.right', android: 'chevron_right' },
   checkmark: { ios: 'checkmark', android: 'check' },
   today: { ios: 'arrow.uturn.backward', android: 'undo' },
+  remove: { ios: 'minus.circle.fill', android: 'do_not_disturb_on' },
   clock: { ios: 'clock', android: 'schedule' },
   demo: { ios: 'sparkles', android: 'auto_awesome' },
 } as const satisfies Record<string, SymbolPair>
@@ -64,8 +67,33 @@ export function Symbol({
   accessibilityLabel,
 }: SymbolProps) {
   return (
+    <RawSymbol
+      pair={SYMBOLS[name]}
+      size={size}
+      color={color}
+      weight={weight}
+      style={style}
+      accessibilityLabel={accessibilityLabel}
+    />
+  )
+}
+
+/**
+ * For symbols that come from data rather than from the catalogue — a category carries its
+ * own `sf` / `material` names so that categories can become user-editable without this
+ * file having to know about them.
+ */
+export function RawSymbol({
+  pair,
+  size = 20,
+  color,
+  weight = 'regular',
+  style,
+  accessibilityLabel,
+}: Omit<SymbolProps, 'name'> & { pair: { ios: string; android: string } }) {
+  return (
     <SymbolView
-      name={SYMBOLS[name]}
+      name={{ ios: pair.ios as SFSymbol, android: pair.android as AndroidSymbol }}
       size={size}
       tintColor={color}
       weight={weight}

@@ -1,17 +1,20 @@
 /**
  * Ranked activities for the visible week, with a proportional bar per row.
  *
- * The bar is the point: v1 showed a title and a duration, and comparing "3 h 15" to
- * "2 h" meant reading two numbers. The bar answers the same question without reading.
+ * The layout is v1's, because v1's was right: a coloured category icon on the left, the
+ * title, and *under it* a bar sharing its line with the duration. Putting the bar on its
+ * own line is what lets it be long enough to compare at a glance — which is the entire
+ * reason it exists. Comparing "3 h 15" to "2 h" means reading two numbers; comparing two
+ * bars does not.
  *
- * Plain React Native rather than a native list row, because of that bar — a `ListItem`
- * cannot hold one. The text still goes through `AppText`, so it carries the platform's
- * type ramp either way. Screens that are *only* rows use `@expo/ui`'s `List`.
+ * What v1 got wrong was the spacing, and it was not really v1's fault: every gap in it was
+ * a hand-placed `<Spacer size=XS />`, so the rhythm depended on remembering to add one.
+ * Here the gaps come from `theme/space.ts` and the row structure, so a dot cannot end up
+ * touching a bar.
  */
 
-import { Link } from 'expo-router'
-import { Fragment } from 'react'
-import { Pressable, StyleSheet, View, useColorScheme } from 'react-native'
+import { useRouter } from 'expo-router'
+import { StyleSheet, View, useColorScheme } from 'react-native'
 
 import type { Bucket } from '@/domain/aggregate'
 import { getCategory } from '@/domain/categories'
@@ -19,8 +22,10 @@ import type { RuleSet } from '@/domain/rules'
 import { categoryOf } from '@/domain/rules'
 import { formatMinutes } from '@/domain/time'
 import { AppText } from '@/ui/AppText'
-import { Symbol } from '@/ui/Symbol'
+import { ListGroup, ListRow } from '@/ui/List'
+import { RawSymbol } from '@/ui/Symbol'
 import { categoryColor, colors } from '@/ui/theme/colors'
+import { layout, space } from '@/ui/theme/space'
 
 export type TopActivitiesProps = {
   buckets: Bucket[]
@@ -36,6 +41,7 @@ export function TopActivities({
   calendarOfTitle,
   limit = 8,
 }: TopActivitiesProps) {
+  const router = useRouter()
   const scheme = useColorScheme() === 'dark' ? 'dark' : 'light'
   const max = buckets[0]?.minutes ?? 1
   const shown = buckets.slice(0, limit)
@@ -43,8 +49,8 @@ export function TopActivities({
   if (shown.length === 0) return null
 
   return (
-    <View style={styles.list}>
-      {shown.map((bucket, index) => {
+    <ListGroup separatorInset="text">
+      {shown.map((bucket) => {
         const categoryId = categoryOf(
           { title: bucket.key, calendarId: calendarOfTitle(bucket.key) },
           rules,
@@ -53,94 +59,72 @@ export function TopActivities({
         const color = categoryColor(category.color, scheme)
 
         return (
-          <Fragment key={bucket.key}>
-            {index > 0 && <View style={styles.separator} />}
-            <Link
-              href={{ pathname: '/activity/[title]', params: { title: bucket.key } }}
-              asChild>
-              <Pressable
-                style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-                accessibilityRole="button"
-                accessibilityLabel={`${bucket.key}, ${formatMinutes(bucket.minutes)}, ${category.name}`}>
-                <View style={styles.body}>
-                  <View style={styles.titleRow}>
-                    <View style={[styles.dot, { backgroundColor: color }]} />
-                    <AppText role="body" numberOfLines={1} style={styles.title}>
-                      {bucket.key}
-                    </AppText>
-                    <AppText role="secondary" tone="secondary" tabular>
-                      {formatMinutes(bucket.minutes)}
-                    </AppText>
-                  </View>
-                  <View style={styles.track}>
-                    <View
-                      style={[
-                        styles.fill,
-                        {
-                          backgroundColor: color,
-                          width: `${Math.max(2, (bucket.minutes / max) * 100)}%`,
-                        },
-                      ]}
-                    />
-                  </View>
-                </View>
-                <Symbol name="chevronRight" size={13} color={colors.tertiaryLabel} />
-              </Pressable>
-            </Link>
-          </Fragment>
+          <ListRow
+            key={bucket.key}
+            title={bucket.key}
+            chevron
+            onPress={() =>
+              router.push({
+                pathname: '/activity/[title]',
+                params: { title: bucket.key },
+              })
+            }
+            accessibilityLabel={`${bucket.key}, ${formatMinutes(bucket.minutes)}, ${category.name}`}
+            leading={
+              <View style={[styles.icon, { backgroundColor: color }]}>
+                <RawSymbol
+                  pair={{ ios: category.sf, android: category.material }}
+                  size={15}
+                  color={colors.onAccent}
+                />
+              </View>
+            }>
+            <View style={styles.meter}>
+              <View style={styles.track}>
+                <View
+                  style={[
+                    styles.fill,
+                    {
+                      backgroundColor: color,
+                      width: `${Math.max(2, (bucket.minutes / max) * 100)}%`,
+                    },
+                  ]}
+                />
+              </View>
+              <AppText role="footnote" tone="secondary" tabular numberOfLines={1}>
+                {formatMinutes(bucket.minutes)}
+              </AppText>
+            </View>
+          </ListRow>
         )
       })}
-    </View>
+    </ListGroup>
   )
 }
 
 const styles = StyleSheet.create({
-  list: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    overflow: 'hidden',
+  icon: {
+    width: layout.iconSize,
+    height: layout.iconSize,
+    borderRadius: layout.iconSize / 3.5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  row: {
+  meter: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingLeft: 16,
-    paddingRight: 12,
-    paddingVertical: 12,
-  },
-  rowPressed: {
-    backgroundColor: colors.selection,
-  },
-  body: {
-    flex: 1,
-    gap: 8,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  title: {
-    flex: 1,
-  },
-  dot: {
-    width: 9,
-    height: 9,
-    borderRadius: 4.5,
+    gap: space.sm,
+    marginTop: space.xs,
   },
   track: {
-    height: 5,
-    borderRadius: 2.5,
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: colors.fill,
     overflow: 'hidden',
   },
   fill: {
-    height: 5,
-    borderRadius: 2.5,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.separator,
-    marginLeft: 33,
+    height: 6,
+    borderRadius: 3,
   },
 })

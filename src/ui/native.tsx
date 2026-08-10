@@ -1,26 +1,31 @@
 /**
- * The two ways this app hosts real platform UI — and the rules that make them behave.
+ * Hosting real platform UI inside a React Native screen.
  *
- * `@expo/ui`'s `Host` is a bridge into SwiftUI / Jetpack Compose, not a `View`. Two
- * properties of that bridge caused every layout bug in the first attempt:
+ * `@expo/ui`'s `Host` is a bridge into SwiftUI / Jetpack Compose, not a `View`, and two
+ * properties of that bridge caused every layout bug in the first build:
  *
  *   1. **A host does not stack its children.** SwiftUI's default for a multi-child view
  *      builder is a `ZStack`, so two labels in a bare `Host` render *on top of each
- *      other*. Every host below therefore has exactly one child, and that child is a
- *      `Column`.
+ *      other*. Every host below has exactly one child, and that child is a `Column`.
  *
  *   2. **A host with no width proposal cannot wrap text.** `matchContents` sizes the host
- *      to its content in *both* axes, so the content is asked to lay out in unbounded
- *      width and a paragraph becomes one long line. `matchContents={{ vertical: true }}`
- *      keeps React Native's width and measures only the height, which is what a block
- *      inside a scrolling screen wants.
+ *      to its content in *both* axes, so the content lays out in unbounded width and a
+ *      paragraph becomes one long line. `matchContents={{ vertical: true }}` keeps React
+ *      Native's width and measures only the height.
  *
- * Anything that is not list-shaped is plain React Native. That is the hybrid split.
+ * What is hosted, and what is not, has since settled. Native controls — `Switch`,
+ * `Picker`, `TextInput`, `Button` — are worth bridging: they carry platform behaviour
+ * (menus, haptics, accessibility, the iOS 26 glass treatment) that would be a poor
+ * imitation in JavaScript, and each is a single leaf so neither pitfall above applies.
+ *
+ * Native *lists* are not, and `src/ui/List.tsx` explains why: `@expo/ui`'s `List` has no
+ * section headers, no header actions, no footnotes, and no way to put a progress bar in a
+ * row — which is the entire grammar these screens are built from.
  */
 
-import { Column, Host, List } from '@expo/ui'
+import { Column, Host } from '@expo/ui'
 import type { ReactNode } from 'react'
-import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native'
+import type { StyleProp, ViewStyle } from 'react-native'
 
 export type NativeBlockProps = {
   children: ReactNode
@@ -31,8 +36,11 @@ export type NativeBlockProps = {
 }
 
 /**
- * A native block sitting inside a React Native screen: a group of controls, a picker, a
- * row of buttons. Takes its width from React Native and reports its own height back.
+ * A native block sitting inside a React Native screen: a group of controls, a row of
+ * buttons. Takes its width from React Native and reports its own height back.
+ *
+ * For a single control in a list row, `<Host matchContents>` around it is enough — no
+ * column is needed for one child, and the row already constrains the width.
  */
 export function NativeBlock({
   children,
@@ -48,29 +56,3 @@ export function NativeBlock({
     </Host>
   )
 }
-
-export type NativeListProps = {
-  children: ReactNode
-  onRefresh?: () => Promise<void>
-  style?: StyleProp<ViewStyle>
-}
-
-/**
- * A full-screen native list — `UICollectionView` with the inset-grouped appearance on
- * iOS, `LazyColumn` on Android. Row height, separator insets, press states, section
- * footers and the scroll-edge effects under the tab bar all come from the OS.
- *
- * `useViewportSizeMeasurement` is required: a virtualised list has no intrinsic height,
- * so without it the host proposes zero and nothing appears.
- */
-export function NativeList({ children, onRefresh, style }: NativeListProps) {
-  return (
-    <Host style={[styles.fill, style]} useViewportSizeMeasurement>
-      <List onRefresh={onRefresh}>{children}</List>
-    </Host>
-  )
-}
-
-const styles = StyleSheet.create({
-  fill: { flex: 1 },
-})

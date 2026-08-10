@@ -1,6 +1,7 @@
 import {
   MINUTES_PER_DAY,
   formatMinutes,
+  formatRelative,
   minutesElapsedInDay,
   overlapMs,
   startOfDay,
@@ -55,5 +56,24 @@ describe('minutesElapsedInDay', () => {
 
   it('caps at a full day', () => {
     expect(minutesElapsedInDay(day, at(2026, 7, 12))).toBe(MINUTES_PER_DAY)
+  })
+})
+
+describe('formatRelative', () => {
+  const t = new Date(2026, 7, 10, 12, 0).getTime()
+
+  it('says "now" rather than counting seconds', () => {
+    expect(formatRelative(t, t + 5_000, 'en-GB')).toBe('now')
+  })
+
+  it('picks the largest unit that fits', () => {
+    expect(formatRelative(t, t + 5 * 60_000, 'en-GB')).toBe('5 minutes ago')
+    expect(formatRelative(t, t + 3 * 3_600_000, 'en-GB')).toBe('3 hours ago')
+    expect(formatRelative(t, t + 26 * 3_600_000, 'en-GB')).toBe('yesterday')
+    expect(formatRelative(t, t + 9 * 86_400_000, 'en-GB')).toBe('last week')
+  })
+
+  it('follows the locale', () => {
+    expect(formatRelative(t, t + 5 * 60_000, 'fr-FR')).toBe('il y a 5 minutes')
   })
 })

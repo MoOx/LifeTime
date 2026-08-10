@@ -119,3 +119,40 @@ export const formatWeekdayNarrow = (t: number, locale: string): string =>
 
 export const formatDayMonthShort = (t: number, locale: string): string =>
   new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(new Date(t))
+
+/**
+ * "just now" / "5 minutes ago" / "yesterday", via `Intl.RelativeTimeFormat`.
+ *
+ * v1 shipped `Date.formatRelative` on top of `date-fns` and a locale table. `Intl` does
+ * it for every locale the OS knows, and it is the right unit that matters here: telling
+ * someone their report is "0 hours old" when it is forty seconds old reads as broken.
+ */
+const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
+  ['second', 1000],
+  ['minute', 60 * 1000],
+  ['hour', 3_600_000],
+  ['day', 86_400_000],
+  ['week', 7 * 86_400_000],
+]
+
+export const formatRelative = (t: number, now: number, locale: string): string => {
+  const elapsed = now - t
+  if (elapsed < 45_000) {
+    // `RelativeTimeFormat` has no "just now"; forcing seconds gives "3 seconds ago",
+    // which is noise on a figure that only matters to the nearest minute.
+    return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(0, 'second')
+  }
+
+  let unit: Intl.RelativeTimeFormatUnit = 'second'
+  let ms = 1000
+  for (const [candidate, size] of RELATIVE_UNITS) {
+    if (elapsed < size) break
+    unit = candidate
+    ms = size
+  }
+
+  return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(
+    -Math.round(elapsed / ms),
+    unit,
+  )
+}

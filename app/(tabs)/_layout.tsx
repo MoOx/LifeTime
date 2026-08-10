@@ -22,17 +22,17 @@ import { SYMBOLS } from '@/ui/Symbol'
 export default function TabsLayout() {
   return (
     <NativeTabs>
-      <NativeTabs.Trigger name="index">
+      <NativeTabs.Trigger name="(summary)">
         <NativeTabs.Trigger.Label>Summary</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf={SYMBOLS.summary.ios} md={SYMBOLS.summary.android} />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="goals">
+      <NativeTabs.Trigger name="(goals)">
         <NativeTabs.Trigger.Label>Goals</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf={SYMBOLS.goals.ios} md={SYMBOLS.goals.android} />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="settings">
+      <NativeTabs.Trigger name="(settings)">
         <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           sf={{ default: SYMBOLS.settings.ios, selected: 'gearshape.fill' }}

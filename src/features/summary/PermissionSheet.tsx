@@ -25,6 +25,7 @@ import { NativeBlock } from '@/ui/native'
 import { FloatingSurface } from '@/ui/Surface'
 import { Symbol } from '@/ui/Symbol'
 import { colors } from '@/ui/theme/colors'
+import { layout, space } from '@/ui/theme/space'
 
 export type PermissionSheetProps = {
   onRequest: () => void
@@ -42,7 +43,7 @@ export function PermissionSheet({
 
   return (
     <View style={styles.anchor} pointerEvents="box-none">
-      <FloatingSurface style={[styles.sheet, { paddingBottom: insets.bottom + 20 }]}>
+      <FloatingSurface style={[styles.sheet, { marginBottom: insets.bottom + space.md }]}>
         <View style={styles.badge}>
           <Symbol name="demo" size={15} color={colors.accent} />
           <AppText role="caption" tone="accent">
@@ -81,19 +82,21 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   sheet: {
-    gap: 10,
-    padding: 20,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    // Inset on every side so it reads as a floating panel rather than a drawer welded to
+    // the screen edge — which is what glass is for.
+    gap: space.sm,
+    padding: space.xl,
+    margin: space.lg,
+    borderRadius: layout.sheetRadius,
     overflow: 'hidden',
   },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: space.xs,
   },
   action: {
-    marginTop: 6,
+    marginTop: space.sm,
     alignSelf: 'stretch',
   },
 })

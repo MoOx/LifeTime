@@ -3,7 +3,13 @@ import type { StyleProp, TextStyle } from 'react-native'
 
 import type { TextRole } from './theme/type'
 
-export type TextTone = 'primary' | 'secondary' | 'tertiary' | 'accent' | 'inverse'
+export type TextTone =
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'accent'
+  | 'inverse'
+  | 'destructive'
 
 export type AppTextProps = {
   role?: TextRole

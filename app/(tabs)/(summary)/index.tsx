@@ -1,34 +1,48 @@
 /**
  * Summary — the screen the app is about.
  *
- * Parity target: v1's `HomeScreen` + `Home` (docs/SPEC.md §4.2), with the three things
- * v1 did well kept intact — the six-week swipe, the grid behind the bars, and the four
- * contextual empty states — and the permission request moved from *before* the screen to
- * *over* it.
+ * The structure is v1's, deliberately: a section heading with a blue action on the right,
+ * the block it introduces, and a footnote under it. v1 had
+ *
+ *     "Weekly Chart"     · Show This Week
+ *     "Top Activities"   · Customize report
+ *     footnote: "Updated 3 minutes ago"
+ *
+ * and every one of those earns its place. The heading action is where a control that
+ * changes what the section shows belongs — not floating over the bars. The footnote
+ * matters because this app reads a calendar it cannot subscribe to: without a timestamp
+ * there is no way to tell a quiet week from a stale read.
+ *
+ * The screen title is gone from this file entirely — `headerLargeTitle` draws it, so it
+ * is UIKit's large title, at UIKit's size, collapsing into the bar on scroll.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Linking, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
+import { useRouter } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useCalendarPermissions } from '@/data/calendars'
 import { useLocaleTag, useWeekStartsOn } from '@/data/locale'
-import { useSettings } from '@/data/settingsStore'
-import { initialWeekIndex, rulesOf, useReport } from '@/data/useReport'
+import { useSettings, useUpdateSettings } from '@/data/settingsStore'
+import { initialWeekIndex, useReport } from '@/data/useReport'
 import { calendarOfTitle, minutesByTitle } from '@/domain/aggregate'
 import { explainEmptiness, filterEvents } from '@/domain/events'
-import { formatDayMonth } from '@/domain/time'
+import { formatRelative } from '@/domain/time'
 import { clampToNow } from '@/domain/week'
 import { EmptyState } from '@/features/summary/EmptyState'
 import { PermissionSheet } from '@/features/summary/PermissionSheet'
 import { TopActivities } from '@/features/summary/TopActivities'
-import { WeekPager } from '@/features/summary/WeekPager'
-import { AppText } from '@/ui/AppText'
+import { WeekPager, type WeekPagerHandle } from '@/features/summary/WeekPager'
+import { ListFootnote, ListGroup, ListHeader, ListRow } from '@/ui/List'
 import { colors } from '@/ui/theme/colors'
+import { space } from '@/ui/theme/space'
 
 export default function SummaryScreen() {
   const insets = useSafeAreaInsets()
+  const router = useRouter()
   const settings = useSettings()
+  const update = useUpdateSettings()
   const locale = useLocaleTag()
   const weekStartsOn = useWeekStartsOn()
   const [permission, requestPermission] = useCalendarPermissions()
@@ -36,8 +50,8 @@ export default function SummaryScreen() {
 
   // A single `now` for the whole render keeps every derived number consistent.
   const now = useMemo(() => Date.now(), [])
-  const rules = useMemo(() => rulesOf(settings), [settings])
   const report = useReport(settings, weekStartsOn, now, granted)
+  const pager = useRef<WeekPagerHandle>(null)
 
   const filter = useMemo(
     () => ({
@@ -59,9 +73,8 @@ export default function SummaryScreen() {
   /**
    * Which week to open on. Issue #19: on a Monday morning the current week is empty
    * through no fault of the user's, and an empty chart is a worse answer than last
-   * week's. `initialWeekIndex` only knows that once the events have arrived, so the
-   * pager is held back until they have — a frame it would have spent measuring its own
-   * width anyway. Once set, the user owns the page.
+   * week's. `initialWeekIndex` only knows that once the events have arrived, so the pager
+   * is held back until they have. Once set, the user owns the page.
    */
   const [initial, setInitial] = useState<number | undefined>(undefined)
   const [index, setIndex] = useState(report.weeks.length - 1)
@@ -97,50 +110,87 @@ export default function SummaryScreen() {
     Linking.openSettings().catch(() => {})
   }, [])
 
+  const toggleHidden = useCallback(
+    () => update({ hideSkippedActivities: !settings.hideSkippedActivities }),
+    [update, settings.hideSkippedActivities],
+  )
+
+  const isCurrentWeek = index >= report.weeks.length - 1
+  const hasHidden = settings.skippedActivityTitles.length > 0
+
   return (
     <View style={styles.screen}>
       <ScrollView
         contentContainerStyle={[
           styles.content,
-          // Room for the permission sheet, so the last row is never trapped behind it.
-          { paddingBottom: insets.bottom + (granted ? 32 : 300) },
+          { paddingBottom: insets.bottom + space.section },
         ]}
+        // Required with a transparent large-title header: the OS insets the content
+        // instead of the first row hiding underneath.
         contentInsetAdjustmentBehavior="automatic"
         refreshControl={
           granted ? (
             <RefreshControl refreshing={report.loading} onRefresh={report.refresh} />
           ) : undefined
         }>
-        <View style={styles.header}>
-          <AppText role="caption" tone="tertiary">
-            {formatDayMonth(now, locale).toUpperCase()}
-          </AppText>
-          <AppText role="screenTitle">Your LifeTime</AppText>
-        </View>
+        <ListHeader
+          title="Weekly chart"
+          action={
+            isCurrentWeek
+              ? undefined
+              : { label: 'This week', onPress: () => pager.current?.goToCurrentWeek() }
+          }
+        />
 
         {initial !== undefined && (
+          <View style={styles.card}>
           <WeekPager
+            ref={pager}
             weeks={report.weeks}
             eventsByWeek={visibleByWeek}
-            rules={rules}
+            rules={report.rules}
             locale={locale}
             weekStartsOn={weekStartsOn}
             now={now}
             initialIndex={initial}
             onIndexChange={setIndex}
           />
+          </View>
         )}
+
+        <ListFootnote>
+          {report.isDemo
+            ? 'Sample data — your own calendars will replace it as soon as you allow access.'
+            : `Updated ${formatRelative(report.updatedAt, now, locale)}`}
+        </ListFootnote>
 
         {emptiness === 'has-events' ? (
           <>
-            <View style={styles.blockHeading}>
-              <AppText role="sectionTitle">Activities</AppText>
-            </View>
+            <ListHeader
+              title="Activities"
+              action={{
+                label: 'Customize report',
+                onPress: () => router.push('/filters'),
+              }}
+            />
             <TopActivities
               buckets={buckets}
-              rules={rules}
+              rules={report.rules}
               calendarOfTitle={titleCalendar}
             />
+            {hasHidden && (
+              <ListGroup style={styles.spacedGroup}>
+                <ListRow
+                  centeredAction
+                  title={
+                    settings.hideSkippedActivities
+                      ? 'Reveal hidden activities'
+                      : 'Mask hidden activities'
+                  }
+                  onPress={toggleHidden}
+                />
+              </ListGroup>
+            )}
           </>
         ) : (
           <EmptyState reason={emptiness} />
@@ -164,16 +214,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   content: {
-    padding: 16,
-    gap: 16,
-    flexGrow: 1,
+    // No horizontal padding: groups, headers and footnotes inset themselves, and the
+    // chart card matches them.
+    paddingBottom: space.section,
   },
-  header: {
-    gap: 2,
-    paddingHorizontal: 2,
+  card: {
+    marginHorizontal: space.lg,
   },
-  blockHeading: {
-    paddingHorizontal: 2,
-    paddingTop: 4,
+  spacedGroup: {
+    marginTop: space.xl,
   },
 })

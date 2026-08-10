@@ -10,7 +10,7 @@
 
 import { useMemo } from 'react'
 
-import { demoEvents } from '@/domain/demo'
+import { DEMO_RULES, demoEvents } from '@/domain/demo'
 import type { TimeEvent } from '@/domain/events'
 import type { RuleSet } from '@/domain/rules'
 import type { Settings } from '@/domain/settings'
@@ -20,9 +20,17 @@ import { useEventRanges } from './useEvents'
 
 export const WEEKS_SHOWN = 6
 
-/** The rule set the whole app resolves categories through. */
-export const rulesOf = (settings: Settings): RuleSet => ({
-  activities: settings.activities,
+/**
+ * The rule set the whole app resolves categories through.
+ *
+ * In demo mode the built-in demo rules are appended *after* the user's, so a rule they
+ * wrote always wins — the demo colours the sample data without ever overriding a real
+ * decision.
+ */
+export const rulesOf = (settings: Settings, demo = false): RuleSet => ({
+  activities: demo
+    ? [...settings.activities, ...DEMO_RULES.activities]
+    : settings.activities,
   calendars: settings.calendarCategories,
 })
 
@@ -31,7 +39,11 @@ export type Report = {
   eventsByWeek: (TimeEvent[] | undefined)[]
   /** True when the events are generated rather than read from the device. */
   isDemo: boolean
+  /** Includes the demo rules when `isDemo`. */
+  rules: RuleSet
   loading: boolean
+  /** When the events were last read, for the "Updated …" footnote. */
+  updatedAt: number
   refresh: () => void
 }
 
@@ -65,11 +77,16 @@ export const useReport = (
     [hasPermission, weeks, now],
   )
 
+  const isDemo = demo !== undefined
+  const rules = useMemo(() => rulesOf(settings, isDemo), [settings, isDemo])
+
   return {
     weeks,
     eventsByWeek: demo ?? live.byRange,
-    isDemo: demo !== undefined,
+    isDemo,
+    rules,
     loading: hasPermission && live.loading,
+    updatedAt: live.updatedAt,
     refresh: live.refresh,
   }
 }

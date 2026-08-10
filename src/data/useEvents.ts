@@ -36,8 +36,15 @@ export type EventsResult = {
 export const useEventRanges = (
   calendarIds: string[],
   ranges: Range[],
-): { byRange: (TimeEvent[] | undefined)[]; loading: boolean; refresh: () => void } => {
+): {
+  byRange: (TimeEvent[] | undefined)[]
+  loading: boolean
+  /** When the last read completed — drives the "Updated …" footnote v1 had. */
+  updatedAt: number
+  refresh: () => void
+} => {
   const [revision, setRevision] = useState(0)
+  const [updatedAt, setUpdatedAt] = useState(() => Date.now())
   const mounted = useRef(true)
 
   useEffect(() => {
@@ -78,7 +85,10 @@ export const useEventRanges = (
       listEvents(calendarIds, new Date(range.start), new Date(range.end))
         .then((events) => {
           cache.set(key, { status: 'done', events })
-          if (!cancelled && mounted.current) setRevision((r) => r + 1)
+          if (!cancelled && mounted.current) {
+            setUpdatedAt(Date.now())
+            setRevision((r) => r + 1)
+          }
         })
         .catch(() => {
           cache.set(key, { status: 'done', events: [] })
@@ -97,5 +107,10 @@ export const useEventRanges = (
     return entry?.status === 'done' ? entry.events : undefined
   })
 
-  return { byRange, loading: byRange.some((events) => events === undefined), refresh }
+  return {
+    byRange,
+    loading: byRange.some((events) => events === undefined),
+    updatedAt,
+    refresh,
+  }
 }

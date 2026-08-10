@@ -1,13 +1,12 @@
 /**
  * Every piece of text in a React Native-laid-out screen.
  *
- * One component, two platform branches, and not a single point size in either:
+ * One component, two platform branches, and no size chosen by this app in either:
  *
- *   • **iOS** — `dynamicTypeRamp` hands the role to `UIFontMetrics`, which returns the
- *     user's current Dynamic Type size for that text style. `fontSize` is deliberately
- *     left unset: `RCTTextAttributes.mm` only falls back to the ramp's base size when
- *     `fontSize` is `NaN`, so setting it would silently take the platform back out of
- *     the loop.
+ *   • **iOS** — Apple's specified size for the role, *plus* `dynamicTypeRamp` so
+ *     `UIFontMetrics` scales it along that role's own curve. Both are needed on Fabric:
+ *     the ramp alone only yields a multiplier and leaves the font at React Native's 14 pt
+ *     default. See the note at the top of `theme/type.ts`.
  *
  *   • **Android** — the Material 3 token's sp values, which scale with the device
  *     font-size setting because `allowFontScaling` stays on. `fontFamily` is never set,
@@ -30,6 +29,7 @@ const TONE_COLOR: Record<TextTone, TextStyle['color']> = {
   tertiary: colors.tertiaryLabel,
   accent: colors.accent,
   inverse: colors.onAccent,
+  destructive: colors.destructive,
 }
 
 export function AppText({
@@ -41,16 +41,12 @@ export function AppText({
   children,
 }: AppTextProps) {
   const spec = TYPE_SCALE[role]
-
-  const typeStyle = Platform.select<TextStyle>({
-    // Size comes from the ramp; only the weight has to be stated.
-    ios: { fontWeight: spec.iosWeight },
-    default: spec.android,
-  })
+  const { ramp, ...ios } = spec.ios
+  const typeStyle = Platform.select<TextStyle>({ ios, default: spec.android })
 
   return (
     <Text
-      dynamicTypeRamp={spec.ramp}
+      dynamicTypeRamp={ramp}
       numberOfLines={numberOfLines}
       style={[typeStyle, { color: TONE_COLOR[tone] }, tabular && styles.tabular, style]}>
       {children}

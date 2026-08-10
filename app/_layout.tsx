@@ -1,3 +1,11 @@
+/**
+ * The root stack holds only what should cover the tabs: the two modal sheets.
+ *
+ * Everything else lives inside its tab's own stack (`app/(tabs)/(summary)/_layout.tsx`
+ * and friends), so pushing an activity or a goal keeps the tab bar in place. Pushing from
+ * here would have slid it away, which is the wrong signal — you have not left the section.
+ */
+
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
@@ -5,6 +13,7 @@ import { StatusBar } from 'expo-status-bar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import { settingsStore, useSettings, useSettingsLoaded } from '@/data/settingsStore'
+import { detailScreenOptions } from '@/ui/stack'
 
 SplashScreen.preventAutoHideAsync().catch(() => {
   // The splash screen may already be hidden; nothing to do.
@@ -26,23 +35,19 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      {/* `style="auto"` follows the system appearance — v1 needed a whole barStyle
-          mapping table plus `react-native-bars` to achieve this. */}
-      <StatusBar style={settings.theme === 'auto' ? 'auto' : settings.theme === 'dark' ? 'light' : 'dark'} />
+      {/* `auto` follows the system appearance — v1 needed a whole barStyle mapping table
+          plus `react-native-bars` to achieve this. */}
+      <StatusBar
+        style={
+          settings.theme === 'auto' ? 'auto' : settings.theme === 'dark' ? 'light' : 'dark'
+        }
+      />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
-        {/* The native header carries platform typography for free — one of the reasons
-            v1's hand-built `StickyHeader` is not ported. */}
-        <Stack.Screen name="activity/[title]" options={{ headerShown: true, title: '' }} />
-        <Stack.Screen name="goal/[id]" options={{ headerShown: true, title: '' }} />
-        <Stack.Screen
-          name="privacy"
-          options={{ headerShown: true, title: '', presentation: 'formSheet', sheetGrabberVisible: true }}
-        />
         <Stack.Screen
           name="filters"
           options={{
-            headerShown: true,
+            ...detailScreenOptions,
             title: 'Customize report',
             presentation: 'formSheet',
             sheetGrabberVisible: true,
@@ -50,7 +55,16 @@ export default function RootLayout() {
         />
         <Stack.Screen
           name="categorize"
-          options={{ headerShown: true, title: 'Sort activities' }}
+          options={{ ...detailScreenOptions, title: 'Sort activities' }}
+        />
+        <Stack.Screen
+          name="privacy"
+          options={{
+            ...detailScreenOptions,
+            title: 'Privacy',
+            presentation: 'formSheet',
+            sheetGrabberVisible: true,
+          }}
         />
       </Stack>
     </SafeAreaProvider>

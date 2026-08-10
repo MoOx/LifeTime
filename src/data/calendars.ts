@@ -7,6 +7,7 @@
  */
 
 import * as Calendar from 'expo-calendar'
+import { Linking, Platform } from 'react-native'
 
 import type { TimeEvent } from '@/domain/events'
 import type { CalendarRef } from '@/domain/settings'
@@ -71,4 +72,16 @@ export const reconcileCalendarIds = (
     }
   }
   return [...ids]
+}
+
+/**
+ * Opens the system calendar, so "add the event you forgot" is one tap away rather than a
+ * trip through the home screen. v1 had this in Settings and it belongs there.
+ *
+ * There is no cross-platform URL for this: iOS uses the `calshow:` scheme, Android an
+ * intent on the CalendarContract time URI.
+ */
+export const openCalendarApp = async (): Promise<void> => {
+  const url = Platform.OS === 'ios' ? 'calshow:' : 'content://com.android.calendar/time'
+  await Linking.openURL(url).catch(() => {})
 }

@@ -18,11 +18,49 @@
  * a snapshot test means something. No `Math.random()`.
  */
 
+import type { Activity } from './activities'
 import { TimeEvent } from './events'
+import type { RuleSet } from './rules'
 import { MS_PER_MINUTE, addDays, dayOfWeek, startOfDay } from './time'
 import { Range } from './week'
 
 export const DEMO_CALENDAR_ID = 'demo'
+
+/**
+ * The demo ships with its own rules, so the chart is in full colour from the first frame.
+ * A grey week would misrepresent the product — the whole promise is "here is where your
+ * time goes", and undifferentiated bars say nothing.
+ *
+ * `Charge airpods` is left out on purpose: something has to remain uncategorised, or the
+ * sorter has nothing to demonstrate and the coverage figure is a meaningless 100 %.
+ */
+const rule = (title: string, categoryId: string): Activity => ({
+  id: `demo_${categoryId}_${title}`,
+  title,
+  match: 'exact',
+  categoryId,
+  createdAt: 0,
+})
+
+export const DEMO_RULES: RuleSet = {
+  activities: [
+    rule('Sleep', 'rest'),
+    rule('Breakfast', 'food'),
+    rule('Lunch', 'food'),
+    rule('Dinner', 'food'),
+    rule('Standup', 'work'),
+    rule('Deep work', 'work'),
+    rule('Sprint review', 'work'),
+    rule('Running', 'exercise'),
+    rule('Climbing', 'exercise'),
+    rule('Netflix', 'fun'),
+    rule('Drinks with friends', 'social'),
+    rule('Groceries', 'chores'),
+    rule('Laundry', 'chores'),
+    rule('Meditation', 'self'),
+  ],
+  calendars: {},
+}
 
 /**
  * A tiny LCG (Numerical Recipes constants). Good enough to vary a demo, and — unlike
