@@ -581,52 +581,60 @@ Two follow-ups worth doing at some point:
 - `webfactory/ssh-agent@v0.9.1` still targets Node 20 and is being force-run on Node 24.
   Harmless today, worth watching.
 
-### Status: the launch crash is NOT solved
+### Post-mortem: the launch crash was one string in the wrong place
 
-> Read this before the post-mortem below. The version-drift fix it describes was real and
-> worth keeping, but **it was not the cause** — build 3 crashed with a byte-identical
-> stack.
-
-Where the evidence stands after four builds and five CI diagnoses:
-
-| Configuration | Result |
-|---|---|
-| Release, **simulator** (iOS 26.5, Xcode 26.6) | **runs** — UI renders, `calaccessd` and `remindd` connect, no crash |
-| Release, **device** (iPhone 17 Pro, **iOS 27.0 beta**), via TestFlight | crashes at the first mounting transaction |
-
-Ruled out, each with evidence rather than reasoning:
-
-- **`@expo/ui`** — `ExpoModulesProvider.swift` registers `ExpoUIModule` alongside every
-  other Expo module.
-- **Autolinking** — resolves all five native packages with correct podspecs.
-- **Version drift** — all six SDK-managed native modules now match, and the crash survived.
-- **Component registration generally** — the same Release binary mounts and renders in a
-  simulator, so the components *are* registered.
-- **The build itself** — builds, links, archives, signs and uploads clean.
-
-What is left, in order of likelihood:
-
-1. **iOS 27.0 beta.** The binary is built against the iOS 26 SDK (`AppVariant: 1:iPhone18,2:26`)
-   and the device runs an OS that postdates React Native 0.86 and Expo SDK 57. This is the
-   only axis the simulator cannot test, since no runner ships an iOS 27 simulator.
-2. **The archive/export/thinning path** — TestFlight binaries are archived, exported for
-   `app-store`, thinned per device and re-signed; a plain `xcodebuild build` is none of
-   those.
-3. Something device-only in `react-native-screens`, which HideTheNotch — running on the
-   same phone, same OS, same toolchain — does not use.
-
-**The experiment that settles it** needs the device, and takes about five minutes: plug the
-iPhone into the Mac and run `npm run ios`. That is a Debug build on the real OS, with
-`RCTAssert` compiled in, so an unregistered Fabric component prints
+A Debug build on the device, run from Xcode, printed in one line what four TestFlight
+builds and five CI diagnoses could not:
 
 ```
-ComponentView with componentHandle ... is not registered.
+Text strings must be rendered within a <Text> component.
+*** Assertion failure in -[RCTComponentViewFactory createComponentViewWithComponentHandle:]
+reason: 'ComponentView with componentHandle `4514895564` (`RawText`) not found.'
 ```
 
-instead of segfaulting. Everything above is an attempt to obtain that one line without the
-device; the device makes it free.
+**`RawText`** is the Fabric component for a bare string rendered outside a `<Text>`. It has
+no native view class on iOS, so the factory finds nothing — and in Release, where the
+assertion above is compiled out, it dereferences a missing map entry instead and segfaults
+at `0x18`.
 
-### Post-mortem: build 2 crashed on launch
+The offending line was in the very first screen the app shows:
+
+```tsx
+<Button onPress={onRequest}>Continue</Button>   // ✗
+<Button onPress={onRequest} label="Continue" /> // ✓
+```
+
+`@expo/ui`'s `Button` renders its children **raw** into the native SwiftUI button:
+
+```tsx
+label={!children ? label : undefined}
+…
+{children as React.ReactElement | undefined}
+```
+
+`ListItem` is the opposite — it has a `wrapStrings` helper that puts bare strings into a
+`Text` for you — which is why passing strings there was fine and made the pattern look
+safe. And `Button`'s `children` is typed `React.ReactNode`, so the compiler accepts a
+string without complaint. Text goes in `label`; `children` is for elements.
+
+**What made this expensive**, worth recording:
+
+- The Release crash names nothing. Every layer of evidence pointed at "a Fabric component
+  is not registered", which is true and useless — `RawText` is *supposed* to be
+  unregistered.
+- Three hypotheses were tested and wrong: dependency drift, `@expo/ui` not linking,
+  `react-native-screens`. Each cost a build.
+- Three diagnostic harnesses were themselves buggy: `timeout` does not exist on macOS,
+  `cancel-in-progress` killed a live run from a skipped one, and a Debug simulator build
+  with no Metro ran none of the app's code while reporting success.
+- The simulator run that reported "still running after 45s" should not be trusted either:
+  the same code path would have hit the same crash there.
+
+The lesson is cheap to state and was available from the start: **a Debug build on the
+device says the answer out loud.** Reach for `npm run ios:device` before building
+anything else.
+
+### Post-mortem: build 2 crashed on launch (a real bug, but not this one)
 
 Build 2 uploaded cleanly and then segfaulted the moment it opened, on an iPhone 17 Pro
 running iOS 27 beta:

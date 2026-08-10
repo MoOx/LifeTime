@@ -28,7 +28,16 @@ export function CalendarPermissionGate({ onRequest }: CalendarPermissionGateProp
         </AppText>
       </Section>
       <Section>
-        <Button onPress={onRequest}>Continue</Button>
+        {/* `label`, not a string child. `@expo/ui`'s Button renders its children raw
+            into the native SwiftUI button — unlike `ListItem`, which wraps bare strings
+            in a Text for you. A string here becomes a Fabric `RawText` node, which has
+            no registered view class, and the app dies at launch:
+
+              Text strings must be rendered within a <Text> component.
+              ComponentView with componentHandle `…` (`RawText`) not found.
+
+            Its `children` is typed `React.ReactNode`, so the compiler allows it. */}
+        <Button onPress={onRequest} label="Continue" />
       </Section>
     </View>
   )
