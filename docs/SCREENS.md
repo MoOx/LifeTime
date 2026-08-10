@@ -266,6 +266,126 @@ yet), Help, Danger Zone, per-option icon colours.
 
 ---
 
+## 8b. The weekly chart — `components/WeeklyGraph.res`
+
+Geometry, exactly. Every number here is from the source, because a chart described
+approximately is a chart redrawn wrongly.
+
+**Constants** (`WeeklyGraph.res:6-10`)
+
+| Name | Value | Meaning |
+| --- | --- | --- |
+| `graphHeight` | `140` | plot height |
+| `graphLetterHeight` | `16` | strip below the plot for the day letters |
+| `slices` | `4` | horizontal grid divisions — *always four*, not a step in hours |
+| `rightSpace` | `28` | gutter reserved to the right of the plot, commented `// Enough for "99m"` |
+
+The plot is `width − rightSpace` wide (`WeeklyGraph.res:253`), so the axis labels hang in
+the gutter rather than over the bars.
+
+**Horizontal grid** — `GridXAxis` (`WeeklyGraph.res:53-107`)
+
+- `maxDuration` is divided into **4 equal slices**, whatever it is. Not "a line every 2 h".
+- A hairline at every slice, `gray5`.
+- Labels only on slices 1…3 — the baseline and the top are unlabelled
+  (`WeeklyGraph.res:78`), so three numbers, never five.
+- **The unit switches with the scale** (`WeeklyGraph.res:59`): above one hour the labels are
+  hours (`"3h"`), at or below one hour they are minutes (`"45m"`). Formatted with no
+  decimals.
+
+**Vertical grid** — `GridYAxis` (`WeeklyGraph.res:109-161`)
+
+- A **dashed** vertical line at every day boundary — eight for seven days
+  (`nbDash = days + 1`), colour `gray4`, drawn by a `Dash` component.
+- The day letter sits at the **bottom left of each column**, just right of its dash
+  (`left = 100 / days * i`, `horizontal=XXS`), font size 10, `allowFontScaling=false`.
+  It is *not* centred under the bar.
+
+**Bars** (`WeeklyGraph.res:255-285`)
+
+- One column per day, each `100 / days` wide; the bar itself is **60 % of its column**,
+  top corners radius 3, `overflow: hidden`.
+- Height per segment = `graphHeight / maxDuration * minutes`.
+- An event crossing midnight is clamped into each day it touches (`WeeklyGraph.res:191-206`).
+- **Stacking order comes from the week's category totals, reversed** — the week's biggest
+  category ends up at the bottom of every bar (`WeeklyGraph.res:265-267`).
+
+**Scale rounding** (`WeeklyGraph.res:238-245`) — `roundTo = max > 60 ? 240 : 20`, then round
+up. Comment: *"the idea here is to avoid when divided for visual slice to have values with
+digits"*.
+
+**v2 status:** partially wrong. Height is 168 not 140; the grid is a fixed 2 h/4 h ladder
+instead of four slices; there is no unit switch; **the vertical dashes are missing
+entirely**; the day letters are centred rather than left-aligned to their dash.
+
+*Deliberate departure:* v2 stacks by category declaration order rather than by week totals.
+v1's order is consistent within a week but changes between weeks, so a colour band moves as
+you swipe. Declaration order is stable everywhere. This one is a fix, not an omission.
+
+---
+
+## 8c. Goal card — `components/GoalCard.res`
+
+**Look** (`GoalCard.res:173-176`, `225-231`) — a filled card in the goal's own category
+colour, with an SVG linear gradient to black at 0.5 opacity over it, corner radius
+`Theme.Radius.button`. All text is the on-dark palette regardless of light/dark mode.
+
+**Layout**
+
+1. Top row (`GoalCard.res:233-310`)
+   - `"GOAL"` / `"LIMIT"`, uppercased, caption1 weight 700, dimmed
+   - Goal title, **title1 weight 500**, one line
+   - Footnote: duration per day, then `", "`, then the cadence — e.g. `"1h, every weekday"`
+   - Right: a `SVGMore` button, 24 pt, `rgba(255,255,255,0.75)` → edit
+2. Bottom row (`GoalCard.res:311-352`)
+   - `ActivityRings` with an icon at its centre, 36 pt, `rgba(255,255,255,0.1)`:
+     scope for a goal, hourglass for a limit, checkmark otherwise
+   - `"Daily Average"` (caption1 weight 300) and the value (title2 weight 500), `"-"` when
+     zero
+
+**The cadence table** (`GoalCard.res:276-296`) is richer than v2's, and the extra cases are
+the ones people actually have:
+
+| Days (Sunday-indexed) | Text |
+| --- | --- |
+| all seven | `"every day"` |
+| Mon–Fri | `"every weekday"` |
+| Mon–Fri minus one | `"every weekday except monday"` … `"…except friday"` |
+| Sat + Sun | `"every day of the weekend"` |
+| anything else | short day names, comma-joined |
+
+**Progress model** (`GoalCard.res:50-68`)
+
+```
+durationProgress        elapsed fraction of the calendar week, at now
+durationProgressTonight elapsed fraction of the calendar week, at end of today
+proportionalGoal        durationPerWeek × durationProgress
+progress                currentTime / proportionalGoal
+progressTonight         currentTime / proportionalGoalTonight   ← what the ring shows
+totalProgress           currentTime / durationPerWeek
+proportionalAverageTime currentTime / (numberOfDays × durationProgressTonight)
+```
+
+Two things follow, and both matter:
+
+- **The fraction is of the calendar week, not of the scheduled days.** This is the bug in
+  IMPROVEMENTS.md §A.1, visible here in one line: a weekday goal is measured against a
+  denominator that keeps growing through Saturday and Sunday. v2's fix stands.
+- **v1's ring showed the pace** (`progressTonight`), never the period total. v2 defaults to
+  the period reading and offers pace as the alternative — a deliberate change, made because
+  a ring that fills across the week is the thing worth filling, and an empty one on Monday
+  morning is a prompt rather than a verdict.
+
+`isAlreadyDone` / `canBeDone` (`GoalCard.res:64-68`) select the ring's colour pair, and
+their definition flips between goal and limit — a goal is done when `totalProgress > 1`, a
+limit is "done" when what remains exceeds the week's remaining wall-clock.
+
+**v2 status:** built with a Skia ring and a light card. The dark category-coloured card with
+its gradient is a real piece of the app's character and is not currently reproduced; the
+`"Daily Average"` figure on the card is missing; the cadence table is missing four cases.
+
+---
+
 ## 9. Privacy — `components/Privacy.res`
 
 Title `"LifeTime & Privacy"`, centred, largeTitle weight 700 (`Privacy.res:9, 15-20`).
@@ -350,10 +470,6 @@ has to be attached to the source rather than written once into the Privacy scree
 Named rather than guessed. Each needs a pass before the screen that depends on it is
 rebuilt.
 
-- `components/GoalCard.res` (368 lines) — the card's exact composition, the debug overlay,
-  what the ring showed and how progress was worded
-- `components/WeeklyGraph.res` (301 lines) — grid rules, hour markers, bar geometry, the
-  today marker, the "no data" per-day state
 - `components/SettingsNotifications.res` (247 lines) — reminder times UI, permission flow
 - `components/SettingsDangerZone.res` (162 lines) — export / import / reset wording
 - `components/CalendarsPermissions.res` (81 lines) — the pre-permission screen
