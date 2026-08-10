@@ -504,19 +504,36 @@ requires either a `v*` tag or `[testflight]` in the commit message — otherwise
 would trigger a 20-minute signed build. Drop the marker once this is merged. This is the
 same arrangement as `MoOx/HideTheNotch`.
 
-### Xcode version — do not add `setup-xcode`
+### Xcode is pinned to 26.6 — and must not drift up
 
-The workflow deliberately uses the runner image's **default** Xcode. Selecting
-`latest-stable` via `maxim-lobanov/setup-xcode` picks Xcode 26.3, whose Swift compiler
-fails on Expo's own code:
+The workflow pins `xcode-version: "26.6"`. It can fail in both directions:
+
+**Too old / wrong.** `latest-stable` once selected Xcode 26.3, whose Swift compiler fails
+on Expo's own code:
 
 ```
 expo-modules-jsi/.../JavaScriptCodable+Date.swift:53:50:
 error: type of expression is ambiguous without a type annotation
 ```
 
-`MoOx/HideTheNotch` hit this and reverted to the image default, which compiles. Pin an
-explicit known-good version here rather than reintroducing `latest-stable`.
+**Too new.** Xcode 27's SDK makes the **UIScene life cycle mandatory**, and Expo SDK 57 /
+React Native 0.86 do not adopt it — nothing in the dependency tree declares
+`UIApplicationSceneManifest`. UIKit then refuses to start the app at all:
+
+```
+_UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption
+Application failed to launch: UIScene life cycle is required for apps built with this SDK.
+```
+
+This is not theoretical: it is what a local `npm run ios:device:release` built with
+Xcode 27 does on an iOS 27 device. And it is dated — **when GitHub's `macos-latest` image
+defaults to Xcode 27, an unpinned build starts producing binaries that cannot launch**,
+for this project and for `MoOx/HideTheNotch` alike. The pin is the protection; raise it
+only once Expo ships UIScene adoption.
+
+Note the two axes are independent: the **device's** iOS version does not matter here, only
+the **SDK the binary was built against**. An SDK-26 build runs on iOS 27; an SDK-27 build
+of this app runs nowhere.
 
 ### `APPLE_TEAM_ID` is a repository *variable*, not a secret
 

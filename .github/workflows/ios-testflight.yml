@@ -94,7 +94,26 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: true
 
-      # Recorded so the version can be pinned explicitly once one is known good.
+      # Pinned, not "latest-stable", and not the image default either.
+      #
+      # 26.6 is known good: it produced builds that install and launch. Two ways it
+      # can drift, both fatal:
+      #
+      #   - latest-stable once picked Xcode 26.3, whose Swift compiler rejects
+      #     expo-modules-jsi (HideTheNotch hit this);
+      #   - the runner image will eventually default to Xcode 27, whose SDK makes the
+      #     UIScene life cycle mandatory. Expo SDK 57 and React Native 0.86 do not adopt
+      #     it — nothing in the tree declares UIApplicationSceneManifest — so an
+      #     iOS 27 SDK build is refused at launch by UIKit itself:
+      #
+      #       Application failed to launch: UIScene life cycle is required for apps
+      #       built with this SDK.
+      #
+      # Raise this only once Expo ships UIScene adoption.
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "26.6"
+
       - name: Xcode version in use
         run: xcodebuild -version
 
