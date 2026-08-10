@@ -119,3 +119,37 @@ export const explainEmptiness = (
 /** Convenience for screens that need the activity set of a range. */
 export const distinctTitles = (events: readonly TimeEvent[]): string[] =>
   Array.from(new Set(events.map((e) => e.title)))
+
+/**
+ * Which week the Summary should open on, given the weeks it has loaded (oldest first).
+ *
+ * Issue #19:
+ *
+ * > Monday morning (no data) should display last week instead […] if there is no data for
+ * > the current week, we should show last week data instead of empty week.
+ * >
+ * > Note: Screentime for example don't have this problem as you always have data, at
+ * > least the current minute session you are in.
+ *
+ * That last note is the whole diagnosis: a screen-time app is never empty, a diary app is
+ * empty every Monday until you write something. Opening on an empty chart makes the app
+ * look broken on the one morning a week it is most likely to be checked.
+ *
+ * `lookBack` bounds how far it will reach — one week by default. Landing the user on a
+ * month-old chart without warning would be more confusing than an empty one, and the
+ * "This week" control makes the position obvious either way.
+ */
+export const initialWeekIndex = (
+  eventsByWeek: readonly (TimeEvent[] | undefined)[],
+  lookBack = 1,
+): number => {
+  const last = eventsByWeek.length - 1
+  if (last < 0) return 0
+  for (let i = last; i >= Math.max(0, last - lookBack); i--) {
+    const events = eventsByWeek[i]
+    // Still loading: do not skip past a week we know nothing about yet.
+    if (events === undefined) return last
+    if (events.some((e) => !e.allDay)) return i
+  }
+  return last
+}

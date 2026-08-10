@@ -74,28 +74,4 @@ export const useReport = (
   }
 }
 
-/**
- * Which week to open on. Issue #19:
- *
- * > Monday morning (no data) should display last week instead […] before the $frequency
- * > threshold, if there is no data for the current week, we should show last week data
- * > instead of empty week.
- *
- * The generalisation is simply "the most recent week that has anything in it", which also
- * covers coming back to the app after a fortnight away. It only ever looks backwards from
- * the current week, and it gives up rather than paging far into the past — landing on a
- * month-old week would be more confusing than an empty one.
- */
-export const initialWeekIndex = (
-  eventsByWeek: (TimeEvent[] | undefined)[],
-  lookBack = 1,
-): number => {
-  const last = eventsByWeek.length - 1
-  for (let i = last; i >= Math.max(0, last - lookBack); i--) {
-    const events = eventsByWeek[i]
-    // Still loading: do not skip past a week we know nothing about yet.
-    if (events === undefined) return last
-    if (events.some((e) => !e.allDay)) return i
-  }
-  return last
-}
+export { initialWeekIndex } from '@/domain/events'

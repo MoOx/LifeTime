@@ -7,7 +7,7 @@
  * *over* it.
  */
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Linking, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -56,7 +56,22 @@ export default function SummaryScreen() {
     [report.eventsByWeek, filter],
   )
 
-  const [index, setIndex] = useState(() => initialWeekIndex(visibleByWeek))
+  /**
+   * Which week to open on. Issue #19: on a Monday morning the current week is empty
+   * through no fault of the user's, and an empty chart is a worse answer than last
+   * week's. `initialWeekIndex` only knows that once the events have arrived, so the
+   * pager is held back until they have — a frame it would have spent measuring its own
+   * width anyway. Once set, the user owns the page.
+   */
+  const [initial, setInitial] = useState<number | undefined>(undefined)
+  const [index, setIndex] = useState(report.weeks.length - 1)
+
+  useEffect(() => {
+    if (report.loading || initial !== undefined) return
+    const start = initialWeekIndex(visibleByWeek)
+    setInitial(start)
+    setIndex(start)
+  }, [report.loading, initial, visibleByWeek])
 
   const week = report.weeks[index] ?? report.weeks[report.weeks.length - 1]!
   const rawEvents = report.eventsByWeek[index]
@@ -103,16 +118,18 @@ export default function SummaryScreen() {
           <AppText role="screenTitle">Your LifeTime</AppText>
         </View>
 
-        <WeekPager
-          weeks={report.weeks}
-          eventsByWeek={visibleByWeek}
-          rules={rules}
-          locale={locale}
-          weekStartsOn={weekStartsOn}
-          now={now}
-          initialIndex={index}
-          onIndexChange={setIndex}
-        />
+        {initial !== undefined && (
+          <WeekPager
+            weeks={report.weeks}
+            eventsByWeek={visibleByWeek}
+            rules={rules}
+            locale={locale}
+            weekStartsOn={weekStartsOn}
+            now={now}
+            initialIndex={initial}
+            onIndexChange={setIndex}
+          />
+        )}
 
         {emptiness === 'has-events' ? (
           <>
