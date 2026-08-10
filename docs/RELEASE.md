@@ -122,6 +122,59 @@ Rule of thumb: **after any local fastlane run, reset `ios/` before building from
 The two disagree about signing by design — CI consumes a fixed profile, a developer wants
 Xcode to mint one.
 
+### "No script URL provided" on a device
+
+```
+No script URL provided. Make sure the packager is running or you have embedded a JS
+bundle in your application bundle.
+unsanitizedScriptURLString = (null)
+```
+
+A Debug build looks for Metro and **never falls back to the embedded bundle**, even though
+`react-native-xcode.sh` does embed one for physical devices. The generated AppDelegate is
+explicit:
+
+```swift
+override func bundleURL() -> URL? {
+#if DEBUG
+    return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: ".expo/.virtual-metro-entry")
+#else
+    return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+#endif
+}
+```
+
+So `(null)` means the packager address could not be resolved. On Xcode 26 the usual reason
+appears in `expo run:ios`'s first line:
+
+```
+Unexpected devicectl JSON version output from devicectl.
+Connecting to physical Apple devices may not work as expected.
+```
+
+Expo CLI cannot parse `devicectl`'s version, so its device integration — including wiring
+up the packager host — is degraded.
+
+**To get JS running in Debug on a device**, reach Metro over the network instead:
+
+```sh
+npx expo start --dev-client --host lan     # Mac and iPhone on the same Wi-Fi
+```
+
+then launch the app from the home screen. If it still cannot connect, shake the device →
+*Configure Bundler* → enter the Mac's LAN IP. That escape hatch does not depend on
+`devicectl` at all.
+
+**If the networks cannot be made to match**, build Release straight onto the device:
+
+```sh
+npm run ios:device:release
+```
+
+Release embeds the bundle, so it needs no Metro. It costs the assertions — `RCTAssert` is
+compiled out — but it reproduces a release-configuration bug in about five minutes on the
+real device, which is a far tighter loop than a TestFlight round-trip for bisecting.
+
 This is a **Debug** build, and that difference is not cosmetic: `RCTAssert` and friends are
 compiled in, so a Fabric component with no registered native class prints its own name
 instead of segfaulting in a factory. Reach for this *first* when something crashes at

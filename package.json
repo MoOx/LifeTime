@@ -21,7 +21,8 @@
     "eas": "npx --yes eas-cli@latest",
     "signing:dev": "bundle exec fastlane ios development",
     "ios:device": "expo run:ios --device",
-    "ios:reset": "expo prebuild --platform ios --clean"
+    "ios:reset": "expo prebuild --platform ios --clean",
+    "ios:device:release": "expo run:ios --device --configuration Release"
   },
   "dependencies": {
     "@expo/ui": "~57.0.9",
