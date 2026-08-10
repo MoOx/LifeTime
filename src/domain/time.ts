@@ -121,11 +121,20 @@ export const formatDayMonthShort = (t: number, locale: string): string =>
   new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(new Date(t))
 
 /**
- * "just now" / "5 minutes ago" / "yesterday", via `Intl.RelativeTimeFormat`.
+ * "5 minutes ago" — when the engine can say it, and a locale-correct absolute time when
+ * it cannot.
  *
- * v1 shipped `Date.formatRelative` on top of `date-fns` and a locale table. `Intl` does
- * it for every locale the OS knows, and it is the right unit that matters here: telling
- * someone their report is "0 hours old" when it is forty seconds old reads as broken.
+ * **Hermes does not implement all of `Intl`.** Its Apple and Android platform layers
+ * provide `Collator`, `DateTimeFormat` and `NumberFormat`; `RelativeTimeFormat`,
+ * `PluralRules`, `ListFormat` and `DisplayNames` are absent. Calling a missing one is not
+ * a graceful degradation — it is a `TypeError` thrown during render, which React Native
+ * turns into a fatal exception and the app dies at launch.
+ *
+ * So this feature-detects rather than assuming, and falls back to `DateTimeFormat`, which
+ * is always there. The fallback is an absolute time rather than a hand-rolled English
+ * table: "Updated at 14:32" is honest and correct in every locale, whereas "il y a 5
+ * minutes" written by hand would only be correct in the two languages someone thought to
+ * add — which is precisely the trap v1's ~90 lines of date tables fell into.
  */
 const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
   ['second', 1000],
@@ -135,13 +144,30 @@ const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
   ['week', 7 * 86_400_000],
 ]
 
+/** Evaluated once: whether the engine has it is a build fact, not state. */
+export const HAS_RELATIVE_TIME_FORMAT =
+  typeof (Intl as { RelativeTimeFormat?: unknown }).RelativeTimeFormat === 'function'
+
+const DAY_MS = 86_400_000
+
+const formatAbsolute = (t: number, now: number, locale: string): string =>
+  now - t < DAY_MS
+    ? new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(
+        new Date(t),
+      )
+    : new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(
+        new Date(t),
+      )
+
 export const formatRelative = (t: number, now: number, locale: string): string => {
+  if (!HAS_RELATIVE_TIME_FORMAT) return formatAbsolute(t, now, locale)
+
   const elapsed = now - t
-  if (elapsed < 45_000) {
-    // `RelativeTimeFormat` has no "just now"; forcing seconds gives "3 seconds ago",
-    // which is noise on a figure that only matters to the nearest minute.
-    return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(0, 'second')
-  }
+  const format = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
+
+  // `RelativeTimeFormat` has no "just now"; forcing seconds gives "3 seconds ago", which
+  // is noise on a figure that only matters to the nearest minute.
+  if (elapsed < 45_000) return format.format(0, 'second')
 
   let unit: Intl.RelativeTimeFormatUnit = 'second'
   let ms = 1000
@@ -151,8 +177,5 @@ export const formatRelative = (t: number, now: number, locale: string): string =
     ms = size
   }
 
-  return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(
-    -Math.round(elapsed / ms),
-    unit,
-  )
+  return format.format(-Math.round(elapsed / ms), unit)
 }

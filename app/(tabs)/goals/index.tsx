@@ -97,7 +97,7 @@ export default function GoalsScreen() {
         </AppText>
         <Pressable
           accessibilityRole="button"
-          onPress={() => router.push('/goal/new')}
+          onPress={() => router.push('/goals/new')}
           style={({ pressed }) => [styles.action, pressed && styles.pressed]}>
           <AppText role="button" tone="accent">
             Add a goal
@@ -142,7 +142,7 @@ export default function GoalsScreen() {
             <Pressable
               key={goal.id}
               onPress={() =>
-                router.push({ pathname: '/goal/[id]', params: { id: goal.id } })
+                router.push({ pathname: '/goals/[id]', params: { id: goal.id } })
               }
               style={({ pressed }) => pressed && styles.pressed}>
               <GoalCard
@@ -165,7 +165,7 @@ export default function GoalsScreen() {
 
       <Pressable
         accessibilityRole="button"
-        onPress={() => router.push('/goal/new')}
+        onPress={() => router.push('/goals/new')}
         style={({ pressed }) => [styles.addRow, pressed && styles.pressed]}>
         <Symbol name="add" size={18} color={colors.accent} />
         <AppText role="button" tone="accent">

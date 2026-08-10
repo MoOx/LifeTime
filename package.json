@@ -11,7 +11,7 @@
     "lint": "expo lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "check": "npm run check:sdk && npm run typecheck && npm run test",
+    "check": "npm run check:sdk && npm run check:routes && npm run check:intl && npm run typecheck && npm run test",
     "build:dev": "npx --yes eas-cli@latest build --profile development --platform all",
     "build:preview": "npx --yes eas-cli@latest build --profile preview --platform all",
     "build:prod": "npx --yes eas-cli@latest build --profile production --platform all",
@@ -22,7 +22,9 @@
     "signing:dev": "bundle exec fastlane ios development",
     "ios:device": "expo run:ios --device",
     "ios:reset": "expo prebuild --platform ios --clean",
-    "ios:device:release": "expo run:ios --device --configuration Release"
+    "ios:device:release": "expo run:ios --device --configuration Release",
+    "check:routes": "node scripts/check-routes.mjs",
+    "check:intl": "node scripts/check-intl.mjs"
   },
   "dependencies": {
     "@expo/ui": "~57.0.9",

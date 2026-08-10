@@ -62,6 +62,41 @@ describe('minutesElapsedInDay', () => {
 describe('formatRelative', () => {
   const t = new Date(2026, 7, 10, 12, 0).getTime()
 
+  // Node has the full Intl; Hermes does not. Both paths have to work, because which
+  // one runs is decided by the engine, not by this code.
+  describe('without Intl.RelativeTimeFormat, as on Hermes', () => {
+    const withoutIt = <T,>(run: () => T): T => {
+      const original = (Intl as { RelativeTimeFormat?: unknown }).RelativeTimeFormat
+      delete (Intl as { RelativeTimeFormat?: unknown }).RelativeTimeFormat
+      jest.resetModules()
+      try {
+        return run()
+      } finally {
+        ;(Intl as { RelativeTimeFormat?: unknown }).RelativeTimeFormat = original
+        jest.resetModules()
+      }
+    }
+
+    it('falls back to an absolute time instead of throwing', () => {
+      const fallback = withoutIt(() => {
+        // Re-require so the module-level capability check sees the missing constructor.
+        const time = require('../time') as typeof import('../time')
+        expect(time.HAS_RELATIVE_TIME_FORMAT).toBe(false)
+        return time.formatRelative(t, t + 5 * 60_000, 'en-GB')
+      })
+      expect(fallback).toMatch(/\d/)
+      expect(fallback).not.toMatch(/ago/)
+    })
+
+    it('gives a date rather than a clock time once it is older than a day', () => {
+      const fallback = withoutIt(() => {
+        const time = require('../time') as typeof import('../time')
+        return time.formatRelative(t, t + 3 * 86_400_000, 'en-GB')
+      })
+      expect(fallback).toMatch(/Aug/)
+    })
+  })
+
   it('says "now" rather than counting seconds', () => {
     expect(formatRelative(t, t + 5_000, 'en-GB')).toBe('now')
   })

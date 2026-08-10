@@ -18,8 +18,10 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
       - run: npm ci
-      - run: npx tsc --noEmit
-      - run: npm test
+      # `npm run check` and not `tsc && jest`: the SDK-drift, route-tree and Hermes-Intl
+      # guards each exist because something they now catch shipped to a device and
+      # crashed it. Running the narrower pair here would let exactly those through.
+      - run: npm run check
 
   # Catches config-plugin and native-config regressions without a macOS runner:
   # a broken app.json fails here rather than 20 minutes into a TestFlight build.
