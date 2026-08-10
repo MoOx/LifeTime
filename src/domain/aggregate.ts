@@ -10,7 +10,7 @@ import { CategoryId, DEFAULT_CATEGORIES } from './categories'
 import { TimeEvent } from './events'
 import { RuleSet, categoryOf } from './rules'
 import { Range } from './week'
-import { msToMinutes, overlapMs, startOfDay, endOfDay } from './time'
+import { MINUTES_PER_HOUR, msToMinutes, overlapMs, startOfDay, endOfDay } from './time'
 
 export type Bucket = { key: string; minutes: number }
 
@@ -111,15 +111,54 @@ export const chartMaximum = (maxMinutes: number): number => {
   return Math.ceil(maxMinutes / step) * step
 }
 
+/** How many horizontal divisions the chart is drawn with. Always four (`WeeklyGraph.res:7`). */
+export const CHART_SLICES = 4
+
+export type ChartGridLine = {
+  /** Minutes this line sits at. */
+  minutes: number
+  /** 0…1 up the plot. */
+  fraction: number
+  /** `"3h"` / `"45m"`, or `undefined` where v1 draws a line but no label. */
+  label?: string
+}
+
 /**
- * Horizontal rules for the chart: every 2 h up to 8 h, then every 4 h. v1 drew a fixed
- * 1 h/2 h/3 h ladder, which flattened into an unreadable stack of lines as soon as a day
- * went past six hours.
+ * The chart's horizontal grid.
+ *
+ * Two things here are v1's and were wrong in the first rebuild, both from
+ * `WeeklyGraph.res:53-107`:
+ *
+ *   • **The maximum is divided into four equal slices, whatever it is** — not a ladder
+ *     every two or four hours. A fixed ladder means a 40-minute week gets no lines at all
+ *     and a 14-hour week gets seven.
+ *   • **The unit follows the scale.** Above an hour the labels are hours, at or below it
+ *     they are minutes. Without that, a short week reads "0 h, 0 h, 1 h".
+ *
+ * The baseline and the topmost line carry no label (`WeeklyGraph.res:78`): the baseline is
+ * zero and the top is the number already printed above the chart, so labelling either is
+ * noise. Three labels, never five.
  */
-export const gridLines = (maximumMinutes: number): number[] => {
+export const chartGrid = (maximumMinutes: number): ChartGridLine[] => {
   if (maximumMinutes <= 0) return []
-  const step = maximumMinutes <= 480 ? 120 : 240
-  const lines: number[] = []
-  for (let m = step; m <= maximumMinutes; m += step) lines.push(m)
+
+  const inHours = maximumMinutes > MINUTES_PER_HOUR
+  const lines: ChartGridLine[] = []
+
+  for (let i = 0; i <= CHART_SLICES; i++) {
+    const fraction = i / CHART_SLICES
+    const minutes = maximumMinutes * fraction
+    const labelled = i > 0 && i < CHART_SLICES
+    lines.push({
+      minutes,
+      fraction,
+      label: labelled
+        ? inHours
+          ? `${Math.round(minutes / MINUTES_PER_HOUR)}h`
+          : `${Math.round(minutes)}m`
+        : undefined,
+    })
+  }
+
   return lines
 }

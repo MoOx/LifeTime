@@ -2,7 +2,7 @@ import { Activity } from '../activities'
 import {
   breakdownByDay,
   chartMaximum,
-  gridLines,
+  chartGrid,
   minutesByCategory,
   minutesByTitle,
   stackedSegments,
@@ -114,11 +114,35 @@ describe('chartMaximum', () => {
   })
 })
 
-describe('gridLines', () => {
-  it('spaces lines so a tall chart does not turn into a ladder', () => {
-    expect(gridLines(0)).toEqual([])
-    expect(gridLines(480)).toEqual([120, 240, 360, 480])
-    expect(gridLines(960)).toEqual([240, 480, 720, 960])
+describe('chartGrid', () => {
+  it('always divides into four slices, whatever the maximum', () => {
+    expect(chartGrid(480).map((l) => l.minutes)).toEqual([0, 120, 240, 360, 480])
+    expect(chartGrid(40).map((l) => l.minutes)).toEqual([0, 10, 20, 30, 40])
+  })
+
+  it('labels only the three inner lines', () => {
+    expect(chartGrid(480).map((l) => l.label)).toEqual([
+      undefined,
+      '2h',
+      '4h',
+      '6h',
+      undefined,
+    ])
+  })
+
+  // Without the unit switch a short week reads "0 h, 0 h, 1 h".
+  it('switches to minutes at or below an hour', () => {
+    expect(chartGrid(40).map((l) => l.label)).toEqual([
+      undefined,
+      '10m',
+      '20m',
+      '30m',
+      undefined,
+    ])
+  })
+
+  it('draws nothing when there is nothing to scale', () => {
+    expect(chartGrid(0)).toEqual([])
   })
 })
 

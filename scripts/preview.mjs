@@ -119,6 +119,33 @@ for (const [name, route] of ROUTES) {
   await page.waitForTimeout(2000)
   await page.screenshot({ path: join(shots, `${name}.png`), fullPage: true })
 
+  /**
+   * A second shot at the bottom, when there is one. A floating sheet or a tab bar sits
+   * over the content at rest, so anything wrong at the *end* of a screen is invisible in
+   * the first shot — which is how a permission sheet came to be covering the last row of
+   * the activity list without anyone noticing.
+   */
+  const scrollable = await page.evaluate(() => {
+    const el = document.scrollingElement ?? document.body
+    const overflow = el.scrollHeight - el.clientHeight
+    if (overflow > 40) {
+      el.scrollTop = el.scrollHeight
+      return true
+    }
+    // React Native Web often scrolls an inner element rather than the document.
+    const inner = [...document.querySelectorAll('div')].find(
+      (d) => d.scrollHeight - d.clientHeight > 40,
+    )
+    if (inner === undefined) return false
+    inner.scrollTop = inner.scrollHeight
+    return true
+  })
+
+  if (scrollable) {
+    await page.waitForTimeout(500)
+    await page.screenshot({ path: join(shots, `${name}-bottom.png`) })
+  }
+
   const body = await page.evaluate(() => document.body.innerText)
   const unmatched = body.includes('Unmatched Route')
   const blank = body.trim().length < 20

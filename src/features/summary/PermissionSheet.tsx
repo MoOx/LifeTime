@@ -32,18 +32,26 @@ export type PermissionSheetProps = {
   /** True once the OS has refused for good and only Settings can undo it. */
   blocked: boolean
   onOpenSettings: () => void
+  /**
+   * Reports how tall the sheet ended up, so the screen behind can pad its scroll view by
+   * exactly that much. Guessing the number left the last activity row trapped underneath.
+   */
+  onHeight?: (height: number) => void
 }
 
 export function PermissionSheet({
   onRequest,
   blocked,
   onOpenSettings,
+  onHeight,
 }: PermissionSheetProps) {
   const insets = useSafeAreaInsets()
 
   return (
     <View style={styles.anchor} pointerEvents="box-none">
-      <FloatingSurface style={[styles.sheet, { marginBottom: insets.bottom + space.md }]}>
+      <FloatingSurface
+        onLayout={(event) => onHeight?.(event.nativeEvent.layout.height)}
+        style={[styles.sheet, { marginBottom: insets.bottom + space.md }]}>
         <View style={styles.badge}>
           <Symbol name="demo" size={15} color={colors.accent} />
           <AppText role="caption" tone="accent">

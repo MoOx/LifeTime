@@ -79,6 +79,13 @@ export default function SummaryScreen() {
   const [initial, setInitial] = useState<number | undefined>(undefined)
   const [index, setIndex] = useState(report.weeks.length - 1)
 
+  /**
+   * The permission sheet floats over this scroll view, so the content has to end above
+   * it. Measured rather than guessed — the guess (300) left the last activity row trapped
+   * underneath, which the preview showed immediately.
+   */
+  const [sheetHeight, setSheetHeight] = useState(0)
+
   useEffect(() => {
     if (report.loading || initial !== undefined) return
     const start = initialWeekIndex(visibleByWeek)
@@ -123,7 +130,10 @@ export default function SummaryScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: insets.bottom + space.section },
+          {
+            paddingBottom:
+              insets.bottom + space.section + (granted ? 0 : sheetHeight + space.lg),
+          },
         ]}
         // Required with a transparent large-title header: the OS insets the content
         // instead of the first row hiding underneath.
@@ -202,6 +212,7 @@ export default function SummaryScreen() {
           onRequest={requestPermission}
           blocked={permission !== null && !permission.granted && !permission.canAskAgain}
           onOpenSettings={openSettings}
+          onHeight={setSheetHeight}
         />
       )}
     </View>

@@ -14,7 +14,13 @@
 
 import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect'
 import type { ReactNode } from 'react'
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native'
+import {
+  StyleSheet,
+  View,
+  type StyleProp,
+  type ViewProps,
+  type ViewStyle,
+} from 'react-native'
 
 import { colors } from './theme/colors'
 
@@ -28,17 +34,27 @@ export type SurfaceProps = {
    */
   glass?: 'clear' | 'regular'
   style?: StyleProp<ViewStyle>
+  onLayout?: ViewProps['onLayout']
 }
 
-export function FloatingSurface({ children, glass = 'regular', style }: SurfaceProps) {
+export function FloatingSurface({
+  children,
+  glass = 'regular',
+  style,
+  onLayout,
+}: SurfaceProps) {
   if (HAS_GLASS) {
     return (
-      <GlassView glassEffectStyle={glass} style={style}>
+      <GlassView glassEffectStyle={glass} style={style} onLayout={onLayout}>
         {children}
       </GlassView>
     )
   }
-  return <View style={[styles.opaque, style]}>{children}</View>
+  return (
+    <View style={[styles.opaque, style]} onLayout={onLayout}>
+      {children}
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
