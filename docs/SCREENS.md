@@ -423,10 +423,121 @@ what is stored; the list of stored settings should come back.
 
 ---
 
-## 10. Help — `components/Help.res`
+## 10. Help — `components/Help.res` + `src/md/help.md`
 
-Rendered from `src/md/help.md` through a markdown → JSON pipeline
-(`Help.res:5-14`, `package.json` script `md:to-json`). Content not yet extracted.
+Markdown, compiled to JSON at build time (`package.json` script `md:to-json`) and rendered
+by `MarkdownJsonRenderer` (`Help.res:5-14`). Title from the document's own `#` heading.
+
+Structure of `help.md` (§ headings verbatim):
+
+1. `# How to use LifeTime` — the same two sentences the empty state uses
+2. `## Start by feeding your calendar` — *"LifeTime will mostly read events that already
+   happened as a diary. The more you feed your calendar, the more LifeTime will be able to
+   show you accurate data."* Then a collapsible `<details>` block, *"Learn More about how to
+   use your calendar app"*, with per-provider links: Apple Calendar, Google Calendar,
+   Microsoft Outlook, Others.
+3. `## Categorize & filter activities` → `### Activities`, which is where the app **promised
+   prefix / suffix matching as Premium** and never shipped it — issue #13. That promise is
+   in the help text a user can read today.
+
+**v2 status:** not built. The `<details>` block and the per-provider links are worth keeping
+— "how do I even get data in here" is the first question a new user has, and v1 answered it
+properly.
+
+---
+
+## 10b. Notifications — `components/SettingsNotifications.res`
+
+1. Row `"Allow Notifications"` + switch (`:73-84`)
+2. Row `"Daily Reminders"` + switch (`:88-109`)
+3. One row per reminder, sorted by hour then minute (`:111-178`)
+   - Left: the time
+   - Right: `"Next notification"` above the relative time until it fires
+   - Dimmed to `opacity: 0.1` when editing is not allowed (`:162`)
+4. Inline picker with `"Cancel"` / `"Add"` while adding (`:210-222`)
+5. Blue row `"Add a New Reminder"` (`:230-237`)
+6. Footnote: *"Notifications are skipped if they are planned in less than `N`min to avoid
+   unecessary reminder."* (`:240-244`, v1 typo "unecessary")
+
+**Duplicate guard** (`:40-58`): adding a reminder that already exists raises an `Alert`,
+title `"Duplicate Reminder"`, message *"You already have a identical reminder. It's not
+necessary to have it twice."*
+
+**v2 status:** a single on/off switch. The reminder list, the next-fire time and the
+duplicate guard are all missing.
+
+---
+
+## 10c. Danger zone — `components/SettingsDangerZone.res`
+
+Three groups, each with its footnote. Every destructive action is confirmed by an `Alert`.
+
+**Backup** (`:56-89`)
+
+- Blue row `"Export Backup"` → copies to the clipboard, then an alert: `"Export Finished"` /
+  *"Data are in you clipboard. Be sure to paste that in a safe place."*
+- Blue row `"Import Backup"` → alert `"Import Data from Clipboard?"` / *"This is a
+  destructive command, all settings will be overwritten by the content of the clipboard
+  (assuming that's a valid Export Backup)."*, buttons `Cancel` / `Import` (destructive)
+- Failure paths: `"No data in your clipboard"`, `"Data don't seem to be a valid Export
+  Backup"` (`:24-28`)
+- Footnote: *"Export contains events metadata including categories & goals that are not
+  stored into your calendars. Export copy raw metadata into your clipboard. Import assume
+  that you have your export in your clipboard, ready to be injected."*
+
+**Demo calendar** (`:96-134`)
+
+- Blue row `"Create Demo Calendar"` → alert `"Inject Demo Calendar"`, buttons `Cancel` /
+  `Inject`
+- Red row `"Remove Demo Calendar"` → alert `"Remove Demo Calendar"`, buttons `Keep` / …
+- Footnote: *"Demo data allows you to quickly test the app if you have currently not enough
+  data in your actual calendars. It can be safely removed without affecting your personal
+  calendars."*
+
+*Worth noting:* v1's demo **wrote a real calendar to the device**. v2 generates events in
+memory instead (`domain/demo.ts`), which needs no write permission and cannot leave residue
+behind — the same idea, done without touching the user's data.
+
+**Reset** (`:139-160`)
+
+- Centred red row `"Reset Settings & Erase All Metadata"` → alert `"Reset Settings & Erase
+  All Data?"` / *"This is a destructive operation and will wipe all settings & data. It
+  cannot be undone unless you use an Export."*, buttons `Cancel` / `Reset` (destructive)
+- Footnote: *"This is a destructive operation and will delete all application metadata.
+  Note: All your calendars and events are safe and are not affected by this operation."*
+
+**v2 status:** not built. The v1 → v2 settings import already exists in
+`domain/settings.ts`; what is missing is the screen that reaches it.
+
+---
+
+## 10d. Calendar permission — `components/CalendarsPermissions.res`
+
+Shown before access is requested, on a card with `Theme.Radius.card`, entering with a
+spring from `translateY: 1000` after a 150 ms delay (`:19-34`).
+
+1. App icon, 48 pt, centred
+2. `"Set Up Calendars Access"` — title2 weight 700
+3. Scrollable body:
+   > *"LifeTime has been designed to protect your personal data and respect your privacy. It
+   > has been built as an on-device service that you can trust.*
+   >
+   > *Calendars are used as the primary source of informations to follow your activities.
+   > LifeTime must have read access to them to be able to show reports and suggestions."*
+4. Blue link `"Learn more about LifeTime & Privacy..."`
+5. Blue button `"Continue"`, `testID="AllowCalendarsAccess"`
+
+**v2 status:** replaced by a glass sheet over a working Summary. The *timing* changed
+deliberately — v1 asked before showing anything — but the copy above is stronger than v2's
+and the "Learn more" link is missing.
+
+---
+
+## 10e. Notification permission — `components/NotificationsPermissionsPopin.res`
+
+Title `"Set Up Reminders"`; body *"Enabling notifications can help you to stay motivated by
+giving you quick recap of your progress goals when necessary. Notifications are generated on
+device."*; request button `testID="NotificationsPermissionsPopin_Button_request"`.
 
 **v2 status:** not built.
 
@@ -470,10 +581,26 @@ has to be attached to the source rather than written once into the Privacy scree
 Named rather than guessed. Each needs a pass before the screen that depends on it is
 rebuilt.
 
-- `components/SettingsNotifications.res` (247 lines) — reminder times UI, permission flow
-- `components/SettingsDangerZone.res` (162 lines) — export / import / reset wording
-- `components/CalendarsPermissions.res` (81 lines) — the pre-permission screen
-- `components/NotificationsPermissionsPopin.res` (149 lines)
-- `src/md/help.md` — the Help content
-- `components/shareable/Theme.res` (295 lines) — for the *semantic* colour roles only, not
-  the values
+Nothing. Every screen in v1 has been read and recorded above.
+
+What remains is **verification of this document against the running v1**, which nobody can
+do — v1 no longer builds. So the citations are the only evidence, and that is why every
+claim carries one.
+
+### The colour roles, for reference
+
+`shareable/Theme.res` names roles rather than colours, and the naming is worth keeping even
+though the values are not (`Theme.res:182-232`):
+
+| v1 role | Used for | v2 |
+| --- | --- | --- |
+| `text` | primary label | `colors.label` |
+| `textLight1` / `textLight2` | secondary / tertiary label | `secondaryLabel` / `tertiaryLabel` |
+| `textOnDarkLight` | dimmed label over a coloured card | needed for the goal card |
+| `textMain` / `textBlue` | accent, link | `accent` / `link` |
+| `background` / `backgroundDark` | screen, card | `background` / `surface` |
+| `separatorOnBackground` | hairline (`gray3`) | `separator` |
+| `backgroundGray5` | iOS row press state | `selection` |
+
+The one role v2 does not have is **`textOnDarkLight`** — a dimmed label guaranteed legible
+over a saturated card, in both appearances. The goal card needs it.
