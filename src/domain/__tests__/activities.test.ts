@@ -1,12 +1,4 @@
-import {
-  Activity,
-  MatchMode,
-  matches,
-  normalizeTitle,
-  resolveCategoryId,
-  suggestCategoryId,
-} from '../activities'
-import { UNKNOWN_CATEGORY_ID } from '../categories'
+import { Activity, MatchMode, matches, normalizeTitle, suggestCategoryId } from '../activities'
 
 const activity = (
   title: string,
@@ -17,6 +9,12 @@ const activity = (
 describe('normalizeTitle', () => {
   it('case-folds and collapses whitespace', () => {
     expect(normalizeTitle('  Daily   Standup ')).toBe('daily standup')
+  })
+
+  // Issue #12: a stray trailing space must not create a second activity.
+  it('matches a title that carries a stray trailing space', () => {
+    expect(matches(activity('Gym', 'exact', 'exercise'), 'Gym ')).toBe(true)
+    expect(normalizeTitle('Gym ')).toBe(normalizeTitle('Gym'))
   })
 
   it('drops leading emoji and symbols', () => {
@@ -40,28 +38,6 @@ describe('matches', () => {
 
   it('never matches on an empty pattern', () => {
     expect(matches(activity('', 'contains', 'work'), 'anything')).toBe(false)
-  })
-})
-
-describe('resolveCategoryId', () => {
-  it('falls back to uncategorized', () => {
-    expect(resolveCategoryId('Whatever', [])).toBe(UNKNOWN_CATEGORY_ID)
-  })
-
-  it('prefers the more specific rule over a catch-all', () => {
-    const rules = [
-      activity('stand', 'contains', 'chores'),
-      activity('daily standup', 'exact', 'work'),
-    ]
-    expect(resolveCategoryId('Daily standup', rules)).toBe('work')
-  })
-
-  it('prefers the longer pattern at equal specificity', () => {
-    const rules = [
-      activity('run', 'contains', 'chores'),
-      activity('morning run', 'contains', 'exercise'),
-    ]
-    expect(resolveCategoryId('My morning run in the park', rules)).toBe('exercise')
   })
 })
 

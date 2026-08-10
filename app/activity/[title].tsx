@@ -1,31 +1,54 @@
 /**
- * One activity: which category it belongs to, and the events behind it.
- * Parity target: v1's `ActivityOptionsScreen` + `ActivityOptions` (docs/SPEC.md §4.6).
+ * One activity: which category it belongs to, how widely the rule should reach, and the
+ * events behind it.
+ *
+ * Parity target: v1's `ActivityOptionsScreen` (docs/SPEC.md §4.6), plus the part issue #13
+ * described and v1 never built:
+ *
+ * > What if you open *Dinner with Jane Doe* & from this screen, make this "Starts with"
+ * > […] Then from here you should be able to choose the part of text you want to match
+ *
+ * That is what the *Match* row does. It is also where the scope question is answered
+ * safely, because `resolve` prefers the most specific rule — a broad `contains` here can
+ * never silently override an exact rule the user wrote elsewhere.
  */
 
-import { Host, List, ListItem } from '@expo/ui'
+import { Host, List, ListItem, Picker } from '@expo/ui'
 import { Stack, useLocalSearchParams } from 'expo-router'
-import { useMemo } from 'react'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { useCallback, useMemo } from 'react'
+import { StyleSheet, View } from 'react-native'
 
 import { useCalendarPermissions } from '@/data/calendars'
 import { useLocaleTag, useWeekStartsOn } from '@/data/locale'
 import { useSettings, useUpdateSettings } from '@/data/settingsStore'
 import { useCalendarList } from '@/data/useCalendarList'
-import { useEventRanges } from '@/data/useEvents'
-import {
-  makeActivityId,
-  matches,
-  resolveCategoryId,
-  suggestCategoryId,
-} from '@/domain/activities'
-import { DEFAULT_CATEGORIES } from '@/domain/categories'
+import { invalidateEvents, useEventRanges } from '@/data/useEvents'
+import { rulesOf } from '@/data/useReport'
+import { type MatchMode, makeActivityId, matches, suggestCategoryId } from '@/domain/activities'
+import { DEFAULT_CATEGORIES, UNKNOWN_CATEGORY_ID, getCategory } from '@/domain/categories'
+import { demoEvents } from '@/domain/demo'
 import { eventKey, filterEvents } from '@/domain/events'
+import { resolve } from '@/domain/rules'
 import { formatDayMonthShort, formatMinutes, msToMinutes } from '@/domain/time'
-import { clampToNow, weekRange } from '@/domain/week'
-import { AppText } from '@/ui/AppText'
-import { Section } from '@/ui/Section'
+import { lastWeeks } from '@/domain/week'
 import { colors } from '@/ui/theme/colors'
+
+const MATCH_MODES: { label: string; value: MatchMode }[] = [
+  { label: 'Exactly this title', value: 'exact' },
+  { label: 'Titles starting with it', value: 'startsWith' },
+  { label: 'Titles ending with it', value: 'endsWith' },
+  { label: 'Titles containing it', value: 'contains' },
+]
+
+const CATEGORY_ITEMS = [
+  { label: 'Uncategorized', value: UNKNOWN_CATEGORY_ID },
+  ...DEFAULT_CATEGORIES.filter((c) => c.id !== UNKNOWN_CATEGORY_ID).map((c) => ({
+    label: c.name,
+    value: c.id,
+  })),
+]
+
+const HISTORY_WEEKS = 6
 
 export default function ActivityScreen() {
   const { title } = useLocalSearchParams<{ title: string }>()
@@ -36,13 +59,19 @@ export default function ActivityScreen() {
   const locale = useLocaleTag()
   const weekStartsOn = useWeekStartsOn()
   const [permission] = useCalendarPermissions()
-  const calendars = useCalendarList(permission?.granted ?? false)
+  const granted = permission?.granted ?? false
+  const calendars = useCalendarList(granted)
 
   const now = useMemo(() => Date.now(), [])
-  const ranges = useMemo(
-    () => [clampToNow(weekRange(now, weekStartsOn), now)],
+  const weeks = useMemo(
+    () => lastWeeks(now, weekStartsOn, HISTORY_WEEKS),
     [now, weekStartsOn],
   )
+  const window = useMemo(
+    () => [{ start: weeks[0]!.start, end: now }],
+    [weeks, now],
+  )
+
   const calendarIds = useMemo(
     () =>
       calendars
@@ -50,124 +79,184 @@ export default function ActivityScreen() {
         .filter((id) => !settings.skippedCalendars.some((s) => s.id === id)),
     [calendars, settings.skippedCalendars],
   )
-  const { byRange } = useEventRanges(calendarIds, ranges)
+  const live = useEventRanges(granted ? calendarIds : [], window)
+  const rules = useMemo(() => rulesOf(settings), [settings])
+
+  /** The rule that currently owns this title, if the user wrote one. */
+  const rule = useMemo(
+    () =>
+      settings.activities.find(
+        (activity) => activity.match === 'exact' && matches(activity, activityTitle),
+      ),
+    [settings.activities, activityTitle],
+  )
 
   const events = useMemo(() => {
-    const raw = byRange[0]
-    if (raw === undefined) return []
+    const raw = granted ? live.byRange[0] : demoEvents(window[0]!, now)
+    if (raw === undefined) return undefined
     return filterEvents(raw, {
       skippedCalendarIds: settings.skippedCalendars.map((c) => c.id),
-      skippedActivityTitles: settings.skippedActivityTitles,
+      skippedActivityTitles: [],
       hideSkippedActivities: false,
-    })
-      .filter((event) => event.title === activityTitle)
-      .sort((a, b) => b.start - a.start)
-  }, [byRange, settings, activityTitle])
+    }).sort((a, b) => b.start - a.start)
+  }, [granted, live.byRange, window, now, settings.skippedCalendars])
 
-  const currentCategoryId = resolveCategoryId(activityTitle, settings.activities)
-  // Only offered when the user has not decided yet.
-  const suggestion =
-    currentCategoryId === 'unknown' ? suggestCategoryId(activityTitle) : undefined
+  const own = useMemo(
+    () => (events ?? []).filter((event) => event.title === activityTitle),
+    [events, activityTitle],
+  )
 
-  const assign = (categoryId: string) => {
+  const calendarId = own[0]?.calendarId ?? ''
+  const resolution = useMemo(
+    () => resolve({ title: activityTitle, calendarId }, rules),
+    [activityTitle, calendarId, rules],
+  )
+
+  const match: MatchMode = rule?.match ?? 'exact'
+
+  /**
+   * How many *other* titles a broader rule would pull in. Issue #13 called this out as
+   * the hard part of the UX — a rule you cannot see the reach of is a rule you cannot
+   * trust — so the count is shown before anything is saved.
+   */
+  const reach = useMemo(() => {
+    if (events === undefined || match === 'exact') return 0
+    const probe = { id: '', title: activityTitle, match, categoryId: '', createdAt: 0 }
+    const titles = new Set(
+      events.filter((e) => matches(probe, e.title)).map((e) => e.title),
+    )
+    titles.delete(activityTitle)
+    return titles.size
+  }, [events, match, activityTitle])
+
+  const write = useCallback(
+    (categoryId: string, nextMatch: MatchMode) => {
+      update((current) => {
+        const others = current.activities.filter((a) => a.id !== rule?.id)
+        if (categoryId === UNKNOWN_CATEGORY_ID) return { ...current, activities: others }
+        return {
+          ...current,
+          activities: [
+            ...others,
+            {
+              id: rule?.id ?? makeActivityId(activityTitle, now),
+              title: activityTitle,
+              match: nextMatch,
+              categoryId,
+              createdAt: rule?.createdAt ?? now,
+            },
+          ],
+        }
+      })
+      invalidateEvents()
+    },
+    [update, rule, activityTitle, now],
+  )
+
+  const hidden = settings.skippedActivityTitles.includes(activityTitle)
+
+  const toggleHidden = useCallback(() => {
     update((current) => ({
       ...current,
-      activities: [
-        // Replace any rule that already claims this exact title.
-        ...current.activities.filter(
-          (activity) => !(activity.match === 'exact' && matches(activity, activityTitle)),
-        ),
-        {
-          id: makeActivityId(activityTitle, now),
-          title: activityTitle,
-          match: 'exact' as const,
-          categoryId,
-          createdAt: now,
-        },
-      ],
+      skippedActivityTitles: hidden
+        ? current.skippedActivityTitles.filter((t) => t !== activityTitle)
+        : [...current.skippedActivityTitles, activityTitle],
     }))
-  }
+  }, [update, hidden, activityTitle])
+
+  const suggestion =
+    resolution.source === 'none' ? suggestCategoryId(activityTitle) : undefined
+
+  const totalMinutes = own.reduce(
+    (sum, event) => sum + msToMinutes(event.end - event.start),
+    0,
+  )
 
   return (
     <>
       <Stack.Screen options={{ title: activityTitle }} />
-      <ScrollView contentContainerStyle={styles.content}>
-        <Section style={styles.header}>
-          <AppText role="screenTitle" numberOfLines={2}>
-            {activityTitle}
-          </AppText>
-          {suggestion !== undefined ? (
-            <AppText role="secondary" tone="secondary">
-              {`Looks like ${DEFAULT_CATEGORIES.find((c) => c.id === suggestion)?.name}. Tap to confirm.`}
-            </AppText>
-          ) : null}
-        </Section>
-
-        <Host style={styles.list} matchContents>
+      <View style={styles.screen}>
+        <Host style={styles.list} useViewportSizeMeasurement>
           <List>
-            {DEFAULT_CATEGORIES.map((category) => (
+            <ListItem
+              supportingText={
+                own.length === 0
+                  ? `Nothing in the last ${HISTORY_WEEKS} weeks`
+                  : `${formatMinutes(totalMinutes)} over ${own.length} ${
+                      own.length === 1 ? 'event' : 'events'
+                    }, last ${HISTORY_WEEKS} weeks`
+              }>
+              {activityTitle}
+            </ListItem>
+
+            <ListItem
+              supportingText={
+                resolution.source === 'calendar'
+                  ? `Currently ${getCategory(resolution.categoryId).name}, from its calendar`
+                  : suggestion !== undefined
+                    ? `Suggested: ${getCategory(suggestion).name}`
+                    : undefined
+              }
+              trailing={
+                <Picker
+                  selectedValue={rule?.categoryId ?? resolution.categoryId}
+                  onValueChange={(value) => write(String(value), match)}>
+                  {CATEGORY_ITEMS.map((item) => (
+                    <Picker.Item key={item.value} label={item.label} value={item.value} />
+                  ))}
+                </Picker>
+              }>
+              Category
+            </ListItem>
+
+            <ListItem
+              supportingText={
+                match === 'exact'
+                  ? 'Only this exact title'
+                  : reach === 0
+                    ? 'No other titles match right now'
+                    : `Also matches ${reach} other ${reach === 1 ? 'title' : 'titles'}`
+              }
+              trailing={
+                <Picker
+                  selectedValue={match}
+                  onValueChange={(value) =>
+                    write(rule?.categoryId ?? resolution.categoryId, value as MatchMode)
+                  }>
+                  {MATCH_MODES.map((mode) => (
+                    <Picker.Item key={mode.value} label={mode.label} value={mode.value} />
+                  ))}
+                </Picker>
+              }>
+              Match
+            </ListItem>
+
+            <ListItem
+              supportingText="Hidden activities stay out of your reports, but still count towards goals"
+              onPress={toggleHidden}>
+              {hidden ? 'Show in reports' : 'Hide from reports'}
+            </ListItem>
+
+            {own.slice(0, 30).map((event) => (
               <ListItem
-                key={category.id}
-                onPress={() => assign(category.id)}
-                supportingText={
-                  category.id === currentCategoryId
-                    ? 'Selected'
-                    : category.id === suggestion
-                      ? 'Suggested'
-                      : undefined
-                }>
-                {category.name}
+                key={eventKey(event)}
+                supportingText={formatMinutes(msToMinutes(event.end - event.start))}>
+                {formatDayMonthShort(event.start, locale)}
               </ListItem>
             ))}
           </List>
         </Host>
-
-        <Section style={styles.header}>
-          <AppText role="sectionTitle">This week</AppText>
-        </Section>
-        <View style={styles.events}>
-          {events.map((event) => (
-            <View key={eventKey(event)} style={styles.event}>
-              <Section>
-                <AppText role="body">{formatDayMonthShort(event.start, locale)}</AppText>
-              </Section>
-              <Section>
-                <AppText role="secondary" tone="secondary">
-                  {formatMinutes(msToMinutes(event.end - event.start))}
-                </AppText>
-              </Section>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
+      </View>
     </>
   )
 }
 
 const styles = StyleSheet.create({
-  content: {
-    padding: 16,
-    gap: 16,
+  screen: {
+    flex: 1,
     backgroundColor: colors.background,
-    flexGrow: 1,
-  },
-  header: {
-    gap: 4,
-    paddingHorizontal: 4,
   },
   list: {
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  events: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  event: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    flex: 1,
   },
 })

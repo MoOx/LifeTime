@@ -7,7 +7,7 @@
  * a "Premium" feature that was never built; it is built here.
  */
 
-import { CategoryId, UNKNOWN_CATEGORY_ID } from './categories'
+import { CategoryId } from './categories'
 
 export type MatchMode = 'exact' | 'startsWith' | 'endsWith' | 'contains'
 
@@ -61,33 +61,21 @@ export const matches = (activity: Activity, eventTitle: string): boolean => {
 }
 
 /**
- * More specific rules win, so a `contains` catch-all never shadows an `exact` rule.
- * Within the same mode, the longer pattern wins.
+ * Rule precedence lives in `./rules.ts`, next to the calendar rules it competes with.
  */
-const SPECIFICITY: Record<MatchMode, number> = {
-  exact: 3,
-  startsWith: 2,
-  endsWith: 2,
-  contains: 1,
-}
 
-export const resolveCategoryId = (
-  eventTitle: string,
-  activities: readonly Activity[],
-): CategoryId => {
-  let best: Activity | undefined
-  for (const activity of activities) {
-    if (!matches(activity, eventTitle)) continue
-    if (
-      best === undefined ||
-      SPECIFICITY[activity.match] > SPECIFICITY[best.match] ||
-      (SPECIFICITY[activity.match] === SPECIFICITY[best.match] &&
-        activity.title.length > best.title.length)
-    ) {
-      best = activity
-    }
+/** "starts with 1:1" — the rule in plain language, for a list row. */
+export const describeMatch = (activity: Activity): string => {
+  switch (activity.match) {
+    case 'exact':
+      return `exactly “${activity.title}”`
+    case 'startsWith':
+      return `starts with “${activity.title}”`
+    case 'endsWith':
+      return `ends with “${activity.title}”`
+    case 'contains':
+      return `contains “${activity.title}”`
   }
-  return best?.categoryId ?? UNKNOWN_CATEGORY_ID
 }
 
 export const isSkipped = (eventTitle: string, skipped: readonly string[]): boolean => {

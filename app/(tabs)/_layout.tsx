@@ -9,27 +9,35 @@
  * v1 built this by hand with `@react-navigation/bottom-tabs`, three custom SVG icons and
  * a manually themed `tabBarStyle` — and got none of those behaviours.
  *
- * Icons follow the platform: SF Symbols on iOS, Material Symbols on Android.
+ * Icons come from each platform's own set: `sf` resolves an SF Symbol, `md` a Material
+ * Symbol. The names are the ones in `src/ui/Symbol.tsx`, so a tab and the same concept
+ * elsewhere in the app never drift apart. The `{ default, selected }` form gives iOS the
+ * filled variant when a tab is active, which is what the platform does natively.
  */
 
 import { NativeTabs } from 'expo-router/unstable-native-tabs'
+
+import { SYMBOLS } from '@/ui/Symbol'
 
 export default function TabsLayout() {
   return (
     <NativeTabs>
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Summary</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="chart.bar.xaxis" drawable="ic_summary" />
+        <NativeTabs.Trigger.Icon sf={SYMBOLS.summary.ios} md={SYMBOLS.summary.android} />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="goals">
         <NativeTabs.Trigger.Label>Goals</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="target" drawable="ic_goals" />
+        <NativeTabs.Trigger.Icon sf={SYMBOLS.goals.ios} md={SYMBOLS.goals.android} />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="settings">
         <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="gearshape" drawable="ic_settings" />
+        <NativeTabs.Trigger.Icon
+          sf={{ default: SYMBOLS.settings.ios, selected: 'gearshape.fill' }}
+          md={SYMBOLS.settings.android}
+        />
       </NativeTabs.Trigger>
     </NativeTabs>
   )

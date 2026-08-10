@@ -54,3 +54,30 @@ export const clampToNow = (range: Range, now: number): Range => ({
   start: range.start,
   end: Math.min(range.end, now),
 })
+
+/** How many whole weeks `week` sits in the past. 0 is the week containing `now`. */
+export const weeksAgo = (week: Range, now: number, weekStartsOn: WeekStartsOn): number =>
+  Math.round((startOfWeek(now, weekStartsOn) - week.start) / (7 * 86_400_000))
+
+/**
+ * "This week" / "Last week" / "4 – 10 Aug". The two nearest weeks get a name because
+ * that is how people refer to them; older ones get their dates, because "3 weeks ago"
+ * stops being something you can picture.
+ */
+export const weekLabel = (
+  week: Range,
+  now: number,
+  weekStartsOn: WeekStartsOn,
+  locale: string,
+): string => {
+  const ago = weeksAgo(week, now, weekStartsOn)
+  if (ago === 0) return 'This week'
+  if (ago === 1) return 'Last week'
+
+  const day = new Intl.DateTimeFormat(locale, { day: 'numeric' })
+  const dayMonth = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' })
+  const last = addDays(week.start, 6)
+  const sameMonth = new Date(week.start).getMonth() === new Date(last).getMonth()
+
+  return `${sameMonth ? day.format(week.start) : dayMonth.format(week.start)} – ${dayMonth.format(last)}`
+}

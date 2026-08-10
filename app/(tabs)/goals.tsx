@@ -1,52 +1,58 @@
 /**
  * Goals — the corrected progress model, rendered.
  *
- * Parity target: v1's `GoalsScreen` + `Goals` + `GoalCard` (docs/SPEC.md §4.7). Present
- * here: the goal list with progress computed by `domain/goals.ts`. Still to port: the
- * goal editor, the progress ring, and the onboarding block.
+ * Parity target: v1's `GoalsScreen` + `Goals` + `GoalCard` (docs/SPEC.md §4.7).
+ *
+ * The control in the top right is the one thing v1 had no equivalent of, and it settles a
+ * genuine ambiguity: a ring can answer "how much of this week have I done" or "am I where
+ * I should be right now", and those are different questions with different right answers.
+ * The default is the first, because that is the Fitness reading — the ring is empty on
+ * Monday morning, and filling it is the point.
  */
 
-import { useMemo } from 'react'
-import { ScrollView, StyleSheet, View, useColorScheme } from 'react-native'
+import { Host, Picker } from '@expo/ui'
+import { Link } from 'expo-router'
+import { useCallback, useMemo } from 'react'
+import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useCalendarPermissions } from '@/data/calendars'
 import { useLocaleTag, useWeekStartsOn } from '@/data/locale'
-import { useSettings } from '@/data/settingsStore'
+import { useSettings, useUpdateSettings } from '@/data/settingsStore'
 import { useCalendarList } from '@/data/useCalendarList'
 import { useEventRanges } from '@/data/useEvents'
-import { minutesByCategory, minutesByTitle } from '@/domain/aggregate'
-import { getCategory } from '@/domain/categories'
-import { filterEvents } from '@/domain/events'
+import { rulesOf } from '@/data/useReport'
+import { demoEvents } from '@/domain/demo'
+import { goalEvents } from '@/domain/events'
 import {
+  type RingMode,
   computeProgress,
-  describeDays,
   goalMinutes,
-  goalTitle,
   periodRange,
-  type GoalStatus,
 } from '@/domain/goals'
-import { formatMinutes } from '@/domain/time'
 import { clampToNow } from '@/domain/week'
+import { GoalCard } from '@/features/goals/GoalCard'
 import { AppText } from '@/ui/AppText'
-import { Section } from '@/ui/Section'
-import { STATUS_PALETTE, colors } from '@/ui/theme/colors'
+import { Symbol } from '@/ui/Symbol'
+import { colors } from '@/ui/theme/colors'
 
-const STATUS_LABEL: Record<GoalStatus, string> = {
-  achieved: 'Achieved',
-  onTrack: 'On track',
-  behind: 'Behind',
-  missed: 'Missed',
-}
+const RING_MODES: { label: string; value: RingMode }[] = [
+  { label: 'Whole period', value: 'period' },
+  { label: 'Today’s pace', value: 'pace' },
+]
 
 export default function GoalsScreen() {
+  const insets = useSafeAreaInsets()
   const settings = useSettings()
+  const update = useUpdateSettings()
   const locale = useLocaleTag()
   const weekStartsOn = useWeekStartsOn()
-  const scheme = useColorScheme() === 'dark' ? 'dark' : 'light'
   const [permission] = useCalendarPermissions()
-  const calendars = useCalendarList(permission?.granted ?? false)
+  const granted = permission?.granted ?? false
+  const calendars = useCalendarList(granted)
 
   const now = useMemo(() => Date.now(), [])
+  const rules = useMemo(() => rulesOf(settings), [settings])
 
   // Goals can have different periods, so fetch the union of the ranges they need.
   const ranges = useMemo(
@@ -65,86 +71,100 @@ export default function GoalsScreen() {
     [calendars, settings.skippedCalendars],
   )
 
-  const { byRange } = useEventRanges(calendarIds, ranges)
+  const live = useEventRanges(granted ? calendarIds : [], ranges)
 
-  if (settings.goals.length === 0) {
-    return (
-      <ScrollView contentContainerStyle={styles.content} contentInsetAdjustmentBehavior="automatic">
-        <Section style={styles.intro}>
-          <AppText role="screenTitle">Goals</AppText>
-          <AppText role="body" tone="secondary">
-            Add a goal to reach, or a limit to respect, and LifeTime will tell you where
-            you stand — measured only on the days you chose.
-          </AppText>
-        </Section>
-      </ScrollView>
-    )
-  }
+  const filter = useMemo(
+    () => ({
+      skippedCalendarIds: settings.skippedCalendars.map((c) => c.id),
+      skippedActivityTitles: settings.skippedActivityTitles,
+      hideSkippedActivities: settings.hideSkippedActivities,
+    }),
+    [settings],
+  )
+
+  const setRingMode = useCallback(
+    (ringMode: RingMode) => update({ ringMode }),
+    [update],
+  )
+
+  const header = (
+    <View style={styles.header}>
+      <AppText role="screenTitle" style={styles.headerTitle}>
+        Goals
+      </AppText>
+      {settings.goals.length > 0 && (
+        <Host matchContents>
+          <Picker
+            selectedValue={settings.ringMode}
+            onValueChange={(value) => setRingMode(value as RingMode)}>
+            {RING_MODES.map((mode) => (
+              <Picker.Item key={mode.value} label={mode.label} value={mode.value} />
+            ))}
+          </Picker>
+        </Host>
+      )}
+    </View>
+  )
 
   return (
-    <ScrollView contentContainerStyle={styles.content} contentInsetAdjustmentBehavior="automatic">
-      <Section>
-        <AppText role="screenTitle">Goals</AppText>
-      </Section>
+    <ScrollView
+      contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]}
+      contentInsetAdjustmentBehavior="automatic"
+      refreshControl={
+        granted ? (
+          <RefreshControl refreshing={live.loading} onRefresh={live.refresh} />
+        ) : undefined
+      }>
+      {header}
 
-      {settings.goals.map((goal, index) => {
-        const range = ranges[index]!
-        const raw = byRange[index]
-        const events =
-          raw === undefined
-            ? undefined
-            : filterEvents(raw, {
-                skippedCalendarIds: settings.skippedCalendars.map((c) => c.id),
-                skippedActivityTitles: settings.skippedActivityTitles,
-                hideSkippedActivities: settings.hideSkippedActivities,
-              })
+      {settings.goals.length === 0 ? (
+        <View style={styles.empty}>
+          <Symbol name="goals" size={34} color={colors.tertiaryLabel} />
+          <AppText role="cardTitle" style={styles.centered}>
+            No goals yet
+          </AppText>
+          <AppText role="secondary" tone="secondary" style={styles.centered}>
+            Set a goal to reach, or a limit to respect, and LifeTime will tell you where
+            you stand — counted only on the days you chose.
+          </AppText>
+          <Link href="/goal/new" asChild>
+            <Pressable
+              accessibilityRole="button"
+              style={({ pressed }) => [styles.action, pressed && styles.pressed]}>
+              <AppText role="button" tone="accent">
+                Add a goal
+              </AppText>
+            </Pressable>
+          </Link>
+        </View>
+      ) : (
+        settings.goals.map((goal, index) => {
+          const range = ranges[index]!
+          const raw = granted ? live.byRange[index] : demoEvents(range, now)
+          const counted =
+            raw === undefined ? undefined : goalEvents(raw, filter, rules)
 
-        const current =
-          events === undefined
-            ? 0
-            : goalMinutes(
-                goal,
-                minutesByCategory(events, settings.activities, range),
-                minutesByTitle(events, range),
-                settings.activities,
-              )
+          const current =
+            counted === undefined ? 0 : goalMinutes(goal, counted, rules, range)
 
-        const progress = computeProgress(goal, current, range, now)
-        const accent = STATUS_PALETTE[progress.status][scheme]
-
-        return (
-          <View key={goal.id} style={[styles.card, { borderLeftColor: accent }]}>
-            <Section style={styles.cardBody}>
-              <AppText role="caption" tone="tertiary">
-                {`${goal.mode === 'limit' ? 'LIMIT' : 'GOAL'} · ${STATUS_LABEL[progress.status]}`}
-              </AppText>
-              <AppText role="cardTitle" numberOfLines={1}>
-                {goalTitle(goal, settings.activities, (id) => getCategory(id).name)}
-              </AppText>
-              <AppText role="secondary" tone="secondary">
-                {`${formatMinutes(goal.durationPerDay)}, ${describeDays(goal.days, locale)}`}
-              </AppText>
-              <AppText role="body">
-                {`${formatMinutes(progress.current)} of ${formatMinutes(progress.target)}`}
-              </AppText>
-              <AppText role="secondary" tone="secondary">
-                {`Daily average ${formatMinutes(progress.dailyAverage)}`}
-              </AppText>
-            </Section>
-            <View style={styles.track}>
-              <View
-                style={[
-                  styles.fill,
-                  {
-                    backgroundColor: accent,
-                    width: `${Math.min(100, Math.max(0, progress.completion * 100))}%`,
-                  },
-                ]}
-              />
-            </View>
-          </View>
-        )
-      })}
+          return (
+            <Link
+              key={goal.id}
+              href={{ pathname: '/goal/[id]', params: { id: goal.id } }}
+              asChild>
+              <Pressable style={({ pressed }) => pressed && styles.pressed}>
+                <GoalCard
+                  goal={goal}
+                  progress={computeProgress(goal, current, range, now)}
+                  ringMode={settings.ringMode}
+                  locale={locale}
+                  activities={settings.activities}
+                />
+              </Pressable>
+            </Link>
+          )
+        })
+      )}
     </ScrollView>
   )
 }
@@ -152,28 +172,40 @@ export default function GoalsScreen() {
 const styles = StyleSheet.create({
   content: {
     padding: 16,
-    gap: 16,
+    gap: 12,
     backgroundColor: colors.background,
     flexGrow: 1,
   },
-  intro: {
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     gap: 12,
+    paddingHorizontal: 2,
+    paddingBottom: 4,
   },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    borderLeftWidth: 4,
-    overflow: 'hidden',
+  headerTitle: {
+    flexShrink: 1,
   },
-  cardBody: {
-    padding: 16,
-    gap: 4,
+  empty: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingHorizontal: 28,
+    paddingVertical: 48,
   },
-  track: {
-    height: 6,
-    backgroundColor: colors.separator,
+  centered: {
+    textAlign: 'center',
   },
-  fill: {
-    height: 6,
+  action: {
+    marginTop: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 999,
+    backgroundColor: colors.selection,
+  },
+  pressed: {
+    opacity: 0.7,
   },
 })

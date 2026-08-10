@@ -1,4 +1,5 @@
 import { Activity } from '../activities'
+import { TimeEvent } from '../events'
 import {
   ALL_DAYS,
   Goal,
@@ -6,9 +7,11 @@ import {
   describeDays,
   goalMinutes,
   periodRange,
+  ringFraction,
   scheduledDays,
   updateGoal,
 } from '../goals'
+import { RuleSet } from '../rules'
 import { weekRange } from '../week'
 
 const at = (y: number, m: number, d: number, h = 0, min = 0) =>
@@ -86,11 +89,13 @@ describe('computeProgress — mid-week', () => {
     expect(evening.dailyAverage).toBeCloseTo(morning.dailyAverage)
   })
 
-  it('is behind when below pace', () => {
-    expect(computeProgress(g, 120, WEEK, wednesdayNoon).status).toBe('behind')
+  it('is behind when the days already over came up short', () => {
+    // Mon + Tue asked for 120; only 60 logged.
+    expect(computeProgress(g, 60, WEEK, wednesdayNoon).status).toBe('behind')
   })
 
-  it('is on track at or near pace', () => {
+  it('is on track once those days are covered, whatever today looks like so far', () => {
+    expect(computeProgress(g, 120, WEEK, wednesdayNoon).status).toBe('onTrack')
     expect(computeProgress(g, 180, WEEK, wednesdayNoon).status).toBe('onTrack')
   })
 })
@@ -105,9 +110,11 @@ describe('computeProgress — reachability', () => {
     expect(p.status).toBe('missed')
   })
 
-  it('keeps a goal alive while it is still reachable', () => {
+  // The empty-ring rule: on the first morning of a goal's week, nothing has gone wrong.
+  it('does not call a goal behind before any scheduled day has finished', () => {
     const p = computeProgress(g, 0, WEEK, at(2026, 7, 10, 9))
-    expect(p.status).toBe('behind')
+    expect(p.expectedByYesterday).toBe(0)
+    expect(p.status).toBe('onTrack')
   })
 })
 
@@ -151,32 +158,65 @@ describe('periodRange', () => {
 describe('goalMinutes', () => {
   const activities: Activity[] = [
     { id: 'a1', title: 'Run', match: 'contains', categoryId: 'exercise', createdAt: 0 },
+    { id: 'a2', title: 'Deep work', match: 'exact', categoryId: 'work', createdAt: 0 },
   ]
+  const ruleSet: RuleSet = { activities, calendars: {} }
+
+  const day = at(2026, 7, 12)
+  const range = { start: day, end: day + 24 * 60 * 60_000 }
+  const ev = (title: string, startHour: number, minutes: number): TimeEvent => ({
+    id: `${title}@${startHour}`,
+    calendarId: 'cal',
+    title,
+    start: day + startHour * 60 * 60_000,
+    end: day + startHour * 60 * 60_000 + minutes * 60_000,
+    allDay: false,
+  })
 
   it('sums the goal categories', () => {
-    const minutes = goalMinutes(
-      goal(),
-      [
-        { key: 'exercise', minutes: 90 },
-        { key: 'work', minutes: 500 },
-      ],
-      [],
-      activities,
-    )
-    expect(minutes).toBe(90)
+    const events = [ev('Morning run', 7, 90), ev('Deep work', 10, 500)]
+    expect(goalMinutes(goal(), events, ruleSet, range)).toBe(90)
   })
 
   it('sums explicitly selected activities through their match rule', () => {
-    const minutes = goalMinutes(
-      goal({ categoryIds: [], activityIds: ['a1'] }),
-      [],
-      [
-        { key: 'Morning run', minutes: 45 },
-        { key: 'Lunch', minutes: 60 },
-      ],
-      activities,
-    )
-    expect(minutes).toBe(45)
+    const events = [ev('Morning run', 7, 45), ev('Lunch', 12, 60)]
+    const tracked = goal({ categoryIds: [], activityIds: ['a1'] })
+    expect(goalMinutes(tracked, events, ruleSet, range)).toBe(45)
+  })
+
+  it('counts an event once when the goal names both its category and its activity', () => {
+    const both = goal({ categoryIds: ['exercise'], activityIds: ['a1'] })
+    expect(goalMinutes(both, [ev('Morning run', 7, 45)], ruleSet, range)).toBe(45)
+  })
+
+  it('clamps an event to the period, so a night crossing midnight is not counted twice', () => {
+    const nightly = goal({ categoryIds: ['work'] })
+    // 23:00 → 03:00, but the range ends at midnight.
+    expect(goalMinutes(nightly, [ev('Deep work', 23, 240)], ruleSet, range)).toBe(60)
+  })
+})
+
+describe('ringFraction', () => {
+  const weekly = goal({ period: 'week', durationPerDay: 60, days: ALL_DAYS })
+
+  // Monday 09:00: 7 h into a 7-day week, one hour already logged.
+  const mondayMorning = at(2026, 7, 10, 9)
+  const progress = computeProgress(weekly, 60, WEEK, mondayMorning)
+
+  it('reads as a share of the whole period in `period` mode', () => {
+    // 60 of the 420 minutes the week asks for.
+    expect(ringFraction(progress, 'period')).toBeCloseTo(60 / 420)
+  })
+
+  it('reads as a share of what is due tonight in `pace` mode', () => {
+    // Monday is the only elapsed day by tonight, so 60 of 60.
+    expect(ringFraction(progress, 'pace')).toBeCloseTo(1)
+  })
+
+  it('is what makes an empty Monday-morning ring correct rather than alarming', () => {
+    const nothingYet = computeProgress(weekly, 0, WEEK, mondayMorning)
+    expect(ringFraction(nothingYet, 'period')).toBe(0)
+    expect(nothingYet.status).toBe('onTrack')
   })
 })
 

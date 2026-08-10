@@ -46,8 +46,17 @@ export const colors = {
   separator: platformColor('separator', '?attr/colorOutlineVariant', '#C6C6C8'),
   /** Accent — Material You dynamic color on Android 12+. */
   accent: platformColor('systemIndigo', '?attr/colorPrimary', '#3023AE'),
+  /** Text and symbols drawn *on* `accent`. */
+  onAccent: platformColor('systemBackground', '?attr/colorOnPrimary', '#FFFFFF'),
   link: platformColor('link', '?attr/colorPrimary', '#007AFF'),
   destructive: platformColor('systemRed', '?attr/colorError', '#FF3B30'),
+  /**
+   * Chart grid lines and the empty part of a bar or ring. Deliberately a *fill* rather
+   * than a separator: fills are meant to sit behind content and stay legible on glass.
+   */
+  fill: platformColor('quaternarySystemFill', '?attr/colorSurfaceVariant', '#E5E5EA'),
+  /** A pressed / selected row background. */
+  selection: platformColor('tertiarySystemFill', '?attr/colorSecondaryContainer', '#E9E9EB'),
 } as const
 
 /**

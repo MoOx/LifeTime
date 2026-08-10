@@ -9,8 +9,11 @@
  */
 
 import type { Activity, MatchMode } from './activities'
+import type { CategoryId } from './categories'
 import { UNKNOWN_CATEGORY_ID } from './categories'
-import type { Goal, GoalMode, GoalPeriod } from './goals'
+import type { Goal, GoalMode, GoalPeriod, RingMode } from './goals'
+import { DEFAULT_RING_MODE } from './goals'
+import type { CalendarRules } from './rules'
 
 export type ThemePreference = 'light' | 'dark' | 'auto'
 
@@ -29,12 +32,18 @@ export type Settings = {
   theme: ThemePreference
   onboarded: boolean
   skippedCalendars: CalendarRef[]
+  /** "Everything in this calendar is Work." Keyed by calendar id. */
+  calendarCategories: CalendarRules
   activities: Activity[]
   skippedActivityTitles: string[]
   hideSkippedActivities: boolean
   goals: Goal[]
+  /** How goal rings read: filling over the period, or measured against today's pace. */
+  ringMode: RingMode
   remindersEnabled: boolean
   reminders: Reminder[]
+  /** Weeks of history the bulk categorisation screen analyses. */
+  categorisationWeeks: number
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -42,12 +51,15 @@ export const DEFAULT_SETTINGS: Settings = {
   theme: 'auto',
   onboarded: false,
   skippedCalendars: [],
+  calendarCategories: {},
   activities: [],
   skippedActivityTitles: [],
   hideSkippedActivities: true,
   goals: [],
+  ringMode: DEFAULT_RING_MODE,
   remindersEnabled: true,
   reminders: [{ hour: 9, minute: 0 }],
+  categorisationWeeks: 6,
 }
 
 // ---------------------------------------------------------------------------
@@ -64,6 +76,17 @@ const asBoolean = (value: unknown, fallback: boolean): boolean =>
 
 const MATCH_MODES: readonly string[] = ['exact', 'startsWith', 'endsWith', 'contains']
 const GOAL_PERIODS: readonly GoalPeriod[] = ['day', 'week', 'month', 'year']
+
+const parseCalendarRules = (raw: unknown): CalendarRules => {
+  if (typeof raw !== 'object' || raw === null) return {}
+  const rules: Record<string, CategoryId> = {}
+  for (const [calendarId, categoryId] of Object.entries(raw as Record<string, unknown>)) {
+    if (typeof categoryId === 'string' && categoryId.length > 0) {
+      rules[calendarId] = categoryId
+    }
+  }
+  return rules
+}
 
 const parseDays = (raw: unknown): boolean[] => {
   const days = asArray(raw)
@@ -115,17 +138,24 @@ export const parseSettings = (raw: unknown): Settings => {
     theme: value.theme === 'light' || value.theme === 'dark' ? value.theme : 'auto',
     onboarded: asBoolean(value.onboarded, false),
     skippedCalendars: asArray(value.skippedCalendars).map(parseCalendarRef),
+    calendarCategories: parseCalendarRules(value.calendarCategories),
     activities: asArray(value.activities).map(parseActivity),
     skippedActivityTitles: asArray(value.skippedActivityTitles).map((v) => asString(v)),
     hideSkippedActivities: asBoolean(value.hideSkippedActivities, true),
     goals: asArray(value.goals).map(parseGoal),
+    ringMode: value.ringMode === 'pace' ? 'pace' : DEFAULT_RING_MODE,
     remindersEnabled: asBoolean(value.remindersEnabled, true),
     reminders: asArray(value.reminders).map((r: any) => ({
       hour: asNumber(r?.hour, 9),
       minute: asNumber(r?.minute, 0),
     })),
+    categorisationWeeks: clampWeeks(asNumber(value.categorisationWeeks, 6)),
   }
 }
+
+/** 1…52. The bulk screen reads a window, not the whole calendar history. */
+const clampWeeks = (weeks: number): number =>
+  Math.min(52, Math.max(1, Math.round(weeks) || 6))
 
 /**
  * Accepts the JSON that v1's *Export Backup* copies to the clipboard, so an existing
@@ -142,6 +172,8 @@ export const importV1Settings = (raw: unknown): Settings => {
     theme: v1.theme === 'light' || v1.theme === 'dark' ? v1.theme : 'auto',
     onboarded: asNumber(v1.lastUpdated) > 0,
     skippedCalendars: asArray(v1.calendarsSkipped).map(parseCalendarRef),
+    // v1 had no calendar-level rules.
+    calendarCategories: {},
     activities: asArray(v1.activities).map((a: any) => ({
       id: asString(a?.id),
       title: asString(a?.title),
@@ -162,10 +194,12 @@ export const importV1Settings = (raw: unknown): Settings => {
       activityIds: asArray(g?.activitiesId).map((v) => asString(v)),
       period: GOAL_PERIODS[asNumber(g?.period, 1)] ?? 'week',
     })),
+    ringMode: DEFAULT_RING_MODE,
     remindersEnabled: asBoolean(v1.notificationsRecurrentRemindersOn, true),
     reminders: asArray(v1.notificationsRecurrentReminders).map((r: any) => ({
       minute: asNumber(asArray(r)[0], 0),
       hour: asNumber(asArray(r)[1], 9),
     })),
+    categorisationWeeks: 6,
   }
 }

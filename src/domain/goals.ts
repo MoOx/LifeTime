@@ -16,8 +16,10 @@
  */
 
 import { Activity, matches } from './activities'
-import { Bucket } from './aggregate'
+import { minutesInRange } from './aggregate'
 import { CategoryId } from './categories'
+import { TimeEvent } from './events'
+import { RuleSet, categoryOf } from './rules'
 import {
   MINUTES_PER_DAY,
   addDays,
@@ -123,6 +125,11 @@ export type GoalProgress = {
   target: number
   /** Minutes the goal asks for by the end of today. */
   expectedByTonight: number
+  /**
+   * Minutes the goal asked for on scheduled days that are *already over*. This, not
+   * `expectedByTonight`, is what "behind" is measured against — see `statusOf`.
+   */
+  expectedByYesterday: number
   /** `current / target` — 1 means the period's target is met. */
   completion: number
   /** `current / expectedByTonight` — 1 means exactly on pace. */
@@ -149,22 +156,34 @@ const scheduledMinutesElapsed = (goal: Goal, range: Range, at: number): number =
     0,
   )
 
+/**
+ * Minutes logged against a goal in a window.
+ *
+ * Counted per event rather than by summing two pre-aggregated bucket lists, because a
+ * goal that names both a category and an activity resolving *into* that category would
+ * otherwise count those minutes twice — v1 had that bug, and so did the first pass here.
+ *
+ * `events` should already be narrowed with `goalEvents`, which is what lets an activity
+ * hidden from the reports still count (issue #29).
+ */
 export const goalMinutes = (
   goal: Goal,
-  byCategory: readonly Bucket[],
-  byTitle: readonly Bucket[],
-  activities: readonly Activity[],
+  events: readonly TimeEvent[],
+  rules: RuleSet,
+  range: Range,
 ): number => {
-  const fromCategories = byCategory
-    .filter((b) => goal.categoryIds.includes(b.key))
-    .reduce((sum, b) => sum + b.minutes, 0)
+  const tracked = rules.activities.filter((a) => goal.activityIds.includes(a.id))
+  let total = 0
 
-  const selected = activities.filter((a) => goal.activityIds.includes(a.id))
-  const fromActivities = byTitle
-    .filter((b) => selected.some((a) => matches(a, b.key)))
-    .reduce((sum, b) => sum + b.minutes, 0)
+  for (const event of events) {
+    const minutes = minutesInRange(event, range)
+    if (minutes <= 0) continue
+    const byActivity = tracked.some((a) => matches(a, event.title))
+    const byCategory = goal.categoryIds.includes(categoryOf(event, rules))
+    if (byActivity || byCategory) total += minutes
+  }
 
-  return fromCategories + fromActivities
+  return total
 }
 
 export const computeProgress = (
@@ -180,6 +199,11 @@ export const computeProgress = (
   const expectedByTonight = (goal.durationPerDay * elapsedTonight) / MINUTES_PER_DAY
   const daysThroughTonight = elapsedTonight / MINUTES_PER_DAY
 
+  // Scheduled days that are entirely behind us. `minutesElapsedInDay` returns 0 for
+  // today at its own midnight, so today drops out on its own.
+  const elapsedYesterday = scheduledMinutesElapsed(goal, range, startOfDay(now))
+  const expectedByYesterday = (goal.durationPerDay * elapsedYesterday) / MINUTES_PER_DAY
+
   // Remaining capacity is real wall-clock time, so it uses `now`, not tonight.
   const elapsedNow = scheduledMinutesElapsed(goal, range, now)
   const totalScheduledMinutes = days.length * MINUTES_PER_DAY
@@ -193,31 +217,87 @@ export const computeProgress = (
     current,
     target,
     expectedByTonight,
+    expectedByYesterday,
     completion,
     pace,
     dailyAverage,
     remainingCapacity,
-    status: statusOf(goal.mode, current, target, pace, remainingCapacity),
+    status: statusOf(goal.mode, {
+      current,
+      target,
+      expectedByTonight,
+      expectedByYesterday,
+      remainingCapacity,
+    }),
   }
 }
 
+/**
+ * Whether a goal is being kept.
+ *
+ * The subtlety is *when* a goal is allowed to be called "behind". Judging it against
+ * `expectedByTonight` means a daily goal is failing from one minute past midnight, every
+ * single day, until the user does the thing — which is both useless and demoralising, and
+ * is exactly what an Apple Fitness ring does *not* do: an empty ring at 9 a.m. is a
+ * prompt, not a verdict.
+ *
+ * So a goal is behind only when it fell short on days that are *already over*
+ * (`expectedByYesterday`). Today is judged when it ends.
+ *
+ * A limit is the mirror image and keeps the tonight-based comparison: the warning has to
+ * arrive while there is still time to stop, not the following morning.
+ */
 const statusOf = (
   mode: GoalMode,
-  current: number,
-  target: number,
-  pace: number,
-  remainingCapacity: number,
+  p: {
+    current: number
+    target: number
+    expectedByTonight: number
+    expectedByYesterday: number
+    remainingCapacity: number
+  },
 ): GoalStatus => {
   if (mode === 'goal') {
-    if (current >= target) return 'achieved'
-    if (target - current > remainingCapacity) return 'missed'
-    return pace >= 0.9 ? 'onTrack' : 'behind'
+    if (p.current >= p.target) return 'achieved'
+    if (p.target - p.current > p.remainingCapacity) return 'missed'
+    if (p.expectedByYesterday <= 0) return 'onTrack'
+    return p.current / p.expectedByYesterday >= 0.9 ? 'onTrack' : 'behind'
   }
   // limit
-  if (current > target) return 'missed'
-  if (target - current > remainingCapacity) return 'achieved'
-  return pace <= 1 ? 'onTrack' : 'behind'
+  if (p.current > p.target) return 'missed'
+  if (p.target - p.current > p.remainingCapacity) return 'achieved'
+  if (p.expectedByTonight <= 0) return 'onTrack'
+  return p.current <= p.expectedByTonight ? 'onTrack' : 'behind'
 }
+
+// ---------------------------------------------------------------------------
+// How the ring reads
+// ---------------------------------------------------------------------------
+
+export type RingMode =
+  /**
+   * Fills over the whole period. Empty on Monday morning, full on Sunday evening — the
+   * Apple Fitness reading, where the empty ring *is* the motivation.
+   */
+  | 'period'
+  /**
+   * Fills against what the goal asks for by tonight. Answers "am I on track *right now*",
+   * and sits near 1 all week when the user is keeping up.
+   */
+  | 'pace'
+
+export const DEFAULT_RING_MODE: RingMode = 'period'
+
+/** 0…1+ — the fraction of the ring to draw. Can exceed 1; the UI shows the overshoot. */
+export const ringFraction = (progress: GoalProgress, mode: RingMode): number =>
+  mode === 'period' ? progress.completion : progress.pace
+
+/**
+ * The number under the ring. In `period` mode it is the share of the period's target; in
+ * `pace` mode, of what was due by tonight.
+ */
+export const ringPercent = (progress: GoalProgress, mode: RingMode): number =>
+  Math.round(ringFraction(progress, mode) * 100)
 
 /**
  * A goal's display title: its own if set, otherwise the joined names of what it tracks.

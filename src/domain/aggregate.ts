@@ -6,9 +6,9 @@
  * inside component render bodies, which is why it had no tests.
  */
 
-import { Activity, resolveCategoryId } from './activities'
-import { CategoryId } from './categories'
+import { CategoryId, DEFAULT_CATEGORIES } from './categories'
 import { TimeEvent } from './events'
+import { RuleSet, categoryOf } from './rules'
 import { Range } from './week'
 import { msToMinutes, overlapMs, startOfDay, endOfDay } from './time'
 
@@ -35,16 +35,22 @@ export const minutesByTitle = (events: readonly TimeEvent[], range: Range): Buck
   return sortDesc([...totals].map(([key, minutes]) => ({ key, minutes })))
 }
 
+/** The calendar an activity title comes from, for resolving its category in a list. */
+export const calendarOfTitle = (
+  events: readonly TimeEvent[],
+  title: string,
+): string => events.find((e) => e.title === title)?.calendarId ?? ''
+
 export const minutesByCategory = (
   events: readonly TimeEvent[],
-  activities: readonly Activity[],
+  rules: RuleSet,
   range: Range,
 ): Bucket[] => {
   const totals = new Map<CategoryId, number>()
   for (const event of events) {
     const minutes = minutesInRange(event, range)
     if (minutes <= 0) continue
-    const categoryId = resolveCategoryId(event.title, activities)
+    const categoryId = categoryOf(event, rules)
     totals.set(categoryId, (totals.get(categoryId) ?? 0) + minutes)
   }
   return sortDesc([...totals].map(([key, minutes]) => ({ key, minutes })))
@@ -63,18 +69,34 @@ export type DayBreakdown = {
  */
 export const breakdownByDay = (
   events: readonly TimeEvent[],
-  activities: readonly Activity[],
+  rules: RuleSet,
   days: readonly number[],
 ): DayBreakdown[] =>
   days.map((day) => {
     const dayRange = { start: startOfDay(day), end: endOfDay(day) }
-    const byCategory = minutesByCategory(events, activities, dayRange)
+    const byCategory = minutesByCategory(events, rules, dayRange)
     return {
       day: dayRange.start,
       byCategory,
       totalMinutes: byCategory.reduce((sum, b) => sum + b.minutes, 0),
     }
   })
+
+/**
+ * The stacking order for a bar. Fixed across the whole chart — if each day sorted its own
+ * segments by size, the colour bands would jump around between bars and the shape would
+ * be unreadable. Declaration order of the categories is stable and meaningful (rest,
+ * food, exercise, …), with anything uncategorised pushed to the top of the stack.
+ */
+export const STACK_ORDER: CategoryId[] = DEFAULT_CATEGORIES.map((c) => c.id)
+
+export const stackedSegments = (
+  breakdown: DayBreakdown,
+): { categoryId: CategoryId; minutes: number }[] =>
+  STACK_ORDER.map((categoryId) => ({
+    categoryId,
+    minutes: breakdown.byCategory.find((b) => b.key === categoryId)?.minutes ?? 0,
+  })).filter((s) => s.minutes > 0)
 
 export const totalMinutes = (buckets: readonly Bucket[]): number =>
   buckets.reduce((sum, b) => sum + b.minutes, 0)
@@ -87,4 +109,17 @@ export const chartMaximum = (maxMinutes: number): number => {
   if (maxMinutes <= 0) return 0
   const step = maxMinutes > 60 ? 240 : 20
   return Math.ceil(maxMinutes / step) * step
+}
+
+/**
+ * Horizontal rules for the chart: every 2 h up to 8 h, then every 4 h. v1 drew a fixed
+ * 1 h/2 h/3 h ladder, which flattened into an unreadable stack of lines as soon as a day
+ * went past six hours.
+ */
+export const gridLines = (maximumMinutes: number): number[] => {
+  if (maximumMinutes <= 0) return []
+  const step = maximumMinutes <= 480 ? 120 : 240
+  const lines: number[] = []
+  for (let m = step; m <= maximumMinutes; m += step) lines.push(m)
+  return lines
 }

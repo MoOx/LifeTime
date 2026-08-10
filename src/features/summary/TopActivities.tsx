@@ -1,79 +1,93 @@
 /**
- * Ranked activities for the visible range, with a proportional bar per row.
+ * Ranked activities for the visible week, with a proportional bar per row.
  *
- * The row itself is React Native rather than a native list row, because it carries a
- * custom bar; the text inside goes through `AppText`, so it still picks up the platform
- * type ramp. Screens that are *only* rows (Settings, Filters) should use `@expo/ui`'s
- * `List` instead — see docs/ARCHITECTURE.md §3.3.
+ * The bar is the point: v1 showed a title and a duration, and comparing "3 h 15" to
+ * "2 h" meant reading two numbers. The bar answers the same question without reading.
+ *
+ * Plain React Native rather than a native list row, because of that bar — a `ListItem`
+ * cannot hold one. The text still goes through `AppText`, so it carries the platform's
+ * type ramp either way. Screens that are *only* rows use `@expo/ui`'s `List`.
  */
 
 import { Link } from 'expo-router'
+import { Fragment } from 'react'
 import { Pressable, StyleSheet, View, useColorScheme } from 'react-native'
 
 import type { Bucket } from '@/domain/aggregate'
-import type { Activity } from '@/domain/activities'
-import { resolveCategoryId } from '@/domain/activities'
 import { getCategory } from '@/domain/categories'
+import type { RuleSet } from '@/domain/rules'
+import { categoryOf } from '@/domain/rules'
 import { formatMinutes } from '@/domain/time'
 import { AppText } from '@/ui/AppText'
-import { Section } from '@/ui/Section'
+import { Symbol } from '@/ui/Symbol'
 import { categoryColor, colors } from '@/ui/theme/colors'
 
 export type TopActivitiesProps = {
   buckets: Bucket[]
-  activities: Activity[]
+  rules: RuleSet
+  /** Which calendar each title came from, so calendar rules can resolve. */
+  calendarOfTitle: (title: string) => string
   limit?: number
 }
 
-export function TopActivities({ buckets, activities, limit = 8 }: TopActivitiesProps) {
+export function TopActivities({
+  buckets,
+  rules,
+  calendarOfTitle,
+  limit = 8,
+}: TopActivitiesProps) {
   const scheme = useColorScheme() === 'dark' ? 'dark' : 'light'
   const max = buckets[0]?.minutes ?? 1
   const shown = buckets.slice(0, limit)
 
-  if (shown.length === 0) {
-    return (
-      <Section style={styles.empty}>
-        <AppText role="secondary" tone="secondary">
-          No activities in this range yet.
-        </AppText>
-      </Section>
-    )
-  }
+  if (shown.length === 0) return null
 
   return (
     <View style={styles.list}>
-      {shown.map((bucket) => {
-        const category = getCategory(resolveCategoryId(bucket.key, activities))
+      {shown.map((bucket, index) => {
+        const categoryId = categoryOf(
+          { title: bucket.key, calendarId: calendarOfTitle(bucket.key) },
+          rules,
+        )
+        const category = getCategory(categoryId)
         const color = categoryColor(category.color, scheme)
+
         return (
-          <Link
-            key={bucket.key}
-            href={{ pathname: '/activity/[title]', params: { title: bucket.key } }}
-            asChild>
-            <Pressable style={styles.row} accessibilityRole="button">
-              <View style={[styles.dot, { backgroundColor: color }]} />
-              <View style={styles.rowBody}>
-                <Section>
-                  <AppText role="body" numberOfLines={1}>
-                    {bucket.key}
-                  </AppText>
-                </Section>
-                <View style={styles.barTrack}>
-                  <View
-                    style={[
-                      styles.barFill,
-                      { backgroundColor: color, width: `${(bucket.minutes / max) * 100}%` },
-                    ]}
-                  />
+          <Fragment key={bucket.key}>
+            {index > 0 && <View style={styles.separator} />}
+            <Link
+              href={{ pathname: '/activity/[title]', params: { title: bucket.key } }}
+              asChild>
+              <Pressable
+                style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+                accessibilityRole="button"
+                accessibilityLabel={`${bucket.key}, ${formatMinutes(bucket.minutes)}, ${category.name}`}>
+                <View style={styles.body}>
+                  <View style={styles.titleRow}>
+                    <View style={[styles.dot, { backgroundColor: color }]} />
+                    <AppText role="body" numberOfLines={1} style={styles.title}>
+                      {bucket.key}
+                    </AppText>
+                    <AppText role="secondary" tone="secondary" tabular>
+                      {formatMinutes(bucket.minutes)}
+                    </AppText>
+                  </View>
+                  <View style={styles.track}>
+                    <View
+                      style={[
+                        styles.fill,
+                        {
+                          backgroundColor: color,
+                          width: `${Math.max(2, (bucket.minutes / max) * 100)}%`,
+                        },
+                      ]}
+                    />
+                  </View>
                 </View>
-              </View>
-              <Section>
-                <AppText role="secondary" tone="secondary">
-                  {formatMinutes(bucket.minutes)}
-                </AppText>
-              </Section>
-            </Pressable>
-          </Link>
+                <Symbol name="chevronRight" size={13} color={colors.tertiaryLabel} />
+              </Pressable>
+            </Link>
+          </Fragment>
         )
       })}
     </View>
@@ -83,37 +97,50 @@ export function TopActivities({ buckets, activities, limit = 8 }: TopActivitiesP
 const styles = StyleSheet.create({
   list: {
     backgroundColor: colors.surface,
-    borderRadius: 12,
+    borderRadius: 18,
     overflow: 'hidden',
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    gap: 8,
+    paddingLeft: 16,
+    paddingRight: 12,
+    paddingVertical: 12,
   },
-  rowBody: {
+  rowPressed: {
+    backgroundColor: colors.selection,
+  },
+  body: {
     flex: 1,
-    gap: 6,
+    gap: 8,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  title: {
+    flex: 1,
   },
   dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 9,
+    height: 9,
+    borderRadius: 4.5,
   },
-  barTrack: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.separator,
+  track: {
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: colors.fill,
     overflow: 'hidden',
   },
-  barFill: {
-    height: 6,
-    borderRadius: 3,
+  fill: {
+    height: 5,
+    borderRadius: 2.5,
   },
-  empty: {
-    padding: 24,
-    alignItems: 'center',
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: colors.separator,
+    marginLeft: 33,
   },
 })
