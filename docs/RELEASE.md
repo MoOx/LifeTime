@@ -92,6 +92,36 @@ signing" and pick your team. Xcode issues a development certificate itself. Noth
 written to the certificates repository — and nothing survives the next
 `expo prebuild --clean`, which regenerates `ios/`.
 
+### "No profiles for 'io.moox.LifeTime' were found" — after running fastlane locally
+
+```
+❌ No profiles for 'io.moox.LifeTime' were found: Xcode couldn't find any iOS App
+   Development provisioning profiles matching 'io.moox.LifeTime'. Automatic signing is
+   disabled and unable to generate a profile. To enable automatic signing, pass
+   -allowProvisioningUpdates to xcodebuild.
+```
+
+The suggestion in that message is a red herring: `expo run:ios` **already** passes
+`-allowProvisioningUpdates` and `-allowProvisioningDeviceRegistration` whenever it
+resolves a development team (`XcodeBuild.js`, and the team is printed a line earlier).
+
+The real cause is the sentence before it — *automatic signing is disabled*. The `ios beta`
+lane calls `update_code_signing_settings(use_automatic_signing: false, …)` to sign the
+release archive with the match profile, and that setting is written into `ios/`. Since
+`expo run:ios` reuses an existing `ios/` rather than regenerating it, the next device build
+inherits manual signing and Xcode refuses to create a profile.
+
+A fresh prebuild writes no `CODE_SIGN_STYLE` at all, so Xcode falls back to automatic:
+
+```sh
+npm run ios:reset      # expo prebuild --platform ios --clean
+npm run ios:device
+```
+
+Rule of thumb: **after any local fastlane run, reset `ios/` before building from the CLI.**
+The two disagree about signing by design — CI consumes a fixed profile, a developer wants
+Xcode to mint one.
+
 This is a **Debug** build, and that difference is not cosmetic: `RCTAssert` and friends are
 compiled in, so a Fabric component with no registered native class prints its own name
 instead of segfaulting in a factory. Reach for this *first* when something crashes at

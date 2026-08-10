@@ -20,7 +20,8 @@
     "testflight": "bundle exec fastlane ios beta",
     "eas": "npx --yes eas-cli@latest",
     "signing:dev": "bundle exec fastlane ios development",
-    "ios:device": "expo run:ios --device"
+    "ios:device": "expo run:ios --device",
+    "ios:reset": "expo prebuild --platform ios --clean"
   },
   "dependencies": {
     "@expo/ui": "~57.0.9",
