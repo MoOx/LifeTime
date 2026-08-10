@@ -24,7 +24,8 @@
     "ios:reset": "expo prebuild --platform ios --clean",
     "ios:device:release": "expo run:ios --device --configuration Release",
     "check:routes": "node scripts/check-routes.mjs",
-    "check:intl": "node scripts/check-intl.mjs"
+    "check:intl": "node scripts/check-intl.mjs",
+    "preview": "node scripts/preview.mjs"
   },
   "dependencies": {
     "@expo/ui": "~57.0.9",
@@ -48,12 +49,14 @@
     "react-native-reanimated": "4.5.1",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
+    "react-native-web": "~0.21.0",
     "react-native-worklets": "0.10.1"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/react": "~19.2.2",
     "jest": "^30.0.0",
+    "playwright": "^1.50.0",
     "ts-jest": "^29.4.0",
     "typescript": "~6.0.3"
   },

@@ -1,17 +1,17 @@
 /**
  * Persistence for the settings document, plus the React binding.
  *
- * Backed by `expo-sqlite/kv-store` — the same key/value API as AsyncStorage, but on
- * SQLite, so it stays fast as the document grows and gives us somewhere to put derived
- * aggregate caches later (IMPROVEMENTS.md §C.3).
+ * Backed by `./storage`, which is `expo-sqlite/kv-store` on device — the same key/value
+ * API as AsyncStorage, but on SQLite, so it stays fast as the document grows and gives us
+ * somewhere to put derived aggregate caches later (IMPROVEMENTS.md §C.3).
  *
  * All parsing lives in `src/domain/settings.ts`, which is pure and unit-tested.
  */
 
 import { useCallback, useSyncExternalStore } from 'react'
-import Storage from 'expo-sqlite/kv-store'
 
 import { DEFAULT_SETTINGS, Settings, parseSettings } from '@/domain/settings'
+import { storage } from './storage'
 
 export const STORAGE_KEY = 'lifetime.settings.v2'
 
@@ -33,7 +33,7 @@ const subscribe = (listener: Listener) => {
 }
 
 const persist = async () => {
-  await Storage.setItem(STORAGE_KEY, JSON.stringify(current))
+  await storage.setItem(STORAGE_KEY, JSON.stringify(current))
 }
 
 export const settingsStore = {
@@ -43,7 +43,7 @@ export const settingsStore = {
 
   async load(): Promise<Settings> {
     if (loaded) return current
-    const stored = await Storage.getItem(STORAGE_KEY)
+    const stored = await storage.getItem(STORAGE_KEY)
     if (stored !== null) {
       try {
         current = parseSettings(JSON.parse(stored))
