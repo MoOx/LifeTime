@@ -26,6 +26,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useCalendarPermissions } from '@/data/calendars'
 import { useSettings, useUpdateSettings } from '@/data/settingsStore'
+import { DEVICE_SOURCE_AVAILABLE, sourceFor } from '@/data/source'
 import { useCalendarList } from '@/data/useCalendarList'
 import { invalidateEvents } from '@/data/useEvents'
 import { describeMatch } from '@/domain/activities'
@@ -51,7 +52,8 @@ export default function FiltersScreen() {
   const router = useRouter()
   const scheme = useColorScheme() === 'dark' ? 'dark' : 'light'
   const [permission] = useCalendarPermissions()
-  const calendars = useCalendarList(permission?.granted ?? false)
+  const source = sourceFor(permission?.granted ?? false)
+  const calendars = useCalendarList(source)
 
   const allHidden = useMemo(
     () =>
@@ -129,12 +131,28 @@ export default function FiltersScreen() {
       contentInsetAdjustmentBehavior="automatic">
       <ListHeader
         title="Calendars"
-        action={{
-          label: allHidden ? 'Show all' : 'Hide all',
-          onPress: () => setAll(allHidden),
-        }}
+        // Offering "Hide all" over an empty group is an action that does nothing, which
+        // reads as a broken screen rather than an empty one.
+        action={
+          calendars.length === 0
+            ? undefined
+            : {
+                label: allHidden ? 'Show all' : 'Hide all',
+                onPress: () => setAll(allHidden),
+              }
+        }
       />
-      <ListGroup separatorInset="text">
+      <ListGroup separatorInset={calendars.length === 0 ? 'full' : 'text'}>
+        {calendars.length === 0 && (
+          <ListRow
+            title="No calendars"
+            subtitle={
+              DEVICE_SOURCE_AVAILABLE
+                ? 'This device has no event calendars to read.'
+                : 'The browser has no calendars to read.'
+            }
+          />
+        )}
         {calendars.map((calendar) => {
           const counted = !settings.skippedCalendars.some((c) => c.id === calendar.id)
           const categoryId =
@@ -190,6 +208,12 @@ export default function FiltersScreen() {
         Turn a calendar off to leave its events out of every report. Give one a category to
         file everything in it at once — a rule on a title still wins over it.
       </ListFootnote>
+      {source.id === 'demo' && calendars.length > 0 && (
+        <ListFootnote>
+          These are the demo calendars. Everything you set here applies to your own the
+          moment you grant access.
+        </ListFootnote>
+      )}
 
       <ListHeader title="Rules" />
       <ListGroup separatorInset={rules.length > 0 ? 'text' : 'full'}>

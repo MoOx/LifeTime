@@ -147,6 +147,13 @@ export default function SettingsScreen() {
       <ListHeader title="More" />
       <ListGroup separatorInset="text">
         <ListRow
+          symbol="help"
+          title="How to use LifeTime"
+          subtitle="Activities, categories, goals — and getting data in"
+          chevron
+          onPress={() => router.push('/help')}
+        />
+        <ListRow
           symbol="privacy"
           title="Privacy"
           subtitle="What LifeTime reads, and what it never does"

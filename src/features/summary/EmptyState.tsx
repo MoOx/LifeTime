@@ -72,7 +72,7 @@ const COPY: Record<Exclude<EmptyReason, 'has-events'>, Copy> = {
 }
 
 const LABELS: Record<ActionKind, string> = {
-  getStarted: 'Get started',
+  getStarted: 'How to get started',
   customize: 'Customize report',
   toggleHidden: 'Reveal hidden activities',
   openCalendar: 'Open Calendar',
@@ -90,7 +90,10 @@ export function EmptyState({ reason, onToggleHidden }: EmptyStateProps) {
   const run = (kind: ActionKind) => {
     switch (kind) {
       case 'getStarted':
-        return router.push('/welcome')
+        // v1 sent this to a help page, and that is the right target: someone staring at an
+        // empty chart needs "how do I get data in here", which the welcome tour — an
+        // introduction to the product — does not answer.
+        return router.push('/help')
       case 'customize':
         return router.push('/filters')
       case 'toggleHidden':

@@ -21,10 +21,31 @@
 import type { Activity } from './activities'
 import { TimeEvent } from './events'
 import type { RuleSet } from './rules'
+import type { CalendarRef } from './settings'
 import { MS_PER_MINUTE, addDays, dayOfWeek, startOfDay } from './time'
 import { Range } from './week'
 
-export const DEMO_CALENDAR_ID = 'demo'
+/**
+ * The demo spans **two** calendars, not one.
+ *
+ * A single bucket would have made two of the app's features undemonstrable before the user
+ * grants anything: turning a calendar off, and "everything in this calendar is Work".
+ * Splitting the generated week the way a real person's is split — the job in one calendar,
+ * the rest of life in another — means the Filters screen has something true to show, and
+ * the calendar→category rule can be tried on before it is trusted with real data.
+ */
+export const DEMO_PERSONAL_CALENDAR_ID = 'demo-personal'
+export const DEMO_WORK_CALENDAR_ID = 'demo-work'
+
+export const DEMO_CALENDARS: CalendarRef[] = [
+  {
+    id: DEMO_PERSONAL_CALENDAR_ID,
+    title: 'Personal',
+    source: 'Demo data',
+    color: '#34C759',
+  },
+  { id: DEMO_WORK_CALENDAR_ID, title: 'Work', source: 'Demo data', color: '#007AFF' },
+]
 
 /**
  * The demo ships with its own rules, so the chart is in full colour from the first frame.
@@ -85,6 +106,8 @@ type Slot = {
   chance?: number
   /** Random spread applied to the start time and duration, in minutes. */
   jitter?: number
+  /** Which demo calendar it belongs to. Defaults to Personal. */
+  work?: true
 }
 
 /**
@@ -94,11 +117,11 @@ type Slot = {
 const WEEK: Slot[] = [
   { title: 'Sleep', startMinute: 0, durationMinutes: 450, days: [0, 1, 2, 3, 4, 5, 6], jitter: 45 },
   { title: 'Breakfast', startMinute: 8 * 60, durationMinutes: 30, days: [1, 2, 3, 4, 5], jitter: 15 },
-  { title: 'Standup', startMinute: 9 * 60 + 30, durationMinutes: 15, days: [1, 2, 3, 4, 5] },
-  { title: 'Deep work', startMinute: 10 * 60, durationMinutes: 150, days: [1, 2, 3, 4, 5], jitter: 30 },
+  { title: 'Standup', startMinute: 9 * 60 + 30, durationMinutes: 15, days: [1, 2, 3, 4, 5], work: true },
+  { title: 'Deep work', startMinute: 10 * 60, durationMinutes: 150, days: [1, 2, 3, 4, 5], jitter: 30, work: true },
   { title: 'Lunch', startMinute: 12 * 60 + 30, durationMinutes: 45, days: [1, 2, 3, 4, 5], jitter: 15 },
-  { title: 'Sprint review', startMinute: 14 * 60, durationMinutes: 60, days: [4] },
-  { title: 'Deep work', startMinute: 14 * 60, durationMinutes: 120, days: [1, 2, 3, 5], jitter: 30 },
+  { title: 'Sprint review', startMinute: 14 * 60, durationMinutes: 60, days: [4], work: true },
+  { title: 'Deep work', startMinute: 14 * 60, durationMinutes: 120, days: [1, 2, 3, 5], jitter: 30, work: true },
   { title: 'Running', startMinute: 18 * 60, durationMinutes: 45, days: [2, 4], chance: 0.8, jitter: 20 },
   { title: 'Climbing', startMinute: 18 * 60 + 30, durationMinutes: 90, days: [6], chance: 0.7 },
   { title: 'Dinner', startMinute: 19 * 60 + 30, durationMinutes: 60, days: [0, 1, 2, 3, 4, 5, 6], jitter: 20 },
@@ -139,7 +162,8 @@ export const demoEvents = (range: Range, until = range.end): TimeEvent[] => {
 
       events.push({
         id: `demo_${day}_${index}`,
-        calendarId: DEMO_CALENDAR_ID,
+        calendarId:
+          slot.work === true ? DEMO_WORK_CALENDAR_ID : DEMO_PERSONAL_CALENDAR_ID,
         title: slot.title,
         start,
         end: Math.min(end, limit),

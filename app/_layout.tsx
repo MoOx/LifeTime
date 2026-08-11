@@ -66,6 +66,10 @@ export default function RootLayout() {
           options={{ ...detailScreenOptions, title: 'Backup & reset' }}
         />
         <Stack.Screen
+          name="help"
+          options={{ ...detailScreenOptions, title: 'How to use LifeTime' }}
+        />
+        <Stack.Screen
           name="welcome"
           options={{ headerShown: false, presentation: 'formSheet', sheetGrabberVisible: true }}
         />

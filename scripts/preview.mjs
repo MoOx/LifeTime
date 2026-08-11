@@ -83,6 +83,7 @@ const ROUTES = [
   ['welcome', '/welcome'],
   ['reminders', '/reminders'],
   ['backup', '/backup'],
+  ['help', '/help'],
   ['activity', '/activity/Deep%20work'],
 ]
 

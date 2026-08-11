@@ -12,14 +12,19 @@ import { AppState } from 'react-native'
 
 import type { TimeEvent } from '@/domain/events'
 import type { Range } from '@/domain/week'
-import { listEvents } from './calendars'
+import type { EventSource } from './source'
 
 type CacheEntry = { status: 'loading' | 'done'; events: TimeEvent[] }
 
 const cache = new Map<string, CacheEntry>()
 
-const keyOf = (calendarIds: readonly string[], range: Range) =>
-  `${[...calendarIds].sort().join(',')}|${range.start}|${range.end}`
+/**
+ * The source id is part of the key. Without it, granting permission mid-session would
+ * serve the demo week back out of the cache for every range already read, and the app
+ * would look like it had ignored the permission it just asked for.
+ */
+const keyOf = (sourceId: string, calendarIds: readonly string[], range: Range) =>
+  `${sourceId}|${[...calendarIds].sort().join(',')}|${range.start}|${range.end}`
 
 export const invalidateEvents = () => cache.clear()
 
@@ -34,6 +39,7 @@ export type EventsResult = {
  * ask for six weeks at once and render each page as it arrives.
  */
 export const useEventRanges = (
+  source: EventSource,
   calendarIds: string[],
   ranges: Range[],
 ): {
@@ -69,8 +75,8 @@ export const useEventRanges = (
   }, [refresh])
 
   const keys = useMemo(
-    () => ranges.map((range) => keyOf(calendarIds, range)),
-    [calendarIds, ranges],
+    () => ranges.map((range) => keyOf(source.id, calendarIds, range)),
+    [source, calendarIds, ranges],
   )
 
   useEffect(() => {
@@ -82,7 +88,8 @@ export const useEventRanges = (
       const key = keys[i]!
       if (cache.has(key)) continue
       cache.set(key, { status: 'loading', events: [] })
-      listEvents(calendarIds, new Date(range.start), new Date(range.end))
+      source
+        .listEvents(calendarIds, new Date(range.start), new Date(range.end))
         .then((events) => {
           cache.set(key, { status: 'done', events })
           if (!cancelled && mounted.current) {
@@ -100,7 +107,7 @@ export const useEventRanges = (
     }
     // `revision` is a deliberate dependency: bumping it after `invalidateEvents` re-runs
     // the fetch for every range.
-  }, [calendarIds, ranges, keys, revision])
+  }, [source, calendarIds, ranges, keys, revision])
 
   const byRange = keys.map((key) => {
     const entry = cache.get(key)

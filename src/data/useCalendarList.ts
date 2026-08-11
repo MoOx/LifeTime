@@ -1,15 +1,25 @@
 import { useEffect, useState } from 'react'
 
-import { listCalendars, type DeviceCalendar } from './calendars'
+import type { CalendarRef } from '@/domain/settings'
+import type { EventSource } from './source'
 
-/** The device's event calendars, re-read whenever permission is granted. */
-export const useCalendarList = (enabled: boolean): DeviceCalendar[] => {
-  const [calendars, setCalendars] = useState<DeviceCalendar[]>([])
+/**
+ * The current source's calendars, re-read whenever the source changes.
+ *
+ * Taking the source rather than a `granted` flag is what lets the Filters screen show real
+ * rows before permission is granted: in demo mode it lists the demo calendars, so turning
+ * one off and giving one a category can both be tried on the sample week.
+ */
+export const useCalendarList = (source: EventSource): CalendarRef[] => {
+  const [calendars, setCalendars] = useState<CalendarRef[]>([])
 
   useEffect(() => {
-    if (!enabled) return
     let cancelled = false
-    listCalendars()
+    // Clear first: the previous source's calendars are not this one's, and leaving them up
+    // for a frame would show device calendars under a demo report.
+    setCalendars([])
+    source
+      .listCalendars()
       .then((result) => {
         if (!cancelled) setCalendars(result)
       })
@@ -19,7 +29,7 @@ export const useCalendarList = (enabled: boolean): DeviceCalendar[] => {
     return () => {
       cancelled = true
     }
-  }, [enabled])
+  }, [source])
 
   return calendars
 }

@@ -462,9 +462,20 @@ Structure of `help.md` (§ headings verbatim):
    prefix / suffix matching as Premium** and never shipped it — issue #13. That promise is
    in the help text a user can read today.
 
-**v2 status:** not built. The `<details>` block and the per-provider links are worth keeping
-— "how do I even get data in here" is the first question a new user has, and v1 answered it
-properly.
+**v2 status:** built, as `app/help.tsx` — a screen rather than compiled Markdown, so the
+links are rows and "Sort my activities" is a control rather than a sentence describing one.
+The `<details>` block survives as a disclosure row, because "how do I even get data in
+here" is the first question a new user has and v1 answered it properly.
+
+Three departures, all recorded in the file's own header:
+
+- The **Premium** promise is dropped, because the feature it promised now exists (issue
+  #13). The paragraph says how to use prefix / suffix / contains matching instead.
+- **"Upcoming features"** is dropped entirely: trophies, awards and personalised
+  encouragement were never built and are not planned.
+- The empty state's first action, `"Get started"`, now points here rather than at the
+  welcome tour, and reads `"How to get started"`. Someone looking at an empty chart is
+  asking how to get data in, which is this screen's subject and not the tour's.
 
 ---
 

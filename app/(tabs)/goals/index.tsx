@@ -18,10 +18,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useCalendarPermissions } from '@/data/calendars'
 import { useLocaleTag, useWeekStartsOn } from '@/data/locale'
 import { useSettings, useUpdateSettings } from '@/data/settingsStore'
-import { useCalendarList } from '@/data/useCalendarList'
+import { sourceFor } from '@/data/source'
 import { useEventRanges } from '@/data/useEvents'
-import { rulesOf } from '@/data/useReport'
-import { demoEvents } from '@/domain/demo'
+import { rulesOf, useActiveCalendarIds } from '@/data/useReport'
 import { goalEvents } from '@/domain/events'
 import { type RingMode, computeProgress, goalMinutes, periodRange } from '@/domain/goals'
 import { clampToNow } from '@/domain/week'
@@ -45,11 +44,14 @@ export default function GoalsScreen() {
   const locale = useLocaleTag()
   const weekStartsOn = useWeekStartsOn()
   const [permission] = useCalendarPermissions()
-  const granted = permission?.granted ?? false
-  const calendars = useCalendarList(granted)
+  const source = sourceFor(permission?.granted ?? false)
+  const calendarIds = useActiveCalendarIds(source, settings)
 
   const now = useMemo(() => Date.now(), [])
-  const rules = useMemo(() => rulesOf(settings, !granted), [settings, granted])
+  const rules = useMemo(
+    () => rulesOf(settings, source.id === 'demo'),
+    [settings, source],
+  )
 
   // Goals can have different periods, so fetch the union of the ranges they need.
   const ranges = useMemo(
@@ -60,15 +62,7 @@ export default function GoalsScreen() {
     [settings.goals, now, weekStartsOn],
   )
 
-  const calendarIds = useMemo(
-    () =>
-      calendars
-        .map((c) => c.id)
-        .filter((id) => !settings.skippedCalendars.some((s) => s.id === id)),
-    [calendars, settings.skippedCalendars],
-  )
-
-  const live = useEventRanges(granted ? calendarIds : [], ranges)
+  const live = useEventRanges(source, calendarIds, ranges)
 
   const filter = useMemo(
     () => ({
@@ -112,11 +106,7 @@ export default function GoalsScreen() {
       style={styles.screen}
       contentContainerStyle={{ paddingBottom: insets.bottom + space.section }}
       contentInsetAdjustmentBehavior="automatic"
-      refreshControl={
-        granted ? (
-          <RefreshControl refreshing={live.loading} onRefresh={live.refresh} />
-        ) : undefined
-      }>
+      refreshControl={<RefreshControl refreshing={live.loading} onRefresh={live.refresh} />}>
       <View style={styles.headerRow}>
         <ListHeader title="Showing" style={styles.headerFlex} />
         <Host matchContents style={styles.picker}>
@@ -133,7 +123,7 @@ export default function GoalsScreen() {
       <View style={styles.cards}>
         {settings.goals.map((goal, index) => {
           const range = ranges[index]!
-          const raw = granted ? live.byRange[index] : demoEvents(range, now)
+          const raw = live.byRange[index]
           const counted = raw === undefined ? undefined : goalEvents(raw, filter, rules)
           const current =
             counted === undefined ? 0 : goalMinutes(goal, counted, rules, range)

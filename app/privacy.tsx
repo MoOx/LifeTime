@@ -11,20 +11,19 @@
 
 import { ScrollView, StyleSheet, View } from 'react-native'
 
+import { useCalendarPermissions } from '@/data/calendars'
+import { sourceFor } from '@/data/source'
 import { AppText } from '@/ui/AppText'
 import { Symbol, type SymbolName } from '@/ui/Symbol'
 import { colors } from '@/ui/theme/colors'
 
-const POINTS: { symbol: SymbolName; title: string; body: string }[] = [
+type Point = { symbol: SymbolName; title: string; body: string }
+
+const POINTS: Point[] = [
   {
     symbol: 'calendar',
     title: 'Read-only',
     body: 'LifeTime asks for calendar access so it can add up the events already there. It never creates, edits or deletes anything.',
-  },
-  {
-    symbol: 'privacy',
-    title: 'Nothing leaves the device',
-    body: 'There is no account, no server and no analytics. Your events are read, counted, and forgotten when you close the app.',
   },
   {
     symbol: 'hidden',
@@ -39,6 +38,27 @@ const POINTS: { symbol: SymbolName; title: string; body: string }[] = [
 ]
 
 export default function PrivacyScreen() {
+  const [permission] = useCalendarPermissions()
+  const source = sourceFor(permission?.granted ?? false)
+
+  /**
+   * The second point is the source's own sentence, not a constant.
+   *
+   * "Nothing leaves the device" is true of the device source and would become a lie the
+   * day a Google Calendar source is added — and a privacy screen that is wrong once is
+   * worth nothing. Reading the claim off the source in use means it cannot drift from the
+   * code path the numbers actually came through.
+   */
+  const points: Point[] = [
+    POINTS[0]!,
+    {
+      symbol: 'privacy',
+      title: source.id === 'demo' ? 'Nothing has been read yet' : 'Nothing leaves the device',
+      body: source.privacy,
+    },
+    ...POINTS.slice(1),
+  ]
+
   return (
     <ScrollView contentContainerStyle={styles.content}>
       <AppText role="screenTitle">Privacy</AppText>
@@ -47,7 +67,7 @@ export default function PrivacyScreen() {
         this app does with yours.
       </AppText>
 
-      {POINTS.map((point) => (
+      {points.map((point) => (
         <View key={point.title} style={styles.point}>
           <Symbol name={point.symbol} size={22} color={colors.accent} />
           <View style={styles.pointBody}>

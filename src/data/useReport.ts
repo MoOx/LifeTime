@@ -10,11 +10,12 @@
 
 import { useMemo } from 'react'
 
-import { DEMO_RULES, demoEvents } from '@/domain/demo'
+import { DEMO_RULES } from '@/domain/demo'
 import type { TimeEvent } from '@/domain/events'
 import type { RuleSet } from '@/domain/rules'
 import type { Settings } from '@/domain/settings'
 import { lastWeeks, type Range, type WeekStartsOn } from '@/domain/week'
+import { sourceFor, type EventSource } from './source'
 import { useCalendarList } from './useCalendarList'
 import { useEventRanges } from './useEvents'
 
@@ -37,6 +38,8 @@ export const rulesOf = (settings: Settings, demo = false): RuleSet => ({
 export type Report = {
   weeks: Range[]
   eventsByWeek: (TimeEvent[] | undefined)[]
+  /** Where these events came from — the demo generator or the device. */
+  source: EventSource
   /** True when the events are generated rather than read from the device. */
   isDemo: boolean
   /** Includes the demo rules when `isDemo`. */
@@ -47,45 +50,53 @@ export type Report = {
   refresh: () => void
 }
 
-export const useReport = (
+/**
+ * Which calendars of a source actually count, honouring the user's exclusions.
+ *
+ * Shared with the other screens that read events, so "this calendar is off" means the same
+ * thing on the Summary, in the sorter and on an activity — three places that each used to
+ * derive it themselves.
+ */
+export const useActiveCalendarIds = (
+  source: EventSource,
   settings: Settings,
-  weekStartsOn: WeekStartsOn,
-  now: number,
-  hasPermission: boolean,
-): Report => {
-  const calendars = useCalendarList(hasPermission)
-
-  const weeks = useMemo(
-    () => lastWeeks(now, weekStartsOn, WEEKS_SHOWN),
-    [now, weekStartsOn],
-  )
-
-  const activeCalendarIds = useMemo(
+): string[] => {
+  const calendars = useCalendarList(source)
+  return useMemo(
     () =>
       calendars
         .map((c) => c.id)
         .filter((id) => !settings.skippedCalendars.some((s) => s.id === id)),
     [calendars, settings.skippedCalendars],
   )
+}
 
-  // The hook still runs without permission — it just resolves to empty ranges — so the
-  // hook order never changes between the demo and the real thing.
-  const live = useEventRanges(hasPermission ? activeCalendarIds : [], weeks)
+export const useReport = (
+  settings: Settings,
+  weekStartsOn: WeekStartsOn,
+  now: number,
+  hasPermission: boolean,
+): Report => {
+  const source = sourceFor(hasPermission)
+  const activeCalendarIds = useActiveCalendarIds(source, settings)
 
-  const demo = useMemo(
-    () => (hasPermission ? undefined : weeks.map((week) => demoEvents(week, now))),
-    [hasPermission, weeks, now],
+  const weeks = useMemo(
+    () => lastWeeks(now, weekStartsOn, WEEKS_SHOWN),
+    [now, weekStartsOn],
   )
 
-  const isDemo = demo !== undefined
+  const live = useEventRanges(source, activeCalendarIds, weeks)
+
+  const isDemo = source.id === 'demo'
   const rules = useMemo(() => rulesOf(settings, isDemo), [settings, isDemo])
 
   return {
     weeks,
-    eventsByWeek: demo ?? live.byRange,
+    eventsByWeek: live.byRange,
+    source,
     isDemo,
     rules,
-    loading: hasPermission && live.loading,
+    loading: live.loading,
     updatedAt: live.updatedAt,
     refresh: live.refresh,
   }

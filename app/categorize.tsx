@@ -25,13 +25,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useCalendarPermissions } from '@/data/calendars'
 import { useSettings, useUpdateSettings } from '@/data/settingsStore'
-import { useCalendarList } from '@/data/useCalendarList'
+import { sourceFor } from '@/data/source'
 import { invalidateEvents, useEventRanges } from '@/data/useEvents'
-import { rulesOf } from '@/data/useReport'
+import { rulesOf, useActiveCalendarIds } from '@/data/useReport'
 import { makeActivityId } from '@/domain/activities'
 import { minutesInRange } from '@/domain/aggregate'
 import { DEFAULT_CATEGORIES, UNKNOWN_CATEGORY_ID, getCategory } from '@/domain/categories'
-import { demoEvents } from '@/domain/demo'
 import { filterEvents } from '@/domain/events'
 import { type Suggestion, coverage, suggestAll } from '@/domain/rules'
 import { formatMinutes } from '@/domain/time'
@@ -55,8 +54,8 @@ export default function CategorizeScreen() {
   const update = useUpdateSettings()
   const router = useRouter()
   const [permission] = useCalendarPermissions()
-  const granted = permission?.granted ?? false
-  const calendars = useCalendarList(granted)
+  const source = sourceFor(permission?.granted ?? false)
+  const activeCalendarIds = useActiveCalendarIds(source, settings)
 
   const now = useMemo(() => Date.now(), [])
   const range = useMemo(
@@ -64,22 +63,13 @@ export default function CategorizeScreen() {
     [now, settings.categorisationWeeks],
   )
 
-  const activeCalendarIds = useMemo(
-    () =>
-      calendars
-        .map((c) => c.id)
-        .filter((id) => !settings.skippedCalendars.some((s) => s.id === id)),
-    [calendars, settings.skippedCalendars],
-  )
-
   const ranges = useMemo(() => [range], [range])
-  const live = useEventRanges(granted ? activeCalendarIds : [], ranges)
-  const events = useMemo(
-    () => (granted ? live.byRange[0] : demoEvents(range, now)),
-    [granted, live.byRange, range, now],
-  )
+  const events = useEventRanges(source, activeCalendarIds, ranges).byRange[0]
 
-  const rules = useMemo(() => rulesOf(settings, !granted), [settings, granted])
+  const rules = useMemo(
+    () => rulesOf(settings, source.id === 'demo'),
+    [settings, source],
+  )
 
   const visible = useMemo(
     () =>

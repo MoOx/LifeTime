@@ -1,5 +1,10 @@
 import { minutesByCategory, totalMinutes } from '../aggregate'
-import { DEMO_CALENDAR_ID, demoEvents } from '../demo'
+import {
+  DEMO_CALENDARS,
+  DEMO_PERSONAL_CALENDAR_ID,
+  DEMO_WORK_CALENDAR_ID,
+  demoEvents,
+} from '../demo'
 import { EMPTY_RULES, RuleSet, coverage } from '../rules'
 import { weekRange } from '../week'
 
@@ -21,9 +26,16 @@ describe('demoEvents', () => {
     for (const event of events) {
       expect(event.end).toBeGreaterThan(event.start)
       expect(event.end).toBeLessThanOrEqual(WEEK.end)
-      expect(event.calendarId).toBe(DEMO_CALENDAR_ID)
+      expect(DEMO_CALENDARS.map((c) => c.id)).toContain(event.calendarId)
       expect(event.allDay).toBe(false)
     }
+  })
+
+  // Both demo calendars have to be non-empty, or turning one off on the Filters screen
+  // would appear to do nothing and the calendar→category rule would have nothing to file.
+  it('spreads across both demo calendars', () => {
+    const ids = new Set(demoEvents(WEEK).map((e) => e.calendarId))
+    expect(ids).toEqual(new Set([DEMO_PERSONAL_CALENDAR_ID, DEMO_WORK_CALENDAR_ID]))
   })
 
   it('is sorted by start time', () => {

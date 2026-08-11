@@ -27,12 +27,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useCalendarPermissions } from '@/data/calendars'
 import { useLocaleTag, useWeekStartsOn } from '@/data/locale'
 import { useSettings, useUpdateSettings } from '@/data/settingsStore'
-import { useCalendarList } from '@/data/useCalendarList'
+import { sourceFor } from '@/data/source'
 import { invalidateEvents, useEventRanges } from '@/data/useEvents'
-import { rulesOf } from '@/data/useReport'
+import { rulesOf, useActiveCalendarIds } from '@/data/useReport'
 import { type MatchMode, makeActivityId, matches, suggestCategoryId } from '@/domain/activities'
 import { DEFAULT_CATEGORIES, UNKNOWN_CATEGORY_ID, getCategory } from '@/domain/categories'
-import { demoEvents } from '@/domain/demo'
 import { eventKey, filterEvents } from '@/domain/events'
 import { resolve } from '@/domain/rules'
 import { formatDayMonthShort, formatMinutes, msToMinutes } from '@/domain/time'
@@ -64,8 +63,8 @@ export default function ActivityScreen() {
   const weekStartsOn = useWeekStartsOn()
   const scheme = useColorScheme() === 'dark' ? 'dark' : 'light'
   const [permission] = useCalendarPermissions()
-  const granted = permission?.granted ?? false
-  const calendars = useCalendarList(granted)
+  const source = sourceFor(permission?.granted ?? false)
+  const calendarIds = useActiveCalendarIds(source, settings)
 
   const now = useMemo(() => Date.now(), [])
   const weeks = useMemo(
@@ -74,15 +73,11 @@ export default function ActivityScreen() {
   )
   const window = useMemo(() => [{ start: weeks[0]!.start, end: now }], [weeks, now])
 
-  const calendarIds = useMemo(
-    () =>
-      calendars
-        .map((c) => c.id)
-        .filter((id) => !settings.skippedCalendars.some((s) => s.id === id)),
-    [calendars, settings.skippedCalendars],
+  const live = useEventRanges(source, calendarIds, window)
+  const rules = useMemo(
+    () => rulesOf(settings, source.id === 'demo'),
+    [settings, source],
   )
-  const live = useEventRanges(granted ? calendarIds : [], window)
-  const rules = useMemo(() => rulesOf(settings, !granted), [settings, granted])
 
   /** The rule that currently owns this title, if the user wrote one. */
   const rule = useMemo(
@@ -94,14 +89,14 @@ export default function ActivityScreen() {
   )
 
   const events = useMemo(() => {
-    const raw = granted ? live.byRange[0] : demoEvents(window[0]!, now)
+    const raw = live.byRange[0]
     if (raw === undefined) return undefined
     return filterEvents(raw, {
       skippedCalendarIds: settings.skippedCalendars.map((c) => c.id),
       skippedActivityTitles: [],
       hideSkippedActivities: false,
     }).sort((a, b) => b.start - a.start)
-  }, [granted, live.byRange, window, now, settings.skippedCalendars])
+  }, [live.byRange, settings.skippedCalendars])
 
   const own = useMemo(
     () => (events ?? []).filter((event) => event.title === activityTitle),
