@@ -185,7 +185,7 @@ export function ListRow({
         <Symbol name={symbol} size={22} color={symbolColor ?? colors.accent} />
       ))}
 
-      <View style={[styles.rowBody, centred && styles.rowBodyCentred]}>
+      <View style={styles.rowBody}>
         <AppText
           role={centred ? 'body' : 'rowTitle'}
           tone={
@@ -278,14 +278,15 @@ const styles = StyleSheet.create({
     paddingVertical: layout.rowPaddingVertical,
   },
   rowCentred: {
+    // The body keeps `flex: 1` and the *text* is centred. Setting `flex: 0` here to let
+    // the row centre its child collapsed the body to zero width, so a one-line centred
+    // label rendered as nothing at all — which is what made "Create goal" and "Add" look
+    // like empty cards.
     justifyContent: 'center',
   },
   rowBody: {
     flex: 1,
     gap: space.xxs,
-  },
-  rowBodyCentred: {
-    flex: 0,
   },
   centredText: {
     textAlign: 'center',

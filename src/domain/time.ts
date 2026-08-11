@@ -151,7 +151,7 @@ export const HAS_RELATIVE_TIME_FORMAT =
 const DAY_MS = 86_400_000
 
 const formatAbsolute = (t: number, now: number, locale: string): string =>
-  now - t < DAY_MS
+  Math.abs(now - t) < DAY_MS
     ? new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(
         new Date(t),
       )
@@ -159,23 +159,30 @@ const formatAbsolute = (t: number, now: number, locale: string): string =>
         new Date(t),
       )
 
+/**
+ * Works in both directions. The first version subtracted `now - t` and treated anything
+ * negative as "now", which is right for "updated 5 minutes ago" and wrong for the other
+ * caller that appeared later: a reminder's next firing time is always in the future, and
+ * every one of them read "now".
+ */
 export const formatRelative = (t: number, now: number, locale: string): string => {
   if (!HAS_RELATIVE_TIME_FORMAT) return formatAbsolute(t, now, locale)
 
-  const elapsed = now - t
+  const delta = now - t
+  const magnitude = Math.abs(delta)
   const format = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
 
   // `RelativeTimeFormat` has no "just now"; forcing seconds gives "3 seconds ago", which
   // is noise on a figure that only matters to the nearest minute.
-  if (elapsed < 45_000) return format.format(0, 'second')
+  if (magnitude < 45_000) return format.format(0, 'second')
 
   let unit: Intl.RelativeTimeFormatUnit = 'second'
   let ms = 1000
   for (const [candidate, size] of RELATIVE_UNITS) {
-    if (elapsed < size) break
+    if (magnitude < size) break
     unit = candidate
     ms = size
   }
 
-  return format.format(-Math.round(elapsed / ms), unit)
+  return format.format(-Math.round(delta / ms), unit)
 }

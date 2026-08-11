@@ -108,6 +108,13 @@ describe('formatRelative', () => {
     expect(formatRelative(t, t + 9 * 86_400_000, 'en-GB')).toBe('last week')
   })
 
+  // A reminder's next firing time is always ahead; the first version called all of them
+  // "now" because it only ever subtracted in one direction.
+  it('looks forward as well as back', () => {
+    expect(formatRelative(t + 3 * 3_600_000, t, 'en-GB')).toBe('in 3 hours')
+    expect(formatRelative(t + 26 * 3_600_000, t, 'en-GB')).toBe('tomorrow')
+  })
+
   it('follows the locale', () => {
     expect(formatRelative(t, t + 5 * 60_000, 'fr-FR')).toBe('il y a 5 minutes')
   })

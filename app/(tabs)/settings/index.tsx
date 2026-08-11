@@ -129,15 +129,14 @@ export default function SettingsScreen() {
       <ListGroup separatorInset="text">
         <ListRow
           symbol="reminder"
-          title="Daily reminder"
-          accessory={
-            <Host matchContents>
-              <Switch
-                value={settings.remindersEnabled}
-                onValueChange={(remindersEnabled) => update({ remindersEnabled })}
-              />
-            </Host>
+          title="Daily reminders"
+          subtitle={
+            settings.remindersEnabled
+              ? `${settings.reminders.length} ${settings.reminders.length === 1 ? 'time' : 'times'} a day`
+              : 'Off'
           }
+          chevron
+          onPress={() => router.push('/reminders')}
         />
       </ListGroup>
       <ListFootnote>
@@ -174,6 +173,21 @@ export default function SettingsScreen() {
           onPress={openSystemSettings}
         />
       </ListGroup>
+
+      <ListHeader title="Your data" />
+      <ListGroup separatorInset="text">
+        <ListRow
+          symbol="backup"
+          title="Backup & reset"
+          subtitle="Export your rules and goals, or start over"
+          chevron
+          onPress={() => router.push('/backup')}
+        />
+      </ListGroup>
+      <ListFootnote>
+        Everything LifeTime stores lives on this device. Without an export, removing the
+        app removes your categories, rules and goals with it.
+      </ListFootnote>
     </ScrollView>
   )
 }

@@ -58,6 +58,14 @@ export default function RootLayout() {
           options={{ ...detailScreenOptions, title: 'Sort activities' }}
         />
         <Stack.Screen
+          name="reminders"
+          options={{ ...detailScreenOptions, title: 'Reminders' }}
+        />
+        <Stack.Screen
+          name="backup"
+          options={{ ...detailScreenOptions, title: 'Backup & reset' }}
+        />
+        <Stack.Screen
           name="welcome"
           options={{ headerShown: false, presentation: 'formSheet', sheetGrabberVisible: true }}
         />

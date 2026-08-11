@@ -81,6 +81,8 @@ const ROUTES = [
   ['categorize', '/categorize'],
   ['privacy', '/privacy'],
   ['welcome', '/welcome'],
+  ['reminders', '/reminders'],
+  ['backup', '/backup'],
   ['activity', '/activity/Deep%20work'],
 ]
 
