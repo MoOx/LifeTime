@@ -17,7 +17,8 @@
  */
 
 import { Button } from '@expo/ui'
-import { StyleSheet, View } from 'react-native'
+import { useRouter } from 'expo-router'
+import { Pressable, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { AppText } from '@/ui/AppText'
@@ -46,6 +47,7 @@ export function PermissionSheet({
   onHeight,
 }: PermissionSheetProps) {
   const insets = useSafeAreaInsets()
+  const router = useRouter()
 
   return (
     <View style={styles.anchor} pointerEvents="box-none">
@@ -60,11 +62,27 @@ export function PermissionSheet({
         </View>
 
         <AppText role="cardTitle">This is your week, with your calendars</AppText>
+        {/* v1's wording, which is stronger than what stood here and was written for a
+            submission that had already been rejected once over this exact request: it says
+            what the app is before it says what it wants. */}
         <AppText role="secondary" tone="secondary">
-          LifeTime reads the events already in your calendars and adds them up. It never
-          writes to them, and nothing leaves this device — there is no account and no
-          server to send anything to.
+          LifeTime is built as an on-device service. It reads the events already in your
+          calendars and adds them up — it never writes to them, and nothing leaves this
+          device, because there is no account and no server to send anything to.
         </AppText>
+
+        {/* v1 put a "Learn more about LifeTime & Privacy…" link on this screen. Asking for
+            a calendar without offering to explain first is the version of this dialog that
+            gets refused. */}
+        <Pressable
+          onPress={() => router.push('/privacy')}
+          hitSlop={8}
+          accessibilityRole="link"
+          style={({ pressed }) => pressed && styles.pressed}>
+          <AppText role="footnote" tone="accent">
+            Learn more about LifeTime &amp; privacy…
+          </AppText>
+        </Pressable>
 
         <NativeBlock style={styles.action}>
           <Button
@@ -106,5 +124,8 @@ const styles = StyleSheet.create({
   action: {
     marginTop: space.sm,
     alignSelf: 'stretch',
+  },
+  pressed: {
+    opacity: 0.5,
   },
 })

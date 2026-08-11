@@ -10,14 +10,26 @@
  * Adding a duplicate is refused with an alert rather than silently merged, also as in v1:
  * two identical reminders is always a mistake, and quietly absorbing it leaves the user
  * wondering whether the tap registered.
+ *
+ * The screen now *schedules* what it lists. It did not before: it stored times that nothing
+ * read, which is the most misleading state a feature can be in — everything about the
+ * screen said it worked. `data/notifications.ts` owns the OS side, and this screen syncs
+ * after every change, so the list and the schedule cannot disagree.
  */
 
 import { Host, Picker } from '@expo/ui'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert, ScrollView, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useLocaleTag } from '@/data/locale'
+import {
+  NOTIFICATIONS_AVAILABLE,
+  getPermission,
+  requestPermission,
+  sync,
+  type PermissionState,
+} from '@/data/notifications'
 import { useSettings, useUpdateSettings } from '@/data/settingsStore'
 import {
   MINIMUM_GAP_MINUTES,
@@ -56,6 +68,23 @@ export default function RemindersScreen() {
   const now = useMemo(() => Date.now(), [])
   const reminders = useMemo(() => sortReminders(settings.reminders), [settings.reminders])
   const [candidate, setCandidate] = useState(key({ hour: 20, minute: 0 }))
+  const [permission, setPermission] = useState<PermissionState>('undetermined')
+
+  useEffect(() => {
+    getPermission().then(setPermission).catch(() => setPermission('denied'))
+  }, [])
+
+  /**
+   * One effect owns the OS schedule. Every path that changes the switch or the list lands
+   * here, so there is no way to add a reminder and forget to register it — which is how
+   * the settings and the notifications drift apart in every app that does this by hand.
+   */
+  useEffect(() => {
+    // Always, including when permission is missing: `sync` cancels everything first, so
+    // losing permission or turning the switch off clears the queue rather than leaving a
+    // notification to arrive after the user said no.
+    sync(settings.remindersEnabled, settings.reminders).catch(() => {})
+  }, [permission, settings.remindersEnabled, settings.reminders])
 
   const add = useCallback(() => {
     const reminder = { hour: Math.floor(candidate / 60), minute: candidate % 60 }
@@ -84,6 +113,37 @@ export default function RemindersScreen() {
 
   const enabled = settings.remindersEnabled
 
+  /**
+   * Turning the switch on is where permission is asked for, and §10e's copy is the reason
+   * it is asked *here* rather than at launch: "notifications are generated on device" is
+   * the sentence that earns the yes, and it only makes sense next to the thing it explains.
+   */
+  const toggle = useCallback(() => {
+    if (enabled) {
+      update({ remindersEnabled: false })
+      return
+    }
+    if (!NOTIFICATIONS_AVAILABLE) return
+    if (permission === 'granted') {
+      update({ remindersEnabled: true })
+      return
+    }
+    requestPermission()
+      .then((next) => {
+        setPermission(next)
+        if (next === 'granted') update({ remindersEnabled: true })
+      })
+      .catch(() => {})
+  }, [enabled, permission, update])
+
+  const blocked = NOTIFICATIONS_AVAILABLE && permission === 'denied'
+  /**
+   * Whether a reminder can actually fire. The switch being on is not enough — the platform
+   * has to support notifications and the OS has to have said yes. Showing "On ✓" while
+   * nothing is scheduled is precisely the lie this whole change exists to remove.
+   */
+  const active = NOTIFICATIONS_AVAILABLE && enabled && permission === 'granted'
+
   return (
     <ScrollView
       style={styles.screen}
@@ -93,22 +153,45 @@ export default function RemindersScreen() {
       <ListGroup separatorInset="text">
         <ListRow
           symbol="reminder"
-          title={enabled ? 'On' : 'Off'}
+          title={
+            !NOTIFICATIONS_AVAILABLE ? 'Unavailable' : active ? 'On' : enabled ? 'Paused' : 'Off'
+          }
           subtitle={
-            enabled
-              ? 'LifeTime will nudge you at the times below'
-              : 'No reminders will be sent'
+            !NOTIFICATIONS_AVAILABLE
+              ? 'Not available in a browser'
+              : blocked
+                ? 'Notifications are turned off for LifeTime'
+                : active
+                  ? 'LifeTime will nudge you at the times below'
+                  : 'No reminders will be sent'
           }
           accessory={
-            enabled ? <Symbol name="checkmark" size={17} color={colors.accent} /> : undefined
+            active ? <Symbol name="checkmark" size={17} color={colors.accent} /> : undefined
           }
-          onPress={() => update({ remindersEnabled: !enabled })}
+          disabled={!NOTIFICATIONS_AVAILABLE || blocked}
+          onPress={toggle}
         />
       </ListGroup>
+      {/* §10e's copy. v1 put it in a popin of its own; it belongs beside the switch it
+          justifies, where someone deciding can actually read it. */}
       <ListFootnote>
         A nudge to fill in what you did, so a week is written down while you still remember
-        it. Nothing is sent anywhere — the notification is scheduled on this device.
+        it. Notifications are generated on this device — nothing is sent anywhere, and
+        LifeTime does not read your calendar to write one.
       </ListFootnote>
+      {blocked && (
+        <ListFootnote tone="destructive">
+          Notifications are turned off for LifeTime in the system settings. Turn them back
+          on there and this switch will work again.
+        </ListFootnote>
+      )}
+      {!NOTIFICATIONS_AVAILABLE && (
+        <ListFootnote>
+          A daily reminder in a browser would need a push service and a server to send from,
+          which LifeTime does not have. Your times are kept, and they will fire on your
+          phone.
+        </ListFootnote>
+      )}
 
       <ListHeader title="Times" />
       <ListGroup>
@@ -120,7 +203,7 @@ export default function RemindersScreen() {
               key={key(reminder)}
               title={formatTime(reminder, locale)}
               subtitle={
-                enabled
+                active
                   ? `Next ${formatRelative(nextOccurrence(reminder, now), now, locale)}`
                   : 'Paused'
               }

@@ -12,6 +12,7 @@ import { useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
+import { sync as syncNotifications } from '@/data/notifications'
 import { settingsStore, useSettings, useSettingsLoaded } from '@/data/settingsStore'
 import { detailScreenOptions } from '@/ui/stack'
 
@@ -30,6 +31,20 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) SplashScreen.hideAsync().catch(() => {})
   }, [loaded])
+
+  /**
+   * Re-register the reminders once settings are in.
+   *
+   * The Reminders screen syncs when it is open, which is not enough: a scheduled
+   * notification does not survive a reinstall, a restore, or the OS clearing the queue, and
+   * a user who set a reminder six months ago has no reason to ever open that screen again.
+   * Cheap, idempotent, and the difference between a feature that works and one that worked
+   * once.
+   */
+  useEffect(() => {
+    if (!loaded) return
+    syncNotifications(settings.remindersEnabled, settings.reminders).catch(() => {})
+  }, [loaded, settings.remindersEnabled, settings.reminders])
 
   if (!loaded) return null
 

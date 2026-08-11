@@ -85,7 +85,9 @@ screen feels considered rather than perfunctory:
 **Responsive rule:** `isWindowTall = height > 650`; drives icon size and the two vertical
 gaps (`Welcome.res:81, 99-112`).
 
-**v2 status:** not built. This is the "tutorial" to preserve.
+**v2 status:** built, as `app/welcome.tsx` — the copy above verbatim, the two staged
+entrances, and the responsive icon rule. It is reachable again from Settings → "Welcome
+screen", so the tutorial is not a one-time thing you can never see twice.
 
 ---
 
@@ -142,8 +144,10 @@ here so the diff is deliberate.)*
 Appears with a spring scale + fade (`NoEventBox.res:161-177`), and carries a soft shadow
 (`NoEventBox.res:186-192`).
 
-**v2 status:** built, but one-week and single-action. Needs the two-week window and the
-second button.
+**v2 status:** built, as `features/summary/EmptyState.tsx` — all four reasons, the two-week
+window, and both buttons on each. The reason is derived by `explainEmptinessOverWeeks`
+rather than by the screen, so the four messages cannot drift apart from the conditions that
+select them. `"Get Started"` reads `"How to get started"` and goes to Help (§10).
 
 ### 3.2 Top activities — `components/TopActivities.res`
 
@@ -178,8 +182,9 @@ Three blocks, not one list.
    - Footnote: `"This will hide similar activities from all reports."` /
      `"This will reveal similar activities in all reports."` (`ActivityOptions.res:136-142`)
 
-**v2 status:** built with the right three blocks. Missing: the events list shows the week,
-not 6 weeks; the tinted check is present. Added in v2: the **Match** row (issue #13).
+**v2 status:** built with the right three blocks, the tinted check, and the events list over
+the full six weeks. Added in v2: the **Match** row (issue #13), with a live count of how
+many other titles a widened rule would claim.
 
 ---
 
@@ -215,8 +220,10 @@ Icon column 28 pt; separator inset `2 × S + 28` (`SettingsView.res:5-7`).
    - `"App System Settings"` — gear icon (`SettingsView.res:112-118`)
 5. Separated at the bottom: `"Danger Zone"` → its own screen (`SettingsView.res:120-131`)
 
-**v2 status:** built with a different grouping. Missing: `"Welcome Screen"` (no onboarding
-yet), Help, Danger Zone, per-option icon colours.
+**v2 status:** built with a different grouping, and now complete: `"Welcome screen"`, Help
+(§10) and Backup & reset (§10c) all have their rows. Per-option icon colours are not
+carried over — v1 tinted each row's icon a different hue, which turned a settings list into
+a colour chart; the symbols are all accent-tinted here and the groups carry the structure.
 
 ---
 
@@ -262,7 +269,9 @@ yet), Help, Danger Zone, per-option icon colours.
 **Debounce:** everything below "Type" is hidden until a debounced flag flips
 (`GoalEdit.res:199-201`) — the screen renders progressively rather than all at once.
 
-**v2 status:** built. **Missing: the slider.** Chips alone cannot express 3 h 45.
+**v2 status:** built, slider included — chips for the nine common durations, and a slider
+under them for everything between. The day toggles carry their own name inside the circle
+rather than a label above a tick.
 
 ---
 
@@ -314,9 +323,10 @@ the gutter rather than over the bars.
 up. Comment: *"the idea here is to avoid when divided for visual slice to have values with
 digits"*.
 
-**v2 status:** partially wrong. Height is 168 not 140; the grid is a fixed 2 h/4 h ladder
-instead of four slices; there is no unit switch; **the vertical dashes are missing
-entirely**; the day letters are centred rather than left-aligned to their dash.
+**v2 status:** built to the geometry above — 140 pt plot, four grid slices with the
+hours/minutes unit switch, the dashed vertical divider at every day boundary, and the day
+letter left-aligned to its own dash. `chartGrid` is pure and tested, so the ladder cannot
+drift from the maximum it is derived from.
 
 *Deliberate departure:* v2 stacks by category declaration order rather than by week totals.
 v1's order is consistent within a week but changes between weeks, so a colour band moves as
@@ -402,9 +412,11 @@ The geometry is a workaround for not having a canvas; Skia gets there directly. 
 and carries the cap shadow with v1's opacity ramp. Not carried over: the mirrored negative
 progress and the concentric stacking, neither of which v1 shipped either.
 
-**v2 status:** built with a Skia ring and a light card. The dark category-coloured card with
-its gradient is a real piece of the app's character and is not currently reproduced; the
-`"Daily Average"` figure on the card is missing; the cadence table is missing four cases.
+**v2 status:** built — the dark category-tinted card with its gradient to 50 % black, the
+white ring on top of it, the `"Daily average"` figure, and `describeDays` covering all of
+v1's cadence phrasings including "every day of the weekend" and "every weekday except
+<day>". Both figures under the ring use `formatHoursMinutes`, which does not roll up into
+days: "15h 1m of 40h" rather than "15h 1m of 1d 16h".
 
 ---
 
@@ -496,8 +508,12 @@ Three departures, all recorded in the file's own header:
 title `"Duplicate Reminder"`, message *"You already have a identical reminder. It's not
 necessary to have it twice."*
 
-**v2 status:** a single on/off switch. The reminder list, the next-fire time and the
-duplicate guard are all missing.
+**v2 status:** built, as `app/reminders.tsx` — the list sorted by hour then minute, the
+next-fire time under each, the inline picker, and the duplicate guard. The `MINIMUM_GAP`
+rule is v1's and the footnote says so (typo fixed). The sorting, adding, removing and
+next-occurrence logic lives in `domain/reminders.ts` and is tested; `opacity: 0.1` for the
+disabled state is not carried over — a row at one tenth opacity reads as a rendering fault,
+so disabled rows go grey instead.
 
 ---
 
@@ -539,8 +555,11 @@ behind — the same idea, done without touching the user's data.
 - Footnote: *"This is a destructive operation and will delete all application metadata.
   Note: All your calendars and events are safe and are not affected by this operation."*
 
-**v2 status:** not built. The v1 → v2 settings import already exists in
-`domain/settings.ts`; what is missing is the screen that reaches it.
+**v2 status:** built, as `app/backup.tsx`, with both confirms and the sentence that lets
+someone press the button — that their calendars are never touched. Import goes through
+`parseSettings`, which accepts a v1 export as well as a v2 one, so a backup taken from the
+old app restores here. The demo-calendar rows are deliberately absent: v2's demo lives in
+memory, so there is nothing to create and nothing to remove.
 
 ---
 
@@ -561,8 +580,10 @@ spring from `translateY: 1000` after a 150 ms delay (`:19-34`).
 5. Blue button `"Continue"`, `testID="AllowCalendarsAccess"`
 
 **v2 status:** replaced by a glass sheet over a working Summary. The *timing* changed
-deliberately — v1 asked before showing anything — but the copy above is stronger than v2's
-and the "Learn more" link is missing.
+deliberately — v1 asked before showing anything, so the very first thing a new user was
+asked was to trust an app they had never seen work. The copy is v1's, which is stronger:
+"LifeTime is built as an on-device service" says what the app *is* before saying what it
+wants. The `"Learn more about LifeTime & privacy…"` link is back, going to §9.
 
 ---
 
@@ -572,7 +593,18 @@ Title `"Set Up Reminders"`; body *"Enabling notifications can help you to stay m
 giving you quick recap of your progress goals when necessary. Notifications are generated on
 device."*; request button `testID="NotificationsPermissionsPopin_Button_request"`.
 
-**v2 status:** not built.
+**v2 status:** built, but not as a popin. The sentence that earns the yes — "notifications
+are generated on device" — sits under the switch it justifies, where someone deciding can
+read it, rather than in a modal of its own that appears before the thing it is about. The
+request happens when the switch is turned on, and only then.
+
+**The bigger fix here was not the copy.** Until now the Reminders screen stored times that
+nothing read: `expo-notifications` was named in `docs/ARCHITECTURE.md` and was not even a
+dependency. The screen listed reminders, showed when each would next fire, and refused
+duplicates — a complete, convincing interface to a feature that did not exist. Nothing
+about it looked unfinished, which is what makes that state worse than a screen marked "not
+built". `src/data/notifications.ts` now owns the OS schedule, `app/_layout.tsx` re-registers
+it on launch, and the row reads "On" only when a notification can actually fire.
 
 ---
 

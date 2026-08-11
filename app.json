@@ -38,6 +38,14 @@
         }
       ],
       [
+        "expo-notifications",
+        {
+          "color": "#3023AE",
+          "defaultChannel": "daily-reminders",
+          "enableBackgroundRemoteNotifications": false
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/splash-icon.png",
