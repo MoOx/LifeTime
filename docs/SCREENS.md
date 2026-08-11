@@ -380,6 +380,28 @@ Two things follow, and both matter:
 their definition flips between goal and limit — a goal is done when `totalProgress > 1`, a
 limit is "done" when what remains exceeds the week's remaining wall-clock.
 
+### The ring itself — `shareable/components/ActivityRings.js`
+
+Read late and worth the delay: it is the most carefully built component in v1, and it uses
+**no canvas at all**. Two half-circles clipped from a round `View`, a `MaskedView` whose
+mask is a PNG (`ActivityRings.mask.png`) turning a solid `startColor` into an
+`endColor` sweep, and Reanimated rotations so the whole thing runs on the UI thread.
+
+The geometry is a workaround for not having a canvas; Skia gets there directly. The
+**behaviours** are the part that was designed, and all three had been missed:
+
+| Behaviour | Where | Why it matters |
+| --- | --- | --- |
+| Animates in over **1500 ms** on `bezier(0.32, 0.12, -0.1, 1)` | `ActivityRings.js:394, 172-178` | The negative third control point overshoots slightly. A ring that appears at 76 % is a graphic; one that sweeps there is a measurement. |
+| The **end cap casts a shadow that strengthens as the arc closes** — opacity 0.5 → 1 between 80 % and 100 % of a turn | `ActivityRings.js:283-289` | Before that there is nothing underneath to cast onto. It arrives exactly when you need to see which end is on top. |
+| The **start cap vanishes past a full turn** | `ActivityRings.js:265` | Once lapped, the start is underneath; drawing it is simply wrong. |
+| Negative progress mirrors the ring (`scaleX: -1`) | `ActivityRings.js:180` | Intended for limits running the other way — `GoalCard.res:158-163` has the call commented out. Never shipped. |
+| Concentric rings with `spaceBetween` | `ActivityRings.js:420-430` | Fitness-style stacking. Only ever used with one ring. |
+
+**v2 status:** the ring now animates on the same curve, hides its start cap past a turn,
+and carries the cap shadow with v1's opacity ramp. Not carried over: the mirrored negative
+progress and the concentric stacking, neither of which v1 shipped either.
+
 **v2 status:** built with a Skia ring and a light card. The dark category-coloured card with
 its gradient is a real piece of the app's character and is not currently reproduced; the
 `"Daily Average"` figure on the card is missing; the cadence table is missing four cases.
@@ -581,7 +603,15 @@ has to be attached to the source rather than written once into the Privacy scree
 Named rather than guessed. Each needs a pass before the screen that depends on it is
 rebuilt.
 
-Nothing. Every screen in v1 has been read and recorded above.
+Nothing — but that sentence was written once before it was true. The first version of
+this document claimed the extraction was complete while
+`shareable/components/ActivityRings.js` had never been opened; it was listed in the
+component table and skipped. It is the most carefully built component in v1, and three of
+its behaviours were missing from the rebuild as a result (see §8c).
+
+The lesson is in the rule at the top: *cited or absent*. A component named in a table is
+not a component that has been read, and "everything is covered" is a claim that needs the
+same evidence as any other.
 
 What remains is **verification of this document against the running v1**, which nobody can
 do — v1 no longer builds. So the citations are the only evidence, and that is why every
