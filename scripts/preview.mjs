@@ -12,10 +12,18 @@
  * states, and any JavaScript error thrown during render.
  *
  * **What it cannot catch, and must not be trusted for:** anything native. The large-title
- * header, Liquid Glass, `Picker` menus, SF Symbols, the tab bar, Dynamic Type and the
- * Skia rings are either absent or approximated on web. This is a preview of *our* layout,
- * not of the platform's chrome. A screen that looks right here can still be wrong on a
- * phone — but a screen that looks wrong here is definitely wrong.
+ * header, Liquid Glass, `Picker` menus, the tab bar, Dynamic Type and the Skia rings are
+ * either absent or approximated on web. This is a preview of *our* layout, not of the
+ * platform's chrome. A screen that looks right here can still be wrong on a phone — but a
+ * screen that looks wrong here is definitely wrong.
+ *
+ * Symbols used to belong on that list, and that was worse than a limitation: `expo-symbols`
+ * renders *nothing* on web, so three screens whose entire state is a check mark — which
+ * category an activity has, which theme is on, which ring mode is on — photographed as if
+ * nothing were selected, and I read those shots as complete. `src/ui/Symbol.web.tsx` now
+ * letters the catalogue: real characters where one means the same thing (✓ › + −), a grey
+ * placeholder at the right size where it does not. Selection is visible again, and a
+ * missing icon looks missing instead of looking like empty space.
  *
  *     npm run preview            export, shoot every route, report errors
  *     npm run preview -- --keep  leave the server up on :8321
