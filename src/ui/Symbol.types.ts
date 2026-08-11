@@ -1,9 +1,14 @@
 /**
- * The symbol catalogue and its types, shared by the native and web implementations.
+ * The symbol catalogue and its types.
  *
  * Names are declared once so a screen refers to a *meaning* ("the chart tab", "a hidden
- * activity") rather than to a glyph name that has to be right twice — and, now, three
- * times, since the web build letters the same catalogue differently (`Symbol.web.tsx`).
+ * activity") rather than to a glyph name that has to be right twice. `SymbolPair` types
+ * both sides against the real catalogues — `SFSymbol` and `AndroidSymbol` are literal
+ * unions — so a misspelling is a compile error rather than an icon that silently renders
+ * as empty space.
+ *
+ * Kept separate from `Symbol.tsx` so a module can import the names without pulling in the
+ * native view.
  */
 
 import type { AndroidSymbol, SFSymbol } from 'expo-symbols'

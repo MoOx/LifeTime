@@ -6,10 +6,19 @@
  * with the v1 set as seed values, so moving them into user settings later is a change of
  * *source*, not of *shape*.
  *
- * Icons are named per platform: SF Symbols on iOS, Material Symbols on Android. v1
+ * Icons are named per platform: SF Symbols on iOS, Material Symbols on Android and web. v1
  * shipped 40 hand-drawn SVGs converted at install time; every one of them has a system
  * equivalent.
+ *
+ * Both names are typed against the real catalogues rather than as `string`. A misspelled
+ * Material name is not an error at runtime — `androidSymbolToString` returns `null` and the
+ * icon renders as empty space — so `string` here would turn a typo into a blank square
+ * nobody notices. `AndroidSymbol` is `keyof typeof symbols.json`, which makes it a compile
+ * error instead.
  */
+
+import type { AndroidSymbol } from 'expo-symbols'
+import type { SFSymbol } from 'sf-symbols-typescript'
 
 export const UNKNOWN_CATEGORY_ID = 'unknown'
 
@@ -20,8 +29,8 @@ export type Category = {
   name: string
   /** Key into the app palette — see `src/ui/theme/colors.ts`. */
   color: CategoryColor
-  sf: string
-  material: string
+  sf: SFSymbol
+  material: AndroidSymbol
 }
 
 export type CategoryColor =

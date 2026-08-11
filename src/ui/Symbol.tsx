@@ -1,14 +1,25 @@
 /**
- * Icons, from the platform's own set: SF Symbols on iOS, Material Symbols on Android.
+ * Icons, from the platform's own set: SF Symbols on iOS, Material Symbols everywhere else.
  *
- * `expo-symbols` takes a `{ ios, android }` pair and renders each side natively, so an
+ * `expo-symbols` takes a `{ ios, android, web }` map and renders each side natively, so an
  * icon inherits the weight, optical size and colour behaviour the OS gives its own —
  * including SF Symbol animations. v1 shipped three hand-drawn SVGs and used them on both
  * platforms.
  *
- * The catalogue lives in `Symbol.types.ts`, because `Symbol.web.tsx` needs the same names:
- * `expo-symbols` renders nothing at all on web, so the web build letters the catalogue
- * itself.
+ * **The `web` key is not optional.** `SymbolView` picks the name with
+ * `props.name[Platform.OS === 'android' ? 'android' : 'web']`, so a pair carrying only
+ * `ios` and `android` resolves to `undefined` on web and the component renders its
+ * `fallback` — nothing. That is why every preview screenshot showed no icons and no
+ * selection ticks, and why a hand-lettered web fallback briefly lived here: the library was
+ * never the problem, the missing key was. Web and Android draw from the same Material
+ * Symbols font (`expo-symbols/build/android/symbols.json`, 4055 glyphs), so the Android
+ * name is exactly the right value for both and is passed through in one place rather than
+ * written twice in every catalogue entry.
+ *
+ * `weight` is deliberately left as a plain string. On Android and web `getFont` only
+ * honours the object form (`{ ios, android }`) with a font imported from
+ * `expo-symbols/androidWeights/*`; a string falls through to the bundled regular face,
+ * which is what we want — one font file rather than nine.
  */
 
 import { SymbolView, type AndroidSymbol, type SFSymbol } from 'expo-symbols'
@@ -53,7 +64,12 @@ export function RawSymbol({
 }: Omit<SymbolProps, 'name'> & { pair: { ios: string; android: string } }) {
   return (
     <SymbolView
-      name={{ ios: pair.ios as SFSymbol, android: pair.android as AndroidSymbol }}
+      name={{
+        ios: pair.ios as SFSymbol,
+        android: pair.android as AndroidSymbol,
+        // Same font, same glyph names — see the note above.
+        web: pair.android as AndroidSymbol,
+      }}
       size={size}
       tintColor={color}
       weight={weight}
