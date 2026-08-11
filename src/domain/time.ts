@@ -102,6 +102,26 @@ export const formatMinutes = (minutes: number): string => {
 }
 
 /**
+ * The same duration, but never rolled up into days: `40h`, not `1d 16h`.
+ *
+ * For a *total* — "you slept 1d 16h this week" — days are the right unit and
+ * `formatMinutes` gives them. For a **target** they are not: a goal of eight hours on five
+ * weekdays is forty hours in the user's head, and "15h 1m of 1d 16h" makes them convert
+ * one side before they can compare it to the other. Both sides of that sentence go through
+ * this, so the two figures are in the same unit.
+ */
+export const formatHoursMinutes = (minutes: number): string => {
+  const total = Math.max(0, Math.round(minutes))
+  const hours = Math.floor(total / MINUTES_PER_HOUR)
+  const mins = total - hours * MINUTES_PER_HOUR
+
+  const parts: string[] = []
+  if (hours > 0) parts.push(`${hours}h`)
+  if (mins > 0 || parts.length === 0) parts.push(`${mins}m`)
+  return parts.join(' ')
+}
+
+/**
  * Locale-aware date parts, via `Intl`. v1 hardcoded English day and month names
  * (`"Monday"`, `"January"`, …) even though it configured `date-fns` locales two files
  * away; going through `Intl` removes ~90 lines of tables and is correct in every locale

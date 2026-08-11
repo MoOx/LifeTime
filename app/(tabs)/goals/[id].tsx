@@ -45,7 +45,7 @@ import {
   makeGoal,
   updateGoal,
 } from '@/domain/goals'
-import { MINUTES_PER_DAY, formatMinutes } from '@/domain/time'
+import { MINUTES_PER_DAY, formatHoursMinutes, formatMinutes } from '@/domain/time'
 import { AppText } from '@/ui/AppText'
 import { ListFootnote, ListGroup, ListHeader, ListRow } from '@/ui/List'
 import { RawSymbol, Symbol } from '@/ui/Symbol'
@@ -275,15 +275,17 @@ export default function GoalEditorScreen() {
                 accessibilityState={{ checked: on }}
                 accessibilityLabel={names[day]}
                 style={({ pressed }) => [styles.day, pressed && styles.pressed]}>
-                <AppText role="caption" tone="tertiary">
-                  {names[day]}
-                </AppText>
-                <View
-                  style={[
-                    styles.dayCircle,
-                    on ? styles.dayOn : styles.dayOff,
-                  ]}>
-                  {on && <Symbol name="checkmark" size={14} color={colors.onAccent} />}
+                {/* The day's own name inside the circle, the way every repeat picker on
+                    both platforms does it. A label above a tick below says the same thing
+                    twice, in two rows, and the tick has to be read against the label to
+                    mean anything. */}
+                <View style={[styles.dayCircle, on ? styles.dayOn : styles.dayOff]}>
+                  <AppText
+                    role="footnote"
+                    tone={on ? 'inverse' : 'secondary'}
+                    numberOfLines={1}>
+                    {names[day]}
+                  </AppText>
                 </View>
               </Pressable>
             )
@@ -343,7 +345,7 @@ export default function GoalEditorScreen() {
           </View>
         </View>
         <ListFootnote>
-          {`${formatMinutes(draft.durationPerDay)} per selected day — ${formatMinutes(total)} over a full week.`}
+          {`${formatMinutes(draft.durationPerDay)} per selected day — ${formatHoursMinutes(total)} over a full week.`}
         </ListFootnote>
 
         <ListHeader title="Period" />
@@ -464,9 +466,9 @@ const styles = StyleSheet.create({
     gap: space.xs,
   },
   dayCircle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
   },

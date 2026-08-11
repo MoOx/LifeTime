@@ -6,6 +6,7 @@ import {
   computeProgress,
   describeDays,
   goalMinutes,
+  goalRanges,
   periodRange,
   ringFraction,
   scheduledDays,
@@ -40,6 +41,37 @@ describe('scheduledDays', () => {
   it('only counts the days the goal applies to', () => {
     expect(scheduledDays(goal(), WEEK)).toHaveLength(5)
     expect(scheduledDays(goal({ days: ALL_DAYS }), WEEK)).toHaveLength(7)
+  })
+})
+
+/**
+ * The Goals screen used to clamp the period to now and then hand that same range to
+ * `computeProgress`, so a goal's target shrank to the days that had already happened: an
+ * "8 h every weekday" goal read "15h 1m of 16h this week" on a Tuesday, under a footnote
+ * promising the ring filled across the whole period. `goalRanges` exists so the two uses
+ * cannot be confused, and these pin the distinction.
+ */
+describe('goalRanges', () => {
+  const tuesdayNoon = at(2026, 7, 11, 12)
+  const eightHoursWeekdays = goal({ durationPerDay: 480 })
+
+  it('keeps the period whole and clamps only the counting window', () => {
+    const { period, counted } = goalRanges(eightHoursWeekdays, tuesdayNoon, 1)
+    expect(period.end).toBe(WEEK.end)
+    expect(counted.end).toBe(tuesdayNoon)
+    expect(counted.start).toBe(period.start)
+  })
+
+  it('targets the whole period, not the part of it that has gone by', () => {
+    const { period } = goalRanges(eightHoursWeekdays, tuesdayNoon, 1)
+    // Five weekdays at eight hours, whatever day it is today.
+    expect(computeProgress(eightHoursWeekdays, 901, period, tuesdayNoon).target).toBe(2400)
+  })
+
+  it('stops clamping once the period is over', () => {
+    // The last instant of the week: there is no future left inside it to cut off.
+    const { period, counted } = goalRanges(eightHoursWeekdays, WEEK.end, 1)
+    expect(counted.end).toBe(period.end)
   })
 })
 

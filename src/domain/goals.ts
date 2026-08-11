@@ -95,6 +95,29 @@ export const periodRange = (
   }
 }
 
+/**
+ * The two ranges a goal needs, which are **not** the same range.
+ *
+ * `period` is the whole period — it is what the goal's target is defined over, so
+ * `computeProgress` must be given this one. `counted` is the same window clamped to now,
+ * which is what events are read and summed over, since reading the future is pointless.
+ *
+ * They are returned together because passing the clamped one to `computeProgress` is a
+ * silent, plausible-looking bug: a weekly goal of 8 h on weekdays showed "15h 1m of 16h"
+ * on a Tuesday — 16 h being 8 h × the two days elapsed — while the footnote underneath
+ * promised the ring "fills across the whole period". The numbers were self-consistent and
+ * completely wrong, which is the kind of mistake a shared helper prevents and a comment
+ * does not.
+ */
+export const goalRanges = (
+  goal: Goal,
+  now: number,
+  weekStartsOn: WeekStartsOn,
+): { period: Range; counted: Range } => {
+  const period = periodRange(goal.period, now, weekStartsOn)
+  return { period, counted: { start: period.start, end: Math.min(period.end, now) } }
+}
+
 /** Start-of-day instants inside `range` on which the goal applies. */
 export const scheduledDays = (goal: Goal, range: Range): number[] => {
   const days: number[] = []
@@ -186,6 +209,10 @@ export const goalMinutes = (
   return total
 }
 
+/**
+ * `range` must be the **whole** period — `goalRanges(...).period`, never `.counted`. The
+ * target is a property of the period, not of how much of it has gone by.
+ */
 export const computeProgress = (
   goal: Goal,
   current: number,

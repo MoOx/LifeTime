@@ -22,8 +22,7 @@ import { sourceFor } from '@/data/source'
 import { useEventRanges } from '@/data/useEvents'
 import { rulesOf, useActiveCalendarIds } from '@/data/useReport'
 import { goalEvents } from '@/domain/events'
-import { type RingMode, computeProgress, goalMinutes, periodRange } from '@/domain/goals'
-import { clampToNow } from '@/domain/week'
+import { type RingMode, computeProgress, goalMinutes, goalRanges } from '@/domain/goals'
 import { GoalCard } from '@/features/goals/GoalCard'
 import { AppText } from '@/ui/AppText'
 import { ListFootnote, ListHeader } from '@/ui/List'
@@ -53,14 +52,14 @@ export default function GoalsScreen() {
     [settings, source],
   )
 
-  // Goals can have different periods, so fetch the union of the ranges they need.
-  const ranges = useMemo(
-    () =>
-      settings.goals.map((goal) =>
-        clampToNow(periodRange(goal.period, now, weekStartsOn), now),
-      ),
+  // Goals can have different periods, so fetch the union of the ranges they need. Each
+  // goal has two: the whole period, which its target is defined over, and that period
+  // clamped to now, which is what there is any point reading events for.
+  const windows = useMemo(
+    () => settings.goals.map((goal) => goalRanges(goal, now, weekStartsOn)),
     [settings.goals, now, weekStartsOn],
   )
+  const ranges = useMemo(() => windows.map((w) => w.counted), [windows])
 
   const live = useEventRanges(source, calendarIds, ranges)
 
@@ -122,11 +121,11 @@ export default function GoalsScreen() {
 
       <View style={styles.cards}>
         {settings.goals.map((goal, index) => {
-          const range = ranges[index]!
+          const { period, counted: window } = windows[index]!
           const raw = live.byRange[index]
           const counted = raw === undefined ? undefined : goalEvents(raw, filter, rules)
           const current =
-            counted === undefined ? 0 : goalMinutes(goal, counted, rules, range)
+            counted === undefined ? 0 : goalMinutes(goal, counted, rules, window)
 
           return (
             <Pressable
@@ -137,7 +136,7 @@ export default function GoalsScreen() {
               style={({ pressed }) => pressed && styles.pressed}>
               <GoalCard
                 goal={goal}
-                progress={computeProgress(goal, current, range, now)}
+                progress={computeProgress(goal, current, period, now)}
                 ringMode={settings.ringMode}
                 locale={locale}
                 activities={settings.activities}

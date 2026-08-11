@@ -1,5 +1,6 @@
 import {
   MINUTES_PER_DAY,
+  formatHoursMinutes,
   formatMinutes,
   formatRelative,
   minutesElapsedInDay,
@@ -22,6 +23,22 @@ describe('formatMinutes', () => {
 
   it('never renders negative durations', () => {
     expect(formatMinutes(-10)).toBe('0m')
+  })
+})
+
+describe('formatHoursMinutes', () => {
+  // A weekly goal of 8 h on five weekdays is "40h" to the person who set it. Rolling it up
+  // into "1d 16h" made the card ask them to convert one side before comparing it.
+  it('keeps hours as hours past a day', () => {
+    expect(formatHoursMinutes(MINUTES_PER_DAY)).toBe('24h')
+    expect(formatHoursMinutes(5 * 8 * 60)).toBe('40h')
+    expect(formatHoursMinutes(MINUTES_PER_DAY + 195)).toBe('27h 15m')
+  })
+
+  it('agrees with formatMinutes below a day', () => {
+    for (const minutes of [0, 45, 60, 75, 1439]) {
+      expect(formatHoursMinutes(minutes)).toBe(formatMinutes(minutes))
+    }
   })
 })
 

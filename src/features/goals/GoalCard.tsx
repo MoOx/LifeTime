@@ -29,7 +29,7 @@ import {
   ringFraction,
   ringPercent,
 } from '@/domain/goals'
-import { formatMinutes } from '@/domain/time'
+import { formatHoursMinutes, formatMinutes } from '@/domain/time'
 import { AppText } from '@/ui/AppText'
 import { RawSymbol } from '@/ui/Symbol'
 import { CATEGORY_PALETTE, STATUS_PALETTE } from '@/ui/theme/colors'
@@ -130,9 +130,11 @@ export function GoalCard({ goal, progress, ringMode, locale, activities }: GoalC
             {progress.dailyAverage > 0 ? formatMinutes(progress.dailyAverage) : '-'}
           </AppText>
           <AppText role="footnote" style={styles.dim}>
+            {/* Both figures in hours, so the comparison is readable: "15h 1m of 40h",
+                not "15h 1m of 1d 16h". */}
             {ringMode === 'period'
-              ? `${formatMinutes(progress.current)} of ${formatMinutes(progress.target)} this ${goal.period}`
-              : `${formatMinutes(progress.current)} of ${formatMinutes(progress.expectedByTonight)} due today`}
+              ? `${formatHoursMinutes(progress.current)} of ${formatHoursMinutes(progress.target)} this ${goal.period}`
+              : `${formatHoursMinutes(progress.current)} of ${formatHoursMinutes(progress.expectedByTonight)} due today`}
           </AppText>
         </View>
       </View>
