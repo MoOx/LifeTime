@@ -69,10 +69,17 @@ export function ListHeader({ title, action, style }: ListHeaderProps) {
 // Footnote
 // ---------------------------------------------------------------------------
 
-export function ListFootnote({ children }: { children: ReactNode }) {
+export function ListFootnote({
+  children,
+  tone = 'tertiary',
+}: {
+  children: ReactNode
+  /** `destructive` turns a footnote into the reason a control above it is disabled. */
+  tone?: 'tertiary' | 'destructive'
+}) {
   return (
     <View style={styles.footnote}>
-      <AppText role="footnote" tone="tertiary">
+      <AppText role="footnote" tone={tone}>
         {children}
       </AppText>
     </View>
@@ -143,6 +150,12 @@ export type ListRowProps = {
   destructive?: boolean
   /** Renders the title in the accent colour, centred — v1's "Mask Hidden Activities". */
   centeredAction?: boolean
+  /**
+   * Greyed out and unpressable. The Contacts.app pattern: the control that commits stays
+   * visible but inert until the form is valid, so the user can see what they are aiming
+   * at. Pair it with a `ListFootnote tone="destructive"` saying what is missing.
+   */
+  disabled?: boolean
   /** Extra content under the title, inside the row: a progress bar, a chart. */
   children?: ReactNode
   accessibilityLabel?: string
@@ -160,13 +173,14 @@ export function ListRow({
   onPress,
   destructive = false,
   centeredAction = false,
+  disabled = false,
   children,
   accessibilityLabel,
 }: ListRowProps) {
   const centred = destructive || centeredAction
 
   const body = (
-    <View style={[styles.row, centred && styles.rowCentred]}>
+    <View style={[styles.row, centred && styles.rowCentred, disabled && styles.disabled]}>
       {leading ?? (symbol !== undefined && (
         <Symbol name={symbol} size={22} color={symbolColor ?? colors.accent} />
       ))}
@@ -174,7 +188,17 @@ export function ListRow({
       <View style={[styles.rowBody, centred && styles.rowBodyCentred]}>
         <AppText
           role={centred ? 'body' : 'rowTitle'}
-          tone={destructive ? 'destructive' : centeredAction ? 'accent' : 'primary'}
+          tone={
+            // A disabled control goes grey, the way iOS greys one. Fading the accent
+            // colour instead leaves a washed-out blue that reads as a rendering fault.
+            disabled
+              ? 'tertiary'
+              : destructive
+                ? 'destructive'
+                : centeredAction
+                  ? 'accent'
+                  : 'primary'
+          }
           numberOfLines={centred ? 1 : 2}
           style={centred && styles.centredText}>
           {title}
@@ -197,7 +221,7 @@ export function ListRow({
     </View>
   )
 
-  if (onPress === undefined) return body
+  if (onPress === undefined || disabled) return body
 
   return (
     <Pressable
@@ -268,6 +292,10 @@ const styles = StyleSheet.create({
   },
   pressedRow: {
     backgroundColor: colors.selection,
+  },
+  disabled: {
+    // Only the accessories dim; the label carries its own disabled colour.
+    opacity: 0.6,
   },
   pressedText: {
     opacity: 0.5,

@@ -32,15 +32,55 @@ const dist = join(root, '.preview/web')
 const shots = join(root, '.preview/shots')
 const PORT = 8321
 
+/**
+ * Some screens only exist once there is data — an empty Goals tab never shows a goal
+ * card, so the card cannot be checked at all. The web build persists settings to
+ * `localStorage`, so a route can be given a seed that is written before the app boots.
+ *
+ * This is the same document shape `domain/settings.ts` parses, so a malformed seed fails
+ * the same way a malformed backup would.
+ */
+const SETTINGS_KEY = 'lifetime.settings.v2'
+
+const withGoals = {
+  version: 2,
+  goals: [
+    {
+      id: 'seed-rest',
+      title: '',
+      createdAt: 0,
+      mode: 'goal',
+      days: [false, true, true, true, true, true, false],
+      durationPerDay: 480,
+      categoryIds: ['rest'],
+      activityIds: [],
+      period: 'week',
+    },
+    {
+      id: 'seed-fun',
+      title: 'Screen time',
+      createdAt: 0,
+      mode: 'limit',
+      days: [true, true, true, true, true, true, true],
+      durationPerDay: 90,
+      categoryIds: ['fun'],
+      activityIds: [],
+      period: 'week',
+    },
+  ],
+}
+
 /** Every route worth looking at, and what it is meant to show. */
 const ROUTES = [
   ['summary', '/'],
   ['goals', '/goals'],
+  ['goals-filled', '/goals', withGoals],
   ['goal-editor', '/goals/new'],
   ['settings', '/settings'],
   ['filters', '/filters'],
   ['categorize', '/categorize'],
   ['privacy', '/privacy'],
+  ['welcome', '/welcome'],
   ['activity', '/activity/Deep%20work'],
 ]
 
@@ -101,12 +141,19 @@ mkdirSync(shots, { recursive: true })
 
 let failures = 0
 
-for (const [name, route] of ROUTES) {
+for (const [name, route, seed] of ROUTES) {
   const page = await browser.newPage({
     // iPhone 16 Pro logical size.
     viewport: { width: 402, height: 874 },
     deviceScaleFactor: 2,
   })
+
+  if (seed !== undefined) {
+    await page.addInitScript(
+      ([key, value]) => window.localStorage.setItem(key, value),
+      [SETTINGS_KEY, JSON.stringify(seed)],
+    )
+  }
 
   const errors = []
   page.on('pageerror', (error) => errors.push(error.message))

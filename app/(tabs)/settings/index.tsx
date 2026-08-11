@@ -155,6 +155,13 @@ export default function SettingsScreen() {
           onPress={() => router.push('/privacy')}
         />
         <ListRow
+          symbol="demo"
+          title="Welcome screen"
+          subtitle="The introduction, again"
+          chevron
+          onPress={() => router.push('/welcome')}
+        />
+        <ListRow
           symbol="calendar"
           title="Open Calendar"
           chevron

@@ -98,6 +98,25 @@ export type EmptyReason =
   | 'only-skipped-activities'
   | 'has-events'
 
+/**
+ * The same question over the window v1 actually asked about: **the last two weeks**
+ * (`NoEventBox.res:12-74`), not the visible one.
+ *
+ * The distinction matters on exactly the day it is most likely to be seen. On a Monday
+ * morning the current week is empty for everyone, and telling a user with a full calendar
+ * that "LifeTime could not find any events" is simply false — it is the message for
+ * someone who has never logged anything, shown to someone who logs constantly. Two weeks
+ * is long enough that an empty answer means something.
+ */
+export const explainEmptinessOverWeeks = (
+  weeks: readonly (readonly TimeEvent[] | undefined)[],
+  filter: EventFilter,
+): EmptyReason | undefined => {
+  // A week still loading cannot contribute to a verdict about absence.
+  if (weeks.some((week) => week === undefined)) return undefined
+  return explainEmptiness(weeks.flat() as TimeEvent[], filter)
+}
+
 export const explainEmptiness = (
   events: readonly TimeEvent[],
   filter: EventFilter,

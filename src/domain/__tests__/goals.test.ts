@@ -234,9 +234,28 @@ describe('describeDays', () => {
   it('names the common cadences', () => {
     expect(describeDays(ALL_DAYS, 'en-US')).toBe('every day')
     expect(describeDays(WEEKDAYS, 'en-US')).toBe('every weekday')
+    // v1's wording (`GoalCard.res:283`) — it reads better than "every weekend day".
     expect(describeDays([true, false, false, false, false, false, true], 'en-US')).toBe(
-      'every weekend day',
+      'every day of the weekend',
     )
+  })
+
+  // The four cases v1 spelled out and the first rebuild dropped. "Mon, Tue, Thu, Fri"
+  // makes the reader do the subtraction; naming the missing day does not.
+  it('names a weekday cadence with one day missing', () => {
+    const exceptWednesday = [false, true, true, false, true, true, false]
+    expect(describeDays(exceptWednesday, 'en-US')).toBe('every weekday except wednesday')
+
+    const exceptMonday = [false, false, true, true, true, true, false]
+    expect(describeDays(exceptMonday, 'en-US')).toBe('every weekday except monday')
+
+    const exceptFriday = [false, true, true, true, true, false, false]
+    expect(describeDays(exceptFriday, 'en-US')).toBe('every weekday except friday')
+  })
+
+  it('does not claim a weekday cadence when a weekend day is involved', () => {
+    const fourDaysWithSunday = [true, true, true, true, false, false, false]
+    expect(describeDays(fourDaysWithSunday, 'en-US')).toBe('Sun, Mon, Tue, Wed')
   })
 
   it('falls back to a locale-formatted day list', () => {

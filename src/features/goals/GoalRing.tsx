@@ -15,6 +15,9 @@
  * Rounded caps and the recessed track are the easy part; they are what make the empty
  * state read as "not yet" rather than "broken", which is the whole point of showing an
  * empty ring on a Monday morning.
+ *
+ * `GoalRing.web.tsx` draws the same shape with SVG, because Skia in a web bundle needs a
+ * CanvasKit WebAssembly module loaded first and throws without it.
  */
 
 import {
@@ -27,18 +30,9 @@ import {
   vec,
 } from '@shopify/react-native-skia'
 import { useMemo } from 'react'
-import { StyleSheet, View } from 'react-native'
 
-export type GoalRingProps = {
-  /** 0…n. Values above 1 lap the ring. */
-  fraction: number
-  size: number
-  thickness?: number
-  /** Start and end of the sweep, usually a category or status colour and a lighter one. */
-  colors: [string, string]
-  trackColor: string
-  children?: React.ReactNode
-}
+import type { GoalRingProps } from './GoalRing.types'
+import { StyleSheet, View } from 'react-native'
 
 /** Rings start at 12 o'clock and run clockwise, like every other ring the user has seen. */
 const START_ANGLE = -90

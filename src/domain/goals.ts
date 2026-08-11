@@ -327,7 +327,24 @@ export const describeDays = (days: readonly boolean[], locale: string): string =
 
   const isWeekday = (i: number) => i >= 1 && i <= 5
   if (count === 5 && days.every((on, i) => on === isWeekday(i))) return 'every weekday'
-  if (count === 2 && days.every((on, i) => on === !isWeekday(i))) return 'every weekend day'
+  if (count === 2 && days.every((on, i) => on === !isWeekday(i))) {
+    // v1's wording (`GoalCard.res:283`), which reads better than "every weekend day".
+    return 'every day of the weekend'
+  }
+
+  /**
+   * "every weekday except wednesday" — four weekdays and no weekend day. v1 spelled all
+   * five cases out by hand (`GoalCard.res:278-282`); they are worth keeping because
+   * "Mon, Tue, Thu, Fri" makes the reader do the subtraction themselves.
+   */
+  if (count === 4 && days.every((on, i) => (on ? isWeekday(i) : true)) && !days[0] && !days[6]) {
+    const missing = days.findIndex((on, i) => isWeekday(i) && !on)
+    const name = new Intl.DateTimeFormat(locale, {
+      weekday: 'long',
+      timeZone: 'UTC',
+    }).format(new Date(Date.UTC(2026, 0, 4) + missing * 86_400_000))
+    return `every weekday except ${name.toLocaleLowerCase(locale)}`
+  }
 
   // 2026-01-04 is a Sunday, so index 0 lines up with `Date.getDay()`.
   const reference = Date.UTC(2026, 0, 4)

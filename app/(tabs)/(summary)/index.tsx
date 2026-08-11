@@ -27,7 +27,7 @@ import { useLocaleTag, useWeekStartsOn } from '@/data/locale'
 import { useSettings, useUpdateSettings } from '@/data/settingsStore'
 import { initialWeekIndex, useReport } from '@/data/useReport'
 import { calendarOfTitle, minutesByTitle } from '@/domain/aggregate'
-import { explainEmptiness, filterEvents } from '@/domain/events'
+import { explainEmptinessOverWeeks, filterEvents } from '@/domain/events'
 import { formatRelative } from '@/domain/time'
 import { clampToNow } from '@/domain/week'
 import { EmptyState } from '@/features/summary/EmptyState'
@@ -108,9 +108,14 @@ export default function SummaryScreen() {
     [events],
   )
 
+  /**
+   * Emptiness is judged over the last two weeks, not the visible one — see
+   * `docs/SCREENS.md` §3.1. `undefined` while they are still loading, so the screen never
+   * claims absence it has not verified.
+   */
   const emptiness = useMemo(
-    () => (rawEvents === undefined ? 'has-events' : explainEmptiness(rawEvents, filter)),
-    [rawEvents, filter],
+    () => explainEmptinessOverWeeks(report.eventsByWeek.slice(-2), filter),
+    [report.eventsByWeek, filter],
   )
 
   const openSettings = useCallback(() => {
@@ -174,7 +179,7 @@ export default function SummaryScreen() {
             : `Updated ${formatRelative(report.updatedAt, now, locale)}`}
         </ListFootnote>
 
-        {emptiness === 'has-events' ? (
+        {emptiness === undefined || emptiness === 'has-events' ? (
           <>
             <ListHeader
               title="Activities"
@@ -203,7 +208,7 @@ export default function SummaryScreen() {
             )}
           </>
         ) : (
-          <EmptyState reason={emptiness} />
+          <EmptyState reason={emptiness} onToggleHidden={toggleHidden} />
         )}
       </ScrollView>
 

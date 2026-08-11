@@ -19,7 +19,7 @@
  *   • Nothing saves until `isValid`, so a goal cannot exist whose progress is undefined.
  */
 
-import { Host, TextInput } from '@expo/ui'
+import { Host, Slider, TextInput } from '@expo/ui'
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
 import {
@@ -45,7 +45,7 @@ import {
   makeGoal,
   updateGoal,
 } from '@/domain/goals'
-import { formatMinutes } from '@/domain/time'
+import { MINUTES_PER_DAY, formatMinutes } from '@/domain/time'
 import { AppText } from '@/ui/AppText'
 import { ListFootnote, ListGroup, ListHeader, ListRow } from '@/ui/List'
 import { RawSymbol, Symbol } from '@/ui/Symbol'
@@ -70,6 +70,9 @@ const PERIODS: { label: string; value: GoalPeriod }[] = [
 ]
 
 /** The durations almost every goal actually uses. */
+/** v1's slider granularity (`GoalEdit.res:294`). */
+const DURATION_STEP = 15
+
 const QUICK_DURATIONS = [15, 30, 45, 60, 90, 120, 180, 240, 480]
 
 const DRAFT: Omit<Goal, 'id' | 'createdAt'> = {
@@ -201,6 +204,19 @@ export default function GoalEditorScreen() {
   const valid = isValid({ ...draft, id: '', createdAt: 0 })
   const total = draft.durationPerDay * draft.days.filter(Boolean).length
 
+  /**
+   * What is missing, named. "Pick a duration, at least one day, and something to track"
+   * makes the user check three things; naming only the ones that are actually wrong makes
+   * them check none.
+   */
+  const missing = [
+    draft.durationPerDay > 0 ? undefined : 'a duration',
+    draft.days.some(Boolean) ? undefined : 'at least one day',
+    draft.categoryIds.length > 0 || draft.activityIds.length > 0
+      ? undefined
+      : 'a category or an activity',
+  ].filter((item): item is string => item !== undefined)
+
   return (
     <>
       <Stack.Screen
@@ -278,24 +294,53 @@ export default function GoalEditorScreen() {
         </ListFootnote>
 
         <ListHeader title="Duration" />
-        <View style={styles.chipsCard}>
-          {QUICK_DURATIONS.map((minutes) => {
-            const selected = draft.durationPerDay === minutes
-            return (
-              <Pressable
-                key={minutes}
-                onPress={() => patch({ durationPerDay: minutes })}
-                style={({ pressed }) => [
-                  styles.chip,
-                  selected && styles.chipOn,
-                  pressed && styles.pressed,
-                ]}>
-                <AppText role="footnote" tone={selected ? 'inverse' : 'primary'} tabular>
-                  {formatMinutes(minutes)}
-                </AppText>
-              </Pressable>
-            )
-          })}
+        <View style={styles.durationCard}>
+          <View style={styles.chips}>
+            {QUICK_DURATIONS.map((minutes) => {
+              const selected = draft.durationPerDay === minutes
+              return (
+                <Pressable
+                  key={minutes}
+                  onPress={() => patch({ durationPerDay: minutes })}
+                  style={({ pressed }) => [
+                    styles.chip,
+                    selected && styles.chipOn,
+                    pressed && styles.pressed,
+                  ]}>
+                  <AppText role="footnote" tone={selected ? 'inverse' : 'primary'} tabular>
+                    {formatMinutes(minutes)}
+                  </AppText>
+                </Pressable>
+              )
+            })}
+          </View>
+
+          {/*
+            The slider is not decoration and not a duplicate of the chips: the chips are
+            the nine durations almost everyone wants, the slider is how you say 3 h 45.
+            v1 had both (`GoalEdit.res:288-300`) and the first rebuild kept only the chips,
+            which quietly made a third of the range unreachable. Same bounds as v1 —
+            0 to 24 h in 15-minute steps — with the ends labelled, as it had them.
+          */}
+          <View style={styles.sliderRow}>
+            <AppText role="caption" tone="tertiary" tabular>
+              0
+            </AppText>
+            <Host matchContents={{ vertical: true }} style={styles.slider}>
+              <Slider
+                value={draft.durationPerDay}
+                min={0}
+                max={MINUTES_PER_DAY}
+                step={DURATION_STEP}
+                onValueChange={(minutes) =>
+                  patch({ durationPerDay: Math.round(minutes / DURATION_STEP) * DURATION_STEP })
+                }
+              />
+            </Host>
+            <AppText role="caption" tone="tertiary" tabular>
+              24
+            </AppText>
+          </View>
         </View>
         <ListFootnote>
           {`${formatMinutes(draft.durationPerDay)} per selected day — ${formatMinutes(total)} over a full week.`}
@@ -379,13 +424,14 @@ export default function GoalEditorScreen() {
         <ListGroup style={styles.spaced}>
           <ListRow
             centeredAction
+            disabled={!valid}
             title={existing === undefined ? 'Create goal' : 'Save changes'}
-            onPress={valid ? save : undefined}
+            onPress={save}
           />
         </ListGroup>
         {!valid && (
-          <ListFootnote>
-            Pick a duration, at least one day, and at least one category or activity.
+          <ListFootnote tone="destructive">
+            {`Still needed: ${missing.join(', ')}.`}
           </ListFootnote>
         )}
 
@@ -431,14 +477,25 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.fill,
   },
-  chipsCard: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: space.sm,
+  durationCard: {
+    gap: space.lg,
     backgroundColor: colors.surface,
     borderRadius: layout.groupRadius,
     marginHorizontal: space.lg,
     padding: space.lg,
+  },
+  chips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: space.sm,
+  },
+  sliderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.md,
+  },
+  slider: {
+    flex: 1,
   },
   chip: {
     paddingVertical: space.sm,

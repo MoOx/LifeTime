@@ -2,59 +2,105 @@
  * "Nothing to show" is never the whole truth — there is always a reason, and the reason
  * is what the user can act on.
  *
- * v1 already got this right and it is the piece most worth keeping: four distinct states,
- * each naming its cause. What is added here is the action. Telling someone "every event
- * this week is in a calendar you deselected" and then making them go find that screen is
- * most of the way to useless.
+ * Rebuilt against `docs/SCREENS.md` §3.1. Two things came back from v1 that the first
+ * version had quietly dropped, and both change what the screen means:
+ *
+ *   • **It judges the last two weeks, not the visible one.** On a Monday morning the
+ *     current week is empty for everybody. Telling someone with a full calendar that
+ *     "LifeTime could not find any events" is the message for a brand-new user, shown to
+ *     the wrong person, on the day they are most likely to open the app.
+ *
+ *   • **Every state offers two ways out.** One that fixes the app's settings and one that
+ *     goes to the calendar, because those are the only two places the problem can be.
+ *     A single button forces a guess about which one the user needs.
+ *
+ * The copy is v1's, verbatim, with one typo corrected — "relevent" → "relevant" — which is
+ * recorded in the blueprint so the change stays a decision rather than a drift.
  */
 
-import { Link } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { Pressable, StyleSheet, View } from 'react-native'
 
+import { openCalendarApp } from '@/data/calendars'
 import type { EmptyReason } from '@/domain/events'
 import { AppText } from '@/ui/AppText'
 import { Symbol, type SymbolName } from '@/ui/Symbol'
 import { colors } from '@/ui/theme/colors'
-import { space } from '@/ui/theme/space'
+import { layout, space } from '@/ui/theme/space'
+
+/**
+ * Appended to the first message only, as in v1 — it explains the *product*, which is only
+ * worth saying to someone who has no data at all.
+ */
+const PITCH =
+  'LifeTime can help you to understand how you use your time and rely on calendar events to learn how you use it. By saving events into your calendars, you will be able to visualize reports so you can take more informed decisions about how to use your valuable time.'
+
+type ActionKind = 'getStarted' | 'customize' | 'toggleHidden' | 'openCalendar'
 
 type Copy = {
   symbol: SymbolName
   title: string
   body: string
-  action?: { label: string; href: string }
+  actions: [ActionKind, ActionKind]
 }
 
 const COPY: Record<Exclude<EmptyReason, 'has-events'>, Copy> = {
   'no-events': {
     symbol: 'calendar',
-    title: 'Nothing logged this week',
-    body: 'LifeTime reads the events already in your calendars. Add a few — even after the fact — and they will show up here.',
+    title: 'Nothing logged in the last two weeks',
+    body: `LifeTime could not find any events on the last two weeks. ${PITCH}`,
+    actions: ['getStarted', 'openCalendar'],
   },
   'only-all-day': {
     symbol: 'clock',
     title: 'Only all-day events',
-    body: 'All-day events have no duration, so there is no time to measure. Give them a start and an end and they will count.',
+    body: 'LifeTime could not find any relevant events on the last two weeks. All day events are not suitable for time tracking.',
+    actions: ['getStarted', 'openCalendar'],
   },
   'only-skipped-calendars': {
     symbol: 'calendarBadgeExclamation',
     title: 'Every event is in a calendar you turned off',
-    body: 'There is time logged this week, but all of it sits in calendars excluded from your reports.',
-    action: { label: 'Choose calendars', href: '/filters' },
+    body: "LifeTime could not find any recent events that aren't part of skipped calendars.",
+    actions: ['customize', 'openCalendar'],
   },
   'only-skipped-activities': {
     symbol: 'hidden',
-    title: 'Everything this week is hidden',
-    body: 'The activities logged this week are all on your hidden list. They still count towards your goals.',
-    action: { label: 'Manage hidden activities', href: '/filters' },
+    title: 'Everything recent is hidden',
+    body: "LifeTime could not find any recent events that aren't part of skipped activities.",
+    actions: ['toggleHidden', 'openCalendar'],
   },
+}
+
+const LABELS: Record<ActionKind, string> = {
+  getStarted: 'Get started',
+  customize: 'Customize report',
+  toggleHidden: 'Reveal hidden activities',
+  openCalendar: 'Open Calendar',
 }
 
 export type EmptyStateProps = {
   reason: Exclude<EmptyReason, 'has-events'>
+  onToggleHidden: () => void
 }
 
-export function EmptyState({ reason }: EmptyStateProps) {
+export function EmptyState({ reason, onToggleHidden }: EmptyStateProps) {
+  const router = useRouter()
   const copy = COPY[reason]
+
+  const run = (kind: ActionKind) => {
+    switch (kind) {
+      case 'getStarted':
+        return router.push('/welcome')
+      case 'customize':
+        return router.push('/filters')
+      case 'toggleHidden':
+        return onToggleHidden()
+      case 'openCalendar':
+        return void openCalendarApp()
+    }
+  }
+
+  const [primary, secondary] = copy.actions
 
   return (
     <View style={styles.container}>
@@ -65,18 +111,25 @@ export function EmptyState({ reason }: EmptyStateProps) {
       <AppText role="secondary" tone="secondary" style={styles.centered}>
         {copy.body}
       </AppText>
-      {copy.action !== undefined && (
-        <Link href={copy.action.href} asChild>
-          <Pressable
-            hitSlop={8}
-            accessibilityRole="button"
-            style={({ pressed }) => [styles.action, pressed && styles.actionPressed]}>
-            <AppText role="button" tone="accent">
-              {copy.action.label}
-            </AppText>
-          </Pressable>
-        </Link>
-      )}
+
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => run(primary)}
+        style={({ pressed }) => [styles.primary, pressed && styles.pressed]}>
+        <AppText role="button" tone="inverse">
+          {LABELS[primary]}
+        </AppText>
+      </Pressable>
+
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => run(secondary)}
+        hitSlop={8}
+        style={({ pressed }) => [styles.secondary, pressed && styles.pressed]}>
+        <AppText role="button" tone="accent">
+          {LABELS[secondary]}
+        </AppText>
+      </Pressable>
     </View>
   )
 }
@@ -91,14 +144,19 @@ const styles = StyleSheet.create({
   centered: {
     textAlign: 'center',
   },
-  action: {
-    marginTop: space.sm,
+  primary: {
+    marginTop: space.md,
+    alignSelf: 'stretch',
+    alignItems: 'center',
     paddingVertical: space.md,
-    paddingHorizontal: space.xl,
-    borderRadius: 999,
-    backgroundColor: colors.selection,
+    borderRadius: layout.groupRadius,
+    backgroundColor: colors.accent,
   },
-  actionPressed: {
+  secondary: {
+    alignItems: 'center',
+    paddingVertical: space.sm,
+  },
+  pressed: {
     opacity: 0.6,
   },
 })
