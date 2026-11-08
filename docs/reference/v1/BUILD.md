@@ -24,7 +24,7 @@ Node, CocoaPods, ReScript, and any environment variables.*
 | ReScript output (`.bs.js`) is not committed | `git ls-tree main` | `rescript build` must succeed |
 | Hermes is on, Flipper is on, platform iOS 11.0 | `ios/Podfile` on `main` | Flipper is removed, the deployment target raised, Hermes kept unless it fails |
 | Release product `LifeTime` → bundle id `io.moox.LifeTime`; Debug `LifeTime.Dev` | `project.pbxproj` on `main` | Release is used for captures: JS is bundled, there are no dev overlays, and no Metro is needed. Its bundle id is the new app's, hence a dedicated simulator |
-| No `UIApplicationSceneManifest`; AppDelegate-only life cycle | `ios/LifeTime/Info.plist`, `AppDelegate.m` on `main` | An app built with the iOS 27 SDK is refused at launch on iOS 27 unless it adopts scenes, so v1 runs on an iOS 26.x runtime |
+| No `UIApplicationSceneManifest`; AppDelegate-only life cycle | `ios/LifeTime/Info.plist`, `AppDelegate.m` on `main` | An app built with the iOS 27 SDK is refused at launch on iOS 27 unless it adopts scenes. So v1 is built with **Xcode 26.6** (`/Applications/Xcode-26.6.0.app` on MoOx's Mac — `scripts/v1/lib.sh` selects it through `DEVELOPER_DIR`) and run on an iOS 26.x runtime |
 | Demo data is built in: Settings → Danger Zone → Create Demo Calendar → Inject | `SettingsDangerZone.res`, `e2e/demo.e2e.js` on `main` | The captures use v1's own demo data, as its App Store screenshots did |
 
 ## Known symptoms and fixes
@@ -44,7 +44,7 @@ row for every new problem met.
 | Hermes pod or `hermes-engine` link errors on arm64 simulator | Old prebuilt Hermes binary | Set `:hermes_enabled => false` (JSC) — `V1_HERMES=0 scripts/v1/setup.sh` |
 | "Upload Debug Symbols to Sentry" build phase fails | No Sentry credentials | `SENTRY_DISABLE_AUTO_UPLOAD=true` (set by `scripts/v1/build.sh`); else delete the phase in the worktree |
 | `patch-package` warns about `react-native+0.67.0-rc.6.patch` | Patch made against rc.6, installed 0.67.1 | Harmless if it applies; if a hunk fails, inspect it — it may matter for the calendar or gestures |
-| App launches then is killed with a UIScene assertion | Built with the iOS 27 SDK and run on iOS 27 | Run on an iOS 26.x runtime, or build with Xcode 26.x |
+| App launches then is killed with a UIScene assertion | Built with the iOS 27 SDK and run on iOS 27 | Build with Xcode 26.6 (the default in `scripts/v1/lib.sh`) and run on an iOS 26.x runtime |
 
 ## Patches applied
 

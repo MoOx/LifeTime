@@ -9,7 +9,7 @@ status bar, and passes three variables:
 |---|---|
 | `OUT` | Folder for screenshots (`docs/reference/v1/ios/light` or `…/dark`) |
 | `VIDEO` | Folder for scroll videos |
-| `RECORD` | `1` in the light pass, so videos are recorded once |
+| `RECORD` | `1` only when `V1_RECORD=1` is set (light pass): scroll videos are optional, since v1's header is not the target |
 
 They are a port of v1's own App Store screenshot flow (`git show main:e2e/demo.e2e.js`)
 and of `e2e/fresh.e2e.js`, using v1's real `testID`s where it has them and its exact

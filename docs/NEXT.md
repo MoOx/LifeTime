@@ -6,8 +6,8 @@
 > is blocked, write the blocker under it instead of ticking it, then ask MoOx everything
 > at once.
 >
-> **Where this runs.** Steps 0–3 and 5–6 need macOS: Xcode, the iOS Simulator and the
-> Android emulator. They are meant for a Claude Code session on MoOx's Mac. Step 4 is
+> **Where this runs.** Steps 0–2, 4 and 5 need macOS: Xcode, the iOS Simulator and the
+> Android emulator. They are meant for a Claude Code session on MoOx's Mac. Step 3 is
 > writing and can run anywhere.
 >
 > **Honesty note.** The scripts and Maestro flows under `scripts/v1/` and `.maestro/v1/`
@@ -36,21 +36,20 @@
    maestro --version; java -version 2>&1 | head -1; command -v emulator adb
    /usr/bin/pgrep -q oahd && echo "Rosetta: installed" || echo "Rosetta: missing"
    ```
-2. Needed:
-   - **Xcode**:
-     - Xcode 27 is needed for the new app: Expo SDK 58 adopts the UIScene life cycle iOS 27 requires.
-     - v1 cannot adopt UIScene, so it needs an **iOS 26.x simulator runtime**. Either Xcode 27 plus the iOS 26 runtime (`xcodebuild -downloadPlatform iOS -buildVersion 26.x`), or Xcode 26.x installed alongside (`xcodes install 26.6`).
-   - **Node 16** for v1 (its `.node-version`), via `fnm`. The current LTS for the new app.
-   - **CocoaPods** (any recent version; skip v1's Ruby 2.7.4 bundler pin unless forced).
+2. Known already: **Xcode 26.6** is at `/Applications/Xcode-26.6.0.app` (installed with `xcodes`). The v1 scripts use it automatically. Check whether Xcode 27 is also present: the new app on Expo SDK 58 can use either.
+3. Needed:
+   - Xcode 26.6 with an **iOS 26.x simulator runtime**.
+   - **Node 16** for v1 (its `.node-version`), via `fnm`, plus the current LTS for the new app.
+   - **CocoaPods**, any recent version. Skip v1's Ruby 2.7.4 bundler pin unless forced.
    - **Rosetta 2** if ReScript 9's compiler turns out to be x86_64-only.
    - **Maestro**: `curl -fsSL "https://get.maestro.mobile.dev" | bash`.
-   - **Android Studio + an arm64 emulator image**: only for the v1 Android fallback and for Android parity later. Not blocking.
-3. Install the user-space tools yourself (fnm, Node versions, Maestro, Homebrew
-   formulae). Put everything that needs MoOx in **one** message: Xcode versions, simulator
-   runtimes, Rosetta, Android Studio, anything needing his password. Then continue with
-   whatever does not depend on the answer.
+   - **Android Studio + an arm64 emulator image (API 35+)**. Needed for the Android header spike in step 4; not needed before.
+4. Install the user-space tools yourself (fnm, Node versions, Maestro, Homebrew
+   formulae). Put everything that needs MoOx in **one** message: simulator runtimes,
+   Rosetta, Android Studio, anything needing his password. Then continue with whatever
+   does not depend on the answer.
 
-**Done when:** BUILD.md lists the machine and every tool needed for steps 1–2 is present.
+**Done when:** BUILD.md lists the machine, and every tool needed for steps 1–2 is present.
 
 ---
 
@@ -66,9 +65,9 @@ captured natively. Do not change v1's behaviour or look; only make it build.
 1. `scripts/v1/setup.sh`. It does the following:
    - Creates a worktree of `main` at `../LifeTime-v1`, leaving this checkout untouched.
    - Installs dependencies under Node 16 and runs v1's generation steps (patches, SVG components, Markdown → JSON, ReScript, splash screen).
-   - Applies the known fixes to build React Native 0.67 with today's Xcode.
+   - Applies the known fixes to build React Native 0.67 with a recent Xcode.
    - Runs `pod install`.
-2. `scripts/v1/build.sh`. It builds a **Release** simulator app (the JS is bundled, so no Metro and no dev overlays) and installs it on a dedicated simulator named `LifeTime v1`. v1's Release bundle id is `io.moox.LifeTime`, the same as the new app's, so they must never share a simulator.
+2. `scripts/v1/build.sh`. It builds with **Xcode 26.6** (iOS 26 SDK, so the iOS 27 UIScene rule does not apply to v1). It produces a **Release** simulator app (the JS is bundled, so no Metro and no dev overlays) and installs it on a dedicated simulator named `LifeTime v1`. v1's Release bundle id is `io.moox.LifeTime`, the same as the new app's, so they must never share a simulator.
 3. When something breaks, check the symptom table in `docs/reference/v1/BUILD.md` first. Then fix with the smallest local patch inside the worktree, and add the symptom and fix to that table. **Nothing is committed to `main`.**
 
 **Done when:**
@@ -77,9 +76,9 @@ captured natively. Do not change v1's behaviour or look; only make it build.
 
 **Time-box:** 3 hours of attempts. If v1 still does not launch, try these in order:
 1. Build v1 for **Android** on an emulator (JDK 11, `npx react-native run-android`, and the same fixes approach). It gives a less faithful look, but exact layout and strings.
-2. Otherwise, ask MoOx for his own v1 screenshots or screen recordings.
+2. Otherwise, ask MoOx for his own v1 screenshots.
 
-In both cases, record the outcome in BUILD.md and go on to step 2 with whatever works.
+In both cases, record the outcome in BUILD.md and go on with whatever works.
 
 ---
 
@@ -87,9 +86,9 @@ In both cases, record the outcome in BUILD.md and go on to step 2 with whatever 
 
 - [ ] **Done:**
 
-**Goal:** a complete native visual reference of v1. This is the "visuellement très
-propre" bar the new UI must meet, and the place the scroll and large-title behaviour
-MoOx found broken in v2 is defined.
+**Goal:** a complete native visual reference of v1's *content*: what each screen shows,
+its hierarchy, spacing, grouping, type and colour. This is the "visuellement très propre"
+bar. Headers and navigation are **not** taken from v1; they follow INTENT.md D10.
 
 **Do:**
 
@@ -98,62 +97,41 @@ MoOx found broken in v2 is defined.
    - Sets a clean status bar (9:41, full bars).
    - Runs the four flows in `.maestro/v1/`:
      - `01-first-launch.yaml`: welcome, privacy, the calendar permission screen, the empty home, empty goals, the new-goal form, and the notification permission prompt.
-     - `02-demo-data.yaml`: injects v1's own demo calendar, categorises activities as v1's Detox flow did, then covers the home (top, scrolled, bottom), the previous week with "Show This Week", activity options and Filters.
+     - `02-demo-data.yaml`: injects v1's own demo calendar, categorises activities as v1's Detox flow did, then covers the home (top, middle, bottom), the previous week with "Show This Week", activity options and Filters.
      - `03-goals.yaml`: three goals created, the goals list, and editing a goal.
      - `04-settings.yaml`: settings, notifications, help and the danger zone.
-   - Records short **videos of scrolling** on screens with a large or sticky title (light pass only).
 2. Fix the flows wherever a selector or a timing is wrong, and re-run until both passes complete.
 3. Open every capture and check it against [SCREENS.md](./SCREENS.md). Fill in the table in `docs/reference/v1/README.md`, and add a row for any state the flows missed (for example, a second empty-state reason).
 
 **Done when:** every row of the README table has a light and a dark capture, or a note
-saying why not. The videos exist. Everything is committed under `docs/reference/v1/ios/`.
+saying why not, all committed under `docs/reference/v1/ios/`.
 
 **Time-box:** 2 hours after v1 first launches.
 
 ---
 
-## Step 3 — Capture the v2 attempt the same way
+## Step 3 — Write the product spec (phase 2)
 
 - [ ] **Done:**
 
-**Goal:** turn MoOx's "rendu imprécis, bugs de navigation et de titres au scroll" into a
-precise list of differences, screen by screen, so the new UI fixes causes rather than
-impressions.
-
-**Do:**
-
-1. Build the current branch for the simulator on its own simulator, `LifeTime v2`. The app is on Expo SDK 57, so use Xcode 26.x, or Xcode 27 with `expo-build-properties` `ios.enableSceneSupport: true` (see DATA-SOURCES.md).
-2. Capture the matching screens, light and dark, plus the same scroll videos. Put them in `docs/reference/v2-attempt/`. A copy of the v1 flows with v2's labels is enough.
-3. Write `docs/reference/DIFF.md`: for each screen, what differs from v1 (header behaviour, spacing, type sizes, grouping, colours, missing elements, bugs seen), with the two images side by side.
-
-**Done when:** DIFF.md covers every screen both versions have.
-
-**Time-box:** 2 hours. If v2 will not build quickly, skip the step and say so in DIFF.md.
-
----
-
-## Step 4 — Write the product spec (phase 2)
-
-- [ ] **Done:**
-
-**Goal:** a spec complete enough that the build (step 6) needs no further questions.
+**Goal:** a spec complete enough that the build (step 5) needs no further questions.
 **Inputs:**
-- [INTENT.md](./INTENT.md)
+- [INTENT.md](./INTENT.md), especially the decisions in §4.
 - [DATA-SOURCES.md](./DATA-SOURCES.md)
 - [SPEC.md](./SPEC.md) and [SCREENS.md](./SCREENS.md)
-- `docs/reference/v1/` and `DIFF.md`
-- [CATEGORISATION.md](./CATEGORISATION.md)
+- `docs/reference/v1/`
+- [CATEGORISATION.md](./CATEGORISATION.md). Update it on the two points INTENT.md §7 lists.
 
 **Write `docs/spec/`.** Adjust the split if it serves the content better.
 
 | File | Covers |
 |---|---|
 | `00-overview.md` | Scope of the first release, what is deliberately out, the two-step vision |
-| `10-model.md` | Sources → raw observations → resolved timeline; how overlaps are merged; activities, categories, rules; goals; unaccounted time |
+| `10-model.md` | Sources → raw observations → resolved timeline; how overlaps are merged; "located but unlabelled" time; activities, categories, rules; goals |
 | `20-sources.md` | Per source: what is read, when, the permission flow, the privacy statement, failure modes, and how to fake it on a simulator |
-| `30-screens.md` | Every screen's content (from SCREENS.md and the v1 captures), states (demo, empty, denied, loading), exact strings, and **header and scroll behaviour** |
-| `40-design.md` | Type roles, spacing, colour, components, Liquid Glass rules, iOS vs Android differences, v1 captures as the bar |
-| `50-architecture.md` | Expo SDK 58, libraries vs custom Expo modules, storage, background work, native verification with Maestro |
+| `30-screens.md` | Every screen's content (from SCREENS.md and the v1 captures), states (demo, empty, denied, loading) and exact strings. Plus the navigation map and each screen's header per D10: which screens get the large or collapsing title on each platform, and which get a small one |
+| `40-design.md` | Type roles, spacing, colour, components, Liquid Glass rules, iOS vs Android differences, v1 captures as the content bar |
+| `50-architecture.md` | Fresh Expo SDK 58 scaffold (D12) and what is ported from the current tree; libraries vs custom Expo modules; storage; background work; native verification with Maestro |
 | `60-slices.md` | Ordered build slices, each with its definition of done and the native evidence that proves it |
 
 **End with `docs/spec/QUESTIONS.md`:** every decision only MoOx can take, each with a
@@ -164,39 +142,46 @@ answers in INTENT.md §4 and in the spec.
 
 ---
 
-## Step 5 — Spikes
+## Step 4 — Spikes
 
 - [ ] **Done:**
 
-**Goal:** prove each risky native assumption from `docs/spec/50-architecture.md` before
-any screen depends on it. Expected at least:
+**Goal:** prove each risky native assumption before any screen depends on it. Each spike
+is a throwaway screen in the fresh SDK 58 app (or a scratch app), not production code.
+Expected at least:
 
-1. **Expo SDK 58 + Xcode 27:**
-   - The app builds and launches on the iOS 27 simulator.
-   - The native stack's large title and scroll collapse match the v1 videos.
-   - The tab bar behaves correctly.
-2. **Grouped lists, headers and footnotes** drawn to match the v1 captures, at Dynamic Type default and at a large size.
-3. **HealthKit:** read sleep and workouts seeded into the simulator.
-4. **Location visits (custom Expo module):** what the simulator can fake; what needs a real iPhone, which is MoOx's.
-5. **On-device categorisation:**
+1. **Native headers (D10):**
+   - **iOS.** A screen with a long grouped list under an expo-router `Stack` with `headerLargeTitle`. The large title must collapse into the navigation bar on scroll exactly as in Mail, under a native tab bar, in light and dark. Also check a pushed screen with a small title and the minimal back button. Find and write down the conditions that make it work: the scroll view as the screen's first scrollable descendant, `contentInsetAdjustmentBehavior="automatic"`, no `headerTransparent`. Those are the mistakes that broke v2.
+   - **Android.** The same screen with react-native-screens' experimental stack (`react-native-screens/experimental`, header `type: 'large'` and `'medium'`) on an emulator. Check the collapse on scroll, the back behaviour, the tabs, and the status bar.
+   - If the experimental stack is not solid enough, use the classic native stack's small top app bar on Android. Write down which, and why.
+   - **Evidence:** screen recordings on both platforms (`xcrun simctl io booted recordVideo`, `adb shell screenrecord`) plus screenshots at rest and collapsed, committed in `docs/spikes/`.
+2. **Expo SDK 58 build:** with Xcode 27 if it is installed, else Xcode 26.6. The app must launch on the newest simulator runtime available.
+3. **Grouped lists, section headers and footnotes** drawn to match the v1 captures' content and polish, at the default Dynamic Type size and at a large one, on iOS and Android.
+4. **HealthKit:** read sleep and workouts seeded into the simulator.
+5. **Location visits (custom Expo module):** what the simulator can fake; what needs a real iPhone, which is MoOx's.
+6. **On-device categorisation:**
    - `expo-ai` / Foundation Models on a batch of real-looking titles, in French and English.
    - The fallback without a model.
 
 For each spike, write a short note in `docs/spikes/`: the question, what was tried, the
-evidence (screenshots, logs), the verdict. A failed spike is a result. Update the spec if
-a verdict changes it.
+evidence, the verdict. A failed spike is a result. Update the spec if a verdict changes it.
 
 **Done when:** every spike has a verdict and the spec reflects them.
 
 ---
 
-## Step 6 — Build, slice by slice
+## Step 5 — Build, slice by slice
 
 - [ ] **Done:**
 
-Follow `docs/spec/60-slices.md`. Each slice:
+Follow `docs/spec/60-slices.md`. **Slice 0** is the fresh Expo SDK 58 scaffold (D12), with:
+- `src/domain` and its tests ported.
+- The offline checks (`scripts/check-*`) and `npm run check`.
+- The TestFlight workflow and fastlane config carried over, plus the Maestro setup.
+
+Each slice:
 - Is built.
-- Is checked on the simulator with Maestro screenshots, compared with the v1 references.
+- Is checked on the simulator and emulator with Maestro screenshots, compared with the v1 references for content and with the platform for headers and navigation.
 - Is committed with that evidence.
 
 Send MoOx a TestFlight build (`[testflight]` in the commit message) only at the

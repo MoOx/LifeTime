@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Capture every v1 screen natively, in light then dark, by running the Maestro flows in
-# .maestro/v1/ against a freshly erased "LifeTime v1" simulator. Scroll videos are
-# recorded in the light pass only. Run scripts/v1/build.sh first.
+# .maestro/v1/ against a freshly erased "LifeTime v1" simulator. Run scripts/v1/build.sh
+# first. Scroll videos are off: v1's header is a hand-built replica the new app does not
+# copy (INTENT.md D10). V1_RECORD=1 records them anyway, in the light pass.
 #
 #   scripts/v1/capture.sh                  both appearances, all flows
 #   V1_MODES=light scripts/v1/capture.sh   one appearance
@@ -35,7 +36,7 @@ for MODE in ${V1_MODES:-light dark}; do
   xcrun simctl install "$UDID" "$APP"
 
   mkdir -p "$OUT_ROOT/$MODE" "$OUT_ROOT/video"
-  RECORD=0; [ "$MODE" = light ] && RECORD=1
+  RECORD=0; [ "${V1_RECORD:-0}" = 1 ] && [ "$MODE" = light ] && RECORD=1
 
   for flow in "$FLOWS_DIR"/${V1_FLOWS:-0}*.yaml; do
     step "$(basename "$flow")"

@@ -31,6 +31,9 @@ Never stop just to report progress; a summary at the end of the run is enough.
 - **Cited or absent.** Behaviour carried over from v1 points to its v1 source
   (`git show main:<path>`); anything new says why it differs.
 - **Spike before building on a native assumption** — prove it on a simulator first.
+- **Headers and navigation are the platform's own** (INTENT.md D10): the iOS large title
+  collapsing into the navigation bar as in Mail; the Material 3 equivalent on Android.
+  Never a hand-built imitation — v1's was one, and it is not the reference for this.
 - **Record decisions** in INTENT.md §4 the moment they are taken.
 - Install user-space tools freely (npm packages, `fnm`, Maestro, Homebrew formulae).
   Ask MoOx — in the single batched message — before anything that needs his password,
@@ -46,7 +49,7 @@ Never stop just to report progress; a summary at the end of the run is enough.
 | `docs/SPEC.md`, `docs/SCREENS.md` | What v1 does, and its screens in detail |
 | `docs/reference/v1/` | Native captures of v1, and how v1 was rebuilt to take them |
 | `src/domain/` | Tested TypeScript domain logic, candidate for reuse |
-| `app/`, `src/ui`, `src/features` | The v2 UI attempt — to be replaced from the spec |
+| `app/`, `src/ui`, `src/features` | The v2 UI attempt — a quarry, not a base: the new app starts from a fresh Expo SDK 58 scaffold (INTENT.md D12) |
 | `.maestro/` | Maestro flows (native screenshots and navigation checks) |
 | `scripts/v1/` | Rebuilding and capturing v1 from the `main` branch |
 | `main` branch | v1 source (React Native 0.67 + ReScript 9) |

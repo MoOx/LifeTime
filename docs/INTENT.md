@@ -166,13 +166,16 @@ particular — where v1, for all its dated code, was visually very clean.
 |---|---|---|
 | D1 | Keep the domain logic that still makes sense, in TypeScript, with its tests (`src/domain/*`) — re-validated against the new spec, not carried over blindly. | MoOx, 2026-11-08 |
 | D2 | Rebuild the UI from the spec. | MoOx, 2026-11-08 |
-| D3 | The visual bar is **v1's cleanliness, rendered with native components**. Navigation and header / large-title behaviour are specified screen by screen and checked on a native renderer before MoOx sees a build. | MoOx's diagnosis + method |
+| D3 | The visual bar is **v1's cleanliness, rendered with native components**: v1's captures set the standard for content, hierarchy, spacing and polish. Navigation and headers are *not* copied from v1 — see D10. Everything is checked on a native renderer before MoOx sees a build. | MoOx's diagnosis + method |
 | D4 | Local first. Cloud sources only where the gain is large *and* broad; each source states its own privacy claim. Strava is out (niche). | MoOx, 2026-11-08 |
 | D5 | The calendar is one source among others. The product framing is decided after [DATA-SOURCES.md](./DATA-SOURCES.md). | MoOx, 2026-11-08 |
 | D6 | Vision in two steps: (1) a weekly overview with minimal manual logging; (2) later, recommendations against goals and constraints. | MoOx, 2026-11-08 |
 | D7 | iOS first (MoOx tests on an iPhone), Android to parity, web for the demo. | *default* |
 | D8 | Native building and verification run in a Claude Code session on MoOx's Mac, driven by [NEXT.md](./NEXT.md) through a plain "continue" ([CLAUDE.md](../CLAUDE.md)); CI only for releases. | MoOx, 2026-11-08 — « Prépare tout ce que tu peux sur une branche, y compris un fichier pour que j'ai juste à lancer un simple prompt "continue" depuis ma machine » |
-| D9 | The visual reference is **v1 itself, rebuilt from `main` and captured natively by Claude** in the iOS Simulator, light and dark, at rest and while scrolling. `LifeTime.sketch` holds only the icon, splash and Play Store graphic — no screens. | MoOx, 2026-11-08 — « Ca serait encore plus précis si tu captures toi même ce qui semble pertinent » |
+| D9 | The visual reference is **v1 itself, rebuilt from `main` and captured natively by Claude** in the iOS Simulator, light and dark. `LifeTime.sketch` holds only the icon, splash and Play Store graphic — no screens. | MoOx, 2026-11-08 — « Ca serait encore plus précis si tu captures toi même ce qui semble pertinent » |
+| D10 | **Headers are the platform's own, not v1's replica.** v1 hand-built an iOS-style large title that turned into a small sticky title. That is replaced by the real thing:<br>• **iOS:** the system large title collapsing into the navigation bar on scroll, as in Mail. The native stack's `headerLargeTitle` (react-native-screens, used by expo-router's `Stack`) is UIKit's own behaviour. v2's header bugs came from misusing it (`headerTransparent` combined with large titles), not from the tool.<br>• **Android:** the Material 3 equivalent, a medium or large top app bar collapsing to the small one on scroll. As of Nov 2026 it exists only in react-native-screens' *experimental* stack (4.30, `react-native-screens/experimental`, header `type: 'small' \| 'medium' \| 'large'`). expo-router 58 wraps that stack but does not expose the type, and `@expo/ui`'s Compose `TopAppBar` is the small fixed bar only. Spike it. If it is not solid, use the standard small top app bar, which is also native. Never a hand-built imitation. | MoOx, 2026-11-08 — « je ne cherche pas spécialement le comportement de ma v1 pour les titres. Je veux au contraire quelque chose qui fait le plus natif possible [...] comme l'app iOS Mail. Et un équivalent android qui aurait du sens. » Library facts: read in the published packages, `react-native-screens` 4.30.1, `expo-router` 58.0.30, `@expo/ui` 58.0.27 |
+| D11 | The v2 attempt is not captured or diffed. | MoOx, 2026-11-08 — « Pas besoin de capturer la v2. » |
+| D12 | **The new app starts from a clean Expo SDK 58 scaffold.** The existing code is a quarry, not a base. What has proven itself is carried over deliberately: `src/domain` with its tests, the TestFlight pipeline and the offline checks (`scripts/check-*`). The rest is carried over piece by piece, once a spike shows it renders correctly natively. | MoOx, 2026-11-08 — « on pourrait repartir de 0 pour la v2 meme si je pense que l'existant de cette session est un bon début. » |
 
 ---
 
@@ -216,6 +219,9 @@ particular — where v1, for all its dated code, was visually very clean.
   Alternatively, a cloud session can drive the Mac through Remote Control once a LifeTime
   folder is offered to cloud sessions (Claude desktop app → Settings → Claude Code →
   Remote Control); that is not available to every account yet.
+- **MoOx's Mac** has Xcode 26.6 at `/Applications/Xcode-26.6.0.app` (installed with
+  `xcodes`), so v1 can be built against the iOS 26 SDK, where the UIScene rule does not
+  apply.
 - **Release pipeline:** `.github/workflows/ios-testflight.yml` (fastlane match against
   `MoOx/certificates`), pinned to Xcode 26.6 until the app adopts the UIScene life cycle
   required by the iOS 27 SDK.

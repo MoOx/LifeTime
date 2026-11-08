@@ -14,7 +14,7 @@ use_node16
 UDID="$(v1_device)"
 step "Simulator: $DEVICE_NAME ($UDID)"
 
-step "xcodebuild (log: $WT/xcodebuild.log)"
+step "xcodebuild with $(xcodebuild -version | head -1) (log: $WT/xcodebuild.log)"
 cd "$WT"
 export SENTRY_DISABLE_AUTO_UPLOAD=true   # v1's Sentry symbol upload has no credentials here
 xcodebuild \
