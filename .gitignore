@@ -62,3 +62,7 @@ fastlane/test_output
 
 # Web preview harness output — regenerate with `npm run preview`
 .preview/
+
+# Deep-research working notes; the synthesised result is committed under docs/
+research_notes/
+reports/
