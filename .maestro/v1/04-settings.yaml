@@ -1,0 +1,66 @@
+# Settings (top, scrolling, bottom), Notifications, and Help with its "Learn More" block.
+# Theme rows are deliberately not tapped: choosing Light or Dark in v1 would override the
+# simulator appearance that capture.sh sets for each pass.
+appId: io.moox.LifeTime
+---
+- launchApp
+- tapOn:
+    id: "tabSettings"
+- scrollUntilVisible:
+    element:
+      text: "Notifications"
+    direction: UP
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/30-settings-top
+
+- runFlow:
+    when:
+      true: ${RECORD == "1"}
+    commands:
+      - startRecording: ${VIDEO}/31-settings-scroll
+      - swipe:
+          start: "50%, 75%"
+          end: "50%, 35%"
+          duration: 1500
+      - swipe:
+          start: "50%, 35%"
+          end: "50%, 75%"
+          duration: 1500
+      - stopRecording
+
+- scrollUntilVisible:
+    element:
+      id: "Settings_To_SettingsDangerZoneScreen"
+    direction: DOWN
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/32-settings-bottom
+
+- scrollUntilVisible:
+    element:
+      text: "Notifications"
+    direction: UP
+- tapOn: "Notifications"
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/33-notifications
+- tapOn:
+    id: "tabSettings"
+- waitForAnimationToEnd
+
+- scrollUntilVisible:
+    element:
+      text: "Help"
+    direction: DOWN
+- tapOn: "Help"
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/34-help
+- scrollUntilVisible:
+    element:
+      text: "Learn More about how to use your calendar app"
+    direction: DOWN
+- tapOn: "Learn More about how to use your calendar app"
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/35-help-learn-more
+- swipe:
+    start: "50%, 15%"
+    end: "50%, 95%"
+- waitForAnimationToEnd

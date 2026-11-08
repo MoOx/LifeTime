@@ -1,0 +1,126 @@
+# Inject v1's own demo calendar, categorise activities exactly as v1's App Store
+# screenshot flow did (e2e/demo.e2e.js), then capture the home in every state worth
+# keeping — including a video of its sticky header while scrolling — plus Filters.
+appId: io.moox.LifeTime
+---
+- launchApp:
+    permissions:
+      calendar: allow
+      notifications: allow
+
+- tapOn:
+    id: "tabSettings"
+- scrollUntilVisible:
+    element:
+      id: "Settings_To_SettingsDangerZoneScreen"
+    direction: DOWN
+- tapOn:
+    id: "Settings_To_SettingsDangerZoneScreen"
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/10-danger-zone
+- tapOn:
+    id: "SettingsDangerZone_CalendarInject"
+- tapOn: "Inject"
+- waitForAnimationToEnd:
+    timeout: 6000
+- tapOn:
+    id: "tabSettings"
+
+- tapOn:
+    id: "tabSummary"
+# Pull to refresh so the injected events are read.
+- swipe:
+    start: "50%, 30%"
+    end: "50%, 85%"
+    duration: 800
+- extendedWaitUntil:
+    visible:
+      id: "TopActivities_Sleep"
+    timeout: 15000
+
+# v1's flow categorises on the previous, complete week.
+- swipe:
+    from:
+      id: "Home_ScrollView_WeeklyGraph"
+    direction: RIGHT
+- waitForAnimationToEnd
+- runFlow: { file: _categorise.yaml, env: { ACTIVITY: "Sleep", CATEGORY: "rest", SHOT: "1" } }
+- runFlow: { file: _categorise.yaml, env: { ACTIVITY: "Work", CATEGORY: "work", SHOT: "0" } }
+- runFlow: { file: _categorise.yaml, env: { ACTIVITY: "Dinner", CATEGORY: "food", SHOT: "0" } }
+- runFlow: { file: _categorise.yaml, env: { ACTIVITY: "Lunch", CATEGORY: "food", SHOT: "0" } }
+- runFlow: { file: _categorise.yaml, env: { ACTIVITY: "Meditation", CATEGORY: "self", SHOT: "0" } }
+- runFlow: { file: _categorise.yaml, env: { ACTIVITY: "Appointment with dentist", CATEGORY: "self", SHOT: "0" } }
+- runFlow: { file: _categorise.yaml, env: { ACTIVITY: "Evening with Jane & John", CATEGORY: "social", SHOT: "0" } }
+- runFlow: { file: _categorise.yaml, env: { ACTIVITY: "CrossFit", CATEGORY: "exercise", SHOT: "0" } }
+
+# Back to the top, on the current week.
+- scrollUntilVisible:
+    element:
+      id: "Home_TitlePre"
+    direction: UP
+- tapOn:
+    text: "Show This Week"
+    optional: true
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/12-home-top
+
+- runFlow:
+    when:
+      true: ${RECORD == "1"}
+    commands:
+      - startRecording: ${VIDEO}/13-home-scroll
+      - swipe:
+          start: "50%, 75%"
+          end: "50%, 35%"
+          duration: 1500
+      - swipe:
+          start: "50%, 75%"
+          end: "50%, 35%"
+          duration: 1500
+      - swipe:
+          start: "50%, 35%"
+          end: "50%, 75%"
+          duration: 1500
+      - swipe:
+          start: "50%, 35%"
+          end: "50%, 75%"
+          duration: 1500
+      - stopRecording
+
+- swipe:
+    start: "50%, 75%"
+    end: "50%, 40%"
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/14-home-scrolled
+- scroll
+- scroll
+- scroll
+- scroll
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/15-home-bottom
+
+- scrollUntilVisible:
+    element:
+      id: "Home_TitlePre"
+    direction: UP
+- swipe:
+    from:
+      id: "Home_ScrollView_WeeklyGraph"
+    direction: RIGHT
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/16-home-previous-week
+- tapOn:
+    text: "Show This Week"
+    optional: true
+
+- scrollUntilVisible:
+    element:
+      text: "Customize report"
+    direction: DOWN
+- tapOn: "Customize report"
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/17-filters
+- swipe:
+    start: "50%, 15%"
+    end: "50%, 95%"
+- waitForAnimationToEnd

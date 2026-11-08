@@ -46,6 +46,23 @@ In order:
 Whether a week can be described without the calendar is a factual question, answered
 source by source in [DATA-SOURCES.md](./DATA-SOURCES.md) — not a branding choice.
 
+**What that research found (2026-11-08).** MoOx's fear is justified, in a narrower form
+than "too thin":
+- Local sources put a time boundary around most of a week. But they can *name* only
+  about half of it, and only on a well-equipped phone. In a worked example (assumed
+  hours, not measured):
+  - iPhone + Apple Watch: about 57% of the 168 hours.
+  - Android + wearable: 41%, and 65% with background location.
+  - Phone alone: 8–24%.
+- The named hours fall in Rest, Exercise, Work at a named place and, on Android or in the
+  EU, phone use. **Nutrition, Social, Self-care and Chores stay almost invisible.**
+- The report's framing: **sensors give the skeleton, the calendar gives the meaning.**
+  - The calendar is the semantic layer, and the sensors audit it. "You planned three gym
+    sessions; your watch saw one" is a recommendation neither source can make alone, and
+    it fits vision step 2 with no cloud and no model.
+- The largest share of an iPhone week is **located but unlabelled**. Cheap, learned rules
+  ("Gym → Exercise") matter more than more sensors.
+
 ---
 
 ## 2. What MoOx asked for
@@ -154,7 +171,8 @@ particular — where v1, for all its dated code, was visually very clean.
 | D5 | The calendar is one source among others. The product framing is decided after [DATA-SOURCES.md](./DATA-SOURCES.md). | MoOx, 2026-11-08 |
 | D6 | Vision in two steps: (1) a weekly overview with minimal manual logging; (2) later, recommendations against goals and constraints. | MoOx, 2026-11-08 |
 | D7 | iOS first (MoOx tests on an iPhone), Android to parity, web for the demo. | *default* |
-| D8 | Specs and research in the cloud session; native building and verification in a session that has simulators (see §6); CI only for releases. | *proposed* 2026-11-08 |
+| D8 | Native building and verification run in a Claude Code session on MoOx's Mac, driven by [NEXT.md](./NEXT.md) through a plain "continue" ([CLAUDE.md](../CLAUDE.md)); CI only for releases. | MoOx, 2026-11-08 — « Prépare tout ce que tu peux sur une branche, y compris un fichier pour que j'ai juste à lancer un simple prompt "continue" depuis ma machine » |
+| D9 | The visual reference is **v1 itself, rebuilt from `main` and captured natively by Claude** in the iOS Simulator, light and dark, at rest and while scrolling. `LifeTime.sketch` holds only the icon, splash and Play Store graphic — no screens. | MoOx, 2026-11-08 — « Ca serait encore plus précis si tu captures toi même ce qui semble pertinent » |
 
 ---
 
@@ -206,11 +224,21 @@ particular — where v1, for all its dated code, was visually very clean.
 
 ## 7. Open items
 
-- **v1 visual references are missing.** The v1 screenshots MoOx shared were chat
-  attachments and are gone; none are in the repository. Needed for D3, ideally under
-  `docs/reference/v1/`.
+- **v1 visual references:** to be captured, per D9 — steps 1–2 of [NEXT.md](./NEXT.md).
 - **Home refresh:** keep pull-to-refresh, or a "Refresh" action next to "Updated …"?
-- **Product framing** once [DATA-SOURCES.md](./DATA-SOURCES.md) is in.
+- **Product framing:** adopt "sensors give the skeleton, the calendar gives the meaning"?
+  For the spec's question batch.
+- **Timeline states the model lacks:** "located but unlabelled" time, and commutes, which
+  fit none of the eight categories (a Transport category, or Uncategorized?).
+- **Platform-specific first sources:** iOS HealthKit + visits; Android Health Connect +
+  usage events, deferring background location until the core passes Play review.
+- **Policy timing:** HealthKit and Core Motion only for visible health and fitness
+  purposes; Screen Time only for device-usage management, with the Family Controls
+  entitlement requested months ahead if wanted (EU-only data).
+- **[CATEGORISATION.md](./CATEGORISATION.md) is outdated on two points:**
+  - Apple's on-device model has a 4,096-token window, so titles go in batches of about
+    20–40 per session, not one session for all titles.
+  - `expo-ai` 0.2.0 (alpha) now exposes the on-device models from Expo.
 - **Recommendations** (vision step 2): scope and timing.
 
 ---

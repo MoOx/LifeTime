@@ -1,0 +1,23 @@
+# Sub-flow: open one activity from Top Activities, give it a category, return to Summary.
+# Env: ACTIVITY (its title), CATEGORY (a category id), SHOT ("1" to capture the screen).
+appId: io.moox.LifeTime
+---
+- scrollUntilVisible:
+    element:
+      id: "TopActivities_${ACTIVITY}"
+    direction: DOWN
+- tapOn:
+    id: "TopActivities_${ACTIVITY}"
+- waitForAnimationToEnd
+- tapOn:
+    id: "ActivityOption_Category_${CATEGORY}"
+- runFlow:
+    when:
+      true: ${SHOT == "1"}
+    commands:
+      - waitForAnimationToEnd
+      - takeScreenshot: ${OUT}/11-activity-options
+# Tapping the active tab pops its stack to the root (React Navigation's default).
+- tapOn:
+    id: "tabSummary"
+- waitForAnimationToEnd

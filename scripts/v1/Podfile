@@ -1,0 +1,61 @@
+# v1's ios/Podfile (main branch), patched only so React Native 0.67 builds with a 2026
+# Xcode. Copied over the worktree's Podfile by scripts/v1/setup.sh — never committed to
+# main. Every change is explained in docs/reference/v1/BUILD.md.
+
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+# Was '11.0'. Current Xcode releases refuse deployment targets that old.
+V1_DEPLOYMENT_TARGET = '15.1'
+platform :ios, V1_DEPLOYMENT_TARGET
+
+target 'LifeTime' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :hermes_enabled => true
+  )
+
+  # https://github.com/react-native-community/react-native-permissions
+  permissions_path = '../node_modules/react-native-permissions/ios'
+  pod 'Permission-Calendars', :path => "#{permissions_path}/Calendars"
+  pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications"
+
+  target 'LifeTimeTests' do
+    inherit! :complete
+  end
+
+  # `use_flipper!()` removed: Flipper does not compile with Xcode 15+ and is debug-only.
+
+  post_install do |installer|
+    react_native_post_install(installer)
+
+    # v1's own M1 fix (https://github.com/facebook/react-native/issues/31941), unchanged.
+    installer.aggregate_targets.each do |aggregate_target|
+      aggregate_target.user_project.native_targets.each do |target|
+        target.build_configurations.each do |config|
+          config.build_settings['LIBRARY_SEARCH_PATHS'] = ['$(SDKROOT)/usr/lib/swift', '$(inherited)']
+        end
+      end
+      aggregate_target.user_project.save
+    end
+
+    __apply_Xcode_12_5_M1_post_install_workaround(installer)
+
+    # Must come after React Native's hooks above, which pin pods to an old target.
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = V1_DEPLOYMENT_TARGET
+        # Build only the simulator's own architecture (arm64 on Apple silicon).
+        config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+        # libc++ removed std::unary_function / binary_function in C++17 mode (Xcode 15+);
+        # boost 1.76 and folly still use them.
+        defs = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] || ['$(inherited)']
+        defs = [defs] if defs.is_a?(String)
+        defs << '_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION'
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = defs
+      end
+    end
+  end
+end

@@ -1,0 +1,96 @@
+# The three goals v1's App Store screenshots showed (e2e/demo.e2e.js), the goals list with
+# its rings, editing a goal, and a scroll video.
+appId: io.moox.LifeTime
+---
+- launchApp
+- tapOn:
+    id: "tabGoals"
+- waitForAnimationToEnd
+
+# 1. "Sleep" — a goal, duration set with the slider, category Rest.
+- tapOn:
+    id: "Goals_Button_AddAGoal"
+- tapOn:
+    id: "GoalEdit_title"
+- inputText: "Sleep"
+- pressKey: Enter
+- swipe:
+    from:
+      id: "GoalEdit_durationSlider"
+    direction: RIGHT
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/20-goal-new-filled
+- scrollUntilVisible:
+    element:
+      id: "GoalEdit_category_bullet_rest"
+    direction: DOWN
+- tapOn:
+    id: "GoalEdit_category_bullet_rest"
+- tapOn:
+    id: "GoalNewModalScreen_Button_Add"
+
+# 2. "Workout" — 30 min, Exercise.
+- tapOn:
+    id: "Goals_Button_AddAGoal"
+- tapOn:
+    id: "GoalEdit_title"
+- inputText: "Workout"
+- pressKey: Enter
+- tapOn:
+    id: "GoalEdit_quickDuration_30"
+- scrollUntilVisible:
+    element:
+      id: "GoalEdit_category_bullet_exercise"
+    direction: DOWN
+- tapOn:
+    id: "GoalEdit_category_bullet_exercise"
+- tapOn:
+    id: "GoalNewModalScreen_Button_Add"
+
+# 3. "Don't Play Too Much" — a limit, 60 min, Entertainment.
+- tapOn:
+    id: "Goals_Button_AddAGoal"
+- tapOn:
+    id: "GoalEdit_title"
+- inputText: "Don't Play Too Much"
+- pressKey: Enter
+- tapOn:
+    id: "GoalEdit_type_limit"
+- tapOn:
+    id: "GoalEdit_quickDuration_60"
+- scrollUntilVisible:
+    element:
+      id: "GoalEdit_category_bullet_fun"
+    direction: DOWN
+- tapOn:
+    id: "GoalEdit_category_bullet_fun"
+- tapOn:
+    id: "GoalNewModalScreen_Button_Add"
+
+# Rings animate in; let them settle.
+- waitForAnimationToEnd:
+    timeout: 4000
+- takeScreenshot: ${OUT}/21-goals-list
+
+- runFlow:
+    when:
+      true: ${RECORD == "1"}
+    commands:
+      - startRecording: ${VIDEO}/23-goals-scroll
+      - swipe:
+          start: "50%, 75%"
+          end: "50%, 35%"
+          duration: 1500
+      - swipe:
+          start: "50%, 35%"
+          end: "50%, 75%"
+          duration: 1500
+      - stopRecording
+
+- tapOn: "Workout"
+- waitForAnimationToEnd
+- takeScreenshot: ${OUT}/22-goal-edit
+- swipe:
+    start: "50%, 15%"
+    end: "50%, 95%"
+- waitForAnimationToEnd
