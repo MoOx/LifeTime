@@ -18,9 +18,9 @@
 
 ---
 
-## Step 0 — Inventory the Mac and get the tools in place
+## Step 0: Inventory the Mac and get the tools in place
 
-- [ ] **Done:**
+- [x] **Done:** 2026-11-09. Machine recorded in `docs/reference/v1/BUILD.md`. Xcode 26.6, iOS 26.5 runtime, Node 16 (fnm), CocoaPods 1.17, Maestro 2.12.1, Rosetta and Android Studio were all present; nothing had to be installed. Xcode 27.2 is also present. Watch the disk: 41 GiB free.
 
 **Goal:** know what is installed, and get everything missing in one request to MoOx.
 

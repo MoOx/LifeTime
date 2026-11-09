@@ -7,7 +7,24 @@ screenshots of it**. Nothing here is committed to `main`; every patch lives in t
 
 ## Machine
 
-*To be filled in by step 0 of [NEXT.md](../../NEXT.md).*
+Inventory taken on 2026-11-09 (step 0 of [NEXT.md](../../NEXT.md)).
+
+| Item | Value |
+|---|---|
+| macOS | 27.3 (26C5035r), arm64 |
+| Disk | 926 GiB, **41 GiB free (96% used)**; Xcode DerivedData alone holds 43 GiB |
+| Xcode | `/Applications/Xcode.app` 27.2 (27B52, the `xcode-select` default) and `/Applications/Xcode-26.6.0.app` 26.6 (17F113) |
+| iOS simulator runtimes | 18.4, 26.5 (23F77), 27.0, 27.1 |
+| iPhone device types | iPhone 17 Pro available (the `LifeTime v1` simulator uses it) |
+| Node | 26.3.1 by default, through `fnm`; 16.13.2 and 16.14.2 and several 22/24 also installed |
+| Ruby | 2.6.10 (system) |
+| CocoaPods | 1.17.0. It wants `LANG=en_US.UTF-8` and warns about unbuilt gem extensions, harmlessly |
+| Maestro | 2.12.1 |
+| Java | OpenJDK 21.0.13 |
+| Rosetta 2 | installed |
+| Android | Android Studio, `emulator` and `adb` present; arm64 images for API 35, 36 and 37.2 beta 3; AVDs `Lyv_E2E_1` and `htn-pixel` (other projects') |
+
+Everything steps 1 and 2 need is present; nothing had to be installed.
 
 ## Toolchain that worked
 
