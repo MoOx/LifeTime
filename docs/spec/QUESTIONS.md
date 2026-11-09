@@ -30,13 +30,11 @@ wrong:
 - Double counting ends: an overlap is counted once. Your totals will be lower than v1's
   where events overlap.
 
-## Status after MoOx's first answers (2026-11-09)
+## Closed (2026-11-09)
 
-Decided, recorded in INTENT.md: Q4 (D13), Q6 (D7), Q7 (D19), Q8 (D20), Q9 (D15), Q10 (D16),
-Q11 (D17), Q13 (D18), and the manual half of Q5 (D14).
-
-Still under discussion: Q1 (a v2-alpha1 close to v1, then sleep and sport, then rethink the
-UI), Q2 (sensors should not be presented as primary: someone working and training at home
-gives them little), Q3 (a commute is a mode, not an activity: reading on the train, cycling
-to work), Q5 (counting past events as time spent), Q12, and overlaps. The spec still assumes
-the defaults on these and will be revised once they are settled.
+All answered, and recorded in INTENT.md §4: Q1 (D21), Q2 (D22, D24), Q3 and overlaps (D23),
+Q4 (D13), Q5 (D14; a past event counts, 10-model.md), Q6 (D7), Q7 (D19), Q8 (D20), Q9 (D15),
+Q10 (D16), Q11 (D17), Q12 (out, 00-overview.md), Q13 (D18). The defaults in the table above are
+kept as history; where they differ, the spec and INTENT.md prevail. Assumed points changed
+since: chart stacking follows the week's totals (D25), and overlaps are D23, not a single
+count.

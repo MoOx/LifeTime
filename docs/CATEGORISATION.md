@@ -108,6 +108,14 @@ vanish under the user's thumb and the remaining count jump around.
 
 ---
 
+### 3.1 A rule from a selection
+
+Select several rows or events; the app deduces one rule that also applies to future events
+(MoOx, 2026-11-09; algorithm in `docs/spec/10-model.md`). The user sees the pattern, can change
+its mode, and sees what else it would claim before applying it.
+
+---
+
 ## 4. Where the on-device model goes
 
 > "à terme, idéalement des propositions en utilisant un llm local qui pourrait proposer

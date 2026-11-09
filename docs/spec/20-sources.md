@@ -5,6 +5,9 @@ app does with them. Each source implements one interface and owns its own privac
 ([SCREENS.md](../SCREENS.md) §12): "nothing leaves this device" is attached to the source,
 not written once for the whole app.
 
+**Alpha1 has Demo and Calendar. Alpha2 adds HealthKit. Health Connect comes with the Android
+pass.**
+
 ```ts
 interface Source {
   id: SourceId
@@ -32,10 +35,9 @@ system prompt appears only after the user taps it.
 
 ## Calendar (iOS, Android)
 
-- **Reads:** title, start, end, all-day, calendar id, availability, and the user's own
-  attendee status where the platform gives it. Six weeks back, one forward.
-- **When:** on app launch, on return to the foreground, on pull to refresh (see
-  [QUESTIONS.md](./QUESTIONS.md) Q4), and on the platform's event-store change signal.
+- **Reads:** title, start, end, all-day, calendar id. Six weeks back, one forward.
+- **When:** on app launch, on return to the foreground, and on the platform's event-store
+  change signal. Always up to date, with no refresh action (D13).
 - **Permission:** iOS full access; Android `READ_CALENDAR`. Never write access.
 - **Privacy statement:** `Your calendars stay on this device. LifeTime only reads them.`
   v1's "mostly read-only" hedge goes ([SCREENS.md](../SCREENS.md) §9).
@@ -55,6 +57,7 @@ system prompt appears only after the user taps it.
   screen.
 - **Privacy statement:** `Your sleep and workouts stay on this device.`
 - **Failures that must be designed for:**
+  - Same session in the calendar and the store: counted once ([10-model.md](./10-model.md)).
   - A denied read looks like no data. Never display "no exercise": the Sources row says
     `No workouts found. Check access in the Health app.` with a link.
   - iOS 27 limited history: weeks before `earliestAuthorizedSampleDate` are labelled unknown,

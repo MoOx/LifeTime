@@ -19,8 +19,10 @@ It decides what the first release is, from what MoOx asked for, the research in
 
 LifeTime shows how your week was spent, with as little manual logging as possible, using
 only what is already on your phone, and helps you keep the goals and limits you set. Sensors
-give the week its skeleton (when you slept, trained, were somewhere); the calendar gives it
-its meaning (what you were doing). What the app does not know, it says it does not know.
+add what they measure with certainty (when you slept, trained); the calendar gives the week
+its meaning (what you were doing). The calendar stays the primary source: someone who works
+and trains at home gives sensors little to see, and the app must be good with the calendar
+alone. The app shows what you do, not what it could not see.
 
 ## The two-step vision (D6)
 
@@ -29,41 +31,40 @@ its meaning (what you were doing). What the app does not know, it says it does n
    constraints. This release only prepares for it: the model keeps the planned-versus-observed
    distinction that step 2 needs ("you planned three gym sessions; your watch saw one").
 
-## First release
+## Release plan (D21)
 
-The first release is **v1's product, rebuilt natively, plus the first automatic sources**.
+Each step is small enough to use for real before deciding the next one.
 
-**Sources**
-- Calendar on iOS and Android, as in v1.
-- iOS: HealthKit sleep and workouts.
-- Android: Health Connect sleep and exercise.
-- Demo data, shown before any permission is requested.
+| Release | Content |
+|---|---|
+| **v2-alpha1** | v1's product brought up to date on iOS: calendar only, existing domain logic, all v1 screens, the Sorter, demo data before any permission |
+| **v2-alpha2** | Sleep and workouts (HealthKit), the observation model and the overlap rules, the Sources screen |
+| **Then** | Android pass (D7); rethink the interface around automation, from what real weeks showed |
 
-**Screens:** every v1 screen (Welcome, Summary, Activity detail, Filters, Goals, Goal editor,
-Settings, Notifications, Reset, Help, Privacy), plus two new ones: the Sorter, which
-categorises in bulk, and Sources.
-
-**Categorisation:** text and calendar rules, the Sorter, keyword suggestions, and the magic
-wand on devices that have an on-device model, if spike 6 passes.
+Sleep and workouts change the visuals little: they are new blocks in the same chart. The
+interface is deliberately not rethought yet. Automation should move the app from "sort your
+list" towards "here is your week, fix what is wrong", but what automation really names on real
+weeks must be known first. So alpha1 puts its care in what survives a redesign: navigation,
+native headers, lists, chart, rings.
 
 **Quality bar:** v1's content, hierarchy and polish, as captured; headers and navigation that
 are the platform's own (D10); every screen checked on a native renderer before MoOx sees it.
 
-## Deliberately out of the first release
+## Deliberately out of alpha1 and alpha2
 
 | Out | Why | When |
 |---|---|---|
-| Location visits and geofences | High value on iOS, but requires a real device for every check, has an open iOS 26 delivery regression, and is what makes "located but unlabelled" time appear. The model is ready for it | First follow-up, after a week of field testing on MoOx's iPhone |
-| Core Motion and Android activity transitions | Depend on a custom module and give boundaries without labels; worth little before places exist | With visits |
-| Android UsageStats | Strongest Android-only source, needs a custom module and a disclosure screen | Second follow-up, once the core passes Play review |
-| Screen Time | Only useful in the EU, entitlement wait of weeks, "personal device usage management" positioning required | Only if MoOx files the request ([QUESTIONS.md](./QUESTIONS.md) Q7) |
-| Android background location | Hardest review in the inventory; rules tighten on 27 January 2027 | After the core is approved |
-| Focus filters, Shortcuts recipes | Exact but need user setup, one signal at a time | Later, on request |
-| Cloud sources | Google Calendar and Microsoft Graph matter mainly for the web demo. Strava is out (D4) | With the web demo, deferred |
-| Web target | Deferred by MoOx ([INTENT.md](../INTENT.md) §2.2) | After the native release |
-| Recommendations | Vision step 2 | Later |
+| Android | iOS first (D7) | A dedicated pass after alpha2 |
+| Magic wand (on-device model) | Keywords, rules and the Sorter come first | After alpha2 |
+| Location visits, geofences | Need a real device for every check and have an open iOS 26 delivery regression | After alpha2, with field testing |
+| Core Motion, activity transitions | Boundaries without labels; worth little before places | With visits |
+| Android UsageStats | Custom module and disclosure screen | After the Android pass |
+| Screen Time | EU-only data; not urgent (D19) | Later |
+| Focus filters, Shortcuts recipes | User setup, one signal at a time | On request |
+| Cloud sources, web target | Deferred by MoOx. Strava is out (D4) | Later |
+| Recommendations | Vision step 2 | After the interface rethink |
 | Periods other than the week for goals | v1 stored them and never honoured them | Not planned |
-| User-defined categories | Not asked for; the data shape allows it | Not planned |
+| User-defined categories | MoOx raised someone tracking both Transport and reading; to revisit with alpha2's overlap rules | To discuss |
 
 ## What success looks like
 
@@ -71,5 +72,5 @@ are the platform's own (D10); every screen checked on a native renderer before M
 - After granting access, a real week appears, and one action categorises most of it.
 - MoOx, comparing with the v1 captures, finds the screens as clean as v1 was, and finds
   nothing wrong with titles on scroll or with navigation.
-- No claim in the app is unproven: a number is either measured, or labelled as a guess, or
-  counted as unaccounted.
+- No claim in the app is unproven: a number is either measured or stated by a source, and a
+  guess is labelled as one.

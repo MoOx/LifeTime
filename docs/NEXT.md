@@ -110,9 +110,7 @@ saying why not, all committed under `docs/reference/v1/ios/`.
 
 ## Step 3: Write the product spec (phase 2)
 
-- [ ] **Done:**
-
-**Status, 2026-11-09: written, waiting for MoOx.** `docs/spec/` is committed and CATEGORISATION.md is updated on the two points of INTENT.md §7. The step is done once MoOx has answered `docs/spec/QUESTIONS.md`; record the answers in INTENT.md §4 and in the spec, tick this, then go on to step 4.
+- [x] **Done:** 2026-11-09. `docs/spec/` committed and revised after MoOx's answers, recorded in INTENT.md §4 (D7, D13 to D26). `docs/spec/QUESTIONS.md` closed.
 
 **Goal:** a spec complete enough that the build (step 5) needs no further questions.
 **Inputs:**
@@ -147,21 +145,15 @@ answers in INTENT.md §4 and in the spec.
 - [ ] **Done:**
 
 **Goal:** prove each risky native assumption before any screen depends on it. Each spike
-is a throwaway screen in the fresh SDK 58 app (or a scratch app), not production code.
-Expected at least:
+is a throwaway screen in a scratch app, not production code.
 
-1. **Native headers (D10):**
-   - **iOS.** A screen with a long grouped list under an expo-router `Stack` with `headerLargeTitle`. The large title must collapse into the navigation bar on scroll exactly as in Mail, under a native tab bar, in light and dark. Also check a pushed screen with a small title and the minimal back button. Find and write down the conditions that make it work: the scroll view as the screen's first scrollable descendant, `contentInsetAdjustmentBehavior="automatic"`, no `headerTransparent`. Those are the mistakes that broke v2.
-   - **Android.** The same screen with react-native-screens' experimental stack (`react-native-screens/experimental`, header `type: 'large'` and `'medium'`) on an emulator. Check the collapse on scroll, the back behaviour, the tabs, and the status bar.
-   - If the experimental stack is not solid enough, use the classic native stack's small top app bar on Android. Write down which, and why.
-   - **Evidence:** screen recordings on both platforms (`xcrun simctl io booted recordVideo`, `adb shell screenrecord`) plus screenshots at rest and collapsed, committed in `docs/spikes/`.
-2. **Expo SDK 58 build:** with Xcode 27 if it is installed, else Xcode 26.6. The app must launch on the newest simulator runtime available.
-3. **Grouped lists, section headers and footnotes** drawn to match the v1 captures' content and polish, at the default Dynamic Type size and at a large one, on iOS and Android.
-4. **HealthKit:** read sleep and workouts seeded into the simulator.
-5. **Location visits (custom Expo module):** what the simulator can fake; what needs a real iPhone, which is MoOx's.
-6. **On-device categorisation:**
-   - `expo-ai` / Foundation Models on a batch of real-looking titles, in French and English.
-   - The fallback without a model.
+**For v2-alpha1 (iOS, calendar only, D21):**
+
+1. **Expo SDK 58 build:** with Xcode 27. The app must launch on the newest simulator runtime.
+2. **Native headers (D10), iOS.** A screen with a long grouped list under an expo-router `Stack` with `headerLargeTitle`. The large title must collapse into the navigation bar on scroll exactly as in Mail, under a native tab bar, in light and dark. Also check a pushed screen with a small title and the minimal back button. Find and write down the conditions that make it work: the scroll view as the screen's first scrollable descendant, `contentInsetAdjustmentBehavior="automatic"`, no `headerTransparent`. Those are the mistakes that broke v2. **Evidence:** screen recording (`xcrun simctl io booted recordVideo`) plus screenshots at rest and collapsed, committed in `docs/spikes/`.
+3. **Grouped lists, section headers and footnotes** drawn to match the v1 captures' content and polish, at the default Dynamic Type size and at a large one.
+
+**Deferred with their releases:** HealthKit (alpha2, slice 10); Android headers with react-native-screens' experimental stack (Android pass, D7); location visits; on-device categorisation.
 
 For each spike, write a short note in `docs/spikes/`: the question, what was tried, the
 evidence, the verdict. A failed spike is a result. Update the spec if a verdict changes it.
@@ -174,14 +166,14 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
 
 - [ ] **Done:**
 
-Follow `docs/spec/60-slices.md`. **Slice 0** is the fresh Expo SDK 58 scaffold (D12), with:
+Follow `docs/spec/60-slices.md`, v2-alpha1 first. **Slice 0** is the fresh Expo SDK 58 scaffold (D12), with:
 - `src/domain` and its tests ported.
 - The offline checks (`scripts/check-*`) and `npm run check`.
 - The TestFlight workflow and fastlane config carried over, plus the Maestro setup.
 
 Each slice:
 - Is built.
-- Is checked on the simulator and emulator with Maestro screenshots, compared with the v1 references for content and with the platform for headers and navigation.
+- Is checked on the simulator with Maestro screenshots, compared with the v1 references for content and with the platform for headers and navigation.
 - Is committed with that evidence.
 
 Send MoOx a TestFlight build (`[testflight]` in the commit message) only at the

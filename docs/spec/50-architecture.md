@@ -21,7 +21,7 @@ by editing it in place.
 | Goal ring, chart | 3 |
 | Screens from `app/` | Rewritten from 30-screens.md, reusing code where it passes |
 
-Bundle id stays `io.moox.LifeTime`, package `io.moox.lifetime` (see Q10).
+Bundle id stays `io.moox.LifeTime`, package `io.moox.lifetime` (D16).
 
 ## Layout
 
@@ -58,15 +58,10 @@ types.
 
 ## Data flow
 
-```
-Source.read(range) → observations (SQLite)
-                   → resolveTimeline(observations, rules, range)   pure, memoised per week
-                   → aggregate / goals                             pure
-                   → screens
-```
-
-The current source (demo or real) is a single decision made in one place
-(`src/data/source.ts` today).
+Alpha1: `calendar or demo → events → rules → aggregate / goals → screens`, the current domain.
+The current source (demo or real) is a single decision made in one place (`src/data/source.ts`
+today). Alpha2 inserts observations and the overlap rules between sources and aggregation
+([10-model.md](./10-model.md)).
 
 ## Background work
 
@@ -80,7 +75,8 @@ Notifications are local and rescheduled on launch and on any settings change.
 ## Internationalisation
 
 Dates and numbers: always `Intl` through `src/domain/time.ts`, with the Hermes guard in
-`scripts/check-intl.mjs`. Copy: see Q9.
+`scripts/check-intl.mjs`. Copy: English first (D15), kept in one place so translation is one
+slice.
 
 ## Verification
 
@@ -91,7 +87,7 @@ Native first ([INTENT.md](../INTENT.md) §5). `scripts/preview.mjs` is never use
 | Domain | Jest, `npm run check` | Every commit |
 | Static | Typecheck, routes, Intl, no PCC entitlement, domain purity | Every commit |
 | iOS UI | Maestro on a simulator: flows and screenshots, light and dark, default and large text | Every slice, on the Mac |
-| Android UI | Maestro on an emulator | Every slice, on the Mac |
+| Android UI | Maestro on an emulator | From the Android pass |
 | Reality | MoOx's iPhone through TestFlight | Milestones |
 
 **Xcode:** SDK 58 is built with Xcode 27.2; v1 stays on 26.6. Maestro drives simulators with

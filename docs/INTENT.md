@@ -184,6 +184,12 @@ particular — where v1, for all its dated code, was visually very clean.
 | D18 | Free, as v1. | MoOx, 2026-11-09 |
 | D19 | Screen Time: not now. Revisit later; EU-only data makes it not urgent. | MoOx, 2026-11-09 |
 | D20 | Notification permission: optional, as in v1, and asked as late as possible. The exact moment depends on what the notifications will say. | MoOx, 2026-11-09 |
+| D21 | **Release plan:** v2-alpha1 is v1 brought up to date (iOS, calendar, existing domain logic); v2-alpha2 adds sleep and sport; then the interface is rethought around automation. | MoOx, 2026-11-09: « on tente d'avoir une remise au gout du jour puis sommeil/sport puis revoir l'UI » |
+| D22 | The calendar stays the primary source. Someone who works and trains at home gives sensors little. Sensors add what they measure with certainty. | MoOx, 2026-11-09: « je ne sais pas si on doit avoir vraiment les capteurs en primaire » |
+| D23 | **Two kinds of overlap.** The same thing seen twice (sport in the calendar and on the watch) counts once. Different things at the same time (a train commute while reading) count in both. Detailed in alpha2. | MoOx, 2026-11-09: « Il faut avoir 2 possibilités » |
+| D24 | Time nothing accounts for is not shown. | MoOx, 2026-11-09: « On veut voir ce qu'on fait, pas ce qu'on ne fait pas. » |
+| D25 | The chart stacks by the week's totals, the biggest at the bottom, as in v1. Possibly revisited later. | MoOx, 2026-11-09: « J'aimais bien l'idée d'empilement qu'on voit les plus gros "consommateurs" de temps » |
+| D26 | The Sorter is in alpha1, with a tool to select several events and deduce a rule that applies in future. | MoOx, 2026-11-09: « selectionner plusieurs evenements et en déduire une regle pour que ca s'applique à l'avenir » |
 
 ---
 
@@ -238,20 +244,12 @@ particular — where v1, for all its dated code, was visually very clean.
 
 ## 7. Open items
 
-- **v1 visual references:** to be captured, per D9 — steps 1–2 of [NEXT.md](./NEXT.md).
-- **Product framing:** adopt "sensors give the skeleton, the calendar gives the meaning"?
-  For the spec's question batch.
-- **Timeline states the model lacks:** "located but unlabelled" time, and commutes, which
-  fit none of the eight categories (a Transport category, or Uncategorized?).
+- **Commutes:** a commute is a mode, not an activity (reading on the train, cycling to work). To settle when motion data arrives, with user-defined categories (D23).
 - **Platform-specific first sources:** iOS HealthKit + visits; Android Health Connect +
   usage events, deferring background location until the core passes Play review.
 - **Policy timing:** HealthKit and Core Motion only for visible health and fitness
   purposes; Screen Time only for device-usage management, with the Family Controls
   entitlement requested months ahead if wanted (EU-only data).
-- **[CATEGORISATION.md](./CATEGORISATION.md) is outdated on two points:**
-  - Apple's on-device model has a 4,096-token window, so titles go in batches of about
-    20–40 per session, not one session for all titles.
-  - `expo-ai` 0.2.0 (alpha) now exposes the on-device models from Expo.
 - **Recommendations** (vision step 2): scope and timing.
 
 ---
