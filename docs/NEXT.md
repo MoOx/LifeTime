@@ -108,9 +108,11 @@ saying why not, all committed under `docs/reference/v1/ios/`.
 
 ---
 
-## Step 3 — Write the product spec (phase 2)
+## Step 3: Write the product spec (phase 2)
 
 - [ ] **Done:**
+
+**Status, 2026-11-09: written, waiting for MoOx.** `docs/spec/` is committed and CATEGORISATION.md is updated on the two points of INTENT.md §7. The step is done once MoOx has answered `docs/spec/QUESTIONS.md`; record the answers in INTENT.md §4 and in the spec, tick this, then go on to step 4.
 
 **Goal:** a spec complete enough that the build (step 5) needs no further questions.
 **Inputs:**

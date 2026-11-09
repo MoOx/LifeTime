@@ -141,14 +141,17 @@ accept-all, same undo. The wand button in the UI is the same button.
 | iOS 26+ | Foundation Models (`LanguageModelSession`, guided generation) | On-device, free, no entitlement. Apple Intelligence devices only. |
 | Android | ML Kit GenAI / Gemini Nano via AICore | On-device, Pixel 9+ and comparable; capability must be queried, not assumed. |
 
-Neither is exposed by an Expo module today, so each needs a small native module. Guided
+`expo-ai` 0.2.0 (alpha, November 2026) now exposes both, one title per call; see
+[DATA-SOURCES.md](./DATA-SOURCES.md). Its per-title design and alpha status still argue for a
+thin module of our own that controls batching and pacing; spike 6 decides. Guided
 generation matters: constraining the output to the category enum removes parsing entirely,
 which is what makes this reliable enough to run unattended over hundreds of titles.
 
 ### 4.3 The rules that must hold
 
-1. **Batch, do not stream.** One session, all uncategorised titles, one pass. Per-title
-   round trips over a few hundred titles is minutes of wall clock and a flat battery.
+1. **Batch, by a size the model allows.** Apple's on-device model has a 4,096-token context
+   per session, so a few hundred titles go in batches of about 20 to 40, each in a fresh
+   session, not one session for all. Results stream into the list as they arrive.
 2. **Send titles, nothing else.** No dates, no attendees, no notes, no location. The
    privacy claim in `app/privacy.tsx` is that the calendar does not leave the device, and
    an on-device model does not weaken it — but only if the prompt stays minimal, so that
