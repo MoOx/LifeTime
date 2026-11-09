@@ -28,8 +28,19 @@ Everything steps 1 and 2 need is present; nothing had to be installed.
 
 ## Toolchain that worked
 
-*To be filled in by step 1: exact versions of macOS, Xcode, the simulator runtime,
-Node, CocoaPods, ReScript, and any environment variables.*
+Verified on 2026-11-09: `docs/reference/v1/ios/00-launch.png` is the real Welcome screen,
+and the app holds a 4.5 MB Hermes bytecode `main.jsbundle`.
+
+| Item | Value |
+|---|---|
+| macOS | 27.3, arm64 |
+| Xcode | 26.6 (17F113), selected through `DEVELOPER_DIR` by `scripts/v1/lib.sh` |
+| SDK / runtime | iPhoneSimulator 26.5 SDK; iOS 26.5 runtime on an iPhone 17 Pro named `LifeTime v1` |
+| Node | 16.x through `fnm`, passed to the bundle phase as `V1_NODE_BINARY` |
+| Ruby / CocoaPods | newest rbenv Ruby (4.0.6) with CocoaPods 1.17.0, `LANG=en_US.UTF-8` |
+| ReScript | 9, as locked by v1; its compiler ran without trouble under Rosetta or natively |
+| JS engine | Hermes (the default); JSC was not needed |
+| Environment | `CI=true` (v1's own switch to skip `sentry-cli`), `ONLY_ACTIVE_ARCH=YES`, `CODE_SIGNING_ALLOWED=NO` |
 
 ## Facts about v1 that shape the build
 
@@ -46,9 +57,10 @@ Node, CocoaPods, ReScript, and any environment variables.*
 
 ## Known symptoms and fixes
 
-Expected from experience with React Native 0.6x on newer Xcode releases; **not yet
-verified on this project**. `scripts/v1/setup.sh` applies the ones marked *auto*; add a
-row for every new problem met.
+The first rows were expected from experience with React Native 0.6x; the rows from
+"`rbenv: version 2.7.4`" down were met on this project on 2026-11-09.
+`scripts/v1/setup.sh` and `build.sh` apply the ones marked *auto*; add a row for every
+new problem met.
 
 | Symptom | Cause | Fix |
 |---|---|---|
@@ -59,10 +71,27 @@ row for every new problem met.
 | `Bad CPU type in executable` running `rescript` or `bsc` | ReScript 9 shipped x86_64 macOS binaries | Install Rosetta 2 (`softwareupdate --install-rosetta`) — needs MoOx |
 | `error:0308010C:digital envelope routines::unsupported` | Node ≥ 17 with old webpack/Metro tooling | Make sure Node 16 is active (`fnm use 16`) |
 | Hermes pod or `hermes-engine` link errors on arm64 simulator | Old prebuilt Hermes binary | Set `:hermes_enabled => false` (JSC) — `V1_HERMES=0 scripts/v1/setup.sh` |
-| "Upload Debug Symbols to Sentry" build phase fails | No Sentry credentials | `SENTRY_DISABLE_AUTO_UPLOAD=true` (set by `scripts/v1/build.sh`); else delete the phase in the worktree |
+| `error: A project slug is required` in the bundle and "Upload Debug Symbols" phases, and no bundle | `sentry-cli` wraps both phases and has no credentials; it ignores `SENTRY_DISABLE_AUTO_UPLOAD` at this version | *auto*: `CI=true`, v1's own switch to skip it (`build.sh`) |
 | `patch-package` warns about `react-native+0.67.0-rc.6.patch` | Patch made against rc.6, installed 0.67.1 | Harmless if it applies; if a hunk fails, inspect it — it may matter for the calendar or gestures |
 | App launches then is killed with a UIScene assertion | Built with the iOS 27 SDK and run on iOS 27 | Build with Xcode 26.6 (the default in `scripts/v1/lib.sh`) and run on an iOS 26.x runtime |
+| `rbenv: version '2.7.4' is not installed` at `pod install` | v1's `.ruby-version`, picked up in the worktree | *auto*: `RBENV_VERSION` set to the newest installed Ruby |
+| `library 'DoubleConversion' not found`, "Target dependency graph (1 target)" | Xcode 26.6 does not find the implicit dependency on `libPods-LifeTime.a` | *auto*: build the `Pods-LifeTime` scheme first (`build.sh`) |
+| `-Wdeprecated-literal-operator` and `-Wbitwise-instead-of-logical` errors in Yoga | Yoga's podspec has `-Werror` and recent clang adds warnings | *auto*: drop `-Werror` from `Yoga.podspec`, before `pod install` |
+| `no member named 'set_terminate' in namespace 'std'` in Sentry | Sentry 7.1.4 relied on a transitive `<exception>` | *auto*: prepend the include, after `pod install` |
+| `missing '#include <sys/_types/_ucontext64.h>'` in Sentry | Same, with the iOS 26 SDK | *auto*: prepend the include, after `pod install` |
+| App stays on the splash screen; `BUILD SUCCEEDED` but no `main.jsbundle`; `ERR_OSSL_EVP_UNSUPPORTED` in the log | The bundle phase evaluates `fnm env` and lands on the default Node (26), then swallows Metro's failure | *auto*: `NODE_BINARY` patched to read `V1_NODE_BINARY`; `build.sh` now fails if the bundle is missing |
 
 ## Patches applied
 
-*To be filled in by step 1: every change made inside the worktree, with the reason.*
+All inside the `../LifeTime-v1` worktree; none reaches `main`, and v1's behaviour and look are unchanged.
+
+| File | Change | Reason |
+|---|---|---|
+| `ios/Podfile` | replaced by `scripts/v1/Podfile` | no Flipper, iOS 15.1, libc++ define |
+| `ios/LifeTime.xcodeproj/project.pbxproj` | deployment target 15.1; `NODE_BINARY` reads `V1_NODE_BINARY` | Xcode minimum; Node 16 for Metro |
+| `node_modules/react-native/third-party-podspecs/boost.podspec` | download URL | old host is gone |
+| `node_modules/react-native/ReactCommon/yoga/Yoga.podspec` | `-Werror` removed | new clang warnings |
+| `node_modules/react-native/ReactCommon/yoga/yoga/YGValue.h` | space removed in `operator""_pt` | applied before `-Werror` was dropped, harmless; `setup.sh` no longer does it |
+| `ios/Pods/Sentry/.../SentryCrashMonitor_CPPException.cpp`, `SentryCrashMachineContext.c` | one `#include` each | headers no longer transitive |
+
+These were found one at a time, so the final `setup.sh` has not been replayed from an empty worktree; each fix in it was applied by the same commands to the worktree that built.

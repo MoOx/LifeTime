@@ -49,8 +49,14 @@ BOOST=node_modules/react-native/third-party-podspecs/boost.podspec
 sed -i '' 's#https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2#https://archives.boost.io/release/1.76.0/source/boost_1_76_0.tar.bz2#' "$BOOST"
 grep -q archives.boost.io "$BOOST" || echo "  ! boost.podspec did not contain the expected URL — check it by hand."
 
+step "Fix: drop Yoga's -Werror (recent clang adds warnings its 2022 sources trip)"
+sed -i '' "/'-Werror',/d" node_modules/react-native/ReactCommon/yoga/Yoga.podspec
+
 step "Fix: app deployment target → 15.1"
 sed -i '' -E 's/IPHONEOS_DEPLOYMENT_TARGET = 1[0-4]\.[0-9]+;/IPHONEOS_DEPLOYMENT_TARGET = 15.1;/g' ios/LifeTime.xcodeproj/project.pbxproj
+
+step "Fix: let the bundle phase use Node 16 (its own fnm lookup lands on the default Node)"
+sed -i '' 's/export NODE_BINARY=node/export NODE_BINARY=\\"${V1_NODE_BINARY:-node}\\"/' ios/LifeTime.xcodeproj/project.pbxproj
 
 step "Fix: Podfile (no Flipper, iOS 15.1, libc++ removed-functions define)"
 cp "$REPO/scripts/v1/Podfile" ios/Podfile
@@ -61,6 +67,18 @@ fi
 
 step "pod install"
 command -v pod >/dev/null || fail "CocoaPods missing: brew install cocoapods"
+# v1's .ruby-version pins 2.7.4, which rbenv refuses when it is not installed. Any Ruby
+# with a recent CocoaPods does the job, so take the newest one rbenv has.
+if command -v rbenv >/dev/null; then export RBENV_VERSION="${V1_RUBY:-$(rbenv versions --bare | tail -1)}"; fi
+export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8   # CocoaPods aborts without a UTF-8 locale
 (cd ios && pod install --repo-update)
+
+step "Fix: Sentry 7.1.4 relied on transitive headers that the iOS 26 SDK no longer pulls in"
+prepend_include() { # <file> <header>
+  grep -q "#include <$2>" "$1" || { chmod u+w "$1"; printf '#include <%s>\n' "$2" | cat - "$1" > "$1.tmp" && command mv -f "$1.tmp" "$1"; }
+}
+SENTRY=ios/Pods/Sentry/Sources/SentryCrash/Recording
+prepend_include "$SENTRY/Monitors/SentryCrashMonitor_CPPException.cpp" exception
+prepend_include "$SENTRY/Tools/SentryCrashMachineContext.c" sys/_types/_ucontext64.h
 
 printf '\n\033[32m✔ v1 prepared in %s — next: scripts/v1/build.sh\033[0m\n' "$WT"

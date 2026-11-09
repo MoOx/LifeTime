@@ -53,9 +53,9 @@
 
 ---
 
-## Step 1 — Rebuild v1 on the iOS Simulator
+## Step 1: Rebuild v1 on the iOS Simulator
 
-- [ ] **Done:**
+- [x] **Done:** 2026-11-09. v1 launches on the `LifeTime v1` simulator (iOS 26.5, Xcode 26.6) and shows its Welcome screen: `docs/reference/v1/ios/00-launch.png`. Toolchain, symptoms and patches in `docs/reference/v1/BUILD.md`.
 
 **Goal:** v1 from the `main` branch running in a simulator, so its screens can be
 captured natively. Do not change v1's behaviour or look; only make it build.
