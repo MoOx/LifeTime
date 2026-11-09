@@ -29,3 +29,14 @@ wrong:
   did.
 - Double counting ends: an overlap is counted once. Your totals will be lower than v1's
   where events overlap.
+
+## Status after MoOx's first answers (2026-11-09)
+
+Decided, recorded in INTENT.md: Q4 (D13), Q6 (D7), Q7 (D19), Q8 (D20), Q9 (D15), Q10 (D16),
+Q11 (D17), Q13 (D18), and the manual half of Q5 (D14).
+
+Still under discussion: Q1 (a v2-alpha1 close to v1, then sleep and sport, then rethink the
+UI), Q2 (sensors should not be presented as primary: someone working and training at home
+gives them little), Q3 (a commute is a mode, not an activity: reading on the train, cycling
+to work), Q5 (counting past events as time spent), Q12, and overlaps. The spec still assumes
+the defaults on these and will be revised once they are settled.

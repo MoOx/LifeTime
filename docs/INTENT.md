@@ -170,12 +170,20 @@ particular — where v1, for all its dated code, was visually very clean.
 | D4 | Local first. Cloud sources only where the gain is large *and* broad; each source states its own privacy claim. Strava is out (niche). | MoOx, 2026-11-08 |
 | D5 | The calendar is one source among others. The product framing is decided after [DATA-SOURCES.md](./DATA-SOURCES.md). | MoOx, 2026-11-08 |
 | D6 | Vision in two steps: (1) a weekly overview with minimal manual logging; (2) later, recommendations against goals and constraints. | MoOx, 2026-11-08 |
-| D7 | iOS first (MoOx tests on an iPhone), Android to parity, web for the demo. | *default* |
+| D7 | iOS first; Android in a dedicated pass afterwards, not in every slice; web for the demo, later. | MoOx, 2026-11-09: « simple faisons iOS pour le moment et on fera une passe android ensuite » |
 | D8 | Native building and verification run in a Claude Code session on MoOx's Mac, driven by [NEXT.md](./NEXT.md) through a plain "continue" ([CLAUDE.md](../CLAUDE.md)); CI only for releases. | MoOx, 2026-11-08 — « Prépare tout ce que tu peux sur une branche, y compris un fichier pour que j'ai juste à lancer un simple prompt "continue" depuis ma machine » |
 | D9 | The visual reference is **v1 itself, rebuilt from `main` and captured natively by Claude** in the iOS Simulator, light and dark. `LifeTime.sketch` holds only the icon, splash and Play Store graphic — no screens. | MoOx, 2026-11-08 — « Ca serait encore plus précis si tu captures toi même ce qui semble pertinent » |
 | D10 | **Headers are the platform's own, not v1's replica.** v1 hand-built an iOS-style large title that turned into a small sticky title. That is replaced by the real thing:<br>• **iOS:** the system large title collapsing into the navigation bar on scroll, as in Mail. The native stack's `headerLargeTitle` (react-native-screens, used by expo-router's `Stack`) is UIKit's own behaviour. v2's header bugs came from misusing it (`headerTransparent` combined with large titles), not from the tool.<br>• **Android:** the Material 3 equivalent, a medium or large top app bar collapsing to the small one on scroll. As of Nov 2026 it exists only in react-native-screens' *experimental* stack (4.30, `react-native-screens/experimental`, header `type: 'small' \| 'medium' \| 'large'`). expo-router 58 wraps that stack but does not expose the type, and `@expo/ui`'s Compose `TopAppBar` is the small fixed bar only. Spike it. If it is not solid, use the standard small top app bar, which is also native. Never a hand-built imitation. | MoOx, 2026-11-08 — « je ne cherche pas spécialement le comportement de ma v1 pour les titres. Je veux au contraire quelque chose qui fait le plus natif possible [...] comme l'app iOS Mail. Et un équivalent android qui aurait du sens. » Library facts: read in the published packages, `react-native-screens` 4.30.1, `expo-router` 58.0.30, `@expo/ui` 58.0.27 |
 | D11 | The v2 attempt is not captured or diffed. | MoOx, 2026-11-08 — « Pas besoin de capturer la v2. » |
 | D12 | **The new app starts from a clean Expo SDK 58 scaffold.** The existing code is a quarry, not a base. What has proven itself is carried over deliberately: `src/domain` with its tests, the TestFlight pipeline and the offline checks (`scripts/check-*`). The rest is carried over piece by piece, once a spike shows it renders correctly natively. | MoOx, 2026-11-08 — « on pourrait repartir de 0 pour la v2 meme si je pense que l'existant de cette session est un bon début. » |
+| D13 | **Always up to date, with no refresh action.** Data is re-read transparently (launch, focus, calendar changes), with a small indicator if it takes a moment, as in iOS Mail. Pull-to-refresh is a nice-to-have only. | MoOx, 2026-11-09: « Le but c'est que les gens n'est pas à faire "Refresh" comme action » |
+| D14 | Categorise automatically whenever possible; manual categorisation stays, and must work on "all events of this kind" (starts with, includes, etc.), not one event at a time. | MoOx, 2026-11-09 |
+| D15 | English first; translation later. | MoOx, 2026-11-09 |
+| D16 | The new app replaces v1: same identifier, same App Store listing, v1 exports importable. | MoOx, 2026-11-09 |
+| D17 | Store copy may state the health purpose that HealthKit requires. | MoOx, 2026-11-09 |
+| D18 | Free, as v1. | MoOx, 2026-11-09 |
+| D19 | Screen Time: not now. Revisit later; EU-only data makes it not urgent. | MoOx, 2026-11-09 |
+| D20 | Notification permission: optional, as in v1, and asked as late as possible. The exact moment depends on what the notifications will say. | MoOx, 2026-11-09 |
 
 ---
 
@@ -231,7 +239,6 @@ particular — where v1, for all its dated code, was visually very clean.
 ## 7. Open items
 
 - **v1 visual references:** to be captured, per D9 — steps 1–2 of [NEXT.md](./NEXT.md).
-- **Home refresh:** keep pull-to-refresh, or a "Refresh" action next to "Updated …"?
 - **Product framing:** adopt "sensors give the skeleton, the calendar gives the meaning"?
   For the spec's question batch.
 - **Timeline states the model lacks:** "located but unlabelled" time, and commutes, which
