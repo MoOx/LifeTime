@@ -9,7 +9,7 @@
 #   V1_FLOWS=02 scripts/v1/capture.sh      only flows whose name starts with 02 (note: 02–04
 #                                          expect the state left by the flows before them)
 #
-# UNTESTED: written without macOS; selectors and timings will need adjusting.
+# Problems and their fixes are recorded in docs/reference/v1/BUILD.md.
 
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
@@ -17,9 +17,16 @@ source "$(dirname "$0")/lib.sh"
 command -v maestro >/dev/null || fail "Maestro missing: curl -fsSL https://get.maestro.mobile.dev | bash"
 [ -d "$APP" ] || fail "No v1 build at $APP — run scripts/v1/build.sh first."
 
+# lib.sh selects Xcode 26.6 to build v1, but under it Maestro's XCTest runner never comes
+# up on this Mac ("DTServiceHubClient failed to bless service hub"): the CoreSimulator in
+# service is Xcode 27's. Driving an iOS 26.5 simulator works with the default Xcode.
+export DEVELOPER_DIR="$(env -u DEVELOPER_DIR xcode-select -p)"
+export MAESTRO_DRIVER_STARTUP_TIMEOUT="${MAESTRO_DRIVER_STARTUP_TIMEOUT:-180000}"
+
 UDID="$(v1_device)"
 OUT_ROOT="$REPO/docs/reference/v1/ios"
 FLOWS_DIR="$REPO/.maestro/v1"
+DEBUG_DIR="$(mktemp -d)/maestro-v1"   # logs stay out of the repository
 
 for MODE in ${V1_MODES:-light dark}; do
   step "$MODE pass on $DEVICE_NAME ($UDID)"
@@ -27,6 +34,13 @@ for MODE in ${V1_MODES:-light dark}; do
   # run, no app state, no events — so flow 01 really sees an empty calendar.
   xcrun simctl shutdown "$UDID" 2>/dev/null || true
   xcrun simctl erase "$UDID"
+  xcrun simctl boot "$UDID"
+  xcrun simctl bootstatus "$UDID" -b >/dev/null
+  # An erased simulator inherits the Mac's language, which localises the system alerts the
+  # flows tap. It only applies after a reboot.
+  xcrun simctl spawn "$UDID" defaults write "Apple Global Domain" AppleLanguages -array en
+  xcrun simctl spawn "$UDID" defaults write "Apple Global Domain" AppleLocale -string en_US
+  xcrun simctl shutdown "$UDID"
   xcrun simctl boot "$UDID"
   xcrun simctl bootstatus "$UDID" -b >/dev/null
   xcrun simctl ui "$UDID" appearance "$MODE"
@@ -40,9 +54,17 @@ for MODE in ${V1_MODES:-light dark}; do
 
   for flow in "$FLOWS_DIR"/${V1_FLOWS:-0}*.yaml; do
     step "$(basename "$flow")"
+    # Maestro 2 refuses screenshot paths outside its output folder and nests that folder
+    # by run, so it writes to a temporary place and only the PNGs are copied here. They are
+    # copied even when the flow fails, so a partial run can still be inspected.
+    RUN_DIR="$DEBUG_DIR/$MODE-$(basename "$flow" .yaml)"
+    status=0
     maestro --device "$UDID" test \
-      -e OUT="$OUT_ROOT/$MODE" -e VIDEO="$OUT_ROOT/video" -e RECORD="$RECORD" \
-      "$flow"
+      --test-output-dir "$RUN_DIR" --debug-output "$RUN_DIR" \
+      -e OUT=. -e VIDEO=. -e RECORD="$RECORD" \
+      "$flow" || status=$?
+    find "$RUN_DIR" -type f -name '*.png' -path '*/takeScreenshot/*' -exec cp {} "$OUT_ROOT/$MODE/" \;
+    [ "$status" = 0 ] || fail "$(basename "$flow") failed: see $RUN_DIR"
   done
 done
 

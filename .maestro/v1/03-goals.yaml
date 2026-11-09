@@ -1,3 +1,5 @@
+# With demo data, tapping a category row opens it; only its bullet, at the row's left edge,
+# checks it (GoalEdit.res on main). iOS merges the bullet into the row, hence the offset.
 # The three goals v1's App Store screenshots showed (e2e/demo.e2e.js), the goals list with
 # its rings, editing a goal, and a scroll video.
 appId: io.moox.LifeTime
@@ -14,18 +16,20 @@ appId: io.moox.LifeTime
     id: "GoalEdit_title"
 - inputText: "Sleep"
 - pressKey: Enter
+# By coordinates, slowly: Maestro's element swipe does not move the slider's thumb.
 - swipe:
-    from:
-      id: "GoalEdit_durationSlider"
-    direction: RIGHT
+    start: "14%, 71%"
+    end: "42%, 71%"
+    duration: 1200
 - waitForAnimationToEnd
 - takeScreenshot: ${OUT}/20-goal-new-filled
 - scrollUntilVisible:
     element:
-      id: "GoalEdit_category_bullet_rest"
+      id: "GoalEdit_category_rest"
     direction: DOWN
 - tapOn:
-    id: "GoalEdit_category_bullet_rest"
+    id: "GoalEdit_category_rest"
+    point: "7%,50%"
 - tapOn:
     id: "GoalNewModalScreen_Button_Add"
 
@@ -40,10 +44,11 @@ appId: io.moox.LifeTime
     id: "GoalEdit_quickDuration_30"
 - scrollUntilVisible:
     element:
-      id: "GoalEdit_category_bullet_exercise"
+      id: "GoalEdit_category_exercise"
     direction: DOWN
 - tapOn:
-    id: "GoalEdit_category_bullet_exercise"
+    id: "GoalEdit_category_exercise"
+    point: "7%,50%"
 - tapOn:
     id: "GoalNewModalScreen_Button_Add"
 
@@ -60,16 +65,26 @@ appId: io.moox.LifeTime
     id: "GoalEdit_quickDuration_60"
 - scrollUntilVisible:
     element:
-      id: "GoalEdit_category_bullet_fun"
+      id: "GoalEdit_category_fun"
     direction: DOWN
 - tapOn:
-    id: "GoalEdit_category_bullet_fun"
+    id: "GoalEdit_category_fun"
+    point: "7%,50%"
 - tapOn:
     id: "GoalNewModalScreen_Button_Add"
 
 # Rings animate in; let them settle.
 - waitForAnimationToEnd:
     timeout: 4000
+# The reminders popin (flow 07) would cover the goals and swallow the tap on a goal. Its
+# close button has no testID, so it goes by position.
+- runFlow:
+    when:
+      visible: "Set Up Reminders"
+    commands:
+      - tapOn:
+          point: "91%, 54%"
+      - waitForAnimationToEnd
 - takeScreenshot: ${OUT}/21-goals-list
 
 - runFlow:
@@ -87,7 +102,10 @@ appId: io.moox.LifeTime
           duration: 1500
       - stopRecording
 
-- tapOn: "Workout"
+# The card's "..." button opens the editor (GoalCard.res on main); it has no testID, and
+# "Workout" is always the third card here.
+- tapOn:
+    point: "87%, 66%"
 - waitForAnimationToEnd
 - takeScreenshot: ${OUT}/22-goal-edit
 - swipe:

@@ -2,8 +2,7 @@
 # Prepare v1 (the `main` branch: React Native 0.67 + ReScript 9) so it can be built for
 # the iOS Simulator and captured. Runs on macOS only.
 #
-# UNTESTED: written in a cloud session that has no macOS. Expect to fix things; record
-# every symptom and fix in docs/reference/v1/BUILD.md.
+# Problems and their fixes are recorded in docs/reference/v1/BUILD.md.
 #
 #   scripts/v1/setup.sh                 prepare ../LifeTime-v1
 #   V1_HERMES=0 scripts/v1/setup.sh     same, with JSC instead of Hermes

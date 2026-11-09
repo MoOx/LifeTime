@@ -6,6 +6,9 @@ appId: io.moox.LifeTime
     element:
       id: "TopActivities_${ACTIVITY}"
     direction: DOWN
+    # Without this, a row under the translucent tab bar counts as visible and the tap hits
+    # the tab bar.
+    centerElement: true
 - tapOn:
     id: "TopActivities_${ACTIVITY}"
 - waitForAnimationToEnd
@@ -16,8 +19,9 @@ appId: io.moox.LifeTime
       true: ${SHOT == "1"}
     commands:
       - waitForAnimationToEnd
+      - runFlow: _no-banner.yaml
       - takeScreenshot: ${OUT}/11-activity-options
-# Tapping the active tab pops its stack to the root (React Navigation's default).
-- tapOn:
-    id: "tabSummary"
+# A real back navigation, as v1's Detox flow did: re-tapping the active tab returns the
+# home to the current week, and the activities to categorise are on the previous one.
+- tapOn: "Back"
 - waitForAnimationToEnd

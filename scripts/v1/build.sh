@@ -3,7 +3,7 @@
 # own App Store screenshot setup used) and launch it on the dedicated "LifeTime v1"
 # simulator. Run scripts/v1/setup.sh first.
 #
-# UNTESTED: written without macOS. Record problems and fixes in docs/reference/v1/BUILD.md.
+# Problems and their fixes are recorded in docs/reference/v1/BUILD.md.
 
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"

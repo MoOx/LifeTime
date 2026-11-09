@@ -81,6 +81,25 @@ new problem met.
 | `missing '#include <sys/_types/_ucontext64.h>'` in Sentry | Same, with the iOS 26 SDK | *auto*: prepend the include, after `pod install` |
 | App stays on the splash screen; `BUILD SUCCEEDED` but no `main.jsbundle`; `ERR_OSSL_EVP_UNSUPPORTED` in the log | The bundle phase evaluates `fnm env` and lands on the default Node (26), then swallows Metro's failure | *auto*: `NODE_BINARY` patched to read `V1_NODE_BINARY`; `build.sh` now fails if the bundle is missing |
 
+## Capturing: what the flows had to learn
+
+Met on 2026-11-09 while making `.maestro/v1/` work, with Maestro 2.12.1.
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| "iOS driver not ready in time", whatever the timeout; `DTServiceHubClient failed to bless service hub` | Under Xcode 26.6, Maestro's XCTest runner never comes up: the CoreSimulator in service is Xcode 27's | `capture.sh` drives the simulator with the default Xcode; 26.6 only builds |
+| `Invalid path … for takeScreenshot` | Maestro 2 refuses paths outside its output folder | Flows write to a temporary folder, `capture.sh` copies the PNGs |
+| System alert never tapped | An erased simulator inherits the Mac's language (French) | `capture.sh` sets `en_US` and reboots after each erase |
+| `GoalEdit_category_bullet_*` not found | iOS merges a nested touchable into its row | Row id; with demo data the row opens the category, so the tap is offset onto the bullet |
+| Element swipes do nothing on the week pager and the slider | Maestro's `swipe: from:` does not drive them | Slow swipes by coordinates; the week swipe asserts "Show This Week" and retries, because it sometimes does not page |
+| Tap lands on the tab bar | A row under the translucent tab bar counts as visible | `centerElement: true` before tapping |
+| App ends up in iOS Settings | A stray gesture on Goals reaches the reminders popin's Continue, which opens Settings when permission is not undetermined | Flow 01 closes the popin after capturing it |
+| Calendar alert missed intermittently | It can take seconds to appear | Flow 01 waits for it |
+| Banner "Ready for Apple Intelligence" over a capture | Shown shortly after a simulator's first boot | `_no-banner.yaml` before each shot of flow 02 |
+
+Runs are not fully deterministic: flow 02 failed intermittently before these fixes. Check
+every pass by eye; a green run can still hold a covered or duplicated screen.
+
 ## Patches applied
 
 All inside the `../LifeTime-v1` worktree; none reaches `main`, and v1's behaviour and look are unchanged.

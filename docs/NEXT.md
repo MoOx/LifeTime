@@ -10,11 +10,9 @@
 > Android emulator. They are meant for a Claude Code session on MoOx's Mac. Step 3 is
 > writing and can run anywhere.
 >
-> **Honesty note.** The scripts and Maestro flows under `scripts/v1/` and `.maestro/v1/`
-> were written in a cloud session that **cannot run a simulator**. They follow v1's own
-> Detox flow (`git show main:e2e/demo.e2e.js`) and its real `testID`s, but nothing in
-> them has been run yet. Expect to fix selectors and build errors; that is part of the
-> step, not a failure of it.
+> **Status of the v1 tooling.** `scripts/v1/` and `.maestro/v1/` were written in a cloud
+> session without a simulator, then made to work on MoOx's Mac on 2026-11-09 (steps 1 and
+> 2). What they needed is in `docs/reference/v1/BUILD.md`.
 
 ---
 
@@ -82,9 +80,9 @@ In both cases, record the outcome in BUILD.md and go on with whatever works.
 
 ---
 
-## Step 2 — Capture v1, screen by screen
+## Step 2: Capture v1, screen by screen
 
-- [ ] **Done:**
+- [x] **Done:** 2026-11-09. 22 screens in light and 22 in dark under `docs/reference/v1/ios/`, each checked by eye; table in `docs/reference/v1/README.md`, where three further empty-state reasons are noted as not captured.
 
 **Goal:** a complete native visual reference of v1's *content*: what each screen shows,
 its hierarchy, spacing, grouping, type and colour. This is the "visuellement très propre"

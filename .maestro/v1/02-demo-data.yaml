@@ -17,10 +17,16 @@ appId: io.moox.LifeTime
 - tapOn:
     id: "Settings_To_SettingsDangerZoneScreen"
 - waitForAnimationToEnd
+- runFlow: _no-banner.yaml
 - takeScreenshot: ${OUT}/10-danger-zone
 - tapOn:
     id: "SettingsDangerZone_CalendarInject"
 - tapOn: "Inject"
+# fullRefresh removes any previous demo calendar first; on a clean device that shows this
+# alert, then goes on injecting (Demo.res on main).
+- tapOn:
+    text: "Ok"
+    optional: true
 - waitForAnimationToEnd:
     timeout: 6000
 - tapOn:
@@ -38,11 +44,21 @@ appId: io.moox.LifeTime
       id: "TopActivities_Sleep"
     timeout: 15000
 
-# v1's flow categorises on the previous, complete week.
-- swipe:
-    from:
-      id: "Home_ScrollView_WeeklyGraph"
-    direction: RIGHT
+# v1's flow categorises on the previous, complete week. A slow swipe by coordinates: Maestro's
+# element swipe does not page this list.
+# The swipe sometimes does not page, and every later step then runs on the wrong week, so
+# it has to prove itself.
+- waitForAnimationToEnd
+- retry:
+    maxRetries: 3
+    commands:
+      - swipe:
+          start: "12%, 36%"
+          end: "92%, 36%"
+          duration: 1000
+      - extendedWaitUntil:
+          visible: "Show This Week"
+          timeout: 4000
 - waitForAnimationToEnd
 - runFlow: { file: _categorise.yaml, env: { ACTIVITY: "Sleep", CATEGORY: "rest", SHOT: "1" } }
 - runFlow: { file: _categorise.yaml, env: { ACTIVITY: "Work", CATEGORY: "work", SHOT: "0" } }
@@ -62,6 +78,7 @@ appId: io.moox.LifeTime
     text: "Show This Week"
     optional: true
 - waitForAnimationToEnd
+- runFlow: _no-banner.yaml
 - takeScreenshot: ${OUT}/12-home-top
 
 - runFlow:
@@ -91,23 +108,35 @@ appId: io.moox.LifeTime
     start: "50%, 75%"
     end: "50%, 40%"
 - waitForAnimationToEnd
+- runFlow: _no-banner.yaml
 - takeScreenshot: ${OUT}/14-home-scrolled
 - scroll
 - scroll
 - scroll
 - scroll
 - waitForAnimationToEnd
+- runFlow: _no-banner.yaml
 - takeScreenshot: ${OUT}/15-home-bottom
 
 - scrollUntilVisible:
     element:
       id: "Home_TitlePre"
     direction: UP
-- swipe:
-    from:
-      id: "Home_ScrollView_WeeklyGraph"
-    direction: RIGHT
+# The swipe sometimes does not page, and every later step then runs on the wrong week, so
+# it has to prove itself.
 - waitForAnimationToEnd
+- retry:
+    maxRetries: 3
+    commands:
+      - swipe:
+          start: "12%, 36%"
+          end: "92%, 36%"
+          duration: 1000
+      - extendedWaitUntil:
+          visible: "Show This Week"
+          timeout: 4000
+- waitForAnimationToEnd
+- runFlow: _no-banner.yaml
 - takeScreenshot: ${OUT}/16-home-previous-week
 - tapOn:
     text: "Show This Week"
@@ -119,6 +148,7 @@ appId: io.moox.LifeTime
     direction: DOWN
 - tapOn: "Customize report"
 - waitForAnimationToEnd
+- runFlow: _no-banner.yaml
 - takeScreenshot: ${OUT}/17-filters
 - swipe:
     start: "50%, 15%"

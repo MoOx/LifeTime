@@ -1,0 +1,13 @@
+# Sub-flow: a system banner ("Ready for Apple Intelligence") can drop in shortly after a
+# simulator's first boot and cover the top of a capture. Swipe it away if it is there.
+appId: io.moox.LifeTime
+---
+- runFlow:
+    when:
+      visible: ".*Apple Intelligence.*"
+    commands:
+      - swipe:
+          start: "50%, 8%"
+          end: "50%, 1%"
+          duration: 200
+      - waitForAnimationToEnd

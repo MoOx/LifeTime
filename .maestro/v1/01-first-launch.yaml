@@ -37,7 +37,12 @@ appId: io.moox.LifeTime
 
 - tapOn:
     id: "AllowCalendarsAccess"
-# The system prompt; its wording depends on the iOS version.
+# The system prompt; its wording depends on the iOS version. It can take a few seconds to
+# appear, and the optional tap below would then silently miss it.
+- extendedWaitUntil:
+    visible: "Allow Full Access"
+    timeout: 10000
+    optional: true
 - tapOn:
     text: "Allow Full Access"
     optional: true
@@ -63,10 +68,10 @@ appId: io.moox.LifeTime
     id: "GoalEdit_quickDuration_30"
 - scrollUntilVisible:
     element:
-      id: "GoalEdit_category_bullet_rest"
+      id: "GoalEdit_category_rest"
     direction: DOWN
 - tapOn:
-    id: "GoalEdit_category_bullet_rest"
+    id: "GoalEdit_category_rest"
 - tapOn:
     id: "GoalNewModalScreen_Button_Add"
 - extendedWaitUntil:
@@ -75,3 +80,8 @@ appId: io.moox.LifeTime
     timeout: 8000
 - waitForAnimationToEnd
 - takeScreenshot: ${OUT}/07-notifications-prompt
+# Close it (no testID, so by position). Left open, a stray gesture landing on the Goals tab
+# in a later flow reaches its Continue button, which sends the app to iOS Settings.
+- tapOn:
+    point: "91%, 54%"
+- waitForAnimationToEnd

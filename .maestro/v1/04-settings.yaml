@@ -53,11 +53,10 @@ appId: io.moox.LifeTime
 - tapOn: "Help"
 - waitForAnimationToEnd
 - takeScreenshot: ${OUT}/34-help
-- scrollUntilVisible:
-    element:
-      text: "Learn More about how to use your calendar app"
-    direction: DOWN
-- tapOn: "Learn More about how to use your calendar app"
+# Visible without scrolling. By position, because iOS merges this summary into one
+# accessibility node with the whole page's text.
+- tapOn:
+    point: "30%, 72%"
 - waitForAnimationToEnd
 - takeScreenshot: ${OUT}/35-help-learn-more
 - swipe:
