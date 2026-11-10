@@ -140,9 +140,16 @@ answers in INTENT.md §4 and in the spec.
 
 ---
 
-## Step 4 — Spikes
+## Step 4: Spikes
 
-- [ ] **Done:**
+- [x] **Done:** 2026-11-10. All three alpha1 spikes pass, on iOS 27.0 with Xcode 27.2:
+  [01-sdk58-build.md](./spikes/01-sdk58-build.md),
+  [02-large-title.md](./spikes/02-large-title.md) (recordings and screenshots, light and dark),
+  [03-grouped-lists.md](./spikes/03-grouped-lists.md) (default and accessibility sizes, two
+  defects fixed). Spec updated: header conditions in `spec/30-screens.md`, spike references in
+  `spec/40-design.md` and `spec/50-architecture.md`. Open, not blocking: inset or
+  edge-to-edge groups (default inset); the iOS 27.2 runtime was downloading, slice 0 re-runs
+  the build on it.
 
 **Goal:** prove each risky native assumption before any screen depends on it. Each spike
 is a throwaway screen in a scratch app, not production code.

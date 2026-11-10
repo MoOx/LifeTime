@@ -15,8 +15,8 @@ grouping, spacing and polish. They do not set headers, navigation or Android's l
 ## Type roles
 
 Roles name a meaning; each maps to the platform's own style and scales with Dynamic Type or
-font scale. This is the table from `src/ui/theme/type.ts`, carried over once validated by
-spike 3.
+font scale. This is the table from `src/ui/theme/type.ts`. Body, footnote and group header were validated
+by [spike 3](../spikes/03-grouped-lists.md); the other roles are checked by the slice that first uses them.
 
 | Role | iOS text style | Material 3 role | Used for |
 |---|---|---|---|
@@ -64,11 +64,11 @@ appearances, `textOnDarkLight` in SCREENS.md §13.
 | Component | iOS | Android |
 |---|---|---|
 | Tab bar | Native tabs (Liquid Glass) | Material navigation bar |
-| Grouped list | Inset grouped, as in Settings.app; v1's edge-to-edge groups, as captured, if spike 3 finds them cleaner | M3 list, grouped by headers and dividers |
+| Grouped list | Inset grouped, as in Settings.app (default); v1's edge-to-edge groups, as captured, if MoOx prefers them: both pass [spike 3](../spikes/03-grouped-lists.md) | M3 list, grouped by headers and dividers |
 | Row | Left slot, text, right slot, chevron | Ripple, same slots |
 | Group heading, action, footnote | As SCREENS.md §1 | Same structure, M3 type |
-| Tinted check | Filled in the item's own colour (calendar, category) | Same; M3 checkbox only if spike 3 shows the tint is lost |
-| Switch, slider | Native, `@expo/ui` where spike 3 validates it | Same |
+| Tinted check | Filled in the item's own colour (calendar, category) | Same; M3 checkbox only if the Android pass shows the tint is lost |
+| Switch, slider | Native, `@expo/ui` once proven on the simulator by the first slice that needs it | Same |
 | Menu, confirm | Native menu and alert | M3 menu and dialog |
 | Sheet | Form sheet | M3 bottom sheet, or a full-screen dialog for forms |
 | Chart | Skia, geometry of SCREENS.md §8b | Same |
@@ -84,7 +84,7 @@ Never on content, lists or cards. Before iOS 26, the system's standard material 
 
 | Topic | iOS | Android |
 |---|---|---|
-| Large titles | UIKit, Mail-style | Experimental medium/large bar, or small bar (spike 1) |
+| Large titles | UIKit, Mail-style | Experimental medium/large bar, or small bar (spike at the Android pass) |
 | Group header case | Uppercase | Sentence case |
 | Back | Minimal chevron | Arrow, predictive back |
 | Primary action on forms | Trailing text button | Trailing text button in the bar |

@@ -37,9 +37,10 @@ captures), and the app starts on the Summary.
 
 ## Headers (D10)
 
-Conditions for the iOS large title are established by spike 1, and must hold on every large
-header: the scroll view is the screen's first scrollable descendant, it uses
-`contentInsetAdjustmentBehavior="automatic"`, and `headerTransparent` is not set.
+Conditions for the iOS large title, established by [spike 2](../spikes/02-large-title.md), must
+hold on every large header: the scroll view is the screen's root (its first scrollable
+descendant), it uses `contentInsetAdjustmentBehavior="automatic"`, `headerTransparent` is not
+set, and the background comes from the Stack's `contentStyle`, not from a wrapper view.
 
 | Screen | iOS | Android, at the Android pass (if the spike passes) | Android fallback | Actions |
 |---|---|---|---|---|

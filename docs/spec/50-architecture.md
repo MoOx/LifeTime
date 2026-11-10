@@ -17,8 +17,8 @@ by editing it in place.
 
 | Carried over only after a spike validates it | Spike |
 |---|---|
-| `src/ui/List.tsx`, `AppText`, theme | 3 |
-| Goal ring, chart | 3 |
+| `src/ui/List.tsx`, `AppText`, theme | 3, done: [docs/spikes/03-grouped-lists.md](../spikes/03-grouped-lists.md) |
+| Goal ring, chart | Proven on the simulator in slice 2, before the Summary is built on them |
 | Screens from `app/` | Rewritten from 30-screens.md, reusing code where it passes |
 
 Bundle id stays `io.moox.LifeTime`, package `io.moox.lifetime` (D16).
@@ -42,7 +42,7 @@ types.
 
 | Need | Choice | Status |
 |---|---|---|
-| Routing, tabs, headers | expo-router `Stack`, native tabs; `react-native-screens/experimental` on Android if spike 1 passes | iOS proven by spike 1 first |
+| Routing, tabs, headers | expo-router `Stack`, native tabs; `react-native-screens/experimental` on Android if its spike passes at the Android pass | iOS proven: [spike 2](../spikes/02-large-title.md) |
 | Calendar | `expo-calendar` | Used today |
 | Health iOS | `@kingstinct/react-native-healthkit` | Spike 4 |
 | Health Android | `react-native-health-connect` | Android slice |
