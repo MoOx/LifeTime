@@ -1,0 +1,6 @@
+✔ 27 SDK-managed packages installed, none drifting
+✔ 3 routes, no URL claimed twice
+✔ 13 files use only Intl APIs Hermes implements
+✔ 21 domain files, no runtime React Native or Expo import
+Test Suites: 10 passed, 10 total
+Tests:       125 passed, 125 total

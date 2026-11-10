@@ -169,9 +169,10 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
 
 ---
 
-## Step 5 — Build, slice by slice
+## Step 5: Build, slice by slice
 
 - [ ] **Done:**
+- Progress: slice 0 done 2026-11-10, evidence in [slices/0/](./slices/0/README.md).
 
 Follow `docs/spec/60-slices.md`, v2-alpha1 first. **Slice 0** is the fresh Expo SDK 58 scaffold (D12), with:
 - `src/domain` and its tests ported.

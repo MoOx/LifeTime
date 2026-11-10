@@ -1,0 +1,12 @@
+# Slice 0: the app launches and shows its first screen.
+# Run with the default Xcode (not 26.6, which only builds v1): maestro test .maestro/launch.yaml
+appId: io.moox.LifeTime
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Your LifeTime"
+- assertVisible:
+    id: "scaffold"
+# Maestro writes this under ~/.maestro/tests/<run>/launch/takeScreenshot/; copy it to
+# docs/slices/0/ as evidence.
+- takeScreenshot: launch

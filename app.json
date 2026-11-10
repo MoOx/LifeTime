@@ -7,7 +7,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "io.moox.LifeTime",
@@ -31,32 +30,17 @@
     "plugins": [
       "expo-router",
       [
-        "expo-calendar",
-        {
-          "calendarPermission": "LifeTime reads your calendars to build your time reports. Your data never leaves your device.",
-          "remindersPermission": false
-        }
-      ],
-      [
-        "expo-notifications",
-        {
-          "color": "#3023AE",
-          "defaultChannel": "daily-reminders",
-          "enableBackgroundRemoteNotifications": false
-        }
-      ],
-      [
         "expo-splash-screen",
         {
           "image": "./assets/splash-icon.png",
           "backgroundColor": "#3023AE",
           "imageWidth": 160
         }
-      ],
-      "expo-localization"
+      ]
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "reactCompiler": true
     }
   }
 }

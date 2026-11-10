@@ -5,7 +5,7 @@ Supersedes [ARCHITECTURE.md](../ARCHITECTURE.md), which described the v2 attempt
 ## Starting point (D12)
 
 A **clean Expo SDK 58 scaffold** (React Native 0.88, UIScene life cycle, so Xcode 27 is
-possible). The current tree is a quarry. It is replaced on this branch by moving it out, not
+possible). The current tree is a quarry, now in `quarry/v2/` (slice 0). It is replaced on this branch by moving it out, not
 by editing it in place.
 
 | Carried over from the start | Condition |

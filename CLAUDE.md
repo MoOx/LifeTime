@@ -49,7 +49,9 @@ Never stop just to report progress; a summary at the end of the run is enough.
 | `docs/SPEC.md`, `docs/SCREENS.md` | What v1 does, and its screens in detail |
 | `docs/reference/v1/` | Native captures of v1, and how v1 was rebuilt to take them |
 | `src/domain/` | Tested TypeScript domain logic, candidate for reuse |
-| `app/`, `src/ui`, `src/features` | The v2 UI attempt — a quarry, not a base: the new app starts from a fresh Expo SDK 58 scaffold (INTENT.md D12) |
+| `app/` | The new app's routes, on a fresh Expo SDK 58 scaffold (INTENT.md D12, `docs/slices/0/`) |
+| `quarry/v2/` | The v2 UI attempt, moved out untouched: a quarry, not a base; reuse a piece only once a slice proves it |
+| `docs/spikes/`, `docs/slices/` | Spike verdicts, and each slice's evidence |
 | `.maestro/` | Maestro flows (native screenshots and navigation checks) |
 | `scripts/v1/` | Rebuilding and capturing v1 from the `main` branch |
 | `main` branch | v1 source (React Native 0.67 + ReScript 9) |
