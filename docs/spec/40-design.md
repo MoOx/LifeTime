@@ -6,7 +6,9 @@ grouping, spacing and polish. They do not set headers, navigation or Android's l
 
 ## Principles
 
-1. Native first. A platform control beats a look-alike, always.
+1. Native first. A platform control beats a look-alike, always. On iOS that means SwiftUI
+   through `@expo/ui` wherever it has the component (D27): the OS then draws today's look,
+   and next year's, instead of the app copying one year's metrics.
 2. Never a hard-coded font size. This was the defect behind "doesn't feel native on Android".
 3. Semantic colours from the system, so light, dark and increased contrast come for free.
 4. Android is Material 3, not iOS with another font.
@@ -29,7 +31,7 @@ by [spike 3](../spikes/03-grouped-lists.md); the other roles are checked by the 
 | `callout` | Callout | Body Medium | Activity row title |
 | `subhead` | Subheadline | Body Medium | Goals introduction, chips |
 | `footnote` | Footnote | Body Small | Under groups |
-| `groupHeader` | Footnote, uppercase on iOS | Title Small, sentence case | Above groups |
+| `groupHeader` | SwiftUI's own section header (D27) | Title Small, sentence case | Above groups |
 | `caption` | Caption 1 | Label Medium | Calendar source, chart labels |
 
 Welcome's thin "Welcome to" and heavy "LifeTime" keep v1's weights (100 and 800) at the role
@@ -44,6 +46,8 @@ fixed geometry; this is the only clamp.
 The 4 pt grid and values of `src/ui/theme/space.ts`: `xxs 2`, `xs 4`, `sm 8`, `md 12`,
 `lg 16`, `xl 20`, `xxl 24`, `section 32`. Screen margin 16. Row minimum 44 pt on iOS and 56 dp
 on Android. Separator inset is derived: margin + icon 28 + gap 12, never typed in.
+On iOS these apply only to what React Native lays out (the chart, goal cards): `Form` rows,
+sections and their margins are SwiftUI's own (D27).
 
 ## Colour
 
@@ -64,11 +68,11 @@ appearances, `textOnDarkLight` in SCREENS.md §13.
 | Component | iOS | Android |
 |---|---|---|
 | Tab bar | Native tabs (Liquid Glass) | Material navigation bar |
-| Grouped list | Inset grouped, as in Settings.app (default); v1's edge-to-edge groups, as captured, if MoOx prefers them: both pass [spike 3](../spikes/03-grouped-lists.md) | M3 list, grouped by headers and dividers |
-| Row | Left slot, text, right slot, chevron | Ripple, same slots |
-| Group heading, action, footnote | As SCREENS.md §1 | Same structure, M3 type |
+| Grouped list | SwiftUI `Form` and `Section` through `@expo/ui`, rounded groups as in Settings.app (D27, [spike 4](../spikes/04-expo-ui-lists.md)); React Native content such as the chart sits in a section through `RNHostView` | M3 list, grouped by headers and dividers |
+| Row | SwiftUI row: text, trailing value, chevron when it pushes (`src/ui/Form.tsx`) | Ripple, same slots |
+| Group heading, action, footnote | `Section` header and footer; the content of SCREENS.md §1, the look of the OS | Same structure, M3 type |
 | Tinted check | Filled in the item's own colour (calendar, category) | Same; M3 checkbox only if the Android pass shows the tint is lost |
-| Switch, slider | Native, `@expo/ui` once proven on the simulator by the first slice that needs it | Same |
+| Switch, slider, picker, date picker, text field | SwiftUI through `@expo/ui` (D27), each proven on the simulator by the first slice that needs it | Jetpack Compose through `@expo/ui` |
 | Menu, confirm | Native menu and alert | M3 menu and dialog |
 | Sheet | Form sheet | M3 bottom sheet, or a full-screen dialog for forms |
 | Chart | Skia, geometry of SCREENS.md §8b | Same |
@@ -85,7 +89,7 @@ Never on content, lists or cards. Before iOS 26, the system's standard material 
 | Topic | iOS | Android |
 |---|---|---|
 | Large titles | UIKit, Mail-style | Experimental medium/large bar, or small bar (spike at the Android pass) |
-| Group header case | Uppercase | Sentence case |
+| Group header case | Whatever SwiftUI's `Section` draws on the running iOS | Sentence case |
 | Back | Minimal chevron | Arrow, predictive back |
 | Primary action on forms | Trailing text button | Trailing text button in the bar |
 | Haptics | Selection on toggles, as in the system | Platform default |

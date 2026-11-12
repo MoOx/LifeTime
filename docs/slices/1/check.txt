@@ -1,0 +1,55 @@
+
+> lifetime@2.0.0 check
+> npm run check:sdk && npm run check:routes && npm run check:intl && npm run check:domain && npm run typecheck && npm run test
+
+
+> lifetime@2.0.0 check:sdk
+> node scripts/check-sdk-versions.mjs
+
+✔ 28 SDK-managed packages installed, none drifting
+
+> lifetime@2.0.0 check:routes
+> node scripts/check-routes.mjs
+
+✔ 11 routes, no URL claimed twice
+    /+not-found                      expo-router/build/views/Unmatched.js
+    /                                ./index.tsx
+    /_sitemap                        expo-router/build/views/Sitemap.js
+    /goal                            ./goal.tsx
+    /goals                           ./(tabs)/goals/index.tsx
+    /help                            ./help.tsx
+    /settings                        ./(tabs)/settings/index.tsx
+    /settings/notifications          ./(tabs)/settings/notifications.tsx
+    /settings/reset                  ./(tabs)/settings/reset.tsx
+    /summary                         ./(tabs)/summary/index.tsx
+    /summary/activity                ./(tabs)/summary/activity.tsx
+
+> lifetime@2.0.0 check:intl
+> node scripts/check-intl.mjs
+
+✔ 33 files use only Intl APIs Hermes implements
+
+> lifetime@2.0.0 check:domain
+> node scripts/check-domain.mjs
+
+✔ 21 domain files, no runtime React Native or Expo import
+
+> lifetime@2.0.0 typecheck
+> tsc --noEmit
+
+
+> lifetime@2.0.0 test
+> jest
+
+watchman warning: Recrawled this watch 21 times, most recently because:
+MustScanSubDirs UserDroppedTo resolve, please review the information on
+https://facebook.github.io/watchman/docs/troubleshooting.html#recrawl
+To clear this warning, run:
+`watchman watch-del '/Users/moox/dev/LifeTime' ; watchman watch-project '/Users/moox/dev/LifeTime'`
+
+
+Test Suites: 10 passed, 10 total
+Tests:       125 passed, 125 total
+Snapshots:   0 total
+Time:        3.495 s, estimated 4 s
+Ran all test suites.

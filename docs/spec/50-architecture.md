@@ -17,7 +17,8 @@ by editing it in place.
 
 | Carried over only after a spike validates it | Spike |
 |---|---|
-| `src/ui/List.tsx`, `AppText`, theme | 3, done: [docs/spikes/03-grouped-lists.md](../spikes/03-grouped-lists.md) |
+| `AppText`, theme, for what React Native draws | 3, done: [docs/spikes/03-grouped-lists.md](../spikes/03-grouped-lists.md) |
+| v2's React Native `List.tsx` | Not carried: lists are SwiftUI's `Form` (D27, [spike 4](../spikes/04-expo-ui-lists.md)) |
 | Goal ring, chart | Proven on the simulator in slice 2, before the Summary is built on them |
 | Screens from `app/` | Rewritten from 30-screens.md, reusing code where it passes |
 
@@ -48,7 +49,7 @@ types.
 | Health Android | `react-native-health-connect` | Android slice |
 | Storage | `expo-sqlite`; settings as one JSON document | |
 | Charts, rings | `@shopify/react-native-skia` | Spike 3 |
-| Native controls | `@expo/ui`, where validated | Spike 3 |
+| Lists, native controls | `@expo/ui` (SwiftUI on iOS) wherever it has the component (D27) | Lists and hosted RN views: [spike 4](../spikes/04-expo-ui-lists.md); each control by its first slice |
 | Icons | `expo-symbols`, both platform names | |
 | Notifications | `expo-notifications`; actually scheduled, tested | |
 | On-device model | Own module for batching, pacing and guardrail bisection; `expo-ai` only if spike 6 shows it suffices | Spike 6 |

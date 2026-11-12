@@ -1,0 +1,75 @@
+# Slice 1: the shell. Three tabs, their large titles at rest and collapsed, pushed screens,
+# the two sheets, and re-tapping a tab popping to its root.
+# Screenshots land under ~/.maestro/tests/<run>/shell/takeScreenshot/; copy them to
+# docs/slices/1/ as evidence, and open them: a passing flow proves navigation, not pictures.
+appId: io.moox.LifeTime
+---
+- launchApp:
+    clearState: true
+
+# Summary
+- assertVisible: "Your LifeTime"
+- takeScreenshot: summary-rest
+- swipe:
+    start: 50%, 70%
+    end: 50%, 35%
+    duration: 600
+- waitForAnimationToEnd
+- takeScreenshot: summary-collapsed
+- tapOn:
+    id: "row-Meditation"
+- assertVisible:
+    id: "activity"
+- assertVisible: "Meditation"
+- takeScreenshot: summary-pushed
+# Re-tapping the active tab pops to the root (30-screens.md).
+- tapOn: "Summary"
+- assertNotVisible:
+    id: "activity"
+- assertVisible:
+    id: "summary"
+
+# Goals and its sheet
+- tapOn: "Goals"
+- assertVisible:
+    id: "goals"
+- takeScreenshot: goals-rest
+- swipe:
+    start: 50%, 70%
+    end: 50%, 35%
+    duration: 600
+- waitForAnimationToEnd
+- takeScreenshot: goals-collapsed
+- tapOn: "New Goal"
+- assertVisible:
+    id: "goal"
+- takeScreenshot: goal-sheet
+- tapOn: "Cancel"
+- assertNotVisible:
+    id: "goal"
+
+# Settings, its pushed screens and the Help sheet
+- tapOn: "Settings"
+- assertVisible:
+    id: "settings"
+- takeScreenshot: settings-rest
+- tapOn:
+    id: "row-notifications"
+- assertVisible:
+    id: "notifications"
+- takeScreenshot: settings-pushed
+- tapOn: "Back"
+- tapOn:
+    id: "row-help"
+- assertVisible:
+    id: "help"
+- takeScreenshot: help-sheet
+- tapOn: "Done"
+- assertNotVisible:
+    id: "help"
+- swipe:
+    start: 50%, 70%
+    end: 50%, 35%
+    duration: 600
+- waitForAnimationToEnd
+- takeScreenshot: settings-collapsed

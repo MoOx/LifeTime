@@ -1,12 +1,25 @@
-import { Stack } from 'expo-router';
-import { PlatformColor } from 'react-native';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router'
+import { useColorScheme } from 'react-native'
 
-// Slice 0 placeholder. Slice 1 replaces it with the native tabs and three stacks
-// of docs/spec/30-screens.md.
+import { stackOptions } from '@/ui/stackOptions'
+
+// Root stack: the tabs, and the sheets of docs/spec/30-screens.md ("Navigation map").
+// Sheets are UIKit page sheets (`modal`), each with its own small native header.
+//
+// The theme follows the system: expo-router colours header titles with the navigation
+// theme's `text`, so without it titles stay black in dark mode. Kept from the SDK 58
+// template that spike 2 built (docs/spikes/04-expo-ui-lists.md, "Dark mode").
 export default function RootLayout() {
+  const scheme = useColorScheme()
   return (
-    <Stack screenOptions={{ contentStyle: { backgroundColor: PlatformColor('systemGroupedBackground') } }}>
-      <Stack.Screen name="index" options={{ title: 'Your LifeTime', headerLargeTitle: true }} />
-    </Stack>
-  );
+    <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Stack screenOptions={stackOptions}>
+        {/* The redirect to /summary: no header, or "index" flashes at launch. */}
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="help" options={{ presentation: 'modal', title: 'Help' }} />
+        <Stack.Screen name="goal" options={{ presentation: 'modal', title: 'New Goal' }} />
+      </Stack>
+    </ThemeProvider>
+  )
 }

@@ -45,3 +45,6 @@ nothing is truncated.
 **Open for MoOx: inset or edge-to-edge?** The spec's default is inset, as in Settings.app on
 iOS 26 and later; v1 was edge-to-edge. Both are equally native and equally cheap. The default
 stays inset until MoOx chooses.
+
+**Answered 2026-11-12:** rounded groups, and drawn by SwiftUI's own `Form` rather than by
+this React Native `Group` (INTENT.md D27). [Spike 4](./04-expo-ui-lists.md) takes over.

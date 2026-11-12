@@ -1,16 +1,7 @@
-import { ScrollView, Text, PlatformColor } from 'react-native';
+import { Redirect } from 'expo-router'
 
-// The scroll view is the screen's root, with automatic content insets, so the large title
-// collapses natively (docs/spikes/02-large-title.md).
+// The tabs live in real directories (check-routes refuses three group indexes on "/"),
+// so the app's root URL sends to the first tab.
 export default function Index() {
-  return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic">
-      <Text
-        testID="scaffold"
-        dynamicTypeRamp="footnote"
-        style={{ fontSize: 13, color: PlatformColor('secondaryLabel'), padding: 16 }}>
-        Scaffold: Expo SDK 58
-      </Text>
-    </ScrollView>
-  );
+  return <Redirect href="/summary" />
 }

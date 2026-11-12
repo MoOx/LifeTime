@@ -1,0 +1,42 @@
+# Slice 1 recording: each tab scrolled until its large title collapses, then back to rest.
+# Run under `xcrun simctl io booted recordVideo` (docs/slices/1/README.md).
+appId: io.moox.LifeTime
+---
+- launchApp
+- assertVisible: "Your LifeTime"
+- swipe:
+    start: 50%, 70%
+    end: 50%, 30%
+    duration: 700
+- waitForAnimationToEnd
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 700
+- waitForAnimationToEnd
+- tapOn: "Goals"
+- assertVisible:
+    id: "goals"
+- swipe:
+    start: 50%, 70%
+    end: 50%, 30%
+    duration: 700
+- waitForAnimationToEnd
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 700
+- waitForAnimationToEnd
+- tapOn: "Settings"
+- assertVisible:
+    id: "settings"
+- swipe:
+    start: 50%, 70%
+    end: 50%, 30%
+    duration: 700
+- waitForAnimationToEnd
+- swipe:
+    start: 50%, 30%
+    end: 50%, 80%
+    duration: 700
+- waitForAnimationToEnd
