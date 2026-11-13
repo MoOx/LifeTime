@@ -4,9 +4,14 @@ appId: io.moox.LifeTime
 ---
 - launchApp:
     clearState: true
+# Welcome shows at every cold start until settings persist (slice 7).
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 30000
+- tapOn: "Continue"
 - assertVisible: "Your LifeTime"
 - assertVisible:
-    id: "scaffold"
+    id: "summary"
 # Maestro writes this under ~/.maestro/tests/<run>/launch/takeScreenshot/; copy it to
 # docs/slices/0/ as evidence.
 - takeScreenshot: launch

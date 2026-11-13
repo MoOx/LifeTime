@@ -1,0 +1,54 @@
+# Slice 3: Welcome, Privacy and Help. Captures to compare with docs/reference/v1/ios/
+# 01-welcome, 02-privacy, 34-help and 35-help-learn-more.
+appId: io.moox.LifeTime
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 30000
+# The pitch is one accessible button: "Welcome to, LifeTime, Your personal coach, ..."
+- assertVisible: "Welcome to, LifeTime, Your personal coach.*"
+# The staged entrances end 2.5 s after launch (Welcome.res:34-79).
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: 01-welcome
+
+# Welcome cannot be swiped away.
+- swipe:
+    start: 50%, 30%
+    end: 50%, 90%
+    duration: 400
+- assertVisible: "Continue"
+
+- tapOn:
+    id: "welcome-privacy"
+- extendedWaitUntil:
+    visible: "LifeTime & Privacy"
+    timeout: 10000
+- assertVisible: ".*read-only.*"
+- takeScreenshot: 02-privacy
+- tapOn: "Done"
+- assertVisible: "Continue"
+
+- tapOn: "Continue"
+- extendedWaitUntil:
+    visible: "Your LifeTime"
+    timeout: 10000
+- assertNotVisible:
+    id: "welcome"
+
+# Help, from Settings.
+- tapOn: "Settings"
+- tapOn:
+    id: "row-help"
+- extendedWaitUntil:
+    visible: "How to use LifeTime"
+    timeout: 10000
+- takeScreenshot: 34-help
+- tapOn: "Learn More about how to use your calendar app"
+- assertVisible: "Apple Calendar (iCloud or local)"
+- takeScreenshot: 35-help-learn-more
+- tapOn: "Done"
+- assertVisible:
+    id: "settings"

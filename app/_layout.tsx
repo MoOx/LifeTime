@@ -19,7 +19,14 @@ export default function RootLayout() {
           {/* The redirect to /summary: no header, or "index" flashes at launch. */}
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="help" options={{ presentation: 'modal', title: 'Help' }} />
+          {/* Welcome cannot be swiped away (spec/30-screens.md, "Navigation map"). */}
+          <Stack.Screen
+            name="welcome"
+            options={{ presentation: 'modal', headerShown: false, gestureEnabled: false }}
+          />
+          {/* Privacy and Help: the title is in the content, as in v1 (spec/30-screens.md). */}
+          <Stack.Screen name="privacy" options={{ presentation: 'modal', title: '' }} />
+          <Stack.Screen name="help" options={{ presentation: 'modal', title: '' }} />
           <Stack.Screen name="goal" options={{ presentation: 'modal', title: 'New Goal' }} />
         </Stack>
       </SettingsProvider>

@@ -3,6 +3,11 @@
 appId: io.moox.LifeTime
 ---
 - launchApp
+# Welcome shows at every cold start until settings persist (slice 7).
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 30000
+- tapOn: "Continue"
 - assertVisible: "Your LifeTime"
 - swipe:
     start: 50%, 70%

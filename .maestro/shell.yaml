@@ -6,6 +6,11 @@ appId: io.moox.LifeTime
 ---
 - launchApp:
     clearState: true
+# Welcome shows at every cold start until settings persist (slice 7).
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 30000
+- tapOn: "Continue"
 
 # Summary
 - assertVisible: "Your LifeTime"
@@ -16,11 +21,20 @@ appId: io.moox.LifeTime
     duration: 600
 - waitForAnimationToEnd
 - takeScreenshot: summary-collapsed
+# Since slice 2 the Summary lists real activities; centre one before tapping it.
+- scrollUntilVisible:
+    element:
+      id: "activity-Sleep"
+    direction: DOWN
+    centerElement: true
+- waitForAnimationToEnd
 - tapOn:
-    id: "row-Meditation"
-- assertVisible:
-    id: "activity"
-- assertVisible: "Meditation"
+    id: "activity-Sleep"
+- extendedWaitUntil:
+    visible:
+      id: "activity"
+    timeout: 10000
+- assertVisible: "Sleep"
 - takeScreenshot: summary-pushed
 # Re-tapping the active tab pops to the root (30-screens.md).
 - tapOn: "Summary"

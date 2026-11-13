@@ -176,6 +176,7 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
   Slice 1 done 2026-11-12, evidence in [slices/1/](./slices/1/README.md); lists moved to
   SwiftUI's `Form` through `@expo/ui` (INTENT.md D27, [spike 4](./spikes/04-expo-ui-lists.md)).
   Slice 2 done 2026-11-13, evidence in [slices/2/](./slices/2/README.md).
+  Slice 3 done 2026-11-13, evidence in [slices/3/](./slices/3/README.md).
 
 Follow `docs/spec/60-slices.md`, v2-alpha1 first. **Slice 0** is the fresh Expo SDK 58 scaffold (D12), with:
 - `src/domain` and its tests ported.

@@ -34,8 +34,9 @@ by [spike 3](../spikes/03-grouped-lists.md); the other roles are checked by the 
 | `groupHeader` | SwiftUI's own section header (D27) | Title Small, sentence case | Above groups |
 | `caption` | Caption 1 | Label Medium | Calendar source, chart labels |
 
-Welcome's thin "Welcome to" and heavy "LifeTime" keep v1's weights (100 and 800) at the role
-sizes, and fit on one line at any size.
+Welcome's thin "Welcome to" and heavy "LifeTime" keep v1's weights (100 and 800) and sizes
+(58 and 68 pt), shrinking to fit one line; they are lettering, not text that should grow with
+Dynamic Type (slice 3, matching capture 01). The rest of Welcome uses the roles.
 
 At the largest accessibility sizes, rows grow and nothing is truncated except the single-line
 titles v1 already truncated. Chart labels scale up to a limit of 1.3, since the chart has
