@@ -39,6 +39,9 @@ const seedWeek = async (calendarId: string, now: number) => {
     ['Deep work', 9, 0, 12, 0],
     ['Lunch', 12, 30, 13, 15],
     ['CrossFit', 18, 0, 19, 0],
+    // Two titles sharing a start, for the Match row's blast radius (slice 5).
+    ['Gym', 7, 15, 8, 0],
+    ['Gym legs', 19, 30, 20, 15],
   ]
   for (let back = 13; back >= 0; back--) {
     const day = startOfDay(addDays(now, -back))

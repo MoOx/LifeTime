@@ -42,9 +42,12 @@ export type TopActivity = Bucket & { categoryId: CategoryId }
 
 export function TopActivities({
   activities,
+  weekStart,
   onCustomize,
 }: {
   activities: TopActivity[]
+  /** The visible week, whose events the activity screen lists (`ActivityOptions.res:108`). */
+  weekStart: number
   onCustomize?: () => void
 }) {
   const scheme = useColorScheme() === 'dark' ? 'dark' : 'light'
@@ -72,7 +75,7 @@ export function TopActivities({
             onPress={() =>
               router.push({
                 pathname: '/summary/activity',
-                params: { title: activity.key },
+                params: { title: activity.key, week: String(weekStart) },
               })
             }
             modifiers={[tint('primary'), accessibilityIdentifier(`activity-${activity.key}`)]}>

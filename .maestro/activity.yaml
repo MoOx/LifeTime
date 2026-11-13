@@ -1,0 +1,128 @@
+# Slice 5: Activity detail and rules, on the E2E calendar (EXPO_PUBLIC_E2E=1 build).
+# Capture to compare with docs/reference/v1/ios/11-activity-options.
+appId: io.moox.LifeTime
+---
+- launchApp:
+    clearState: true
+    # Maestro grants every permission by default; the flow asks for real.
+    permissions:
+      calendar: unset
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 30000
+- tapOn: "Continue"
+- tapOn:
+    id: "use-my-calendar"
+- extendedWaitUntil:
+    visible:
+      id: "access-continue"
+    timeout: 10000
+- tapOn:
+    id: "access-continue"
+- waitForAnimationToEnd
+- tapOn: "Allow Full Access"
+- openLink: "lifetime://e2e?scenario=week"
+# iOS asks "Open in LifeTime?" for a link opened from outside the app.
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Deep work"
+    timeout: 15000
+- takeScreenshot: 12-before-rule
+
+# Sleep's detail: the categories, the Match row, the week's events, Hide.
+- scrollUntilVisible:
+    element:
+      id: "activity-Sleep"
+    direction: DOWN
+    centerElement: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "activity-Sleep"
+- extendedWaitUntil:
+    visible:
+      id: "activity"
+    timeout: 10000
+- assertVisible: "Uncategorized"
+- takeScreenshot: 11-activity
+- scrollUntilVisible:
+    element:
+      id: "toggle-activity-hidden"
+    direction: DOWN
+- waitForAnimationToEnd
+- takeScreenshot: 11b-activity-events
+
+# A rule: Sleep is Rest. The chart and the list follow.
+- scrollUntilVisible:
+    element:
+      id: "category-rest"
+    direction: UP
+    centerElement: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "category-rest"
+- extendedWaitUntil:
+    visible:
+      id: "category-rest-selected"
+    timeout: 10000
+- tapOn: "Back"
+- scrollUntilVisible:
+    element: "Weekly Chart"
+    direction: UP
+- waitForAnimationToEnd
+- takeScreenshot: 12-after-rule
+
+# The blast radius: widening "Gym" to "Starts With" also claims "Gym legs".
+- scrollUntilVisible:
+    element:
+      id: "activity-Gym"
+    direction: DOWN
+    centerElement: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "activity-Gym"
+- extendedWaitUntil:
+    visible:
+      id: "activity"
+    timeout: 10000
+- assertVisible: "Matches only “Gym”."
+- tapOn:
+    id: "category-exercise"
+- tapOn:
+    id: "match-mode"
+- tapOn: "Starts With"
+- extendedWaitUntil:
+    visible: "Also matches 1 other activity: Gym legs"
+    timeout: 10000
+- takeScreenshot: 11c-blast-radius
+- tapOn: "Back"
+
+# Gym legs now resolves through the widened rule.
+- scrollUntilVisible:
+    element:
+      id: "activity-Gym legs"
+    direction: DOWN
+    centerElement: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "activity-Gym legs"
+- extendedWaitUntil:
+    visible:
+      id: "category-exercise-selected"
+    timeout: 10000
+- takeScreenshot: 11d-claimed
+
+# Hide, then reveal. Centred: under the floating tab bar the tap would land on the tab.
+- scrollUntilVisible:
+    element:
+      id: "toggle-activity-hidden"
+    direction: DOWN
+    centerElement: true
+- waitForAnimationToEnd
+- tapOn:
+    id: "toggle-activity-hidden"
+- assertVisible: "Reveal Activity"
+- tapOn:
+    id: "toggle-activity-hidden"
+- assertVisible: "Hide Activity"

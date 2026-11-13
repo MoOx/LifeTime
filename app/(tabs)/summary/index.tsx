@@ -134,7 +134,11 @@ export default function Summary() {
         />
       </Section>
 
-      <TopActivities activities={activities} onCustomize={() => router.push('/filters')} />
+      <TopActivities
+        activities={activities}
+        weekStart={report.weeks[index].start}
+        onCustomize={() => router.push('/filters')}
+      />
 
       <Section>
         <Button onPress={toggleHidden} modifiers={[accessibilityIdentifier('toggle-hidden')]}>

@@ -91,11 +91,20 @@ export const isSkipped = (eventTitle: string, skipped: readonly string[]): boole
  */
 const SUGGESTIONS: [RegExp, CategoryId][] = [
   [/\b(sleep|nap|nuit|dodo|sieste|sommeil)\b/iu, 'rest'],
-  [/\b(gym|run|running|swim|yoga|workout|training|sport|course|muscu|v[ée]lo|bike)\b/iu, 'exercise'],
+  [
+    /\b(gym|run|running|swim|yoga|workout|training|sport|course|muscu|v[ée]lo|bike)\b/iu,
+    'exercise',
+  ],
   [/\b(lunch|dinner|breakfast|brunch|d[ée]jeuner|d[îi]ner|petit.?d[ée]j|repas)\b/iu, 'food'],
   [/\b(standup|meeting|1:1|retro|sprint|review|call|r[ée]union|point|boulot|work)\b/iu, 'work'],
-  [/\b(drinks|party|birthday|apero|ap[ée]ro|anniversaire|famille|family|friends|amis)\b/iu, 'social'],
-  [/\b(meditation|therapy|m[ée]ditation|th[ée]rapie|massage|coiffeur|doctor|m[ée]decin)\b/iu, 'self'],
+  [
+    /\b(drinks|party|birthday|apero|ap[ée]ro|anniversaire|famille|family|friends|amis)\b/iu,
+    'social',
+  ],
+  [
+    /\b(meditation|therapy|m[ée]ditation|th[ée]rapie|massage|coiffeur|doctor|m[ée]decin)\b/iu,
+    'self',
+  ],
   [/\b(movie|cinema|netflix|game|gaming|concert|s[ée]rie|film|jeu)\b/iu, 'fun'],
   [/\b(clean|laundry|groceries|courses|m[ée]nage|lessive|vaisselle|admin)\b/iu, 'chores'],
 ]
@@ -106,4 +115,52 @@ export const suggestCategoryId = (eventTitle: string): CategoryId | undefined =>
     if (pattern.test(title)) return categoryId
   }
   return undefined
+}
+
+/** The user's rule written for this exact pattern, if any. */
+export const ruleFor = (activities: readonly Activity[], title: string): Activity | undefined => {
+  const pattern = normalizeTitle(title)
+  return activities.find((a) => normalizeTitle(a.title) === pattern)
+}
+
+/**
+ * Activity detail's category list: writes the rule for this title, replacing the one with
+ * the same pattern (v1 wrote an `exact` rule and replaced any existing one,
+ * `ActivityOptions.res:74-92`). The match mode is the Match row's (issue #13).
+ */
+export const withRule = (
+  activities: readonly Activity[],
+  title: string,
+  categoryId: CategoryId,
+  match: MatchMode,
+  now: number,
+): Activity[] => {
+  const pattern = normalizeTitle(title)
+  return [
+    ...activities.filter((a) => normalizeTitle(a.title) !== pattern),
+    { id: makeActivityId(title, now), title, match, categoryId, createdAt: now },
+  ]
+}
+
+/**
+ * The blast radius of a rule (issue #13, CATEGORISATION.md): the other titles it would also
+ * claim, each once, in the order given. The Match row shows their count before the rule is
+ * widened.
+ */
+export const alsoMatches = (
+  rule: Pick<Activity, 'title' | 'match'>,
+  titles: readonly string[],
+): string[] => {
+  const own = normalizeTitle(rule.title)
+  const probe: Activity = { id: '', categoryId: '', createdAt: 0, ...rule }
+  const seen = new Set<string>()
+  const result: string[] = []
+  for (const title of titles) {
+    const normalized = normalizeTitle(title)
+    if (normalized === own || seen.has(normalized)) continue
+    if (!matches(probe, title)) continue
+    seen.add(normalized)
+    result.push(title)
+  }
+  return result
 }

@@ -1,10 +1,21 @@
-import { Activity, MatchMode, matches, normalizeTitle, suggestCategoryId } from '../activities'
+import {
+  Activity,
+  alsoMatches,
+  MatchMode,
+  matches,
+  normalizeTitle,
+  ruleFor,
+  suggestCategoryId,
+  withRule,
+} from '../activities'
 
-const activity = (
-  title: string,
-  match: MatchMode,
-  categoryId: string,
-): Activity => ({ id: `${match}:${title}`, title, match, categoryId, createdAt: 0 })
+const activity = (title: string, match: MatchMode, categoryId: string): Activity => ({
+  id: `${match}:${title}`,
+  title,
+  match,
+  categoryId,
+  createdAt: 0,
+})
 
 describe('normalizeTitle', () => {
   it('case-folds and collapses whitespace', () => {
@@ -52,5 +63,36 @@ describe('suggestCategoryId', () => {
 
   it('returns nothing when it has no opinion', () => {
     expect(suggestCategoryId('Zblorb')).toBeUndefined()
+  })
+})
+
+describe('withRule', () => {
+  it('replaces the rule with the same pattern and keeps the others', () => {
+    const first = withRule([], 'Deep work', 'work', 'exact', 1)
+    const both = withRule(first, 'Lunch', 'food', 'exact', 2)
+    const replaced = withRule(both, 'deep work', 'fun', 'startsWith', 3)
+    expect(replaced.map((a) => [a.title, a.categoryId, a.match])).toEqual([
+      ['Lunch', 'food', 'exact'],
+      ['deep work', 'fun', 'startsWith'],
+    ])
+    expect(ruleFor(replaced, 'Deep Work')?.categoryId).toBe('fun')
+  })
+})
+
+describe('alsoMatches', () => {
+  const titles = ['Client call', 'Client lunch', 'client call', 'Call mum', 'Lunch']
+  it('lists the other titles a widened rule would claim, once each', () => {
+    expect(alsoMatches({ title: 'Client call', match: 'startsWith' }, titles)).toEqual([])
+    expect(alsoMatches({ title: 'Client', match: 'startsWith' }, titles)).toEqual([
+      'Client call',
+      'Client lunch',
+    ])
+    expect(alsoMatches({ title: 'call', match: 'contains' }, titles)).toEqual([
+      'Client call',
+      'Call mum',
+    ])
+  })
+  it('claims nothing else when exact', () => {
+    expect(alsoMatches({ title: 'Lunch', match: 'exact' }, titles)).toEqual([])
   })
 })
