@@ -2,6 +2,7 @@ import {
   formatUpdated,
   MINUTES_PER_DAY,
   formatHoursMinutes,
+  durationParts,
   formatMinutes,
   formatRelative,
   minutesElapsedInDay,
@@ -11,6 +12,22 @@ import {
 
 const at = (y: number, m: number, d: number, h = 0, min = 0) =>
   new Date(y, m, d, h, min).getTime()
+
+describe('durationParts', () => {
+  it('splits a duration into numbers and units, collapsing empty ones', () => {
+    expect(durationParts(0)).toEqual([{ value: 0, unit: 'm' }])
+    expect(durationParts(60)).toEqual([{ value: 1, unit: 'h' }])
+    expect(durationParts(3 * 1440 + 14 * 60 + 31)).toEqual([
+      { value: 3, unit: 'd' },
+      { value: 14, unit: 'h' },
+      { value: 31, unit: 'm' },
+    ])
+    expect(durationParts(1440 + 5)).toEqual([
+      { value: 1, unit: 'd' },
+      { value: 5, unit: 'm' },
+    ])
+  })
+})
 
 describe('formatMinutes', () => {
   it('collapses empty units', () => {

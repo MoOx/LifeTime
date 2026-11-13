@@ -1,12 +1,19 @@
-import { Button, HStack, ProgressView, Spacer, Text } from '@expo/ui/swift-ui'
-import { accessibilityIdentifier, controlSize, textCase } from '@expo/ui/swift-ui/modifiers'
+import { Button, Divider, HStack, ProgressView, Spacer, Text, VStack } from '@expo/ui/swift-ui'
+import {
+  accessibilityIdentifier,
+  controlSize,
+  font,
+  foregroundStyle,
+  padding,
+  textCase,
+} from '@expo/ui/swift-ui/modifiers'
 import { router } from 'expo-router'
 import { useMemo, useRef, useState } from 'react'
 
 import { calendarOfTitle, minutesByTitle, totalMinutes } from '@/domain/aggregate'
 import { explainEmptinessOverWeeks } from '@/domain/events'
 import { categoryOf } from '@/domain/rules'
-import { formatMinutes, formatUpdated } from '@/domain/time'
+import { formatUpdated } from '@/domain/time'
 import { clampToNow } from '@/domain/week'
 import { openAppSettings } from '@/data/calendar'
 import { useLocaleTag, useWeekStartsOn } from '@/data/locale'
@@ -18,7 +25,8 @@ import { EmptyState } from '@/features/summary/EmptyState'
 import { TopActivities, type TopActivity } from '@/features/summary/TopActivities'
 import { WeekPager, type WeekPagerHandle } from '@/features/summary/WeekPager'
 import { NoticeCard } from '@/ui/Card'
-import { FormScreen, Row, Section } from '@/ui/Form'
+import { FormScreen, Section } from '@/ui/Form'
+import { DurationMetric } from '@/ui/Metric'
 
 /** v1's line above the title, `MONDAY 9 NOVEMBER` (`Home.res:124-133`), in the device's language. */
 const dateLine = (now: number, locale: string): string => {
@@ -110,8 +118,13 @@ export default function Summary() {
         <EmptyState reason={emptiness} onToggleHidden={toggleHidden} />
       ) : null}
 
+      {/*
+        Health's "This Week" card (INTENT.md D28): the figure first, numbers large and units
+        small, then the chart. v1 put `Total Logged Time` in a row under the chart.
+      */}
       <Section
         title="Weekly Chart"
+        prominent
         action={{
           label: 'Show This Week',
           onPress: () => pager.current?.showThisWeek(),
@@ -125,21 +138,29 @@ export default function Summary() {
             {report.loading ? <ProgressView modifiers={[controlSize('mini')]} /> : null}
           </HStack>
         }>
-        <WeekPager
-          ref={pager}
-          weeks={report.weeks}
-          eventsByWeek={report.eventsByWeek}
-          rules={report.rules}
-          locale={locale}
-          now={now}
-          weekStartsOn={weekStartsOn}
-          onIndexChange={setIndex}
-        />
-        <Row
-          title="Total Logged Time"
-          value={formatMinutes(totalMinutes(activities))}
-          testID="total"
-        />
+        <VStack alignment="leading" spacing={12} modifiers={[padding({ vertical: 4 })]}>
+          <VStack alignment="leading" spacing={0}>
+            <Text
+              modifiers={[
+                font({ textStyle: 'footnote', weight: 'semibold' }),
+                foregroundStyle({ type: 'hierarchical', style: 'secondary' }),
+              ]}>
+              Total Logged Time
+            </Text>
+            <DurationMetric minutes={totalMinutes(activities)} testID="total" />
+          </VStack>
+          <Divider />
+          <WeekPager
+            ref={pager}
+            weeks={report.weeks}
+            eventsByWeek={report.eventsByWeek}
+            rules={report.rules}
+            locale={locale}
+            now={now}
+            weekStartsOn={weekStartsOn}
+            onIndexChange={setIndex}
+          />
+        </VStack>
       </Section>
 
       <TopActivities

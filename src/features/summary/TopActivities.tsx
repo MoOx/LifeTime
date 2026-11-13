@@ -2,7 +2,8 @@
  * The week's activities, heaviest first: docs/SCREENS.md §3.2, `TopActivities.res` on
  * `main`. Drawn by SwiftUI (INTENT.md D27): each row is a button holding the category
  * icon, the title, a bar in the category colour with the duration after it, and the
- * chevron.
+ * chevron. A card in the Health style (D28): a prominent title, then a sentence that sums up
+ * the week.
  */
 
 import { Button, Capsule, HStack, Image, Spacer, Text, VStack } from '@expo/ui/swift-ui'
@@ -40,6 +41,10 @@ const BAR_SHARE = 40
 
 export type TopActivity = Bucket & { categoryId: CategoryId }
 
+/** "51%": a share of the week, never 0% for something shown. */
+const share = (part: number, whole: number): string =>
+  `${whole > 0 ? Math.max(1, Math.round((part / whole) * 100)) : 0}%`
+
 export function TopActivities({
   activities,
   weekStart,
@@ -54,10 +59,13 @@ export function TopActivities({
   const [expanded, setExpanded] = useState(false)
   const shown = expanded ? activities : activities.slice(0, ROWS_COLLAPSED)
   const max = activities[0]?.minutes ?? 0
+  const top = activities[0]
+  const total = activities.reduce((sum, activity) => sum + activity.minutes, 0)
 
   return (
     <Section
       title="Top Activities"
+      prominent
       action={{ label: 'Customize report', onPress: onCustomize }}
       footer={
         activities.length === 0
@@ -65,6 +73,17 @@ export function TopActivities({
           : undefined
       }>
       {activities.length === 0 ? <Text>No activities</Text> : null}
+      {top ? (
+        // Health's cards open with a sentence that sums up (INTENT.md D28). New: v1 went
+        // straight to the rows.
+        <Text
+          modifiers={[
+            font({ textStyle: 'body', weight: 'semibold' }),
+            accessibilityIdentifier('activities-summary'),
+          ]}>
+          {`${top.key} took the most time: ${formatMinutes(top.minutes)}, ${share(top.minutes, total)} of everything logged.`}
+        </Text>
+      ) : null}
       {shown.map((activity) => {
         const category = getCategory(activity.categoryId)
         const color = categoryColor(category.color, scheme)

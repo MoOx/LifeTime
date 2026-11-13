@@ -26,6 +26,7 @@ import {
   buttonStyle,
   disabled,
   font,
+  headerProminence,
   hidden,
   foregroundStyle,
   monospacedDigit,
@@ -53,6 +54,7 @@ export function Section({
   action,
   header,
   footer,
+  prominent = false,
   children,
 }: {
   title?: string
@@ -65,6 +67,11 @@ export function Section({
   header?: ReactNode
   /** A string is drawn as SwiftUI's own footer text; a node replaces it. */
   footer?: string | ReactNode
+  /**
+   * A feed's section title, larger, as Health's "This Week" above its cards (INTENT.md D28):
+   * SwiftUI's own increased header prominence.
+   */
+  prominent?: boolean
   children?: ReactNode
 }) {
   const heading =
@@ -91,7 +98,8 @@ export function Section({
     <SwiftSection
       title={heading ? undefined : title}
       header={heading}
-      footer={typeof footer === 'string' ? <Text>{footer}</Text> : footer}>
+      footer={typeof footer === 'string' ? <Text>{footer}</Text> : footer}
+      modifiers={prominent ? [headerProminence('increased')] : undefined}>
       {children}
     </SwiftSection>
   )

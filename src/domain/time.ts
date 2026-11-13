@@ -85,21 +85,31 @@ export const overlapMs = (
 ): number => Math.max(0, Math.min(aEnd, bEnd) - Math.max(aStart, bStart))
 
 /**
- * Human duration, e.g. `2d 3h 15m`. Empty units are collapsed; zero renders as `0m`.
- * Ported from the v1 `Date.minToString` so exported reports stay comparable.
+ * A duration as its numbers and units, `[{ value: 2, unit: 'd' }, ...]`, for drawing the
+ * numbers large and the units small, as iOS 27's Health does ("5 h 33 min",
+ * docs/reference/health-27.md). Empty units are collapsed; zero is `0m`.
  */
-export const formatMinutes = (minutes: number): string => {
+export const durationParts = (minutes: number): { value: number; unit: 'd' | 'h' | 'm' }[] => {
   const total = Math.max(0, Math.round(minutes))
   const days = Math.floor(total / MINUTES_PER_DAY)
   const hours = Math.floor((total - days * MINUTES_PER_DAY) / MINUTES_PER_HOUR)
   const mins = total - days * MINUTES_PER_DAY - hours * MINUTES_PER_HOUR
 
-  const parts: string[] = []
-  if (days > 0) parts.push(`${days}d`)
-  if (hours > 0) parts.push(`${hours}h`)
-  if (mins > 0 || parts.length === 0) parts.push(`${mins}m`)
-  return parts.join(' ')
+  const parts: { value: number; unit: 'd' | 'h' | 'm' }[] = []
+  if (days > 0) parts.push({ value: days, unit: 'd' })
+  if (hours > 0) parts.push({ value: hours, unit: 'h' })
+  if (mins > 0 || parts.length === 0) parts.push({ value: mins, unit: 'm' })
+  return parts
 }
+
+/**
+ * Human duration, e.g. `2d 3h 15m`. Empty units are collapsed; zero renders as `0m`.
+ * Ported from the v1 `Date.minToString` so exported reports stay comparable.
+ */
+export const formatMinutes = (minutes: number): string =>
+  durationParts(minutes)
+    .map(({ value, unit }) => `${value}${unit}`)
+    .join(' ')
 
 /**
  * The same duration, but never rolled up into days: `40h`, not `1d 16h`.
