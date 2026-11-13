@@ -16,7 +16,7 @@ Done 2026-11-13 (docs/spec/60-slices.md, slice 5; SCREENS.md §4; spec/10-model.
     day, a bar against the week's longest, its duration, start and end (`Events.res`).
   - `Hide Activity` / `Reveal Activity` with v1's footnotes.
 - **Domain** (`src/domain/activities.ts`, tested): `withRule` (replace the rule with the same
-  pattern), `ruleFor`, `alsoMatches` (the titles a rule would also claim). 135 tests.
+  pattern), `ruleFor`, `alsoMatches` (the titles a rule would also claim). 133 tests.
 - The Summary passes the visible week to the screen, as v1 did.
 - The E2E fortnight gains `Gym` and `Gym legs`, two titles sharing a start, so the blast
   radius has something to show.
