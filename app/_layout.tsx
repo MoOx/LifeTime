@@ -1,6 +1,7 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router'
 import { useColorScheme } from 'react-native'
 
+import { SettingsProvider } from '@/data/settings'
 import { stackOptions } from '@/ui/stackOptions'
 
 // Root stack: the tabs, and the sheets of docs/spec/30-screens.md ("Navigation map").
@@ -13,13 +14,15 @@ export default function RootLayout() {
   const scheme = useColorScheme()
   return (
     <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={stackOptions}>
-        {/* The redirect to /summary: no header, or "index" flashes at launch. */}
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="help" options={{ presentation: 'modal', title: 'Help' }} />
-        <Stack.Screen name="goal" options={{ presentation: 'modal', title: 'New Goal' }} />
-      </Stack>
+      <SettingsProvider>
+        <Stack screenOptions={stackOptions}>
+          {/* The redirect to /summary: no header, or "index" flashes at launch. */}
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="help" options={{ presentation: 'modal', title: 'Help' }} />
+          <Stack.Screen name="goal" options={{ presentation: 'modal', title: 'New Goal' }} />
+        </Stack>
+      </SettingsProvider>
     </ThemeProvider>
   )
 }

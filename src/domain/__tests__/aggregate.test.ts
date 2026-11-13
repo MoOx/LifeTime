@@ -6,6 +6,7 @@ import {
   minutesByCategory,
   minutesByTitle,
   stackedSegments,
+  weekStackOrder,
 } from '../aggregate'
 import { TimeEvent } from '../events'
 import { RuleSet } from '../rules'
@@ -146,29 +147,49 @@ describe('chartGrid', () => {
   })
 })
 
-describe('stackedSegments', () => {
-  it('orders segments identically on every day, whatever their size', () => {
-    const range = { start: at(2026, 7, 10), end: at(2026, 7, 10, 23, 59) }
-    const monday = breakdownByDay(
+describe('weekStackOrder', () => {
+  it("puts the week's biggest category at the bottom of every bar", () => {
+    const days = breakdownByDay(
       [
-        event('Sleep', at(2026, 7, 10, 0), at(2026, 7, 10, 7)),
-        event('Standup', at(2026, 7, 10, 9), at(2026, 7, 10, 9, 30)),
+        // Monday: more work than sleep. Tuesday: only sleep. The week: sleep wins.
+        event('Sleep', at(2026, 7, 10, 0), at(2026, 7, 10, 2)),
+        event('Standup', at(2026, 7, 10, 9), at(2026, 7, 10, 12)),
+        event('Sleep', at(2026, 7, 11, 0), at(2026, 7, 11, 7)),
       ],
       ruleSet,
-      [range.start],
-    )[0]
-
-    // `rest` is declared before `work`, so it sits lower in every bar — even though
-    // sorting by size would also put it first here.
-    expect(stackedSegments(monday).map((s) => s.categoryId)).toEqual(['rest', 'work'])
+      [at(2026, 7, 10), at(2026, 7, 11)],
+    )
+    const order = weekStackOrder(days)
+    expect(order).toEqual(['rest', 'work'])
+    // The same order on both days, though Monday alone would put work first.
+    expect(stackedSegments(days[0], order).map((s) => s.categoryId)).toEqual(['rest', 'work'])
+    expect(stackedSegments(days[1], order).map((s) => s.categoryId)).toEqual(['rest'])
   })
 
+  it('breaks ties with the declaration order', () => {
+    const days = breakdownByDay(
+      [
+        event('Standup', at(2026, 7, 10, 9), at(2026, 7, 10, 10)),
+        event('Sleep', at(2026, 7, 10, 0), at(2026, 7, 10, 1)),
+      ],
+      ruleSet,
+      [at(2026, 7, 10)],
+    )
+    expect(weekStackOrder(days)).toEqual(['rest', 'work'])
+  })
+
+  it('is empty for an empty week', () => {
+    expect(weekStackOrder(breakdownByDay([], ruleSet, [at(2026, 7, 10)]))).toEqual([])
+  })
+})
+
+describe('stackedSegments', () => {
   it('drops categories with no time', () => {
     const monday = breakdownByDay(
       [event('Standup', at(2026, 7, 10, 9), at(2026, 7, 10, 9, 30))],
       ruleSet,
       [at(2026, 7, 10)],
     )[0]
-    expect(stackedSegments(monday)).toEqual([{ categoryId: 'work', minutes: 30 }])
+    expect(stackedSegments(monday, ['rest', 'work'])).toEqual([{ categoryId: 'work', minutes: 30 }])
   })
 })

@@ -75,7 +75,7 @@ appearances, `textOnDarkLight` in SCREENS.md §13.
 | Switch, slider, picker, date picker, text field | SwiftUI through `@expo/ui` (D27), each proven on the simulator by the first slice that needs it | Jetpack Compose through `@expo/ui` |
 | Menu, confirm | Native menu and alert | M3 menu and dialog |
 | Sheet | Form sheet | M3 bottom sheet, or a full-screen dialog for forms |
-| Chart | Skia, geometry of SCREENS.md §8b | Same |
+| Chart | React Native views, geometry of SCREENS.md §8b, stacked by the week's totals (D25), in a SwiftUI page-style `TabView` (slice 2) | Same views, Compose pager |
 | Ring | Skia, behaviours of SCREENS.md §8c: 1500 ms sweep on the same curve, end-cap shadow, start cap hidden past a turn | Same |
 | Icons | SF Symbols through expo-symbols | Material Symbols through expo-symbols |
 

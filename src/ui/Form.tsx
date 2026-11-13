@@ -21,8 +21,12 @@ import {
   Text,
 } from '@expo/ui/swift-ui'
 import {
+  accessibilityHidden,
   accessibilityIdentifier,
+  buttonStyle,
+  disabled,
   font,
+  hidden,
   foregroundStyle,
   monospacedDigit,
   tint,
@@ -39,17 +43,54 @@ export function FormScreen({ children, testID }: { children: ReactNode; testID?:
   )
 }
 
+/**
+ * A section. `title` is SwiftUI's own header; `action` adds a trailing button to it, as v1's
+ * group headings had ("Show This Week", "Customize report": SCREENS.md §1), and as
+ * Settings.app does. `header` replaces the header entirely.
+ */
 export function Section({
   title,
+  action,
+  header,
   footer,
   children,
 }: {
   title?: string
+  /**
+   * `hidden` keeps the button in the tree but invisible: switching between a plain title and
+   * a header with an action changes the section's structure, and SwiftUI then rebuilds what
+   * it holds (the Summary's pager lost its position: docs/slices/2/README.md).
+   */
+  action?: { label: string; onPress?: () => void; testID?: string; hidden?: boolean }
+  header?: ReactNode
   footer?: string
-  children: ReactNode
+  children?: ReactNode
 }) {
+  const heading =
+    header ??
+    (action && title ? (
+      <HStack>
+        <Text>{title}</Text>
+        <Spacer />
+        <Button
+          label={action.label}
+          onPress={action.onPress}
+          modifiers={[
+            buttonStyle('borderless'),
+            // Always the same modifiers, only their values change: a stable structure.
+            hidden(action.hidden === true),
+            accessibilityHidden(action.hidden === true),
+            disabled(action.hidden === true || action.onPress === undefined),
+            ...(action.testID ? [accessibilityIdentifier(action.testID)] : []),
+          ]}
+        />
+      </HStack>
+    ) : undefined)
   return (
-    <SwiftSection title={title} footer={footer ? <Text>{footer}</Text> : undefined}>
+    <SwiftSection
+      title={heading ? undefined : title}
+      header={heading}
+      footer={footer ? <Text>{footer}</Text> : undefined}>
       {children}
     </SwiftSection>
   )

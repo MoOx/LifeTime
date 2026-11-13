@@ -1,4 +1,5 @@
 import {
+  formatUpdated,
   MINUTES_PER_DAY,
   formatHoursMinutes,
   formatMinutes,
@@ -134,5 +135,22 @@ describe('formatRelative', () => {
 
   it('follows the locale', () => {
     expect(formatRelative(t, t + 5 * 60_000, 'fr-FR')).toBe('il y a 5 minutes')
+  })
+})
+
+describe('formatUpdated', () => {
+  const now = new Date(2026, 10, 9, 15, 0).getTime()
+  it('says today with the time, as v1 did', () => {
+    expect(formatUpdated(new Date(2026, 10, 9, 13, 53).getTime(), now, 'en-US')).toBe(
+      'today at 1:53 PM',
+    )
+  })
+  it('says yesterday', () => {
+    expect(formatUpdated(new Date(2026, 10, 8, 9, 5).getTime(), now, 'en-US')).toBe(
+      'yesterday at 9:05 AM',
+    )
+  })
+  it('falls back to the date', () => {
+    expect(formatUpdated(new Date(2026, 10, 2, 9, 5).getTime(), now, 'en-US')).toBe('Nov 2')
   })
 })

@@ -83,20 +83,46 @@ export const breakdownByDay = (
   })
 
 /**
- * The stacking order for a bar. Fixed across the whole chart — if each day sorted its own
- * segments by size, the colour bands would jump around between bars and the shape would
- * be unreadable. Declaration order of the categories is stable and meaningful (rest,
- * food, exercise, …), with anything uncategorised pushed to the top of the stack.
+ * The categories' declaration order (rest, food, exercise, ...), with anything
+ * uncategorised last. Breaks ties in `weekStackOrder`.
  */
 export const STACK_ORDER: CategoryId[] = DEFAULT_CATEGORIES.map((c) => c.id)
 
+/**
+ * The stacking order of a week's bars, bottom first: the week's category totals, biggest
+ * first, so the biggest "consumer" of time sits at the bottom of every bar
+ * (`WeeklyGraph.res:265-267`; INTENT.md D25, MoOx: « qu'on voit les plus gros
+ * "consommateurs" de temps »). One order per week, so the bands line up across the
+ * week's bars; it can change from one week to the next, which v2 had replaced by the
+ * declaration order and D25 reverts.
+ */
+export const weekStackOrder = (days: readonly DayBreakdown[]): CategoryId[] => {
+  const totals = new Map<CategoryId, number>()
+  for (const day of days) {
+    for (const bucket of day.byCategory) {
+      totals.set(bucket.key, (totals.get(bucket.key) ?? 0) + bucket.minutes)
+    }
+  }
+  const rank = (id: CategoryId) => {
+    const index = STACK_ORDER.indexOf(id)
+    return index === -1 ? STACK_ORDER.length : index
+  }
+  return [...totals.keys()].sort(
+    (a, b) => totals.get(b)! - totals.get(a)! || rank(a) - rank(b),
+  )
+}
+
+/** A day's segments in `order`, bottom first, without the empty ones. */
 export const stackedSegments = (
   breakdown: DayBreakdown,
+  order: readonly CategoryId[],
 ): { categoryId: CategoryId; minutes: number }[] =>
-  STACK_ORDER.map((categoryId) => ({
-    categoryId,
-    minutes: breakdown.byCategory.find((b) => b.key === categoryId)?.minutes ?? 0,
-  })).filter((s) => s.minutes > 0)
+  order
+    .map((categoryId) => ({
+      categoryId,
+      minutes: breakdown.byCategory.find((b) => b.key === categoryId)?.minutes ?? 0,
+    }))
+    .filter((s) => s.minutes > 0)
 
 export const totalMinutes = (buckets: readonly Bucket[]): number =>
   buckets.reduce((sum, b) => sum + b.minutes, 0)

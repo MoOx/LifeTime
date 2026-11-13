@@ -20,5 +20,7 @@ export type AppTextProps = {
   style?: StyleProp<TextStyle>
   /** Digits that line up in a column: totals, axis labels, durations. */
   tabular?: boolean
+  /** Caps Dynamic Type scaling, for text inside fixed geometry such as the chart. */
+  maxFontSizeMultiplier?: number
   children: ReactNode
 }

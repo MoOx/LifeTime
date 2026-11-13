@@ -19,7 +19,8 @@ by editing it in place.
 |---|---|
 | `AppText`, theme, for what React Native draws | 3, done: [docs/spikes/03-grouped-lists.md](../spikes/03-grouped-lists.md) |
 | v2's React Native `List.tsx` | Not carried: lists are SwiftUI's `Form` (D27, [spike 4](../spikes/04-expo-ui-lists.md)) |
-| Goal ring, chart | Proven on the simulator in slice 2, before the Summary is built on them |
+| Chart | Done in slice 2 with React Native views, no Skia: [slices/2/](../slices/2/README.md) |
+| Goal ring | Proven on the simulator in slice 6, before Goals are built on it |
 | Screens from `app/` | Rewritten from 30-screens.md, reusing code where it passes |
 
 Bundle id stays `io.moox.LifeTime`, package `io.moox.lifetime` (D16).
@@ -48,7 +49,8 @@ types.
 | Health iOS | `@kingstinct/react-native-healthkit` | Spike 4 |
 | Health Android | `react-native-health-connect` | Android slice |
 | Storage | `expo-sqlite`; settings as one JSON document | |
-| Charts, rings | `@shopify/react-native-skia` | Spike 3 |
+| Chart | React Native views in a SwiftUI page-style `TabView` | Slice 2 |
+| Goal ring | `@shopify/react-native-skia` | Slice 6 |
 | Lists, native controls | `@expo/ui` (SwiftUI on iOS) wherever it has the component (D27) | Lists and hosted RN views: [spike 4](../spikes/04-expo-ui-lists.md); each control by its first slice |
 | Icons | `expo-symbols`, both platform names | |
 | Notifications | `expo-notifications`; actually scheduled, tested | |

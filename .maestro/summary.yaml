@@ -1,0 +1,93 @@
+# Slice 2: the Summary on demo data. Captures to compare with docs/reference/v1/ios/
+# 12-home-top, 14-home-scrolled, 15-home-bottom and 16-home-previous-week.
+# Screenshots land under ~/.maestro/tests/<run>/summary/takeScreenshot/.
+appId: io.moox.LifeTime
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Your LifeTime"
+- assertVisible: "Demo data"
+- assertVisible: "Daily Average"
+- assertVisible: "Total Logged Time"
+# Hidden on the current week; it stays in the tree, disabled and without text.
+- assertVisible:
+    id: "show-this-week"
+    enabled: false
+- takeScreenshot: 12-top
+
+# Six weeks: swipe back to the oldest. The swipe crosses the chart, at 47% of the height.
+- swipe:
+    start: 15%, 47%
+    end: 90%, 47%
+    duration: 400
+- waitForAnimationToEnd
+# Off-screen pages stay in the accessibility tree, so captions cannot prove which week is
+# shown; the "Show This Week" button can, and the screenshots are checked by eye.
+- assertVisible:
+    id: "show-this-week"
+    enabled: true
+- takeScreenshot: 16-previous-week
+- repeat:
+    times: 4
+    commands:
+      - swipe:
+          start: 15%, 47%
+          end: 90%, 47%
+          duration: 400
+      - waitForAnimationToEnd
+- takeScreenshot: 16b-oldest-week
+# One more swipe: there is no seventh week.
+- swipe:
+    start: 15%, 47%
+    end: 90%, 47%
+    duration: 400
+- waitForAnimationToEnd
+- tapOn:
+    id: "show-this-week"
+- waitForAnimationToEnd
+- takeScreenshot: 12b-back-to-this-week
+# Hidden on the current week; it stays in the tree, disabled and without text.
+- assertVisible:
+    id: "show-this-week"
+    enabled: false
+
+# Top activities and the bottom of the screen.
+- scrollUntilVisible:
+    element: "Top Activities"
+    direction: DOWN
+- swipe:
+    start: 50%, 60%
+    end: 50%, 40%
+    duration: 600
+- waitForAnimationToEnd
+- takeScreenshot: 14-scrolled
+- scrollUntilVisible:
+    element:
+      id: "toggle-hidden"
+    direction: DOWN
+- waitForAnimationToEnd
+- takeScreenshot: 15-bottom
+- tapOn:
+    id: "toggle-hidden"
+- assertVisible: "Mask Hidden Activities"
+- tapOn:
+    id: "toggle-hidden"
+- assertVisible: "Reveal Hidden Activities"
+
+# An activity opens its detail.
+# Centred, or the row can sit under the floating tab bar and the tap lands on the tab.
+- scrollUntilVisible:
+    element:
+      id: "activity-Sleep"
+    direction: UP
+    centerElement: true
+# A tap during a scroll's deceleration only stops it: wait first.
+- waitForAnimationToEnd
+- tapOn:
+    id: "activity-Sleep"
+- extendedWaitUntil:
+    visible:
+      id: "activity"
+    timeout: 10000
+- takeScreenshot: 11-activity
+- assertVisible: "Sleep"

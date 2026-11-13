@@ -39,6 +39,7 @@ export function AppText({
   numberOfLines,
   style,
   tabular = false,
+  maxFontSizeMultiplier,
   children,
 }: AppTextProps) {
   const spec = TYPE_SCALE[role]
@@ -49,6 +50,7 @@ export function AppText({
     <Text
       dynamicTypeRamp={ramp}
       numberOfLines={numberOfLines}
+      maxFontSizeMultiplier={maxFontSizeMultiplier}
       style={[typeStyle, { color: TONE_COLOR[tone] }, tabular && styles.tabular, style]}>
       {children}
     </Text>

@@ -206,3 +206,19 @@ export const formatRelative = (t: number, now: number, locale: string): string =
 
   return format.format(-Math.round(delta / ms), unit)
 }
+
+/**
+ * The Summary's "Updated ..." footnote, as v1 wrote it: `today at 1:53 PM`,
+ * `yesterday at 9:05 AM`, then the date. v1 called date-fns' `formatRelative`
+ * (`git show main:src/Date.res`, line 346, used by `Home.res`); this keeps the three cases
+ * that a re-read on every launch and foreground can reach.
+ */
+export const formatUpdated = (t: number, now: number, locale: string): string => {
+  const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(
+    new Date(t),
+  )
+  const day = startOfDay(t)
+  if (day === startOfDay(now)) return `today at ${time}`
+  if (day === startOfDay(addDays(now, -1))) return `yesterday at ${time}`
+  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(new Date(t))
+}
