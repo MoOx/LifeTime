@@ -23,6 +23,7 @@ import { RuleSet, categoryOf } from './rules'
 import {
   MINUTES_PER_DAY,
   addDays,
+  formatHoursMinutes,
   dayOfWeek,
   endOfDay,
   endOfMonth,
@@ -73,6 +74,16 @@ export const isValid = (goal: Goal): boolean =>
   goal.durationPerDay > 0 &&
   goal.days.some(Boolean) &&
   (goal.categoryIds.length > 0 || goal.activityIds.length > 0)
+
+/**
+ * What stops a goal being saved, named, for the editor's red footnote (spec/30-screens.md,
+ * "Goal editor": v1 only disabled `Add`). Empty exactly when `isValid` is true.
+ */
+export const missingParts = (goal: Goal): string[] => [
+  ...(goal.days.some(Boolean) ? [] : ['a day']),
+  ...(goal.durationPerDay > 0 ? [] : ['a duration']),
+  ...(goal.categoryIds.length + goal.activityIds.length > 0 ? [] : ['a category or activity']),
+]
 
 // ---------------------------------------------------------------------------
 // Period windows
@@ -325,6 +336,83 @@ export const ringFraction = (progress: GoalProgress, mode: RingMode): number =>
  */
 export const ringPercent = (progress: GoalProgress, mode: RingMode): number =>
   Math.round(ringFraction(progress, mode) * 100)
+
+/**
+ * v1's ring colours (`Goal.res` `Colors`, on `main`): two lime greens, then the system
+ * yellow, orange and red.
+ */
+export const RING_COLORS = {
+  good: 'rgb(216, 255, 1)',
+  ok: 'rgb(153, 255, 0)',
+  alert: '#FFCC00',
+  danger: '#FF9500',
+  bad: '#FF3B30',
+} as const
+
+/**
+ * The ring's gradient, start then end: v1's table (`GoalCard.res:123-143` on `main`), read
+ * on the pace (`progressTonight` there) whatever the ring shows. v1's "cannot be done"
+ * cases are this module's `missed` and `achieved` statuses.
+ */
+export const ringColors = (mode: GoalMode, progress: GoalProgress): [string, string] => {
+  const { good, ok, alert, danger, bad } = RING_COLORS
+  if (progress.status === 'missed') return [danger, bad]
+  if (progress.status === 'achieved') return [ok, good]
+  const p = progress.pace
+  if (mode === 'goal') {
+    if (p <= 0.25) return [bad, bad]
+    if (p <= 0.5) return [danger, bad]
+    if (p <= 0.75) return [alert, danger]
+    if (p <= 0.9) return [ok, danger]
+    if (p < 1) return [ok, alert]
+    return [ok, good]
+  }
+  if (p <= 0.75) return [ok, good]
+  if (p <= 0.9) return [alert, ok]
+  if (p < 1) return [danger, ok]
+  if (p >= 1.15) return [alert, bad]
+  return [alert, danger]
+}
+
+const PERIOD_WORDS: Record<GoalPeriod, string> = {
+  day: 'today',
+  week: 'this week',
+  month: 'this month',
+  year: 'this year',
+}
+
+/**
+ * One sentence that says where a goal stands, as iOS 27's Health opens its cards
+ * (INTENT.md D28). New: v1's card showed only the ring and the daily average. Durations
+ * never roll up into days, so both sides of "of" read the same way.
+ */
+export const statusSentence = (goal: Goal, progress: GoalProgress): string => {
+  const f = formatHoursMinutes
+  const when = PERIOD_WORDS[goal.period]
+  const { current, target, status } = progress
+  if (goal.mode === 'goal') {
+    switch (status) {
+      case 'achieved':
+        return `Reached: ${f(current)} of ${f(target)} ${when}.`
+      case 'onTrack':
+        return `On track: ${f(current)} of ${f(target)} ${when}.`
+      case 'behind':
+        return `Behind: ${f(current)} of ${f(target)} ${when}, ${f(progress.expectedByYesterday - current)} to catch up.`
+      case 'missed':
+        return `Out of reach ${when}: ${f(current)} of ${f(target)}.`
+    }
+  }
+  switch (status) {
+    case 'achieved':
+      return `Kept: ${f(current)} of ${f(target)}, and it can no longer be exceeded ${when}.`
+    case 'onTrack':
+      return `Within the limit: ${f(current)} of ${f(target)} ${when}.`
+    case 'behind':
+      return `Close to the limit: ${f(current)} of ${f(target)} ${when}.`
+    case 'missed':
+      return `Over the limit by ${f(current - target)} ${when}.`
+  }
+}
 
 /**
  * A goal's display title: its own if set, otherwise the joined names of what it tracks.

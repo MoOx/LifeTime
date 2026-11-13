@@ -1,0 +1,150 @@
+# Slice 6: Goals on demo data. Captures to compare with docs/reference/v1/ios/ 05-goals-empty,
+# 06-goal-new, 20-goal-new-filled, 21-goals-list and 22-goal-edit, and a recording of the
+# ring sweep. Screenshots land under ~/.maestro/tests/<run>/goals/takeScreenshot/.
+appId: io.moox.LifeTime
+---
+- launchApp:
+    clearState: true
+    permissions:
+      calendar: unset
+# Welcome shows at every cold start until settings persist (slice 7).
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 30000
+- tapOn: "Continue"
+- extendedWaitUntil:
+    visible:
+      id: "summary"
+    timeout: 15000
+- tapOn: "Goals"
+
+# The empty state: v1's introduction, then a goal and a limit apart.
+- extendedWaitUntil:
+    visible:
+      id: "add-goal"
+    timeout: 10000
+- assertVisible:
+    id: "add-limit"
+- takeScreenshot: 05-goals-empty
+
+# A new goal: Add stays disabled and the footnote names what is missing.
+- tapOn:
+    id: "add-goal"
+- extendedWaitUntil:
+    visible:
+      id: "goal-title"
+    timeout: 10000
+- assertVisible:
+    id: "goal-type-goal-selected"
+- takeScreenshot: 06-goal-new
+- scrollUntilVisible:
+    element:
+      id: "goal-missing"
+    direction: DOWN
+- assertVisible: "To add this goal, choose a duration and a category or activity."
+- takeScreenshot: 06b-goal-missing
+- scrollUntilVisible:
+    element:
+      id: "goal-title"
+    direction: UP
+- tapOn:
+    id: "goal-title"
+- inputText: "Workout"
+# iOS's one-time keyboard tip ("Type English and French") can cover the sheet.
+- tapOn:
+    text: "Continue"
+    optional: true
+- pressKey: Enter
+- tapOn:
+    id: "goal-quick-60"
+- assertVisible: ".*Weekly Goal.*7h.*"
+- scrollUntilVisible:
+    element:
+      id: "goal-category-exercise"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "goal-category-exercise"
+- assertNotVisible:
+    id: "goal-missing"
+- takeScreenshot: 20-goal-new-filled
+- tapOn: "Add"
+
+# The card, and the ring sweeping in.
+- startRecording: goals-ring-sweep
+- extendedWaitUntil:
+    visible:
+      id: "goal-Workout"
+    timeout: 10000
+- waitForAnimationToEnd
+- stopRecording
+- takeScreenshot: 21a-one-goal
+
+# A limit.
+- tapOn: "New Goal"
+- extendedWaitUntil:
+    visible:
+      id: "goal-title"
+    timeout: 10000
+- tapOn:
+    id: "goal-type-limit"
+- assertVisible:
+    id: "goal-type-limit-selected"
+- tapOn:
+    id: "goal-title"
+- inputText: "Work"
+# iOS's one-time keyboard tip ("Type English and French") can cover the sheet.
+- tapOn:
+    text: "Continue"
+    optional: true
+- pressKey: Enter
+- tapOn:
+    id: "goal-quick-60"
+- scrollUntilVisible:
+    element:
+      id: "goal-category-work"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "goal-category-work"
+- tapOn: "Add"
+- extendedWaitUntil:
+    visible:
+      id: "goal-Work"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: 21-goals-list
+
+# The rings' reading: current progress instead of the entire week.
+- tapOn:
+    id: "ring-mode"
+- tapOn: "Current Progress"
+- waitForAnimationToEnd
+- assertVisible: "Rings fill against what is due by tonight: full means on track right now."
+- takeScreenshot: 21b-current-progress
+
+# Editing keeps the goal; Delete asks first.
+- tapOn:
+    id: "goal-Workout"
+- extendedWaitUntil:
+    visible: "Edit Goal"
+    timeout: 10000
+- takeScreenshot: 22-goal-edit
+- scrollUntilVisible:
+    element:
+      id: "goal-delete"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "goal-delete"
+- extendedWaitUntil:
+    visible: "Delete This Goal"
+    timeout: 5000
+- takeScreenshot: 22b-delete-confirm
+- tapOn: "Delete"
+- extendedWaitUntil:
+    notVisible:
+      id: "goal-Workout"
+    timeout: 10000
+- assertVisible:
+    id: "goal-Work"

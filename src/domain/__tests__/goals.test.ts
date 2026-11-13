@@ -7,9 +7,14 @@ import {
   describeDays,
   goalMinutes,
   goalRanges,
+  isValid,
+  missingParts,
   periodRange,
+  RING_COLORS,
+  ringColors,
   ringFraction,
   scheduledDays,
+  statusSentence,
   updateGoal,
 } from '../goals'
 import { RuleSet } from '../rules'
@@ -249,6 +254,60 @@ describe('ringFraction', () => {
     const nothingYet = computeProgress(weekly, 0, WEEK, mondayMorning)
     expect(ringFraction(nothingYet, 'period')).toBe(0)
     expect(nothingYet.status).toBe('onTrack')
+  })
+})
+
+describe('ringColors', () => {
+  const weekly = goal({ days: ALL_DAYS, durationPerDay: 60 })
+  // Wednesday evening: three days due by tonight, 180 minutes.
+  const wednesday = at(2026, 7, 12, 20)
+  const colours = (current: number, mode: Goal['mode'] = 'goal') =>
+    ringColors(mode, computeProgress({ ...weekly, mode }, current, WEEK, wednesday))
+
+  it('follows v1 for a goal, on the pace', () => {
+    expect(colours(30)).toEqual([RING_COLORS.bad, RING_COLORS.bad])
+    expect(colours(120)).toEqual([RING_COLORS.alert, RING_COLORS.danger])
+    expect(colours(200)).toEqual([RING_COLORS.ok, RING_COLORS.good])
+  })
+
+  it('follows v1 for a limit, on the pace', () => {
+    expect(colours(60, 'limit')).toEqual([RING_COLORS.ok, RING_COLORS.good])
+    expect(colours(170, 'limit')).toEqual([RING_COLORS.danger, RING_COLORS.ok])
+  })
+
+  it('turns red and orange once a goal is out of reach', () => {
+    const late = at(2026, 7, 16, 23)
+    const progress = computeProgress(weekly, 0, WEEK, late)
+    expect(progress.status).toBe('missed')
+    expect(ringColors('goal', progress)).toEqual([RING_COLORS.danger, RING_COLORS.bad])
+  })
+})
+
+describe('statusSentence', () => {
+  const weekly = goal({ days: ALL_DAYS, durationPerDay: 60 })
+  const wednesday = at(2026, 7, 12, 20)
+  const sentence = (current: number, mode: Goal['mode'] = 'goal') =>
+    statusSentence({ ...weekly, mode }, computeProgress({ ...weekly, mode }, current, WEEK, wednesday))
+
+  it('says where a goal stands, in hours and minutes', () => {
+    expect(sentence(150)).toBe('On track: 2h 30m of 7h this week.')
+    expect(sentence(60)).toBe('Behind: 1h of 7h this week, 1h to catch up.')
+    expect(sentence(450)).toBe('Reached: 7h 30m of 7h this week.')
+  })
+
+  it('says where a limit stands', () => {
+    expect(sentence(60, 'limit')).toBe('Within the limit: 1h of 7h this week.')
+    expect(sentence(480, 'limit')).toBe('Over the limit by 1h this week.')
+  })
+})
+
+describe('missingParts', () => {
+  it('names what is missing, and nothing once the goal is valid', () => {
+    expect(missingParts(goal())).toEqual([])
+    expect(isValid(goal())).toBe(true)
+    const empty = goal({ days: [false, false, false, false, false, false, false], durationPerDay: 0, categoryIds: [] })
+    expect(missingParts(empty)).toEqual(['a day', 'a duration', 'a category or activity'])
+    expect(isValid(empty)).toBe(false)
   })
 })
 

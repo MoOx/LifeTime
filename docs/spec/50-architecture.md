@@ -50,7 +50,7 @@ types.
 | Health Android | `react-native-health-connect` | Android slice |
 | Storage | `expo-sqlite`; settings as one JSON document | |
 | Chart | React Native views in a SwiftUI page-style `TabView` | Slice 2 |
-| Goal ring | `@shopify/react-native-skia` | Slice 6 |
+| Goal ring | `@shopify/react-native-skia` 2.14 | Done in slice 6: [slices/6/](../slices/6/README.md) |
 | Lists, native controls | `@expo/ui` (SwiftUI on iOS) wherever it has the component (D27) | Lists and hosted RN views: [spike 4](../spikes/04-expo-ui-lists.md); each control by its first slice |
 | Icons | `expo-symbols`, both platform names | |
 | Notifications | `expo-notifications`; actually scheduled, tested | |
