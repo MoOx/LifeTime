@@ -61,11 +61,36 @@ export const nextOccurrence = (reminder: Reminder, now: number): number => {
 }
 
 /**
- * v1 skipped a notification planned within `N` minutes of the moment it was scheduled, to
- * avoid firing one the instant you set it (`SettingsNotifications.res:240-244`). Kept as a
- * rule so the screen can explain itself.
+ * v1 skipped a notification planned within 30 minutes of the moment it was scheduled, to
+ * avoid one popping right after the app was opened (`Notifications.res:3`,
+ * `minutesGapToAvoidTooCloseNotif`, footnote at `SettingsNotifications.res:240-244`). Kept
+ * as a rule so the screen can explain itself. v2 had 15, with no source.
  */
-export const MINIMUM_GAP_MINUTES = 15
+export const MINIMUM_GAP_MINUTES = 30
 
 export const firesTooSoon = (reminder: Reminder, now: number): boolean =>
   nextOccurrence(reminder, now) - now < MINIMUM_GAP_MINUTES * 60_000
+
+/** iOS keeps at most 64 pending local notifications per app. */
+export const MAX_PENDING = 64
+
+/**
+ * The instants to schedule, soonest first: each reminder's next `days` occurrences, the
+ * first one moved to tomorrow when it would fire too soon (v1's rule, `firesTooSoon`).
+ * One-off notifications rather than a repeating one, because a repeating trigger cannot
+ * skip its first firing; rescheduled on launch and on any change (spec/50-architecture.md),
+ * as v1 did on each opening (`NotificationsRegisterer.res`).
+ */
+export const upcomingFirings = (
+  reminders: readonly Reminder[],
+  now: number,
+  days = 7,
+): number[] =>
+  reminders
+    .flatMap((reminder) => {
+      const next = nextOccurrence(reminder, now)
+      const first = firesTooSoon(reminder, now) ? addDays(next, 1) : next
+      return Array.from({ length: days }, (_, i) => addDays(first, i))
+    })
+    .sort((a, b) => a - b)
+    .slice(0, MAX_PENDING)

@@ -221,7 +221,8 @@ export const formatRelative = (t: number, now: number, locale: string): string =
  * The Summary's "Updated ..." footnote, as v1 wrote it: `today at 1:53 PM`,
  * `yesterday at 9:05 AM`, then the date. v1 called date-fns' `formatRelative`
  * (`git show main:src/Date.res`, line 346, used by `Home.res`); this keeps the three cases
- * that a re-read on every launch and foreground can reach.
+ * that a re-read on every launch and foreground can reach, plus `tomorrow at 9:00 AM`, which
+ * a reminder's next firing reaches (capture 33, the same `formatRelative`).
  */
 export const formatUpdated = (t: number, now: number, locale: string): string => {
   const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(
@@ -230,5 +231,6 @@ export const formatUpdated = (t: number, now: number, locale: string): string =>
   const day = startOfDay(t)
   if (day === startOfDay(now)) return `today at ${time}`
   if (day === startOfDay(addDays(now, -1))) return `yesterday at ${time}`
+  if (day === startOfDay(addDays(now, 1))) return `tomorrow at ${time}`
   return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(new Date(t))
 }

@@ -10,7 +10,7 @@ import {
   tint,
 } from '@expo/ui/swift-ui/modifiers'
 import { router, Stack } from 'expo-router'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import type { SFSymbol } from 'sf-symbols-typescript'
 
 import { goalEvents } from '@/domain/events'
@@ -18,6 +18,7 @@ import { computeProgress, goalMinutes, goalRanges, type RingMode } from '@/domai
 import { useLocaleTag, useWeekStartsOn } from '@/data/locale'
 import { useNow } from '@/data/now'
 import { useReport } from '@/data/report'
+import { refreshNotificationAccess } from '@/data/notifications'
 import { useSettings } from '@/data/settings'
 import { GoalCard } from '@/features/goals/GoalCard'
 import { FormScreen, Section } from '@/ui/Form'
@@ -70,6 +71,18 @@ export default function Goals() {
       return { goal, progress: computeProgress(goal, current, period, now) }
     })
   }, [settings.goals, report.rawByWeek, report.filter, report.rules, now, weekStartsOn])
+
+  // v1's reminders card, once the first goal exists (spec/30-screens.md, "Reminders
+  // prompt"), if iOS has not been asked yet.
+  const count = useRef(settings.goals.length)
+  useEffect(() => {
+    const before = count.current
+    count.current = settings.goals.length
+    if (before > 0 || settings.goals.length === 0) return
+    refreshNotificationAccess().then((access) => {
+      if (access === 'undetermined') router.push('/reminders-access')
+    })
+  }, [settings.goals.length])
 
   const ringMode = RING_MODES.find((m) => m.mode === settings.ringMode) ?? RING_MODES[0]
 

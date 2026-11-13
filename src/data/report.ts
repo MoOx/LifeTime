@@ -57,8 +57,14 @@ const splitByWeek = (events: TimeEvent[], weeks: Range[]): TimeEvent[][] =>
 
 export const useReport = (settings: Settings, weekStartsOn: WeekStartsOn, now: number): Report => {
   const access = useCalendarAccess()
-  const source: SourceState =
-    access === 'granted' ? 'calendar' : access === 'denied' ? 'denied' : 'demo'
+  // `Show Demo Data` (Reset) brings the generated week back whatever the access.
+  const source: SourceState = settings.showDemo
+    ? 'demo'
+    : access === 'granted'
+      ? 'calendar'
+      : access === 'denied'
+        ? 'denied'
+        : 'demo'
 
   // Access may change in Settings while the app is away: re-read it with the calendar.
   const getPermission = useCallback(() => {

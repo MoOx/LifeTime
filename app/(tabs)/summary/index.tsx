@@ -15,7 +15,7 @@ import { explainEmptinessOverWeeks } from '@/domain/events'
 import { categoryOf } from '@/domain/rules'
 import { formatUpdated } from '@/domain/time'
 import { clampToNow } from '@/domain/week'
-import { openAppSettings } from '@/data/calendar'
+import { openAppSettings, useCalendarAccess } from '@/data/calendar'
 import { useLocaleTag, useWeekStartsOn } from '@/data/locale'
 import { useNow } from '@/data/now'
 import { useReport } from '@/data/report'
@@ -44,6 +44,7 @@ export default function Summary() {
   const locale = useLocaleTag()
   const now = useNow()
   const report = useReport(settings, weekStartsOn, now)
+  const access = useCalendarAccess()
   const last = report.weeks.length - 1
   const [index, setIndex] = useState(last)
   const pager = useRef<WeekPagerHandle>(null)
@@ -89,11 +90,20 @@ export default function Summary() {
           icon="calendar"
           title="Demo Data"
           body="These reports come from generated events. Use your calendar to see how your own weeks are spent. It stays on this device."
-          primary={{
-            label: 'Use my calendar',
-            onPress: () => router.push('/calendar-access'),
-            testID: 'use-my-calendar',
-          }}
+          primary={
+            // `Show Demo Data` (Reset) with the calendar allowed: the way back is to hide it.
+            access === 'granted'
+              ? {
+                  label: 'Hide Demo Data',
+                  onPress: () => update((s) => ({ ...s, showDemo: false })),
+                  testID: 'hide-demo',
+                }
+              : {
+                  label: 'Use my calendar',
+                  onPress: () => router.push('/calendar-access'),
+                  testID: 'use-my-calendar',
+                }
+          }
           testID="demo-card"
         />
       ) : null}

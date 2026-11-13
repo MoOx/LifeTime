@@ -48,12 +48,12 @@ types.
 | Calendar | Own Expo module, `modules/lifetime-calendar` (read-only; change signal; E2E-only writes) | Slice 4 |
 | Health iOS | `@kingstinct/react-native-healthkit` | Spike 4 |
 | Health Android | `react-native-health-connect` | Android slice |
-| Storage | `expo-sqlite`; settings as one JSON document | |
+| Storage | `expo-sqlite`; settings as one JSON document | Done in slice 7 |
 | Chart | React Native views in a SwiftUI page-style `TabView` | Slice 2 |
 | Goal ring | `@shopify/react-native-skia` 2.14 | Done in slice 6: [slices/6/](../slices/6/README.md) |
 | Lists, native controls | `@expo/ui` (SwiftUI on iOS) wherever it has the component (D27) | Lists and hosted RN views: [spike 4](../spikes/04-expo-ui-lists.md); each control by its first slice |
 | Icons | `expo-symbols`, both platform names | |
-| Notifications | `expo-notifications`; actually scheduled, tested | |
+| Notifications | `expo-notifications`; actually scheduled, tested | Done in slice 7, a delivery logged |
 | On-device model | Own module for batching, pacing and guardrail bisection; `expo-ai` only if spike 6 shows it suffices | Spike 6 |
 | Crash reporting | None: no third-party service, as promised on the Privacy screen | |
 

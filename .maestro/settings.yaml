@@ -1,0 +1,191 @@
+# Slice 7: Settings, Notifications, Reset. Needs an E2E build (EXPO_PUBLIC_E2E=1) for the
+# reminder a minute ahead. Captures to compare with docs/reference/v1/ios/ 07-notifications-
+# prompt, 10-danger-zone, 30-settings-top and 33-notifications.
+appId: io.moox.LifeTime
+---
+- launchApp:
+    clearState: true
+    permissions:
+      calendar: unset
+      notifications: unset
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 30000
+- tapOn: "Continue"
+- extendedWaitUntil:
+    visible:
+      id: "summary"
+    timeout: 15000
+
+# The first goal brings v1's reminders card.
+- tapOn: "Goals"
+- tapOn:
+    id: "add-goal"
+- extendedWaitUntil:
+    visible:
+      id: "goal-title"
+    timeout: 10000
+- tapOn:
+    id: "goal-title"
+- inputText: "Workout"
+- tapOn:
+    text: "Continue"
+    optional: true
+- pressKey: Enter
+- tapOn:
+    id: "goal-quick-60"
+- scrollUntilVisible:
+    element:
+      id: "goal-category-exercise"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "goal-category-exercise"
+- tapOn: "Add"
+- extendedWaitUntil:
+    visible:
+      id: "reminders-access"
+    timeout: 10000
+- takeScreenshot: 07-reminders-prompt
+- tapOn:
+    id: "reminders-continue"
+- waitForAnimationToEnd
+- takeScreenshot: 07b-system-prompt
+- tapOn: "Allow"
+- extendedWaitUntil:
+    visible:
+      id: "goal-Workout"
+    timeout: 10000
+
+# Settings, and the theme overriding the system's.
+- tapOn: "Settings"
+- extendedWaitUntil:
+    visible:
+      id: "theme-auto-checked"
+    timeout: 10000
+- takeScreenshot: 30-settings-top
+- tapOn:
+    id: "theme-dark"
+- assertVisible:
+    id: "theme-dark-checked"
+- waitForAnimationToEnd
+- takeScreenshot: 30b-theme-dark
+- tapOn:
+    id: "theme-auto"
+
+# Notifications: allowed, a 9:00 reminder, and the duplicate guard.
+- tapOn:
+    id: "row-notifications"
+- extendedWaitUntil:
+    visible:
+      id: "reminder-9-0"
+    timeout: 10000
+- takeScreenshot: 33-notifications
+- tapOn:
+    id: "add-reminder"
+- extendedWaitUntil:
+    visible:
+      id: "reminder-add"
+    timeout: 5000
+- takeScreenshot: 33b-adding
+- tapOn:
+    id: "reminder-add"
+- extendedWaitUntil:
+    visible: "Duplicate Reminder"
+    timeout: 5000
+- takeScreenshot: 33c-duplicate
+- tapOn: "OK"
+- tapOn: "Cancel"
+# Re-tapping the tab pops to its root.
+- tapOn: "Settings"
+- extendedWaitUntil:
+    visible:
+      id: "row-reset"
+    timeout: 10000
+
+# Reset: export, erase, import back. Centred, or the row sits under the floating tab bar.
+- scrollUntilVisible:
+    element:
+      id: "row-reset"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "row-reset"
+- extendedWaitUntil:
+    visible:
+      id: "export-backup"
+    timeout: 10000
+- takeScreenshot: 10-reset
+- tapOn:
+    id: "export-backup"
+- extendedWaitUntil:
+    visible: "Export Finished"
+    timeout: 5000
+- tapOn: "OK"
+- tapOn:
+    id: "reset-all"
+- extendedWaitUntil:
+    visible: "Reset Settings & Erase All Data?"
+    timeout: 5000
+- takeScreenshot: 10b-reset-confirm
+# The alert's `Reset`, by position: the screen's title is "Reset" too.
+- tapOn:
+    point: "68%,58%"
+- tapOn: "Goals"
+- extendedWaitUntil:
+    visible:
+      id: "add-goal"
+    timeout: 10000
+- tapOn: "Settings"
+- extendedWaitUntil:
+    visible:
+      id: "import-backup"
+    timeout: 10000
+- tapOn:
+    id: "import-backup"
+- extendedWaitUntil:
+    visible: "Import Data from Clipboard?"
+    timeout: 5000
+- tapOn: "Import"
+# iOS may ask before an app reads the clipboard.
+- tapOn:
+    text: "Allow Paste"
+    optional: true
+- extendedWaitUntil:
+    visible: "Import Finished"
+    timeout: 10000
+- tapOn: "OK"
+- tapOn: "Goals"
+- extendedWaitUntil:
+    visible:
+      id: "goal-Workout"
+    timeout: 10000
+
+# Kept on the device: a cold start shows no Welcome, and the goal is still there.
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: "summary"
+    timeout: 30000
+- assertNotVisible: "Welcome to"
+- tapOn: "Goals"
+- extendedWaitUntil:
+    visible:
+      id: "goal-Workout"
+    timeout: 10000
+
+# A reminder really delivered: one a minute ahead, then wait on the home screen.
+- openLink: "lifetime://e2e?notify=soon"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "summary"
+    timeout: 15000
+- pressKey: Home
+- extendedWaitUntil:
+    visible: "(What about|Want to|How |If you have).*"
+    timeout: 120000
+- takeScreenshot: 33d-delivered

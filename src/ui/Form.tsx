@@ -26,6 +26,7 @@ import {
   buttonStyle,
   disabled,
   font,
+  frame,
   headerProminence,
   hidden,
   foregroundStyle,
@@ -34,6 +35,10 @@ import {
 } from '@expo/ui/swift-ui/modifiers'
 import { router, type Href } from 'expo-router'
 import type { ReactNode } from 'react'
+import type { ColorValue } from 'react-native'
+import type { SFSymbol } from 'sf-symbols-typescript'
+
+import { colors } from '@/ui/theme/colors'
 
 /** A whole screen that is a grouped list. Its own scroll view drives the large title. */
 export function FormScreen({ children, testID }: { children: ReactNode; testID?: string }) {
@@ -106,26 +111,55 @@ export function Section({
 }
 
 /**
- * A row: a title, an optional trailing value, and a chevron when it pushes a screen.
- * Navigation stays expo-router's (`router.push`), so the header is the native stack's.
+ * A row: an optional coloured symbol (v1's settings rows, SCREENS.md §6), a title, an
+ * optional trailing value, a check when it is the chosen option, and a chevron when it pushes
+ * a screen. Navigation stays expo-router's (`router.push`), so the header is the native
+ * stack's.
  */
 export function Row({
   title,
   value,
   href,
   onPress,
+  icon,
+  iconColor,
+  checked,
+  tone,
+  chevron,
   testID,
 }: {
   title: string
   value?: string
   href?: Href
   onPress?: () => void
+  icon?: SFSymbol
+  iconColor?: ColorValue
+  checked?: boolean
+  /** `link` draws the title in the link colour (v1's blue rows), `destructive` in red. */
+  tone?: 'link' | 'destructive'
+  /** Shows the chevron without `href`, for a row that opens something else. */
+  chevron?: boolean
   testID?: string
 }) {
   const press = onPress ?? (href ? () => router.push(href) : undefined)
   const content = (
-    <HStack>
-      <Text>{title}</Text>
+    <HStack spacing={12}>
+      {icon ? (
+        <Image
+          systemName={icon}
+          size={20}
+          color={iconColor ?? colors.link}
+          modifiers={[frame({ width: 28 })]}
+        />
+      ) : null}
+      <Text
+        modifiers={
+          tone
+            ? [foregroundStyle(tone === 'link' ? colors.link : colors.destructive)]
+            : undefined
+        }>
+        {title}
+      </Text>
       <Spacer />
       {value ? (
         <Text
@@ -137,7 +171,13 @@ export function Row({
           {value}
         </Text>
       ) : null}
-      {href ? (
+      {checked ? (
+        <Image
+          systemName="checkmark"
+          modifiers={[font({ weight: 'semibold' }), foregroundStyle(colors.link)]}
+        />
+      ) : null}
+      {href || chevron ? (
         <Image
           systemName="chevron.right"
           modifiers={[
@@ -154,7 +194,10 @@ export function Row({
     // row in the label colours, as Settings.app draws them.
     <Button
       onPress={press}
-      modifiers={[tint('primary'), ...(testID ? [accessibilityIdentifier(testID)] : [])]}>
+      modifiers={[
+        tint('primary'),
+        ...(testID ? [accessibilityIdentifier(`${testID}${checked ? '-checked' : ''}`)] : []),
+      ]}>
       {content}
     </Button>
   )

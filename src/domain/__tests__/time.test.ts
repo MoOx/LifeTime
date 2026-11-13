@@ -155,6 +155,15 @@ describe('formatRelative', () => {
   })
 })
 
+describe('formatUpdated, ahead', () => {
+  it("says tomorrow for a reminder's next firing, as v1 did (capture 33)", () => {
+    const now = new Date(2026, 10, 9, 13, 53).getTime()
+    expect(formatUpdated(new Date(2026, 10, 10, 9, 0).getTime(), now, 'en-US')).toBe(
+      'tomorrow at 9:00 AM',
+    )
+  })
+})
+
 describe('formatUpdated', () => {
   const now = new Date(2026, 10, 9, 15, 0).getTime()
   it('says today with the time, as v1 did', () => {

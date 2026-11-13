@@ -44,6 +44,11 @@ export type Settings = {
   reminders: Reminder[]
   /** Weeks of history the bulk categorisation screen analyses. */
   categorisationWeeks: number
+  /**
+   * `Show Demo Data` (spec/30-screens.md, Reset): the generated week even once the calendar
+   * is allowed. Replaces v1's `Create Demo Calendar`, since the demo lives in memory.
+   */
+  showDemo: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -60,6 +65,7 @@ export const DEFAULT_SETTINGS: Settings = {
   remindersEnabled: true,
   reminders: [{ hour: 9, minute: 0 }],
   categorisationWeeks: 6,
+  showDemo: false,
 }
 
 // ---------------------------------------------------------------------------
@@ -150,6 +156,7 @@ export const parseSettings = (raw: unknown): Settings => {
       minute: asNumber(r?.minute, 0),
     })),
     categorisationWeeks: clampWeeks(asNumber(value.categorisationWeeks, 6)),
+    showDemo: asBoolean(value.showDemo, false),
   }
 }
 
@@ -201,5 +208,6 @@ export const importV1Settings = (raw: unknown): Settings => {
       hour: asNumber(asArray(r)[1], 9),
     })),
     categorisationWeeks: 6,
+    showDemo: false,
   }
 }

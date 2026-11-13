@@ -69,6 +69,10 @@ appId: io.moox.LifeTime
     id: "goal-missing"
 - takeScreenshot: 20-goal-new-filled
 - tapOn: "Add"
+# The first goal brings the reminders card (slice 7) when iOS has not been asked.
+- tapOn:
+    id: "reminders-not-now"
+    optional: true
 
 # The card, and the ring sweeping in.
 - startRecording: goals-ring-sweep

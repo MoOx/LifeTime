@@ -6,6 +6,7 @@ import {
   nextOccurrence,
   removeReminder,
   sortReminders,
+  upcomingFirings,
 } from '../reminders'
 import type { Reminder } from '../settings'
 
@@ -64,5 +65,25 @@ describe('firesTooSoon', () => {
   it('flags a reminder set just before its own time', () => {
     expect(firesTooSoon(at(9), clock(8, 55))).toBe(true)
     expect(firesTooSoon(at(9), clock(8, 60 - MINIMUM_GAP_MINUTES - 1))).toBe(false)
+  })
+})
+
+describe('upcomingFirings', () => {
+  it('schedules a week ahead, soonest first', () => {
+    const firings = upcomingFirings([at(21), at(9)], clock(8))
+    expect(firings).toHaveLength(14)
+    expect(firings[0]).toBe(clock(9))
+    expect(firings[1]).toBe(clock(21))
+    expect(firings).toEqual([...firings].sort((a, b) => a - b))
+  })
+
+  it('moves a firing that is too close to tomorrow, as v1 did', () => {
+    const [first] = upcomingFirings([at(9)], clock(8, 45))
+    expect(first).toBe(new Date(2026, 7, 12, 9).getTime())
+  })
+
+  it('stays under the 64 pending notifications iOS allows', () => {
+    const many = Array.from({ length: 12 }, (_, i) => at(8 + i))
+    expect(upcomingFirings(many, clock(7))).toHaveLength(64)
   })
 })

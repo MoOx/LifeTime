@@ -1,7 +1,8 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router'
 import { useColorScheme } from 'react-native'
 
-import { SettingsProvider } from '@/data/settings'
+import { useReminderSchedule } from '@/data/notifications'
+import { SettingsProvider, useSettings } from '@/data/settings'
 import { stackOptions } from '@/ui/stackOptions'
 
 // Root stack: the tabs, and the sheets of docs/spec/30-screens.md ("Navigation map").
@@ -15,6 +16,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
       <SettingsProvider>
+        <ReminderSchedule />
         <Stack screenOptions={stackOptions}>
           {/* The redirect to /summary: no header, or "index" flashes at launch. */}
           <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -38,6 +40,16 @@ export default function RootLayout() {
               sheetGrabberVisible: true,
             }}
           />
+          {/* v1's reminders card, after the first goal: the same kind of sheet (D28). */}
+          <Stack.Screen
+            name="reminders-access"
+            options={{
+              presentation: 'formSheet',
+              headerShown: false,
+              sheetAllowedDetents: 'fitToContents',
+              sheetGrabberVisible: true,
+            }}
+          />
           {/* E2E builds only: seeds the simulator's calendar, then shows the Summary. */}
           <Stack.Screen name="e2e" options={{ headerShown: false }} />
           <Stack.Screen name="goal" options={{ presentation: 'modal', title: 'New Goal' }} />
@@ -45,4 +57,10 @@ export default function RootLayout() {
       </SettingsProvider>
     </ThemeProvider>
   )
+}
+
+/** Keeps the reminders scheduled with iOS in step with the settings (spec/50-architecture.md). */
+function ReminderSchedule() {
+  useReminderSchedule(useSettings().settings)
+  return null
 }
