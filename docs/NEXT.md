@@ -180,6 +180,8 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
   Slice 4 done 2026-11-13, evidence in [slices/4/](./slices/4/README.md); the calendar is read
   through LifeTime's own module, `modules/lifetime-calendar`.
   Slice 5 done 2026-11-13, evidence in [slices/5/](./slices/5/README.md).
+  Slice 4b done 2026-11-13 (notices as cards, INTENT.md D28, from MoOx's Health screenshots),
+  evidence in [slices/4b/](./slices/4b/README.md). Next: slice 5b, the Summary as cards.
 
 Follow `docs/spec/60-slices.md`, v2-alpha1 first. **Slice 0** is the fresh Expo SDK 58 scaffold (D12), with:
 - `src/domain` and its tests ported.

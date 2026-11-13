@@ -66,3 +66,6 @@ fastlane/test_output
 # Deep-research working notes; the synthesised result is committed under docs/
 research_notes/
 reports/
+
+# MoOx's own Health captures: personal data, never committed (docs/reference/health-27.md)
+docs/reference/ios health 27.3/

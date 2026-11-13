@@ -12,7 +12,7 @@ appId: io.moox.LifeTime
     visible: "Continue"
     timeout: 30000
 - tapOn: "Continue"
-- assertVisible: "Demo data"
+- assertVisible: "Demo Data"
 
 # The permission card, from the demo row.
 - tapOn:
@@ -31,7 +31,7 @@ appId: io.moox.LifeTime
     visible:
       id: "summary"
     timeout: 10000
-- assertNotVisible: "Demo data"
+- assertNotVisible: "Demo Data"
 
 # Reason 1: no events on the last two weeks (the simulator's calendars are empty).
 - openLink: "lifetime://e2e?scenario=empty"
@@ -44,6 +44,14 @@ appId: io.moox.LifeTime
       id: "empty-no-events"
     timeout: 15000
 - takeScreenshot: 04-empty-no-events
+# v1's close button explains why the card stays (NoEventBox.res:205-217).
+- tapOn:
+    id: "empty-about"
+- extendedWaitUntil:
+    visible: "Let's stay motivated!"
+    timeout: 5000
+- takeScreenshot: 04e-empty-about
+- tapOn: "Got it"
 
 # Reason 2: only all-day events.
 - openLink: "lifetime://e2e?scenario=all-day"

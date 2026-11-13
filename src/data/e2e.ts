@@ -20,6 +20,16 @@ export const E2E_CALENDAR = 'LifeTime E2E'
 
 export type Scenario = 'empty' | 'week' | 'all-day' | 'late-event'
 
+let isolated = false
+
+/**
+ * Once a flow has seeded, the app reads the E2E calendar alone. The simulator's own calendars
+ * come and go: on 2026-11-13 iOS added "US Holidays", 122 all-day events, and the flow's "no
+ * events" became "only all-day events" (docs/slices/4b/README.md). Never true outside E2E
+ * builds.
+ */
+export const e2eIsolated = () => isolated
+
 const minuteMs = 60_000
 const at = (day: number, hour: number, minute = 0) => day + (hour * 60 + minute) * minuteMs
 
@@ -31,21 +41,26 @@ const writes = () => {
   return { reset: e2eResetCalendar, create: e2eCreateCalendar, event: e2eCreateEvent }
 }
 
+/** The week's routine: title, start and end (hour, minute). */
+const SLOTS: [string, number, number, number, number][] = [
+  ['Sleep', 0, 0, 7, 0],
+  ['Deep work', 9, 0, 12, 0],
+  ['Lunch', 12, 30, 13, 15],
+  ['CrossFit', 18, 0, 19, 0],
+  // Two titles sharing a start, for the Match row's blast radius (slice 5).
+  ['Gym', 7, 15, 8, 0],
+  ['Gym legs', 19, 30, 20, 15],
+]
+
+/** Every title `week` writes, for the flow that hides them all (`skip=activities`). */
+export const WEEK_TITLES = SLOTS.map(([title]) => title)
+
 /** Two weeks of a plausible routine, ending now. */
 const seedWeek = async (calendarId: string, now: number) => {
   const { event } = writes()
-  const slots: [string, number, number, number, number][] = [
-    ['Sleep', 0, 0, 7, 0],
-    ['Deep work', 9, 0, 12, 0],
-    ['Lunch', 12, 30, 13, 15],
-    ['CrossFit', 18, 0, 19, 0],
-    // Two titles sharing a start, for the Match row's blast radius (slice 5).
-    ['Gym', 7, 15, 8, 0],
-    ['Gym legs', 19, 30, 20, 15],
-  ]
   for (let back = 13; back >= 0; back--) {
     const day = startOfDay(addDays(now, -back))
-    for (const [title, h1, m1, h2, m2] of slots) {
+    for (const [title, h1, m1, h2, m2] of SLOTS) {
       const end = at(day, h2, m2)
       if (end > now) continue
       await event(calendarId, title, at(day, h1, m1), end, false)
@@ -65,6 +80,7 @@ const seedAllDay = async (calendarId: string, now: number) => {
 export const seed = async (scenario: Scenario, now = Date.now()): Promise<string | undefined> => {
   if (!E2E_ENABLED) return undefined
   const { reset, create, event } = writes()
+  isolated = true
   if (scenario === 'late-event') {
     // One more event, ending five minutes ago, in the existing calendar.
     const calendar = (await LifeTimeCalendar.listCalendars()).find((c) => c.title === E2E_CALENDAR)

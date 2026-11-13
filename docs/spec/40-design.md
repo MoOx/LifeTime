@@ -8,7 +8,9 @@ grouping, spacing and polish. They do not set headers, navigation or Android's l
 
 1. Native first. A platform control beats a look-alike, always. On iOS that means SwiftUI
    through `@expo/ui` wherever it has the component (D27): the OS then draws today's look,
-   and next year's, instead of the app copying one year's metrics.
+   and next year's, instead of the app copying one year's metrics. Grouped lists are for
+   settings-like screens; notices and feeds are cards, as in iOS 27's Health app (D28,
+   [reference/health-27.md](../reference/health-27.md)).
 2. Never a hard-coded font size. This was the defect behind "doesn't feel native on Android".
 3. Semantic colours from the system, so light, dark and increased contrast come for free.
 4. Android is Material 3, not iOS with another font.
@@ -70,12 +72,14 @@ appearances, `textOnDarkLight` in SCREENS.md §13.
 |---|---|---|
 | Tab bar | Native tabs (Liquid Glass) | Material navigation bar |
 | Grouped list | SwiftUI `Form` and `Section` through `@expo/ui`, rounded groups as in Settings.app (D27, [spike 4](../spikes/04-expo-ui-lists.md)); React Native content such as the chart sits in a section through `RNHostView` | M3 list, grouped by headers and dividers |
+| Notice card | A `Form` section with one row, insets removed (`src/ui/Card.tsx`): an optional banner in the accent colour with an uppercase label and a close button, then an SF Symbol, a Headline title, the text in Subheadline secondary, capsule buttons (`borderedProminent`, then `bordered`). Empty states, the demo invitation, access refused (D28) | M3 card, same slots |
+| Feed card | Health's "This Week" card: a heading in the category's colour with its icon and chevron, a sentence, the chart; under bold section titles. Summary and Goals (D28) | M3 card |
 | Row | SwiftUI row: text, trailing value, chevron when it pushes (`src/ui/Form.tsx`) | Ripple, same slots |
 | Group heading, action, footnote | `Section` header and footer; the content of SCREENS.md §1, the look of the OS | Same structure, M3 type |
 | Tinted check | Filled in the item's own colour (calendar, category) | Same; M3 checkbox only if the Android pass shows the tint is lost |
 | Switch, slider, picker, date picker, text field | SwiftUI through `@expo/ui` (D27), each proven on the simulator by the first slice that needs it | Jetpack Compose through `@expo/ui` |
 | Menu, confirm | Native menu and alert | M3 menu and dialog |
-| Sheet | Form sheet | M3 bottom sheet, or a full-screen dialog for forms |
+| Sheet | Form sheet; a permission request is a sheet sized to its content, centred under its glyph, `Continue` then `Not Now` (D28) | M3 bottom sheet, or a full-screen dialog for forms |
 | Chart | React Native views, geometry of SCREENS.md §8b, stacked by the week's totals (D25), in a SwiftUI page-style `TabView` (slice 2) | Same views, Compose pager |
 | Ring | Skia, behaviours of SCREENS.md §8c: 1500 ms sweep on the same curve, end-cap shadow, start cap hidden past a turn | Same |
 | Icons | SF Symbols through expo-symbols | Material Symbols through expo-symbols |

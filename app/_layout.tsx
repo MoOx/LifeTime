@@ -28,7 +28,16 @@ export default function RootLayout() {
           <Stack.Screen name="privacy" options={{ presentation: 'modal', title: '' }} />
           <Stack.Screen name="help" options={{ presentation: 'modal', title: '' }} />
           <Stack.Screen name="filters" options={{ presentation: 'modal', title: 'Filters' }} />
-          <Stack.Screen name="calendar-access" options={{ presentation: 'modal', title: '' }} />
+          {/* v1's permission card: a sheet sized to its content (INTENT.md D28). */}
+          <Stack.Screen
+            name="calendar-access"
+            options={{
+              presentation: 'formSheet',
+              headerShown: false,
+              sheetAllowedDetents: 'fitToContents',
+              sheetGrabberVisible: true,
+            }}
+          />
           {/* E2E builds only: seeds the simulator's calendar, then shows the Summary. */}
           <Stack.Screen name="e2e" options={{ headerShown: false }} />
           <Stack.Screen name="goal" options={{ presentation: 'modal', title: 'New Goal' }} />

@@ -58,8 +58,8 @@ searched for in an E2E binary and in a build without the flag. [check.txt](./che
 | v1 | Now | Why |
 |---|---|---|
 | Permission card over the Summary at first launch | The same card and copy, as a sheet from `Use my calendar` | Demo first, spec/30-screens.md |
-| Card with a calendar glyph | No glyph: the sheet's title leads | The sheet carries the context |
-| Empty-state card with a shadow and a spring entrance | A SwiftUI section with the message and its two buttons | D27 |
+| Card with a calendar glyph | No glyph: the sheet's title leads | The sheet carries the context; the glyph is back in [slice 4b](../4b/README.md) (D28) |
+| Empty-state card with a shadow and a spring entrance | A SwiftUI section with the message and its two buttons | D27; redone as v1's card in [slice 4b](../4b/README.md) (D28) |
 | Pull to refresh | Re-read on launch, foreground, focus and the store's change signal | D13 |
 | `relevent` | `relevant` | Corrected strings |
 | Filters as edge-to-edge rows | SwiftUI `Form` rows, checks in the calendar's colour | D27 |

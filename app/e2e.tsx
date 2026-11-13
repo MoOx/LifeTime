@@ -1,7 +1,7 @@
 import { Redirect, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 
-import { E2E_CALENDAR, E2E_ENABLED, seed, type Scenario } from '@/data/e2e'
+import { E2E_CALENDAR, E2E_ENABLED, seed, WEEK_TITLES, type Scenario } from '@/data/e2e'
 import { useSettings } from '@/data/settings'
 
 /**
@@ -26,7 +26,7 @@ export default function E2E() {
               ? [{ id: calendarId, title: E2E_CALENDAR, source: '', color: '#5856D6' }]
               : [],
           skippedActivityTitles:
-            skip === 'activities' ? ['Sleep', 'Deep work', 'Lunch', 'CrossFit'] : [],
+            skip === 'activities' ? WEEK_TITLES : [],
           hideSkippedActivities: true,
         }))
       })

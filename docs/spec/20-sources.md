@@ -31,7 +31,8 @@ system prompt appears only after the user taps it.
 - **Change from v1:** v1 wrote a real calendar; demo stays in memory, so nothing can be left
   behind ([SCREENS.md](../SCREENS.md) §10c). `Create Demo Calendar` is replaced by
   `Show Demo Data`.
-- **Banner:** a persistent row on the Summary: `Demo data` with an action `Use my calendar`.
+- **Banner:** a persistent card on the Summary, as Health's suggestion cards (D28): `Demo Data`,
+  a sentence saying the events are generated, and `Use my calendar`.
 
 ## Calendar (iOS, Android)
 

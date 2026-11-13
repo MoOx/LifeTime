@@ -13,6 +13,7 @@ import { Linking } from 'react-native'
 
 import LifeTimeCalendar from '../../modules/lifetime-calendar'
 
+import { E2E_CALENDAR, e2eIsolated } from '@/data/e2e'
 import type { TimeEvent } from '@/domain/events'
 import type { CalendarRef } from '@/domain/settings'
 
@@ -51,7 +52,10 @@ export const requestCalendarAccess = async (): Promise<boolean> => {
 }
 
 export const listCalendars = async (): Promise<CalendarRef[]> =>
-  (await LifeTimeCalendar.listCalendars()).sort((a, b) => a.title.localeCompare(b.title))
+  (await LifeTimeCalendar.listCalendars())
+    // Maestro's flows read their own calendar alone (`e2eIsolated`); false in shipped builds.
+    .filter((c) => !e2eIsolated() || c.title === E2E_CALENDAR)
+    .sort((a, b) => a.title.localeCompare(b.title))
 
 export const listEvents = async (
   calendarIds: readonly string[],

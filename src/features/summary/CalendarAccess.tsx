@@ -1,13 +1,14 @@
 /**
  * v1's calendar permission card (SCREENS.md §10d, `CalendarsPermissions.res`): the copy,
- * with "informations" corrected. Shown as a sheet from `Use my calendar`, and inline on the
- * Summary when access was refused, where `Open Settings` replaces `Continue`
- * (spec/20-sources.md, "Failures").
+ * with "informations" corrected. Shown as a sheet from `Use my calendar`, centred under v1's
+ * calendar glyph (INTENT.md D28), and as a card on the Summary when access was refused, where
+ * `Open Settings` replaces `Continue` (spec/20-sources.md, "Failures").
  */
 
 import { Button, HStack, Spacer, Text } from '@expo/ui/swift-ui'
 import {
   accessibilityIdentifier,
+  buttonBorderShape,
   buttonStyle,
   controlSize,
   font,
@@ -34,7 +35,7 @@ export function PrivacyLink() {
   )
 }
 
-/** A full-width prominent button, as v1's blue `Continue`. */
+/** A full-width prominent button, as v1's blue `Continue`, in the OS's capsule shape. */
 export function ProminentButton({
   label,
   onPress,
@@ -49,6 +50,7 @@ export function ProminentButton({
       onPress={onPress}
       modifiers={[
         buttonStyle('borderedProminent'),
+        buttonBorderShape('capsule'),
         controlSize('large'),
         tint(colors.accent),
         accessibilityIdentifier(testID),

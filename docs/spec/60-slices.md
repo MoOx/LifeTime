@@ -18,7 +18,8 @@ v1 are listed there, each with its reason.
 | 3 | **Welcome, Privacy, Help.** | Matches 01, 02, 34, 35; staged entrances | Recording of Welcome |
 | 4 | **Calendar source.** Permission card, Filters, empty states, always up to date | Matches 03, 04, 17; each of the four empty reasons, and denied, reachable by a flow; an event added in Calendar appears with no action | Captures of all four reasons, which v1's set lacks |
 | 5 | **Activity detail and rules.** Category list, Events, Hide, Match row | Matches 11; a rule changes the chart; the blast radius shows | |
-| 6 | **Goals.** List, empty state, editor, slider, validation, ring and its switch | Matches 05, 06, 20, 21, 22; ring behaviours; red footnote on invalid | Recording of the ring sweep |
+| 5b | **Summary as cards** (D28). Weekly chart and Top Activities as Health's "This Week" cards, under bold section titles | Matches 12, 14, 15, 16 for content; the pager and every slice 2 and 5 flow still pass | Side-by-side with captures and with the Health reference |
+| 6 | **Goals.** List as cards (D28), empty state, editor, slider, validation, ring and its switch | Matches 05, 06, 20, 21, 22; ring behaviours; red footnote on invalid | Recording of the ring sweep |
 | 7 | **Settings, Notifications, Reset.** Reminders really scheduled | Matches 07, 10, 30, 33; a reminder fires in the simulator; export, import, reset round trip | Log of a delivered notification |
 | 8 | **Sorter and rule from a selection.** Bulk categorisation, keywords, coverage, `inferRule` | One action categorises the demo week; selecting several titles yields the expected rule, which also applies to a new event | `inferRule` tests |
 | 9 | **Accessibility pass.** Large text, VoiceOver labels, Reduce Motion | Every screen at the largest text size; labels read correctly | Captures; audit notes |

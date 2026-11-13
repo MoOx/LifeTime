@@ -14,7 +14,7 @@ appId: io.moox.LifeTime
     timeout: 30000
 - tapOn: "Continue"
 - assertVisible: "Your LifeTime"
-- assertVisible: "Demo data"
+- assertVisible: "Demo Data"
 - assertVisible: "Daily Average"
 - assertVisible: "Total Logged Time"
 # Hidden on the current week; it stays in the tree, disabled and without text.
@@ -23,10 +23,10 @@ appId: io.moox.LifeTime
     enabled: false
 - takeScreenshot: 12-top
 
-# Six weeks: swipe back to the oldest. The swipe crosses the chart, at 47% of the height.
+# Six weeks: swipe back to the oldest. The swipe crosses the chart, at 68% of the height, below the demo card (slice 4b).
 - swipe:
-    start: 15%, 47%
-    end: 90%, 47%
+    start: 15%, 68%
+    end: 90%, 68%
     duration: 400
 - waitForAnimationToEnd
 # Off-screen pages stay in the accessibility tree, so captions cannot prove which week is
@@ -39,15 +39,15 @@ appId: io.moox.LifeTime
     times: 4
     commands:
       - swipe:
-          start: 15%, 47%
-          end: 90%, 47%
+          start: 15%, 68%
+          end: 90%, 68%
           duration: 400
       - waitForAnimationToEnd
 - takeScreenshot: 16b-oldest-week
 # One more swipe: there is no seventh week.
 - swipe:
-    start: 15%, 47%
-    end: 90%, 47%
+    start: 15%, 68%
+    end: 90%, 68%
     duration: 400
 - waitForAnimationToEnd
 - tapOn:
@@ -69,10 +69,12 @@ appId: io.moox.LifeTime
     duration: 600
 - waitForAnimationToEnd
 - takeScreenshot: 14-scrolled
+# Centred, or the button can sit under the floating tab bar (taller demo card, slice 4b).
 - scrollUntilVisible:
     element:
       id: "toggle-hidden"
     direction: DOWN
+    centerElement: true
 - waitForAnimationToEnd
 - takeScreenshot: 15-bottom
 - tapOn:
