@@ -11,7 +11,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "io.moox.LifeTime",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCalendarsFullAccessUsageDescription": "Your calendars stay on this device. LifeTime only reads them, to show how your week was spent."
       }
     },
     "android": {

@@ -1,0 +1,12 @@
+Read-only check, 2026-11-13: where the E2E write functions appear in each Release build.
+Swift keeps string literals of 15 bytes or fewer inside the instructions, so in the native
+binary only the longer names (e2eResetCalendar, e2eCreateCalendar) can be searched for.
+
+== E2E build (EXPO_PUBLIC_E2E=1)
+  e2eResetCalendar: native 2, JS bundle 1
+  e2eCreateCalendar: native 2, JS bundle 1
+  e2eCreateEvent: native 0, JS bundle 1
+== Build without the flag
+  e2eResetCalendar: native 0, JS bundle 0
+  e2eCreateCalendar: native 0, JS bundle 0
+  e2eCreateEvent: native 0, JS bundle 0

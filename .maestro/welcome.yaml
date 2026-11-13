@@ -4,6 +4,9 @@ appId: io.moox.LifeTime
 ---
 - launchApp:
     clearState: true
+    # Maestro grants every permission by default; the demo needs calendar access undecided.
+    permissions:
+      calendar: unset
 - extendedWaitUntil:
     visible: "Continue"
     timeout: 30000

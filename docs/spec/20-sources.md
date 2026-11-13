@@ -43,9 +43,12 @@ system prompt appears only after the user taps it.
   v1's "mostly read-only" hedge goes ([SCREENS.md](../SCREENS.md) §9).
 - **Failures:** denied → Summary shows the permission card with `Open Settings`; no calendars
   → the empty state; a calendar that disappears → its observations are dropped.
-- **Library:** `expo-calendar`.
-- **Fake it:** Maestro flow granting calendar then injecting events through a debug-only deep
-  link, as v1's demo calendar did; the simulator's calendar is real.
+- **Library:** LifeTime's own module, `modules/lifetime-calendar` (EventKit), since slice 4: it
+  exposes the event store's change signal, which `expo-calendar` 58 does not, and keeps the
+  write functions Maestro needs out of shipped builds ([slices/4/](../slices/4/README.md)).
+- **Fake it:** an E2E build (`EXPO_PUBLIC_E2E=1`) seeds a `LifeTime E2E` calendar through the
+  `lifetime://e2e?scenario=...` link (`.maestro/calendar.yaml`), as v1's demo calendar did; the
+  simulator's calendar is real.
 
 ## HealthKit (iOS)
 

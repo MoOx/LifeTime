@@ -45,7 +45,7 @@ types.
 | Need | Choice | Status |
 |---|---|---|
 | Routing, tabs, headers | expo-router `Stack`, native tabs; `react-native-screens/experimental` on Android if its spike passes at the Android pass | iOS proven: [spike 2](../spikes/02-large-title.md) |
-| Calendar | `expo-calendar` | Used today |
+| Calendar | Own Expo module, `modules/lifetime-calendar` (read-only; change signal; E2E-only writes) | Slice 4 |
 | Health iOS | `@kingstinct/react-native-healthkit` | Spike 4 |
 | Health Android | `react-native-health-connect` | Android slice |
 | Storage | `expo-sqlite`; settings as one JSON document | |

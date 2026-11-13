@@ -35,7 +35,7 @@ export function ProseScreen({
           {centered ? (
             <HStack>
               <Spacer />
-              <Title>{title}</Title>
+              <Title centered>{title}</Title>
               <Spacer />
             </HStack>
           ) : (
@@ -48,12 +48,12 @@ export function ProseScreen({
   )
 }
 
-function Title({ children }: { children: string }) {
+function Title({ children, centered = false }: { children: string; centered?: boolean }) {
   return (
     <Text
       modifiers={[
         font({ textStyle: 'largeTitle', weight: 'bold' }),
-        multilineTextAlignment('center'),
+        multilineTextAlignment(centered ? 'center' : 'leading'),
         accessibilityAddTraits(['isHeader']),
       ]}>
       {children}

@@ -63,7 +63,8 @@ export function Section({
    */
   action?: { label: string; onPress?: () => void; testID?: string; hidden?: boolean }
   header?: ReactNode
-  footer?: string
+  /** A string is drawn as SwiftUI's own footer text; a node replaces it. */
+  footer?: string | ReactNode
   children?: ReactNode
 }) {
   const heading =
@@ -90,7 +91,7 @@ export function Section({
     <SwiftSection
       title={heading ? undefined : title}
       header={heading}
-      footer={footer ? <Text>{footer}</Text> : undefined}>
+      footer={typeof footer === 'string' ? <Text>{footer}</Text> : footer}>
       {children}
     </SwiftSection>
   )

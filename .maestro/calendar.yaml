@@ -1,0 +1,123 @@
+# Slice 4: the calendar source. Needs an E2E build (EXPO_PUBLIC_E2E=1).
+# Captures to compare with docs/reference/v1/ios/ 03-calendar-permission, 04-home-empty and
+# 17-filters, plus the four empty reasons v1's set lacks.
+appId: io.moox.LifeTime
+---
+- launchApp:
+    clearState: true
+    # Maestro grants every permission by default; the flow asks for real.
+    permissions:
+      calendar: unset
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 30000
+- tapOn: "Continue"
+- assertVisible: "Demo data"
+
+# The permission card, from the demo row.
+- tapOn:
+    id: "use-my-calendar"
+- extendedWaitUntil:
+    visible: "Set Up Calendars Access"
+    timeout: 10000
+- takeScreenshot: 03-calendar-permission
+- tapOn:
+    id: "access-continue"
+# iOS's own prompt: Maestro taps system alerts, though they are not in the app's tree.
+- waitForAnimationToEnd
+- takeScreenshot: 03b-system-prompt
+- tapOn: "Allow Full Access"
+- extendedWaitUntil:
+    visible:
+      id: "summary"
+    timeout: 10000
+- assertNotVisible: "Demo data"
+
+# Reason 1: no events on the last two weeks (the simulator's calendars are empty).
+- openLink: "lifetime://e2e?scenario=empty"
+# iOS asks "Open in LifeTime?" for a link opened from outside the app.
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "empty-no-events"
+    timeout: 15000
+- takeScreenshot: 04-empty-no-events
+
+# Reason 2: only all-day events.
+- openLink: "lifetime://e2e?scenario=all-day"
+# iOS asks "Open in LifeTime?" for a link opened from outside the app.
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "empty-only-all-day"
+    timeout: 15000
+- takeScreenshot: 04b-empty-only-all-day
+
+# Reason 3: only skipped calendars; its primary button opens Filters.
+- openLink: "lifetime://e2e?scenario=week&skip=calendar"
+# iOS asks "Open in LifeTime?" for a link opened from outside the app.
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "empty-only-skipped-calendars"
+    timeout: 15000
+- takeScreenshot: 04c-empty-only-skipped-calendars
+- tapOn: "Help me customize settings"
+- extendedWaitUntil:
+    visible:
+      id: "filters"
+    timeout: 10000
+- takeScreenshot: 17-filters-skipped
+- tapOn:
+    id: "calendar-LifeTime E2E"
+- waitForAnimationToEnd
+- takeScreenshot: 17-filters
+- tapOn: "Done"
+- extendedWaitUntil:
+    visible: "Deep work"
+    timeout: 15000
+- assertNotVisible:
+    id: "empty-only-skipped-calendars"
+
+# Reason 4: only hidden activities; its primary button reveals them.
+- openLink: "lifetime://e2e?scenario=week&skip=activities"
+# iOS asks "Open in LifeTime?" for a link opened from outside the app.
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "empty-only-skipped-activities"
+    timeout: 15000
+- takeScreenshot: 04d-empty-only-skipped-activities
+- tapOn: "Toggle Hidden Activities"
+- extendedWaitUntil:
+    visible: "Deep work"
+    timeout: 15000
+
+# A real fortnight, then one more event: it appears with no refresh action.
+- openLink: "lifetime://e2e?scenario=week"
+# iOS asks "Open in LifeTime?" for a link opened from outside the app.
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible: "Deep work"
+    timeout: 15000
+- takeScreenshot: 12-calendar-week
+- openLink: "lifetime://e2e?scenario=late-event"
+# iOS asks "Open in LifeTime?" for a link opened from outside the app.
+- tapOn:
+    text: "Open"
+    optional: true
+- scrollUntilVisible:
+    element: "Late addition"
+    direction: DOWN
+    timeout: 20000
+- takeScreenshot: 18-late-addition

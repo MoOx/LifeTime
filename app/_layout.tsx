@@ -27,6 +27,10 @@ export default function RootLayout() {
           {/* Privacy and Help: the title is in the content, as in v1 (spec/30-screens.md). */}
           <Stack.Screen name="privacy" options={{ presentation: 'modal', title: '' }} />
           <Stack.Screen name="help" options={{ presentation: 'modal', title: '' }} />
+          <Stack.Screen name="filters" options={{ presentation: 'modal', title: 'Filters' }} />
+          <Stack.Screen name="calendar-access" options={{ presentation: 'modal', title: '' }} />
+          {/* E2E builds only: seeds the simulator's calendar, then shows the Summary. */}
+          <Stack.Screen name="e2e" options={{ headerShown: false }} />
           <Stack.Screen name="goal" options={{ presentation: 'modal', title: 'New Goal' }} />
         </Stack>
       </SettingsProvider>

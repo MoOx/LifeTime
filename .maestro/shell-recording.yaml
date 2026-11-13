@@ -2,7 +2,10 @@
 # Run under `xcrun simctl io booted recordVideo` (docs/slices/1/README.md).
 appId: io.moox.LifeTime
 ---
-- launchApp
+- launchApp:
+    # Maestro grants every permission by default; the demo needs calendar access undecided.
+    permissions:
+      calendar: unset
 # Welcome shows at every cold start until settings persist (slice 7).
 - extendedWaitUntil:
     visible: "Continue"

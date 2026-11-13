@@ -1,15 +1,25 @@
-import { Button, HStack, Spacer, Text } from '@expo/ui/swift-ui'
-import { accessibilityIdentifier, disabled, textCase } from '@expo/ui/swift-ui/modifiers'
+import { Button, HStack, ProgressView, Spacer, Text } from '@expo/ui/swift-ui'
+import { accessibilityIdentifier, controlSize, textCase } from '@expo/ui/swift-ui/modifiers'
+import { router } from 'expo-router'
 import { useMemo, useRef, useState } from 'react'
 
 import { calendarOfTitle, minutesByTitle, totalMinutes } from '@/domain/aggregate'
+import { explainEmptinessOverWeeks } from '@/domain/events'
 import { categoryOf } from '@/domain/rules'
 import { formatMinutes, formatUpdated } from '@/domain/time'
 import { clampToNow } from '@/domain/week'
+import { openAppSettings } from '@/data/calendar'
 import { useLocaleTag, useWeekStartsOn } from '@/data/locale'
 import { useNow } from '@/data/now'
 import { useReport } from '@/data/report'
 import { useSettings } from '@/data/settings'
+import {
+  ACCESS_BODY,
+  ACCESS_TITLE,
+  PrivacyLink,
+  ProminentButton,
+} from '@/features/summary/CalendarAccess'
+import { EmptyState } from '@/features/summary/EmptyState'
 import { TopActivities, type TopActivity } from '@/features/summary/TopActivities'
 import { WeekPager, type WeekPagerHandle } from '@/features/summary/WeekPager'
 import { FormScreen, Row, Section } from '@/ui/Form'
@@ -51,22 +61,46 @@ export default function Summary() {
     [events, range.start, range.end, report.rules],
   )
 
+  const toggleHidden = () =>
+    update((s) => ({ ...s, hideSkippedActivities: !s.hideSkippedActivities }))
+
+  // The empty states look at the last two weeks (`NoEventBox.res:12-74`), real data only.
+  const emptiness =
+    report.source === 'calendar' && !report.loading
+      ? explainEmptinessOverWeeks(report.rawByWeek.slice(-2), report.filter)
+      : undefined
+
   return (
     <FormScreen testID="summary">
       <Section header={<Text modifiers={[textCase('uppercase')]}>{dateLine(now, locale)}</Text>}>
-        {report.isDemo ? (
+        {report.source === 'demo' ? (
           // spec/20-sources.md, "Demo": a persistent row while the data is generated.
-          // `Use my calendar` opens the permission card, which arrives with slice 4.
           <HStack>
             <Text>Demo data</Text>
             <Spacer />
             <Button
               label="Use my calendar"
-              modifiers={[disabled(true), accessibilityIdentifier('use-my-calendar')]}
+              onPress={() => router.push('/calendar-access')}
+              modifiers={[accessibilityIdentifier('use-my-calendar')]}
             />
           </HStack>
         ) : null}
       </Section>
+
+      {report.source === 'denied' ? (
+        // Access refused: the permission card, with `Open Settings` (spec/20-sources.md).
+        <Section title={ACCESS_TITLE}>
+          {ACCESS_BODY.map((paragraph) => (
+            <Text key={paragraph}>{paragraph}</Text>
+          ))}
+          <PrivacyLink />
+          <ProminentButton label="Open Settings" onPress={openAppSettings} testID="open-settings" />
+        </Section>
+      ) : null}
+
+      {emptiness !== undefined && emptiness !== 'has-events' ? (
+        <EmptyState reason={emptiness} onToggleHidden={toggleHidden} />
+      ) : null}
 
       <Section
         title="Weekly Chart"
@@ -76,17 +110,23 @@ export default function Summary() {
           testID: 'show-this-week',
           hidden: index === last,
         }}
-        footer={`Updated ${formatUpdated(report.updatedAt, now, locale)}`}>
+        footer={
+          // v1's small indicator beside `Updated` while the calendar is read (`Home.res:271-275`).
+          <HStack spacing={6}>
+            <Text>{`Updated ${formatUpdated(report.updatedAt, now, locale)}`}</Text>
+            {report.loading ? <ProgressView modifiers={[controlSize('mini')]} /> : null}
+          </HStack>
+        }>
         <WeekPager
-            ref={pager}
-            weeks={report.weeks}
-            eventsByWeek={report.eventsByWeek}
-            rules={report.rules}
-            locale={locale}
-            now={now}
-            weekStartsOn={weekStartsOn}
-            onIndexChange={setIndex}
-          />
+          ref={pager}
+          weeks={report.weeks}
+          eventsByWeek={report.eventsByWeek}
+          rules={report.rules}
+          locale={locale}
+          now={now}
+          weekStartsOn={weekStartsOn}
+          onIndexChange={setIndex}
+        />
         <Row
           title="Total Logged Time"
           value={formatMinutes(totalMinutes(activities))}
@@ -94,18 +134,10 @@ export default function Summary() {
         />
       </Section>
 
-      {/* `Customize report` opens Filters, which arrives with slice 4. */}
-      <TopActivities activities={activities} />
+      <TopActivities activities={activities} onCustomize={() => router.push('/filters')} />
 
       <Section>
-        <Button
-          onPress={() =>
-            update((s) => ({
-              ...s,
-              hideSkippedActivities: !s.hideSkippedActivities,
-            }))
-          }
-          modifiers={[accessibilityIdentifier('toggle-hidden')]}>
+        <Button onPress={toggleHidden} modifiers={[accessibilityIdentifier('toggle-hidden')]}>
           <HStack>
             <Spacer />
             <Text>
