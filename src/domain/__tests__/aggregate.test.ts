@@ -3,6 +3,7 @@ import {
   breakdownByDay,
   chartMaximum,
   chartGrid,
+  describeWeekChart,
   minutesByCategory,
   minutesByTitle,
   stackedSegments,
@@ -12,8 +13,7 @@ import { TimeEvent } from '../events'
 import { RuleSet } from '../rules'
 import { startOfDay } from '../time'
 
-const at = (y: number, m: number, d: number, h = 0, min = 0) =>
-  new Date(y, m, d, h, min).getTime()
+const at = (y: number, m: number, d: number, h = 0, min = 0) => new Date(y, m, d, h, min).getTime()
 
 const event = (
   title: string,
@@ -122,24 +122,12 @@ describe('chartGrid', () => {
   })
 
   it('labels only the three inner lines', () => {
-    expect(chartGrid(480).map((l) => l.label)).toEqual([
-      undefined,
-      '2h',
-      '4h',
-      '6h',
-      undefined,
-    ])
+    expect(chartGrid(480).map((l) => l.label)).toEqual([undefined, '2h', '4h', '6h', undefined])
   })
 
   // Without the unit switch a short week reads "0 h, 0 h, 1 h".
   it('switches to minutes at or below an hour', () => {
-    expect(chartGrid(40).map((l) => l.label)).toEqual([
-      undefined,
-      '10m',
-      '20m',
-      '30m',
-      undefined,
-    ])
+    expect(chartGrid(40).map((l) => l.label)).toEqual([undefined, '10m', '20m', '30m', undefined])
   })
 
   it('draws nothing when there is nothing to scale', () => {
@@ -191,5 +179,22 @@ describe('stackedSegments', () => {
       [at(2026, 7, 10)],
     )[0]
     expect(stackedSegments(monday, ['rest', 'work'])).toEqual([{ categoryId: 'work', minutes: 30 }])
+  })
+})
+
+describe('describeWeekChart', () => {
+  it('reads each day with its total and its biggest category', () => {
+    const days = [at(2026, 7, 10), at(2026, 7, 11)]
+    const events = [
+      event('Sleep', at(2026, 7, 10, 0), at(2026, 7, 10, 7)),
+      event('Lunch', at(2026, 7, 10, 12), at(2026, 7, 10, 13)),
+    ]
+    const names = ['Monday', 'Tuesday']
+    const phrases = describeWeekChart(
+      breakdownByDay(events, ruleSet, days),
+      (day) => names[days.indexOf(day)],
+      (id) => (id === 'rest' ? 'Rest' : id),
+    )
+    expect(phrases).toEqual(['Monday: 8h, mostly Rest', 'Tuesday: nothing logged'])
   })
 })

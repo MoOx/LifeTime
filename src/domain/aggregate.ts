@@ -10,7 +10,14 @@ import { CategoryId, DEFAULT_CATEGORIES } from './categories'
 import { TimeEvent } from './events'
 import { RuleSet, categoryOf } from './rules'
 import { Range } from './week'
-import { MINUTES_PER_HOUR, msToMinutes, overlapMs, startOfDay, endOfDay } from './time'
+import {
+  MINUTES_PER_HOUR,
+  endOfDay,
+  formatMinutes,
+  msToMinutes,
+  overlapMs,
+  startOfDay,
+} from './time'
 
 export type Bucket = { key: string; minutes: number }
 
@@ -36,10 +43,8 @@ export const minutesByTitle = (events: readonly TimeEvent[], range: Range): Buck
 }
 
 /** The calendar an activity title comes from, for resolving its category in a list. */
-export const calendarOfTitle = (
-  events: readonly TimeEvent[],
-  title: string,
-): string => events.find((e) => e.title === title)?.calendarId ?? ''
+export const calendarOfTitle = (events: readonly TimeEvent[], title: string): string =>
+  events.find((e) => e.title === title)?.calendarId ?? ''
 
 export const minutesByCategory = (
   events: readonly TimeEvent[],
@@ -107,9 +112,7 @@ export const weekStackOrder = (days: readonly DayBreakdown[]): CategoryId[] => {
     const index = STACK_ORDER.indexOf(id)
     return index === -1 ? STACK_ORDER.length : index
   }
-  return [...totals.keys()].sort(
-    (a, b) => totals.get(b)! - totals.get(a)! || rank(a) - rank(b),
-  )
+  return [...totals.keys()].sort((a, b) => totals.get(b)! - totals.get(a)! || rank(a) - rank(b))
 }
 
 /** A day's segments in `order`, bottom first, without the empty ones. */
@@ -188,3 +191,19 @@ export const chartGrid = (maximumMinutes: number): ChartGridLine[] => {
 
   return lines
 }
+
+/**
+ * The week chart read aloud (slice 9): VoiceOver cannot see the bars, so each day becomes a
+ * phrase with its total and its biggest category, "Monday: 6h 30m, mostly Work". Day and
+ * category names come from the caller, which knows the locale.
+ */
+export const describeWeekChart = (
+  breakdown: readonly DayBreakdown[],
+  dayName: (day: number) => string,
+  categoryName: (id: CategoryId) => string,
+): string[] =>
+  breakdown.map((day) => {
+    const top = day.byCategory[0]
+    if (day.totalMinutes <= 0 || top === undefined) return `${dayName(day.day)}: nothing logged`
+    return `${dayName(day.day)}: ${formatMinutes(day.totalMinutes)}, mostly ${categoryName(top.key)}`
+  })

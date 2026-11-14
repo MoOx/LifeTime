@@ -19,24 +19,26 @@ import {
   breakdownByDay,
   chartGrid,
   chartMaximum,
+  describeWeekChart,
   stackedSegments,
   weekStackOrder,
 } from '@/domain/aggregate'
 import { getCategory } from '@/domain/categories'
 import type { TimeEvent } from '@/domain/events'
 import type { RuleSet } from '@/domain/rules'
-import { formatWeekdayNarrow } from '@/domain/time'
+import { formatWeekdayLong, formatWeekdayNarrow } from '@/domain/time'
 import { daysOfWeek, type Range } from '@/domain/week'
 import { AppText } from '@/ui/AppText'
 import { categoryColor } from '@/ui/theme/colors'
 import { space } from '@/ui/theme/space'
+import { useTextScale } from '@/ui/textSize'
 
 /** `WeeklyGraph.res:6-10`: plot, day-letter strip, and the gutter "Enough for "99m"". */
 const PLOT_HEIGHT = 140
 const LETTER_HEIGHT = 16
 const RIGHT_GUTTER = 28
 /** Labels scale with Dynamic Type up to this factor only: the plot is fixed (40-design.md). */
-const LABEL_SCALE_LIMIT = 1.3
+export const LABEL_SCALE_LIMIT = 1.3
 
 /** `WeeklyGraph.res`: horizontal lines in `gray5`, dashed day dividers in `gray4`. */
 const gridColor = PlatformColor('systemGray5')
@@ -49,6 +51,9 @@ export type WeekChartProps = {
   locale: string
 }
 
+/** The letter strip's height, as the pager sizes itself around the chart. */
+export const chartHeight = (labelScale: number) => PLOT_HEIGHT + LETTER_HEIGHT * labelScale
+
 export function WeekChart({ week, events, rules, locale }: WeekChartProps) {
   const scheme = useColorScheme() === 'dark' ? 'dark' : 'light'
   const days = useMemo(() => daysOfWeek(week), [week])
@@ -59,9 +64,23 @@ export function WeekChart({ week, events, rules, locale }: WeekChartProps) {
     [breakdown],
   )
   const grid = useMemo(() => chartGrid(maximum), [maximum])
+  // The gutter and the letter strip grow with their labels, up to the same limit (slice 9):
+  // at 28 pt, "10h" was cut to "1…" at the largest sizes.
+  const labelScale = useTextScale(LABEL_SCALE_LIMIT)
+  const spoken = useMemo(
+    () =>
+      describeWeekChart(
+        breakdown,
+        (day) => formatWeekdayLong(day, locale),
+        (id) => getCategory(id).name,
+      ).join('. '),
+    [breakdown, locale],
+  )
 
   return (
-    <View style={styles.chart}>
+    // One element for VoiceOver: the bars, letters and gridlines say nothing on their own,
+    // so the chart reads as the day-by-day sentence (slice 9).
+    <View style={styles.chart} accessible accessibilityRole="image" accessibilityLabel={spoken}>
       <View style={styles.plotColumn}>
         <View style={styles.plot}>
           {grid.map((line) => (
@@ -104,7 +123,7 @@ export function WeekChart({ week, events, rules, locale }: WeekChartProps) {
           </View>
         </View>
         {/* Day letters at the bottom left of their column, beside the dash. */}
-        <View style={styles.axis}>
+        <View style={[styles.axis, { height: LETTER_HEIGHT * labelScale }]}>
           {days.map((day, index) => (
             <View
               key={day}
@@ -116,7 +135,7 @@ export function WeekChart({ week, events, rules, locale }: WeekChartProps) {
           ))}
         </View>
       </View>
-      <View style={styles.gutter} pointerEvents="none">
+      <View style={[styles.gutter, { width: RIGHT_GUTTER * labelScale }]} pointerEvents="none">
         {grid.map((line) =>
           line.label === undefined ? null : (
             <AppText
@@ -183,8 +202,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     justifyContent: 'flex-end',
   },
-  axis: { height: LETTER_HEIGHT },
+  axis: {},
   letterSlot: { position: 'absolute', top: 0, paddingLeft: space.xxs },
-  gutter: { width: RIGHT_GUTTER, height: PLOT_HEIGHT },
+  gutter: { height: PLOT_HEIGHT },
   gutterLabel: { position: 'absolute', left: space.xs },
 })

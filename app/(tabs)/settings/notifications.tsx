@@ -1,6 +1,7 @@
 import { Button, DatePicker, HStack, Spacer, Text, Toggle, VStack } from '@expo/ui/swift-ui'
 import {
   accessibilityIdentifier,
+  labelStyle,
   buttonStyle,
   disabled,
   font,
@@ -30,6 +31,7 @@ import {
 } from '@/data/notifications'
 import { useSettings } from '@/data/settings'
 import { FormScreen, Row, Section } from '@/ui/Form'
+import { useAccessibilityTextSize } from '@/ui/textSize'
 
 /**
  * Notifications: SCREENS.md §10b, `SettingsNotifications.res` on `main`, capture 33.
@@ -44,6 +46,7 @@ export default function Notifications() {
   const access = useNotificationAccess()
   const locale = useLocaleTag()
   const now = useNow()
+  const accessibilitySize = useAccessibilityTextSize()
   const [adding, setAdding] = useState<Date | undefined>(undefined)
   const allowed = access === 'granted'
   const active = allowed && settings.remindersEnabled
@@ -91,45 +94,72 @@ export default function Notifications() {
         />
         {sortReminders(settings.reminders).map((reminder) => {
           const at = new Date(2026, 0, 1, reminder.hour, reminder.minute)
-          return (
-            <HStack
-              key={`${reminder.hour}:${reminder.minute}`}
-              modifiers={[
-                // v1 dimmed to 0.1, which reads as a rendering fault (SCREENS.md §10b).
-                opacity(active ? 1 : 0.4),
-                accessibilityIdentifier(`reminder-${reminder.hour}-${reminder.minute}`),
-              ]}>
-              <Text modifiers={[font({ textStyle: 'title3' }), monospacedDigit()]}>
-                {time.format(at)}
-              </Text>
-              <Spacer />
-              <VStack alignment="trailing" spacing={0}>
-                <Text
-                  modifiers={[
-                    font({ textStyle: 'caption' }),
-                    foregroundStyle({ type: 'hierarchical', style: 'secondary' }),
-                  ]}>
-                  Next notification
-                </Text>
-                <Text
-                  modifiers={[
-                    font({ textStyle: 'footnote' }),
-                    foregroundStyle({ type: 'hierarchical', style: 'secondary' }),
-                  ]}>
-                  {formatUpdated(nextOccurrence(reminder, now), now, locale)}
-                </Text>
-              </VStack>
-              <Button
-                systemImage="minus.circle.fill"
-                onPress={() =>
-                  update((s) => ({ ...s, reminders: removeReminder(s.reminders, reminder) }))
-                }
+          const label = time.format(at)
+          const next = (
+            <VStack alignment={accessibilitySize ? 'leading' : 'trailing'} spacing={0}>
+              <Text
                 modifiers={[
-                  buttonStyle('borderless'),
-                  foregroundStyle('red'),
-                  accessibilityIdentifier(`remove-${reminder.hour}-${reminder.minute}`),
-                ]}
-              />
+                  font({ textStyle: 'caption' }),
+                  foregroundStyle({ type: 'hierarchical', style: 'secondary' }),
+                ]}>
+                Next notification
+              </Text>
+              <Text
+                modifiers={[
+                  font({ textStyle: 'footnote' }),
+                  foregroundStyle({ type: 'hierarchical', style: 'secondary' }),
+                ]}>
+                {formatUpdated(nextOccurrence(reminder, now), now, locale)}
+              </Text>
+            </VStack>
+          )
+          const remove = (
+            // A label with an icon-only style: `systemImage` alone draws nothing (@expo/ui
+            // uses it only with a label), so the button was missing since slice 7. The label
+            // is what VoiceOver reads.
+            <Button
+              label={`Remove ${label} reminder`}
+              systemImage="minus.circle.fill"
+              onPress={() =>
+                update((s) => ({ ...s, reminders: removeReminder(s.reminders, reminder) }))
+              }
+              modifiers={[
+                labelStyle('iconOnly'),
+                buttonStyle('borderless'),
+                foregroundStyle('red'),
+                accessibilityIdentifier(`remove-${reminder.hour}-${reminder.minute}`),
+              ]}
+            />
+          )
+          const hour = (
+            <Text modifiers={[font({ textStyle: 'title3' }), monospacedDigit()]}>{label}</Text>
+          )
+          const rowModifiers = [
+            // v1 dimmed to 0.1, which reads as a rendering fault (SCREENS.md §10b).
+            opacity(active ? 1 : 0.4),
+            accessibilityIdentifier(`reminder-${reminder.hour}-${reminder.minute}`),
+          ]
+          // At the accessibility text sizes the next firing goes under the hour: beside it,
+          // both broke mid-word ("9:00 A M", slice 9).
+          return accessibilitySize ? (
+            <VStack
+              key={`${reminder.hour}:${reminder.minute}`}
+              alignment="leading"
+              spacing={4}
+              modifiers={rowModifiers}>
+              <HStack>
+                {hour}
+                <Spacer />
+                {remove}
+              </HStack>
+              {next}
+            </VStack>
+          ) : (
+            <HStack key={`${reminder.hour}:${reminder.minute}`} modifiers={rowModifiers}>
+              {hour}
+              <Spacer />
+              {next}
+              {remove}
             </HStack>
           )
         })}

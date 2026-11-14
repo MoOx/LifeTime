@@ -1,0 +1,285 @@
+# Slice 9: every screen at the text size the flow runs at. Needs an E2E build
+# (EXPO_PUBLIC_E2E=1). Run it after setting the size, for the largest:
+#   xcrun simctl ui booted content_size accessibility-extra-extra-extra-large
+# Each long screen is captured at its top and once scrolled. Taps go through ids, since
+# large text pushes labels off screen and wraps them.
+appId: io.moox.LifeTime
+---
+- launchApp:
+    clearState: true
+    permissions:
+      calendar: unset
+      notifications: unset
+- extendedWaitUntil:
+    visible:
+      id: "welcome-continue"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: a01-welcome
+# The pitch scrolls above the pinned `Continue`; Maestro counts the link as visible while it
+# is still under the button, so the flow scrolls to the end first.
+- swipe:
+    start: 50%, 60%
+    end: 50%, 15%
+- swipe:
+    start: 50%, 60%
+    end: 50%, 15%
+- waitForAnimationToEnd
+- takeScreenshot: a01b-welcome-scrolled
+- tapOn:
+    id: "welcome-privacy"
+- waitForAnimationToEnd
+- takeScreenshot: a02-privacy
+- tapOn: "Done"
+- tapOn:
+    id: "welcome-continue"
+
+# The Summary on demo data.
+- extendedWaitUntil:
+    visible:
+      id: "summary"
+    timeout: 15000
+- takeScreenshot: a03-summary-demo
+- swipe:
+    start: 50%, 75%
+    end: 50%, 25%
+- takeScreenshot: a04-summary-demo-scrolled
+- swipe:
+    start: 50%, 75%
+    end: 50%, 25%
+- takeScreenshot: a05-summary-demo-bottom
+
+# The calendar card and the system prompt.
+- scrollUntilVisible:
+    element:
+      id: "use-my-calendar"
+    direction: UP
+- tapOn:
+    id: "use-my-calendar"
+- extendedWaitUntil:
+    visible:
+      id: "calendar-access"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: a06-calendar-access
+# Full height at these sizes, and its content scrolls to the buttons.
+- scrollUntilVisible:
+    element:
+      id: "access-continue"
+    direction: DOWN
+- takeScreenshot: a06b-calendar-access-scrolled
+- tapOn:
+    id: "access-continue"
+- waitForAnimationToEnd
+- tapOn: "Allow Full Access"
+
+# The empty state.
+- openLink: "lifetime://e2e?scenario=empty"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "empty-no-events"
+    timeout: 15000
+- takeScreenshot: a07-empty
+
+# Filters, from the skipped-calendars empty state.
+- openLink: "lifetime://e2e?scenario=week&skip=calendar"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "empty-only-skipped-calendars"
+    timeout: 15000
+- scrollUntilVisible:
+    element: "Help me customize settings"
+    direction: DOWN
+- tapOn: "Help me customize settings"
+- extendedWaitUntil:
+    visible:
+      id: "filters"
+    timeout: 10000
+- tapOn:
+    id: "calendar-LifeTime E2E"
+- waitForAnimationToEnd
+- takeScreenshot: a08-filters
+- tapOn: "Done"
+
+# A real week: the Sorter's card, the chart, the activities. The Summary is the one left
+# scrolled before Filters opened.
+- scrollUntilVisible:
+    element:
+      id: "sorter-card"
+    direction: UP
+    timeout: 20000
+- takeScreenshot: a09-summary-week
+- scrollUntilVisible:
+    element:
+      id: "week-pager"
+    direction: DOWN
+- takeScreenshot: a10-summary-chart
+- scrollUntilVisible:
+    element:
+      id: "activity-Gym"
+    direction: DOWN
+    centerElement: true
+- takeScreenshot: a11-summary-activities
+- tapOn:
+    id: "activity-Gym"
+- extendedWaitUntil:
+    visible:
+      id: "activity"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: a12-activity
+- swipe:
+    start: 50%, 75%
+    end: 50%, 25%
+- takeScreenshot: a13-activity-scrolled
+- tapOn: "Back"
+
+# The Sorter, and a rule from a selection.
+# Centred: near the top of the list, the button can sit under the navigation bar's blur.
+- scrollUntilVisible:
+    element:
+      id: "open-sorter"
+    direction: UP
+    centerElement: true
+- tapOn:
+    id: "open-sorter"
+- extendedWaitUntil:
+    visible:
+      id: "coverage"
+    timeout: 10000
+- takeScreenshot: a14-sorter
+- tapOn: "Select"
+- scrollUntilVisible:
+    element:
+      id: "sort-select-Gym"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "sort-select-Gym"
+- takeScreenshot: a15-sorter-select
+- scrollUntilVisible:
+    element:
+      id: "make-rule"
+    direction: UP
+- tapOn:
+    id: "make-rule"
+- extendedWaitUntil:
+    visible:
+      id: "rule-pattern"
+    timeout: 5000
+- takeScreenshot: a16-sorter-rule
+- tapOn: "Cancel"
+- tapOn: "Done"
+
+# Goals: the empty state, the editor, the reminders card, a card.
+- tapOn: "Goals"
+- extendedWaitUntil:
+    visible: "Goals"
+    timeout: 10000
+- takeScreenshot: a17-goals-empty
+- scrollUntilVisible:
+    element:
+      id: "add-goal"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "add-goal"
+- extendedWaitUntil:
+    visible:
+      id: "goal-title"
+    timeout: 10000
+- takeScreenshot: a18-goal-new
+- tapOn:
+    id: "goal-title"
+- inputText: "Workout"
+- tapOn:
+    text: "Continue"
+    optional: true
+- pressKey: Enter
+- scrollUntilVisible:
+    element:
+      id: "goal-quick-60"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "goal-quick-60"
+- takeScreenshot: a19-goal-duration
+- scrollUntilVisible:
+    element:
+      id: "goal-category-exercise"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "goal-category-exercise"
+- takeScreenshot: a20-goal-categories
+- tapOn: "Add"
+- extendedWaitUntil:
+    visible:
+      id: "reminders-access"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: a21-reminders-access
+- scrollUntilVisible:
+    element:
+      id: "reminders-not-now"
+    direction: DOWN
+- takeScreenshot: a21b-reminders-access-scrolled
+- waitForAnimationToEnd
+- tapOn:
+    id: "reminders-not-now"
+- extendedWaitUntil:
+    visible:
+      id: "goal-Workout"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: a22-goal-card
+
+# Settings and its screens.
+- tapOn: "Settings"
+- extendedWaitUntil:
+    visible:
+      id: "row-notifications"
+    timeout: 10000
+- takeScreenshot: a23-settings
+- swipe:
+    start: 50%, 75%
+    end: 50%, 25%
+- takeScreenshot: a24-settings-scrolled
+- scrollUntilVisible:
+    element:
+      id: "row-notifications"
+    direction: UP
+- tapOn:
+    id: "row-notifications"
+- waitForAnimationToEnd
+- takeScreenshot: a25-notifications
+- tapOn: "Back"
+- scrollUntilVisible:
+    element:
+      id: "row-reset"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "row-reset"
+- waitForAnimationToEnd
+- takeScreenshot: a26-reset
+- tapOn: "Back"
+- scrollUntilVisible:
+    element:
+      id: "row-help"
+    direction: UP
+    centerElement: true
+- tapOn:
+    id: "row-help"
+- extendedWaitUntil:
+    visible:
+      id: "help"
+    timeout: 10000
+- takeScreenshot: a27-help
+- tapOn: "Done"

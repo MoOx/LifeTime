@@ -1,4 +1,4 @@
-import { Button, Host, Text, VStack } from '@expo/ui/swift-ui'
+import { Button, Text, VStack } from '@expo/ui/swift-ui'
 import {
   accessibilityAddTraits,
   accessibilityIdentifier,
@@ -18,6 +18,7 @@ import {
   ProminentButton,
 } from '@/features/summary/CalendarAccess'
 import { CalendarGlyph } from '@/ui/Card'
+import { CardSheet } from '@/ui/Sheet'
 
 /**
  * The permission card as a sheet, opened by `Use my calendar` (spec/30-screens.md): v1's
@@ -32,10 +33,8 @@ export default function CalendarAccess() {
     router.back()
   }
   return (
-    <Host matchContents={{ vertical: true }} style={{ width: '100%' }}>
-      <VStack
-        spacing={16}
-        modifiers={[padding({ horizontal: 24, top: 32, bottom: 8 })]}>
+    <CardSheet>
+      <VStack spacing={16} modifiers={[padding({ horizontal: 24, top: 32, bottom: 8 })]}>
         <CalendarGlyph />
         <Text
           modifiers={[
@@ -71,6 +70,6 @@ export default function CalendarAccess() {
           />
         </VStack>
       </VStack>
-    </Host>
+    </CardSheet>
   )
 }

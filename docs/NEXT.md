@@ -188,6 +188,9 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
   evidence in [slices/7/](./slices/7/README.md).
   Slice 8 done 2026-11-14 (the Sorter and a rule from a selection), evidence in
   [slices/8/](./slices/8/README.md).
+  Slice 9 done 2026-11-14 (the accessibility pass: every screen at the largest text size,
+  VoiceOver labels, Reduce Motion), evidence in [slices/9/](./slices/9/README.md); one point
+  to hear on a device with VoiceOver (README, "Open").
 
 Follow `docs/spec/60-slices.md`, v2-alpha1 first. **Slice 0** is the fresh Expo SDK 58 scaffold (D12), with:
 - `src/domain` and its tests ported.

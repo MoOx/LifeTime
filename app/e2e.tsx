@@ -1,4 +1,4 @@
-import { Redirect, useLocalSearchParams } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 
 import { E2E_CALENDAR, E2E_ENABLED, seed, WEEK_TITLES, type Scenario } from '@/data/e2e'
@@ -40,13 +40,19 @@ export default function E2E() {
             skip === 'calendar' && calendarId
               ? [{ id: calendarId, title: E2E_CALENDAR, source: '', color: '#5856D6' }]
               : [],
-          skippedActivityTitles:
-            skip === 'activities' ? WEEK_TITLES : [],
+          skippedActivityTitles: skip === 'activities' ? WEEK_TITLES : [],
           hideSkippedActivities: true,
         }))
       })
       .finally(() => setDone(true))
   }, [scenario, skip, notify, title, update])
 
-  return done ? <Redirect href="/summary" /> : null
+  // Back to the Summary already in the stack. A `<Redirect>` replaced this screen with a
+  // second set of tabs, so every link stacked one more: two Goals screens then each opened
+  // the reminders sheet (slice 9).
+  useEffect(() => {
+    if (done) router.dismissTo('/summary')
+  }, [done])
+
+  return null
 }

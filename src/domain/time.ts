@@ -77,12 +77,8 @@ export const minutesElapsedInDay = (day: number, now: number): number => {
  * This is the primitive the whole aggregation layer is built on: an event that starts
  * before the window or ends after it only contributes the part that falls inside.
  */
-export const overlapMs = (
-  aStart: number,
-  aEnd: number,
-  bStart: number,
-  bEnd: number,
-): number => Math.max(0, Math.min(aEnd, bEnd) - Math.max(aStart, bStart))
+export const overlapMs = (aStart: number, aEnd: number, bStart: number, bEnd: number): number =>
+  Math.max(0, Math.min(aEnd, bEnd) - Math.max(aStart, bStart))
 
 /**
  * A duration as its numbers and units, `[{ value: 2, unit: 'd' }, ...]`, for drawing the
@@ -147,6 +143,9 @@ export const formatDayMonth = (t: number, locale: string): string =>
 export const formatWeekdayNarrow = (t: number, locale: string): string =>
   new Intl.DateTimeFormat(locale, { weekday: 'narrow' }).format(new Date(t))
 
+export const formatWeekdayLong = (t: number, locale: string): string =>
+  new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(new Date(t))
+
 export const formatDayMonthShort = (t: number, locale: string): string =>
   new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(new Date(t))
 
@@ -182,12 +181,8 @@ const DAY_MS = 86_400_000
 
 const formatAbsolute = (t: number, now: number, locale: string): string =>
   Math.abs(now - t) < DAY_MS
-    ? new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(
-        new Date(t),
-      )
-    : new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(
-        new Date(t),
-      )
+    ? new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(new Date(t))
+    : new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(new Date(t))
 
 /**
  * Works in both directions. The first version subtracted `now - t` and treated anything

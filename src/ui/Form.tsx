@@ -19,8 +19,10 @@ import {
   Section as SwiftSection,
   Spacer,
   Text,
+  VStack,
 } from '@expo/ui/swift-ui'
 import {
+  accessibilityAddTraits,
   accessibilityHidden,
   accessibilityIdentifier,
   buttonStyle,
@@ -39,6 +41,7 @@ import type { ColorValue } from 'react-native'
 import type { SFSymbol } from 'sf-symbols-typescript'
 
 import { colors } from '@/ui/theme/colors'
+import { ICON_SCALE_LIMIT, useAccessibilityTextSize, useTextScale } from '@/ui/textSize'
 
 /** A whole screen that is a grouped list. Its own scroll view drives the large title. */
 export function FormScreen({ children, testID }: { children: ReactNode; testID?: string }) {
@@ -79,12 +82,15 @@ export function Section({
   prominent?: boolean
   children?: ReactNode
 }) {
+  const accessibilitySize = useAccessibilityTextSize()
   const heading =
     header ??
     (action && title ? (
-      <HStack>
+      // At the accessibility text sizes the action goes under the title: side by side, both
+      // wrapped mid-word ("Weekl / y / Chart", slice 9).
+      <Stack accessibilitySize={accessibilitySize}>
         <Text>{title}</Text>
-        <Spacer />
+        {accessibilitySize ? null : <Spacer />}
         <Button
           label={action.label}
           onPress={action.onPress}
@@ -97,7 +103,7 @@ export function Section({
             ...(action.testID ? [accessibilityIdentifier(action.testID)] : []),
           ]}
         />
-      </HStack>
+      </Stack>
     ) : undefined)
   return (
     <SwiftSection
@@ -142,21 +148,22 @@ export function Row({
   testID?: string
 }) {
   const press = onPress ?? (href ? () => router.push(href) : undefined)
+  // Symbols grow with the text, up to `ICON_SCALE_LIMIT` (slice 9).
+  const iconScale = useTextScale(ICON_SCALE_LIMIT)
   const content = (
     <HStack spacing={12}>
       {icon ? (
         <Image
           systemName={icon}
-          size={20}
+          size={20 * iconScale}
           color={iconColor ?? colors.link}
-          modifiers={[frame({ width: 28 })]}
+          // Decoration: the title says it (slice 9); SwiftUI would read the symbol's name.
+          modifiers={[frame({ width: 28 * iconScale }), accessibilityHidden(true)]}
         />
       ) : null}
       <Text
         modifiers={
-          tone
-            ? [foregroundStyle(tone === 'link' ? colors.link : colors.destructive)]
-            : undefined
+          tone ? [foregroundStyle(tone === 'link' ? colors.link : colors.destructive)] : undefined
         }>
         {title}
       </Text>
@@ -174,7 +181,12 @@ export function Row({
       {checked ? (
         <Image
           systemName="checkmark"
-          modifiers={[font({ weight: 'semibold' }), foregroundStyle(colors.link)]}
+          modifiers={[
+            font({ weight: 'semibold' }),
+            foregroundStyle(colors.link),
+            // Read as the row's "Selected" trait instead.
+            accessibilityHidden(true),
+          ]}
         />
       ) : null}
       {href || chevron ? (
@@ -183,6 +195,7 @@ export function Row({
           modifiers={[
             font({ textStyle: 'footnote', weight: 'semibold' }),
             foregroundStyle({ type: 'hierarchical', style: 'tertiary' }),
+            accessibilityHidden(true),
           ]}
         />
       ) : null}
@@ -196,9 +209,28 @@ export function Row({
       onPress={press}
       modifiers={[
         tint('primary'),
+        // Always present, so the structure is stable; `isButton` is already the Button's.
+        accessibilityAddTraits(checked ? ['isSelected'] : ['isButton']),
         ...(testID ? [accessibilityIdentifier(`${testID}${checked ? '-checked' : ''}`)] : []),
       ]}>
       {content}
     </Button>
+  )
+}
+
+/** Side by side, or stacked and leading-aligned at the accessibility text sizes. */
+function Stack({
+  accessibilitySize,
+  children,
+}: {
+  accessibilitySize: boolean
+  children: ReactNode
+}) {
+  return accessibilitySize ? (
+    <VStack alignment="leading" spacing={4}>
+      {children}
+    </VStack>
+  ) : (
+    <HStack>{children}</HStack>
   )
 }

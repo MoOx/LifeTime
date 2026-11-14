@@ -41,8 +41,22 @@ Welcome's thin "Welcome to" and heavy "LifeTime" keep v1's weights (100 and 800)
 Dynamic Type (slice 3, matching capture 01). The rest of Welcome uses the roles.
 
 At the largest accessibility sizes, rows grow and nothing is truncated except the single-line
-titles v1 already truncated. Chart labels scale up to a limit of 1.3, since the chart has
-fixed geometry; this is the only clamp.
+titles v1 already truncated (the Summary's activity rows). Checked on every screen by slice 9
+([slices/9/](../slices/9/README.md)), which settled these rules (`src/ui/textSize.ts`):
+
+- **At the five accessibility sizes, a row's parts stack** instead of sitting side by side,
+  where SwiftUI's `isAccessibilitySize` turns true: a section title over its action, an
+  activity's duration over its bar, the Sorter's category menu under its title, a reminder's
+  next firing under its hour. Side by side, both halves broke mid-word.
+- **Fixed rows are capped at the largest standard size** with SwiftUI's `dynamicTypeSize`, as
+  Apple advises: the goal editor's four quick durations and its seven day circles.
+- **Chart labels scale up to 1.3**, since the chart has fixed geometry; the gutter and the
+  letter strip grow with them, and the pager's height follows the caption, on two lines at the
+  accessibility sizes.
+- **Row symbols grow with the text up to 1.5 times** (`ICON_SCALE_LIMIT`): fixed, they looked
+  lost; at twice, "Nutrition" broke as "Nutri-tion".
+- **Screens that are one card scroll**: Welcome's pitch scrolls above a pinned `Continue`, and
+  the permission sheets open full height and scroll instead of sizing to their content.
 
 ## Spacing
 
@@ -99,7 +113,23 @@ Never on content, lists or cards. Before iOS 26, the system's standard material 
 | Primary action on forms | Trailing text button | Trailing text button in the bar |
 | Haptics | Selection on toggles, as in the system | Platform default |
 
+## VoiceOver
+
+Settled by slice 9 (`src/ui/Symbols.tsx`):
+
+- A selectable row is a button whose state is the **Selected** trait (`selectionTraits`),
+  not its check or circle: category choices, Filters' calendars, the goal's type and days, the
+  Sorter's selection, Settings' theme.
+- A symbol beside a text that says the same is hidden (`IconTile`, `CheckCircle`, `Chevron`).
+- A control whose visible text is not enough says what it changes: "Category for Gym" with
+  the category as its value, "Remove 9:00 AM reminder", "60 minutes a day", the duration
+  slider read as a duration rather than a percentage.
+- The week chart is one element read as its days: "Monday: 6h 30m, mostly Work"
+  (`describeWeekChart`).
+
 ## Motion
 
 Keep v1's considered entrances: Welcome's two staged springs (SCREENS.md §2), empty-state
-scale and fade, the ring sweep. Respect Reduce Motion. No other decorative animation.
+scale and fade, the ring sweep. Respect Reduce Motion: Welcome shows at once, the ring is drawn
+at its value (slice 9). No other decorative animation. Welcome's `Continue` fades without
+sliding: a SwiftUI button mounted mid-slide kept a frame below where it was drawn.

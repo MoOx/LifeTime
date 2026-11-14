@@ -6,10 +6,9 @@
  * the week.
  */
 
-import { Button, Capsule, HStack, Image, Spacer, Text, VStack } from '@expo/ui/swift-ui'
+import { Button, Capsule, HStack, Spacer, Text, VStack } from '@expo/ui/swift-ui'
 import {
   accessibilityIdentifier,
-  background,
   containerRelativeFrame,
   font,
   foregroundStyle,
@@ -17,7 +16,6 @@ import {
   layoutPriority,
   lineLimit,
   monospacedDigit,
-  shapes,
   tint,
 } from '@expo/ui/swift-ui/modifiers'
 import { router } from 'expo-router'
@@ -29,7 +27,9 @@ import { getCategory, type CategoryId } from '@/domain/categories'
 import { formatMinutes } from '@/domain/time'
 import { Section } from '@/ui/Form'
 import { categoryColor } from '@/ui/theme/colors'
+import { Chevron, IconTile } from '@/ui/Symbols'
 import { layout } from '@/ui/theme/space'
+import { useAccessibilityTextSize } from '@/ui/textSize'
 
 /** `TopActivities.res:6`: eight rows, then Show More. */
 const ROWS_COLLAPSED = 8
@@ -56,6 +56,7 @@ export function TopActivities({
   onCustomize?: () => void
 }) {
   const scheme = useColorScheme() === 'dark' ? 'dark' : 'light'
+  const accessibilitySize = useAccessibilityTextSize()
   const [expanded, setExpanded] = useState(false)
   const shown = expanded ? activities : activities.slice(0, ROWS_COLLAPSED)
   const max = activities[0]?.minutes ?? 0
@@ -99,25 +100,25 @@ export function TopActivities({
             }
             modifiers={[tint('primary'), accessibilityIdentifier(`activity-${activity.key}`)]}>
             <HStack spacing={layout.iconGap}>
-              <Image
-                systemName={category.sf}
-                color="white"
-                size={15}
-                modifiers={[
-                  frame({ width: layout.iconSize, height: layout.iconSize }),
-                  background(
-                    color,
-                    shapes.roundedRectangle({
-                      cornerRadius: 7,
-                      roundedCornerStyle: 'continuous',
-                    }),
-                  ),
-                ]}
-              />
+              <IconTile icon={category.sf} color={color} />
               <VStack alignment="leading" spacing={6}>
                 <Text modifiers={[font({ textStyle: 'callout' }), lineLimit(1)]}>
                   {activity.key}
                 </Text>
+                {/*
+                  At the accessibility text sizes the duration goes above the bar: beside it,
+                  the bar kept its share of the width and cut "21h" to "2…" (slice 9).
+                */}
+                {accessibilitySize ? (
+                  <Text
+                    modifiers={[
+                      font({ textStyle: 'footnote' }),
+                      foregroundStyle({ type: 'hierarchical', style: 'secondary' }),
+                      monospacedDigit(),
+                    ]}>
+                    {formatMinutes(activity.minutes)}
+                  </Text>
+                ) : null}
                 <HStack spacing={6}>
                   <Capsule
                     modifiers={[
@@ -131,30 +132,26 @@ export function TopActivities({
                       frame({ height: 6 }),
                     ]}
                   />
-                  <Text
-                    modifiers={[
-                      font({ textStyle: 'footnote' }),
-                      foregroundStyle({
-                        type: 'hierarchical',
-                        style: 'secondary',
-                      }),
-                      monospacedDigit(),
-                      lineLimit(1),
-                      // The duration is never cut: the bar gives way first.
-                      layoutPriority(1),
-                    ]}>
-                    {formatMinutes(activity.minutes)}
-                  </Text>
+                  {accessibilitySize ? null : (
+                    <Text
+                      modifiers={[
+                        font({ textStyle: 'footnote' }),
+                        foregroundStyle({
+                          type: 'hierarchical',
+                          style: 'secondary',
+                        }),
+                        monospacedDigit(),
+                        lineLimit(1),
+                        // The duration is never cut: the bar gives way first.
+                        layoutPriority(1),
+                      ]}>
+                      {formatMinutes(activity.minutes)}
+                    </Text>
+                  )}
                   <Spacer />
                 </HStack>
               </VStack>
-              <Image
-                systemName="chevron.right"
-                modifiers={[
-                  font({ textStyle: 'footnote', weight: 'semibold' }),
-                  foregroundStyle({ type: 'hierarchical', style: 'tertiary' }),
-                ]}
-              />
+              <Chevron />
             </HStack>
           </Button>
         )

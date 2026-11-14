@@ -1,16 +1,16 @@
-import { Button, HStack, Image, Menu, Picker, Spacer, Text, VStack } from '@expo/ui/swift-ui'
+import { Button, HStack, Menu, Picker, Spacer, Text, VStack } from '@expo/ui/swift-ui'
 import {
+  accessibilityElement,
   accessibilityIdentifier,
-  background,
+  accessibilityLabel,
+  accessibilityValue,
   buttonBorderShape,
   buttonStyle,
   disabled,
   font,
   foregroundStyle,
-  frame,
   lineLimit,
   monospacedDigit,
-  shapes,
   tag,
   tint,
 } from '@expo/ui/swift-ui/modifiers'
@@ -30,6 +30,8 @@ import { useSettings } from '@/data/settings'
 import { FormScreen, Section } from '@/ui/Form'
 import { categoryColor, colors } from '@/ui/theme/colors'
 import { layout } from '@/ui/theme/space'
+import { CheckCircle, IconTile, selectionTraits } from '@/ui/Symbols'
+import { useAccessibilityTextSize } from '@/ui/textSize'
 
 const MODES: { mode: MatchMode; label: string }[] = [
   { mode: 'exact', label: 'Exact' },
@@ -58,6 +60,7 @@ export default function Sorter() {
   const now = useNow()
   const report = useReport(settings, useWeekStartsOn(), now)
   const scheme = useColorScheme() === 'dark' ? 'dark' : 'light'
+  const accessibilitySize = useAccessibilityTextSize()
   const events = useMemo(() => report.eventsByWeek.flat(), [report.eventsByWeek])
 
   const [rows, setRows] = useState<Suggestion[] | undefined>(undefined)
@@ -239,7 +242,7 @@ export default function Sorter() {
                   accessibilityIdentifier(`rule-category-${category.id}`),
                 ]}>
                 <HStack spacing={layout.iconGap}>
-                  <Tile icon={category.sf} color={categoryColor(category.color, scheme)} />
+                  <IconTile icon={category.sf} color={categoryColor(category.color, scheme)} />
                   <Text>{category.name}</Text>
                   <Spacer />
                 </HStack>
@@ -263,15 +266,23 @@ export default function Sorter() {
             const label = (
               <HStack spacing={layout.iconGap}>
                 {selecting ? (
-                  <Image
-                    systemName={isSelected ? 'checkmark.circle.fill' : 'circle'}
+                  <CheckCircle
+                    selected={isSelected}
                     size={22}
                     color={isSelected ? colors.link : colors.tertiaryLabel}
                   />
                 ) : null}
-                <Tile icon={category.sf} color={color} />
-                <VStack alignment="leading" spacing={2}>
-                  <Text modifiers={[lineLimit(1)]}>{row.title}</Text>
+                <IconTile icon={category.sf} color={color} />
+                {/*
+                  One element for VoiceOver, "Gym, 10h 30m · Guess", whatever it makes of the
+                  symbols beside it (slice 9).
+                */}
+                <VStack
+                  alignment="leading"
+                  spacing={2}
+                  modifiers={[accessibilityElement('combine')]}>
+                  {/* Whole at the accessibility sizes: "Cross…" did not say which (slice 9). */}
+                  <Text modifiers={[lineLimit(accessibilitySize ? 3 : 1)]}>{row.title}</Text>
                   <Text
                     modifiers={[
                       font({ textStyle: 'footnote' }),
@@ -297,46 +308,42 @@ export default function Sorter() {
                   }
                   modifiers={[
                     tint('primary'),
+                    selectionTraits(isSelected),
                     accessibilityIdentifier(`sort-select-${row.title}${isSelected ? '-on' : ''}`),
                   ]}>
                   {label}
                 </Button>
               )
             }
-            return (
+            const menu = (
+              <Menu
+                label={category.id === UNKNOWN_CATEGORY_ID ? 'Choose' : category.name}
+                modifiers={[
+                  // "Exercise" alone does not say what it changes (slice 9).
+                  accessibilityLabel(`Category for ${row.title}`),
+                  accessibilityValue(category.id === UNKNOWN_CATEGORY_ID ? 'None' : category.name),
+                  accessibilityIdentifier(`sort-row-${row.title}${rule ? '-sorted' : ''}`),
+                ]}>
+                {DEFAULT_CATEGORIES.filter((c) => c.id !== UNKNOWN_CATEGORY_ID).map((c) => (
+                  <Button key={c.id} label={c.name} onPress={() => answer(row.title, c.id)} />
+                ))}
+              </Menu>
+            )
+            // At the accessibility text sizes the menu goes under the title, which it squeezed.
+            return accessibilitySize ? (
+              <VStack key={row.title} alignment="leading" spacing={8}>
+                {label}
+                {menu}
+              </VStack>
+            ) : (
               <HStack key={row.title}>
                 {label}
-                <Menu
-                  label={category.id === UNKNOWN_CATEGORY_ID ? 'Choose' : category.name}
-                  modifiers={[
-                    accessibilityIdentifier(`sort-row-${row.title}${rule ? '-sorted' : ''}`),
-                  ]}>
-                  {DEFAULT_CATEGORIES.filter((c) => c.id !== UNKNOWN_CATEGORY_ID).map((c) => (
-                    <Button key={c.id} label={c.name} onPress={() => answer(row.title, c.id)} />
-                  ))}
-                </Menu>
+                {menu}
               </HStack>
             )
           })}
         </Section>
       </FormScreen>
     </>
-  )
-}
-
-function Tile({ icon, color }: { icon: Parameters<typeof Image>[0]['systemName']; color: string }) {
-  return (
-    <Image
-      systemName={icon}
-      color="white"
-      size={15}
-      modifiers={[
-        frame({ width: layout.iconSize, height: layout.iconSize }),
-        background(
-          color,
-          shapes.roundedRectangle({ cornerRadius: 7, roundedCornerStyle: 'continuous' }),
-        ),
-      ]}
-    />
   )
 }

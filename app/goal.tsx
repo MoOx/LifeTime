@@ -11,16 +11,16 @@ import {
   VStack,
 } from '@expo/ui/swift-ui'
 import {
+  accessibilityHidden,
+  dynamicTypeSize,
+  accessibilityValue,
   accessibilityIdentifier,
   accessibilityLabel,
-  background,
   buttonStyle,
   font,
   foregroundStyle,
-  frame,
   monospacedDigit,
   padding,
-  shapes,
   tint,
 } from '@expo/ui/swift-ui/modifiers'
 import { router, Stack, useLocalSearchParams } from 'expo-router'
@@ -43,6 +43,7 @@ import { useSettings } from '@/data/settings'
 import { FormScreen, Section } from '@/ui/Form'
 import { CATEGORY_PALETTE, categoryColor, colors } from '@/ui/theme/colors'
 import { layout } from '@/ui/theme/space'
+import { CheckCircle, IconTile, selectionTraits } from '@/ui/Symbols'
 
 /** v1's quick durations (`GoalEdit.res:242-287`, capture 06). */
 const QUICK = [30, 45, 60, 90]
@@ -153,6 +154,7 @@ export default function GoalEditor() {
               onPress={() => set({ mode: type.mode })}
               modifiers={[
                 tint('primary'),
+                selectionTraits(draft.mode === type.mode),
                 accessibilityIdentifier(
                   `goal-type-${type.mode}${draft.mode === type.mode ? '-selected' : ''}`,
                 ),
@@ -164,7 +166,11 @@ export default function GoalEditor() {
                 {draft.mode === type.mode ? (
                   <Image
                     systemName="checkmark"
-                    modifiers={[font({ weight: 'semibold' }), foregroundStyle(colors.link)]}
+                    modifiers={[
+                      font({ weight: 'semibold' }),
+                      foregroundStyle(colors.link),
+                      accessibilityHidden(true),
+                    ]}
                   />
                 ) : null}
               </HStack>
@@ -173,7 +179,8 @@ export default function GoalEditor() {
         </Section>
 
         <Section title="Days" footer="Select the days where you would like to respect this goal.">
-          <HStack>
+          {/* Seven columns, a fixed row: capped as the quick durations above (slice 9). */}
+          <HStack modifiers={[dynamicTypeSize({ max: 'xxxLarge' })]}>
             {order.map((index, position) => (
               <HStack key={index} spacing={0}>
                 {position > 0 ? <Spacer /> : null}
@@ -182,6 +189,8 @@ export default function GoalEditor() {
                     modifiers={[
                       font({ textStyle: 'caption' }),
                       foregroundStyle({ type: 'hierarchical', style: 'secondary' }),
+                      // The button under it reads the long name.
+                      accessibilityHidden(true),
                     ]}>
                     {dayName(index, 'short')}
                   </Text>
@@ -192,11 +201,13 @@ export default function GoalEditor() {
                     modifiers={[
                       buttonStyle('plain'),
                       accessibilityLabel(dayName(index, 'long')),
+                      selectionTraits(draft.days[index]),
                       accessibilityIdentifier(`goal-day-${index}${draft.days[index] ? '-on' : ''}`),
                     ]}>
-                    <Image
-                      systemName={draft.days[index] ? 'checkmark.circle.fill' : 'circle'}
+                    <CheckCircle
+                      selected={draft.days[index]}
                       size={30}
+                      grows={false}
                       color={draft.days[index] ? colors.link : colors.tertiaryLabel}
                     />
                   </Button>
@@ -209,7 +220,11 @@ export default function GoalEditor() {
         <Section
           title="Duration"
           footer="Goals are measured on a weekly basis. The time spent on an entire week is what matters to achieve your goal.">
-          <HStack>
+          {/*
+            Four buttons on one line, a fixed row: capped at the largest standard size, as
+            Apple advises for such rows. Past it, "45min" broke into "45 mi n" (slice 9).
+          */}
+          <HStack modifiers={[dynamicTypeSize({ max: 'xxxLarge' })]}>
             {QUICK.map((minutes, position) => (
               <HStack key={minutes} spacing={0}>
                 {position > 0 ? <Spacer /> : null}
@@ -219,6 +234,7 @@ export default function GoalEditor() {
                   modifiers={[
                     buttonStyle('borderless'),
                     font({ textStyle: 'subheadline', weight: 'semibold' }),
+                    accessibilityLabel(`${minutes} minutes a day`),
                     accessibilityIdentifier(`goal-quick-${minutes}`),
                   ]}
                 />
@@ -234,7 +250,12 @@ export default function GoalEditor() {
             onValueChange={(value) => set({ durationPerDay: Math.round(value) })}
             minimumValueLabel={<Text>0</Text>}
             maximumValueLabel={<Text>24</Text>}
-            modifiers={[accessibilityIdentifier('goal-duration-slider')]}
+            modifiers={[
+              // VoiceOver would read the position as a percentage of 24 h.
+              accessibilityLabel('Average Time per Day'),
+              accessibilityValue(formatMinutes(draft.durationPerDay)),
+              accessibilityIdentifier('goal-duration-slider'),
+            ]}
           />
           <LabeledContent label="Average Time per Day">
             <Text modifiers={[monospacedDigit()]}>{formatMinutes(draft.durationPerDay)}</Text>
@@ -313,23 +334,6 @@ export default function GoalEditor() {
   )
 }
 
-function IconTile({ icon, color }: { icon: SFSymbol; color: string }) {
-  return (
-    <Image
-      systemName={icon}
-      color="white"
-      size={15}
-      modifiers={[
-        frame({ width: layout.iconSize, height: layout.iconSize }),
-        background(
-          color,
-          shapes.roundedRectangle({ cornerRadius: 7, roundedCornerStyle: 'continuous' }),
-        ),
-      ]}
-    />
-  )
-}
-
 /** v1's rows: a circle to tick, the category's icon, its name (capture 06). */
 function CheckRow({
   label,
@@ -353,10 +357,11 @@ function CheckRow({
       onPress={onPress}
       modifiers={[
         tint('primary'),
+        selectionTraits(selected),
         accessibilityIdentifier(`${testID}${selected ? '-selected' : ''}`),
       ]}>
       <HStack spacing={layout.iconGap} modifiers={indent ? [padding({ leading: 40 })] : []}>
-        <Image systemName={selected ? 'checkmark.circle.fill' : 'circle'} color={color} size={24} />
+        <CheckCircle selected={selected} color={color} />
         {icon ? <IconTile icon={icon} color={color} /> : null}
         <Text>{label}</Text>
         <Spacer />

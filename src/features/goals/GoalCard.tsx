@@ -13,6 +13,7 @@
 
 import { Button, HStack, Image, RNHostView, Spacer, Text, VStack } from '@expo/ui/swift-ui'
 import {
+  accessibilityHidden,
   accessibilityIdentifier,
   font,
   foregroundStyle,
@@ -40,6 +41,8 @@ import { formatMinutes } from '@/domain/time'
 import { DurationMetric } from '@/ui/Metric'
 import { Section } from '@/ui/Form'
 import { categoryColor } from '@/ui/theme/colors'
+
+import { Chevron } from '@/ui/Symbols'
 
 import { GoalRing } from './GoalRing'
 
@@ -73,7 +76,12 @@ export function GoalCard({
         modifiers={[tint('primary'), accessibilityIdentifier(`goal-${title}`)]}>
         <VStack alignment="leading" spacing={10} modifiers={[padding({ vertical: 4 })]}>
           <HStack spacing={6}>
-            <Image systemName={category.sf} color={color} size={15} />
+            <Image
+              systemName={category.sf}
+              color={color}
+              size={15}
+              modifiers={[accessibilityHidden(true)]}
+            />
             <Text
               modifiers={[
                 font({ textStyle: 'subheadline', weight: 'semibold' }),
@@ -83,13 +91,7 @@ export function GoalCard({
               {goal.mode === 'goal' ? 'Goal' : 'Limit'}
             </Text>
             <Spacer />
-            <Image
-              systemName="chevron.right"
-              modifiers={[
-                font({ textStyle: 'footnote', weight: 'semibold' }),
-                foregroundStyle({ type: 'hierarchical', style: 'tertiary' }),
-              ]}
-            />
+            <Chevron />
           </HStack>
           <VStack alignment="leading" spacing={2}>
             <Text modifiers={[font({ textStyle: 'title2', weight: 'bold' }), lineLimit(1)]}>

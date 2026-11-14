@@ -1,4 +1,4 @@
-import { Button, HStack, Image, Spacer, Text, VStack } from '@expo/ui/swift-ui'
+import { Button, HStack, Spacer, Text, VStack } from '@expo/ui/swift-ui'
 import { accessibilityIdentifier, font, foregroundStyle, tint } from '@expo/ui/swift-ui/modifiers'
 import { router, Stack } from 'expo-router'
 
@@ -9,6 +9,7 @@ import { useReport } from '@/data/report'
 import { useSettings } from '@/data/settings'
 import type { CalendarRef } from '@/domain/settings'
 import { FormScreen, Section } from '@/ui/Form'
+import { CheckCircle, selectionTraits } from '@/ui/Symbols'
 
 /**
  * Filters ("Customize report"): SCREENS.md §5, `Filters.res` on `main`, capture 17. One row
@@ -63,6 +64,8 @@ export default function Filters() {
                   onPress={() => toggle(calendar)}
                   modifiers={[
                     tint('primary'),
+                    // "Selected" when the calendar is shown in the report.
+                    selectionTraits(shown),
                     accessibilityIdentifier(`calendar-${calendar.title}`),
                   ]}>
                   <HStack>
@@ -79,11 +82,7 @@ export default function Filters() {
                       ) : null}
                     </VStack>
                     <Spacer />
-                    <Image
-                      systemName={shown ? 'checkmark.circle.fill' : 'circle'}
-                      color={calendar.color}
-                      size={22}
-                    />
+                    <CheckCircle selected={shown} color={calendar.color} size={22} />
                   </HStack>
                 </Button>
               )

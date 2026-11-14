@@ -12,6 +12,7 @@ import {
   Animated,
   Image,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -117,60 +118,78 @@ export default function Welcome() {
           paddingBottom: insets.bottom + space.lg,
         },
       ]}>
-      <Animated.View
-        style={[styles.pitch, { opacity: pitchOpacity, transform: [{ scale: pitchScale }] }]}>
-        <Pressable onPress={onContinue} accessibilityRole="button">
-          <Image
-            source={require('../assets/icon.png')}
-            accessibilityIgnoresInvertColors
-            style={{
-              width: iconSize,
-              height: iconSize,
-              borderRadius: iconSize / 5,
-              borderCurve: 'continuous',
-            }}
-          />
-          <View style={{ height: tall ? space.md : space.xxs }} />
-          {/* `Welcome.res:113-124`: v1's sizes and weights, shrunk to fit one line. */}
-          <Text
-            numberOfLines={1}
-            adjustsFontSizeToFit
-            allowFontScaling={false}
-            style={[styles.welcomeTo, { color: colors.label }]}>
-            Welcome to
-          </Text>
-          <Text
-            numberOfLines={1}
-            adjustsFontSizeToFit
-            allowFontScaling={false}
-            style={[styles.appName, { color: colors.accent }]}>
-            LifeTime
-          </Text>
-          <View style={{ height: tall ? space.md : space.xxs }} />
-          <AppText role="sectionTitle" style={styles.baseline}>
-            Your personal coach, helping you to reach your goals and spend your valuable time on
-            things you love.
-          </AppText>
-        </Pressable>
-      </Animated.View>
+      {/*
+        The pitch and the permission sentence scroll, `Continue` stays at the bottom: at the
+        accessibility text sizes they no longer fit one screen (slice 9). At the default size
+        nothing scrolls and the layout is v1's.
+      */}
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}>
+        <Animated.View
+          style={[styles.pitch, { opacity: pitchOpacity, transform: [{ scale: pitchScale }] }]}>
+          <Pressable onPress={onContinue} accessibilityRole="button">
+            <Image
+              source={require('../assets/icon.png')}
+              accessibilityIgnoresInvertColors
+              style={{
+                width: iconSize,
+                height: iconSize,
+                borderRadius: iconSize / 5,
+                borderCurve: 'continuous',
+              }}
+            />
+            <View style={{ height: tall ? space.md : space.xxs }} />
+            {/* `Welcome.res:113-124`: v1's sizes and weights, shrunk to fit one line. */}
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              allowFontScaling={false}
+              style={[styles.welcomeTo, { color: colors.label }]}>
+              Welcome to
+            </Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              allowFontScaling={false}
+              style={[styles.appName, { color: colors.accent }]}>
+              LifeTime
+            </Text>
+            <View style={{ height: tall ? space.md : space.xxs }} />
+            <AppText role="sectionTitle" style={styles.baseline}>
+              Your personal coach, helping you to reach your goals and spend your valuable time on
+              things you love.
+            </AppText>
+          </Pressable>
+        </Animated.View>
 
-      <Animated.View style={{ opacity: bottomOpacity, transform: [{ translateY: bottomY }] }}>
-        <Pressable onPress={onContinue} style={styles.permissionRow}>
-          <CalendarIcon />
-          <AppText role="caption" tone="secondary" style={styles.permissionText}>
-            LifeTime needs access to your calendar to show activity reports & suggestions. Your data
-            stays on your device.
-          </AppText>
-        </Pressable>
-        <Pressable
-          onPress={() => router.push('/privacy')}
-          accessibilityRole="link"
-          testID="welcome-privacy"
-          style={styles.privacyLink}>
-          <AppText role="footnote" tone="accent" style={styles.privacyText}>
-            About LifeTime & Privacy...
-          </AppText>
-        </Pressable>
+        <Animated.View style={{ opacity: bottomOpacity, transform: [{ translateY: bottomY }] }}>
+          <Pressable onPress={onContinue} style={styles.permissionRow}>
+            <CalendarIcon />
+            <AppText role="caption" tone="secondary" style={styles.permissionText}>
+              LifeTime needs access to your calendar to show activity reports & suggestions. Your
+              data stays on your device.
+            </AppText>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push('/privacy')}
+            accessibilityRole="link"
+            testID="welcome-privacy"
+            style={styles.privacyLink}>
+            <AppText role="footnote" tone="accent" style={styles.privacyText}>
+              About LifeTime & Privacy...
+            </AppText>
+          </Pressable>
+        </Animated.View>
+      </ScrollView>
+
+      {/*
+        `Continue` fades in without sliding: the SwiftUI button mounts during the slide and
+        kept the frame it had then, 46 pt below where it was drawn, where Maestro tapped and
+        VoiceOver would activate it (slice 9).
+      */}
+      <Animated.View style={{ opacity: bottomOpacity }}>
         {presented ? (
           <Host matchContents={{ vertical: true }}>
             <Button
@@ -215,8 +234,10 @@ function CalendarIcon() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, justifyContent: 'space-between', backgroundColor: colors.surface },
-  pitch: { flex: 1, justifyContent: 'center' },
+  screen: { flex: 1, backgroundColor: colors.surface },
+  scroll: { flex: 1 },
+  scrollContent: { flexGrow: 1, justifyContent: 'space-between' },
+  pitch: { flexGrow: 1, justifyContent: 'center' },
   welcomeTo: { fontSize: 58, lineHeight: 60, fontWeight: '100' },
   appName: { fontSize: 68, lineHeight: 70, fontWeight: '800' },
   baseline: { fontWeight: '400' },

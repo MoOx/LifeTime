@@ -17,6 +17,7 @@ import {
   accessibilityIdentifier,
   foregroundStyle,
   frame,
+  lineLimit,
   tabViewStyle,
 } from '@expo/ui/swift-ui/modifiers'
 import { forwardRef, memo, useImperativeHandle, useState } from 'react'
@@ -25,8 +26,9 @@ import type { TimeEvent } from '@/domain/events'
 import type { RuleSet } from '@/domain/rules'
 import { addDays } from '@/domain/time'
 import { weeksAgo, type Range, type WeekStartsOn } from '@/domain/week'
+import { useAccessibilityTextSize, useTextScale } from '@/ui/textSize'
 
-import { WeekChart } from './WeekChart'
+import { chartHeight, LABEL_SCALE_LIMIT, WeekChart } from './WeekChart'
 
 export type WeekPagerHandle = { showThisWeek: () => void }
 
@@ -47,61 +49,79 @@ export const weekCaption = (
 
 const pageId = (week: Range) => String(week.start)
 
-/** Caption, 12 pt gap, then the chart's 140 pt plot and 16 pt day letters (`WeeklyGraph.res:8-9`). */
-const PAGER_HEIGHT = 22 + 12 + 140 + 16
+/**
+ * Caption, 12 pt gap, then the chart's 140 pt plot and 16 pt day letters
+ * (`WeeklyGraph.res:8-9`). The caption follows the text size, on two lines at the
+ * accessibility sizes, and the letters up to the chart's limit (slice 9): a fixed 190 pt cut
+ * the letters off.
+ */
+const CAPTION_LINE = 22
+const pagerHeight = (textScale: number, captionLines: number) =>
+  CAPTION_LINE * textScale * captionLines + 12 + chartHeight(Math.min(textScale, LABEL_SCALE_LIMIT))
 
 /**
  * Memoised: the Summary re-renders whenever the visible week changes, and the pager has no
  * reason to follow.
  */
-export const WeekPager = memo(forwardRef<
-  WeekPagerHandle,
-  {
-    weeks: Range[]
-    eventsByWeek: TimeEvent[][]
-    rules: RuleSet
-    locale: string
-    now: number
-    weekStartsOn: WeekStartsOn
-    onIndexChange: (index: number) => void
-  }
->(function WeekPager({ weeks, eventsByWeek, rules, locale, now, weekStartsOn, onIndexChange }, ref) {
-  const last = weeks.length - 1
-  const [selection, setSelection] = useState(pageId(weeks[last]))
+export const WeekPager = memo(
+  forwardRef<
+    WeekPagerHandle,
+    {
+      weeks: Range[]
+      eventsByWeek: TimeEvent[][]
+      rules: RuleSet
+      locale: string
+      now: number
+      weekStartsOn: WeekStartsOn
+      onIndexChange: (index: number) => void
+    }
+  >(function WeekPager(
+    { weeks, eventsByWeek, rules, locale, now, weekStartsOn, onIndexChange },
+    ref,
+  ) {
+    const last = weeks.length - 1
+    const textScale = useTextScale()
+    const captionLines = useAccessibilityTextSize() ? 2 : 1
+    const [selection, setSelection] = useState(pageId(weeks[last]))
 
-  useImperativeHandle(ref, () => ({
-    showThisWeek: () => {
-      setSelection(pageId(weeks[last]))
-      onIndexChange(last)
-    },
-  }))
+    useImperativeHandle(ref, () => ({
+      showThisWeek: () => {
+        setSelection(pageId(weeks[last]))
+        onIndexChange(last)
+      },
+    }))
 
-  return (
-    <TabView
-      selection={selection}
-      onSelectionChange={(page) => {
-        setSelection(page)
-        const index = weeks.findIndex((week) => pageId(week) === page)
-        if (index !== -1) onIndexChange(index)
-      }}
-      modifiers={[
-        tabViewStyle({ type: 'page', indexDisplayMode: 'never' }),
-        // A page-style TabView does not size to its content: caption, plot and day letters.
-        frame({ height: PAGER_HEIGHT }),
-        accessibilityIdentifier('week-pager'),
-      ]}>
-      {weeks.map((week, index) => (
-        <TabView.Tab key={week.start} value={pageId(week)}>
-          <VStack alignment="leading" spacing={12}>
-            <Text modifiers={[foregroundStyle({ type: 'hierarchical', style: 'secondary' })]}>
-              {weekCaption(week, now, weekStartsOn, locale)}
-            </Text>
-            <RNHostView matchContents={{ vertical: true }}>
-              <WeekChart week={week} events={eventsByWeek[index]} rules={rules} locale={locale} />
-            </RNHostView>
-          </VStack>
-        </TabView.Tab>
-      ))}
-    </TabView>
-  )
-}))
+    return (
+      <TabView
+        selection={selection}
+        onSelectionChange={(page) => {
+          setSelection(page)
+          const index = weeks.findIndex((week) => pageId(week) === page)
+          if (index !== -1) onIndexChange(index)
+        }}
+        modifiers={[
+          tabViewStyle({ type: 'page', indexDisplayMode: 'never' }),
+          // A page-style TabView does not size to its content: caption, plot and day letters.
+          frame({ height: pagerHeight(textScale, captionLines) }),
+          accessibilityIdentifier('week-pager'),
+        ]}>
+        {weeks.map((week, index) => (
+          <TabView.Tab key={week.start} value={pageId(week)}>
+            <VStack alignment="leading" spacing={12}>
+              <Text
+                modifiers={[
+                  foregroundStyle({ type: 'hierarchical', style: 'secondary' }),
+                  lineLimit(captionLines),
+                ]}>
+                {weekCaption(week, now, weekStartsOn, locale)}
+              </Text>
+              <RNHostView matchContents={{ vertical: true }}>
+                <WeekChart week={week} events={eventsByWeek[index]} rules={rules} locale={locale} />
+              </RNHostView>
+            </VStack>
+          </TabView.Tab>
+        ))}
+      </TabView>
+    )
+  }),
+)

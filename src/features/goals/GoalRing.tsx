@@ -25,7 +25,13 @@ import {
 } from '@shopify/react-native-skia'
 import { useEffect, useMemo, type ReactNode } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { Easing, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated'
+import {
+  Easing,
+  ReduceMotion,
+  useDerivedValue,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated'
 
 /** Rings start at 12 o'clock and run clockwise, like every other ring the user has seen. */
 const START_ANGLE = -90
@@ -87,6 +93,8 @@ export function GoalRing({
     swept.value = withTiming(Math.max(0, fraction), {
       duration: DURATION,
       easing: EASING,
+      // With Reduce Motion on, the ring is drawn at its value at once (40-design.md, "Motion").
+      reduceMotion: ReduceMotion.System,
     })
   }, [fraction, swept])
 

@@ -3,7 +3,9 @@ import { useColorScheme } from 'react-native'
 
 import { useReminderSchedule } from '@/data/notifications'
 import { SettingsProvider, useSettings } from '@/data/settings'
+import { cardSheetOptions } from '@/ui/Sheet'
 import { stackOptions } from '@/ui/stackOptions'
+import { useAccessibilityTextSize } from '@/ui/textSize'
 
 // Root stack: the tabs, and the sheets of docs/spec/30-screens.md ("Navigation map").
 // Sheets are UIKit page sheets (`modal`), each with its own small native header.
@@ -13,6 +15,7 @@ import { stackOptions } from '@/ui/stackOptions'
 // template that spike 2 built (docs/spikes/04-expo-ui-lists.md, "Dark mode").
 export default function RootLayout() {
   const scheme = useColorScheme()
+  const accessibilitySize = useAccessibilityTextSize()
   return (
     <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
       <SettingsProvider>
@@ -31,29 +34,16 @@ export default function RootLayout() {
           <Stack.Screen name="help" options={{ presentation: 'modal', title: '' }} />
           <Stack.Screen name="filters" options={{ presentation: 'modal', title: 'Filters' }} />
           {/* v1's permission card: a sheet sized to its content (INTENT.md D28). */}
-          <Stack.Screen
-            name="calendar-access"
-            options={{
-              presentation: 'formSheet',
-              headerShown: false,
-              sheetAllowedDetents: 'fitToContents',
-              sheetGrabberVisible: true,
-            }}
-          />
+          <Stack.Screen name="calendar-access" options={cardSheetOptions(accessibilitySize)} />
           {/* v1's reminders card, after the first goal: the same kind of sheet (D28). */}
-          <Stack.Screen
-            name="reminders-access"
-            options={{
-              presentation: 'formSheet',
-              headerShown: false,
-              sheetAllowedDetents: 'fitToContents',
-              sheetGrabberVisible: true,
-            }}
-          />
+          <Stack.Screen name="reminders-access" options={cardSheetOptions(accessibilitySize)} />
           {/* E2E builds only: seeds the simulator's calendar, then shows the Summary. */}
           <Stack.Screen name="e2e" options={{ headerShown: false }} />
           <Stack.Screen name="goal" options={{ presentation: 'modal', title: 'New Goal' }} />
-          <Stack.Screen name="sorter" options={{ presentation: 'modal', title: 'Sort Activities' }} />
+          <Stack.Screen
+            name="sorter"
+            options={{ presentation: 'modal', title: 'Sort Activities' }}
+          />
         </Stack>
       </SettingsProvider>
     </ThemeProvider>

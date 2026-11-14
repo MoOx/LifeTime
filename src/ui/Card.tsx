@@ -102,15 +102,17 @@ export function NoticeCard({
             ) : null}
           </HStack>
         ) : null}
-        <VStack
-          alignment="leading"
-          spacing={14}
-          modifiers={[padding({ all: INSET })]}>
+        <VStack alignment="leading" spacing={14} modifiers={[padding({ all: INSET })]}>
           <HStack alignment="top" spacing={12}>
             <Image
               systemName={icon}
               size={28}
-              modifiers={[foregroundStyle(colors.accent), frame({ width: 34 })]}
+              // Decoration: the title beside it says what the card is about.
+              modifiers={[
+                foregroundStyle(colors.accent),
+                frame({ width: 34 }),
+                accessibilityHidden(true),
+              ]}
             />
             <VStack alignment="leading" spacing={4}>
               {/*

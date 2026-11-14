@@ -1,4 +1,4 @@
-import { Button, Host, Image, Text, VStack } from '@expo/ui/swift-ui'
+import { Button, Image, Text, VStack } from '@expo/ui/swift-ui'
 import {
   accessibilityAddTraits,
   accessibilityHidden,
@@ -17,6 +17,7 @@ import { router } from 'expo-router'
 import { requestNotificationAccess } from '@/data/notifications'
 import { ProminentButton } from '@/features/summary/CalendarAccess'
 import { colors } from '@/ui/theme/colors'
+import { CardSheet } from '@/ui/Sheet'
 
 /**
  * v1's reminders card (SCREENS.md §10e, `NotificationsPermissionsPopin.res` on `main`,
@@ -31,7 +32,7 @@ export default function RemindersAccess() {
     router.back()
   }
   return (
-    <Host matchContents={{ vertical: true }} style={{ width: '100%' }}>
+    <CardSheet>
       <VStack spacing={16} modifiers={[padding({ horizontal: 24, top: 32, bottom: 8 })]}>
         <Image
           systemName="bell.badge.fill"
@@ -73,6 +74,6 @@ export default function RemindersAccess() {
           />
         </VStack>
       </VStack>
-    </Host>
+    </CardSheet>
   )
 }

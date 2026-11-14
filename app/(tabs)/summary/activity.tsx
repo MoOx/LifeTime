@@ -1,14 +1,12 @@
-import { Button, Capsule, HStack, Image, Picker, Spacer, Text, VStack } from '@expo/ui/swift-ui'
+import { Button, Capsule, HStack, Picker, Spacer, Text, VStack } from '@expo/ui/swift-ui'
 import {
   accessibilityIdentifier,
-  background,
   containerRelativeFrame,
   fixedSize,
   font,
   foregroundStyle,
   frame,
   monospacedDigit,
-  shapes,
   tag,
   textCase,
   tint,
@@ -29,6 +27,7 @@ import { useSettings } from '@/data/settings'
 import { FormScreen, Section } from '@/ui/Form'
 import { categoryColor, colors } from '@/ui/theme/colors'
 import { layout } from '@/ui/theme/space'
+import { CheckCircle, IconTile, selectionTraits } from '@/ui/Symbols'
 
 const MODES: { mode: MatchMode; label: string }[] = [
   { mode: 'exact', label: 'Exact' },
@@ -117,31 +116,14 @@ export default function Activity() {
                 onPress={() => setRule(category.id, mode)}
                 modifiers={[
                   tint('primary'),
+                  selectionTraits(selected),
                   accessibilityIdentifier(`category-${category.id}${selected ? '-selected' : ''}`),
                 ]}>
                 <HStack spacing={layout.iconGap}>
-                  <Image
-                    systemName={category.sf}
-                    color="white"
-                    size={15}
-                    modifiers={[
-                      frame({ width: layout.iconSize, height: layout.iconSize }),
-                      background(
-                        color,
-                        shapes.roundedRectangle({
-                          cornerRadius: 7,
-                          roundedCornerStyle: 'continuous',
-                        }),
-                      ),
-                    ]}
-                  />
+                  <IconTile icon={category.sf} color={color} />
                   <Text>{category.name}</Text>
                   <Spacer />
-                  <Image
-                    systemName={selected ? 'checkmark.circle.fill' : 'circle'}
-                    color={color}
-                    size={24}
-                  />
+                  <CheckCircle selected={selected} color={color} />
                 </HStack>
               </Button>
             )

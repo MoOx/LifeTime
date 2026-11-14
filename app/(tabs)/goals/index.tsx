@@ -1,11 +1,7 @@
-import { Button, HStack, Image, Picker, Text, VStack } from '@expo/ui/swift-ui'
+import { Button, HStack, Picker, Text, VStack } from '@expo/ui/swift-ui'
 import {
   accessibilityIdentifier,
-  background,
   font,
-  foregroundStyle,
-  frame,
-  shapes,
   tag,
   tint,
 } from '@expo/ui/swift-ui/modifiers'
@@ -24,6 +20,7 @@ import { GoalCard } from '@/features/goals/GoalCard'
 import { FormScreen, Section } from '@/ui/Form'
 import { CATEGORY_PALETTE } from '@/ui/theme/colors'
 import { layout } from '@/ui/theme/space'
+import { IconTile } from '@/ui/Symbols'
 
 /** v1's two paragraphs (`Goals.res:93-154`), "help your to" corrected. */
 const INTRO = [
@@ -102,10 +99,9 @@ export default function Goals() {
                   {INTRO.map((paragraph) => (
                     <Text
                       key={paragraph}
-                      modifiers={[
-                        font({ textStyle: 'subheadline' }),
-                        foregroundStyle({ type: 'hierarchical', style: 'secondary' }),
-                      ]}>
+                      // The header is already secondary: a hierarchical secondary on top of
+                      // it drew the text at a contrast too low to read (slice 9).
+                      modifiers={[font({ textStyle: 'subheadline' })]}>
                       {paragraph}
                     </Text>
                   ))}
@@ -181,18 +177,7 @@ function AddRow({
   return (
     <Button onPress={onPress} modifiers={[tint('primary'), accessibilityIdentifier(testID)]}>
       <HStack spacing={layout.iconGap}>
-        <Image
-          systemName={icon}
-          color="white"
-          size={15}
-          modifiers={[
-            frame({ width: layout.iconSize, height: layout.iconSize }),
-            background(
-              color,
-              shapes.roundedRectangle({ cornerRadius: 7, roundedCornerStyle: 'continuous' }),
-            ),
-          ]}
-        />
+        <IconTile icon={icon} color={color} />
         <Text>{label}</Text>
       </HStack>
     </Button>

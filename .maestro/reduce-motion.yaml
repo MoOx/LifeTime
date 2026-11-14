@@ -1,0 +1,56 @@
+# Slice 9: Reduce Motion. Turn it on in the simulator first, then run:
+#   xcrun simctl spawn booted defaults write com.apple.Accessibility ReduceMotionEnabled -bool true
+# Recordings of Welcome's entrance and of a goal ring appearing: with Reduce Motion, both are
+# in place from their first frame (40-design.md, "Motion").
+appId: io.moox.LifeTime
+---
+- startRecording: reduce-motion-welcome
+- launchApp:
+    clearState: true
+    permissions:
+      calendar: unset
+      notifications: unset
+- extendedWaitUntil:
+    visible:
+      id: "welcome-continue"
+    timeout: 30000
+- takeScreenshot: m01-welcome
+- stopRecording
+- waitForAnimationToEnd
+- tapOn:
+    id: "welcome-continue"
+- extendedWaitUntil:
+    visible:
+      id: "summary"
+    timeout: 15000
+- tapOn: "Goals"
+- tapOn:
+    id: "add-goal"
+- extendedWaitUntil:
+    visible:
+      id: "goal-title"
+    timeout: 10000
+- tapOn:
+    id: "goal-quick-60"
+- scrollUntilVisible:
+    element:
+      id: "goal-category-work"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "goal-category-work"
+- tapOn: "Add"
+# The reminders card comes with the first goal; the ring is recorded as the card goes.
+- extendedWaitUntil:
+    visible:
+      id: "reminders-not-now"
+    timeout: 10000
+- startRecording: reduce-motion-ring
+- tapOn:
+    id: "reminders-not-now"
+- extendedWaitUntil:
+    visible:
+      id: "goal-Work"
+    timeout: 10000
+- takeScreenshot: m02-goal-ring
+- stopRecording
