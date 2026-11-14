@@ -31,12 +31,12 @@ concurrency:
 
 jobs:
   testflight:
-    # Deliberately the image default Xcode. HideTheNotch established that
-    # setup-xcode with latest-stable picks Xcode 26.3, whose Swift compiler
-    # rejects expo-modules-jsi:
-    #   JavaScriptCodable+Date.swift:53:50: error: type of expression is
-    #   ambiguous without a type annotation
-    runs-on: macos-latest
+    # The app is built and checked locally with Xcode 27.2 (docs/slices/0/). The
+    # macos-latest and macos-26 images stop at Xcode 26.6, so the first alpha1 run
+    # failed at setup-xcode; GitHub's Xcode 27 image (public preview, label
+    # `xcode-27`, actions/runner-images#14404) has 27.2. HideTheNotch had found that
+    # Xcode 26.3's Swift compiler rejects expo-modules-jsi.
+    runs-on: xcode-27
     timeout-minutes: 90
     if: >-
       github.event_name != 'push' ||
