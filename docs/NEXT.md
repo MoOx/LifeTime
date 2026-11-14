@@ -200,6 +200,10 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
   MoOx: accept the pending agreement in App Store Connect (Business, or the banner on the
   home page), then rerun the last failed run of "iOS to TestFlight", or push a commit
   containing `[testflight]`.
+  3. MoOx accepted an agreement; the rerun of `0aded80` (attempt 2, 19:13) got the same
+     answer. Still missing: possibly the Apple Developer Program License Agreement on
+     developer.apple.com/account, which only the Account Holder can accept, or a delay before
+     an accepted agreement takes effect.
 
 Follow `docs/spec/60-slices.md`, v2-alpha1 first. **Slice 0** is the fresh Expo SDK 58 scaffold (D12), with:
 - `src/domain` and its tests ported.
