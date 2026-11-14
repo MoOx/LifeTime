@@ -12,7 +12,7 @@ import { useMemo, useRef, useState } from 'react'
 
 import { calendarOfTitle, minutesByTitle, totalMinutes } from '@/domain/aggregate'
 import { explainEmptinessOverWeeks } from '@/domain/events'
-import { categoryOf } from '@/domain/rules'
+import { categoryOf, coverage } from '@/domain/rules'
 import { formatUpdated } from '@/domain/time'
 import { clampToNow } from '@/domain/week'
 import { openAppSettings, useCalendarAccess } from '@/data/calendar'
@@ -65,6 +65,15 @@ export default function Summary() {
       })),
     [events, range.start, range.end, report.rules],
   )
+
+  // Share of the six weeks' minutes with a category (CATEGORISATION.md §3).
+  const sorted = useMemo(
+    () =>
+      coverage(report.eventsByWeek.flat(), report.rules, (e) => (e.end - e.start) / 60_000),
+    [report.eventsByWeek, report.rules],
+  )
+  // Real calendars only: the demo comes sorted, as an example.
+  const sortable = report.source === 'calendar' && !report.loading && sorted < 0.99
 
   const toggleHidden = () =>
     update((s) => ({ ...s, hideSkippedActivities: !s.hideSkippedActivities }))
@@ -121,6 +130,22 @@ export default function Summary() {
             testID: 'access-privacy',
           }}
           testID="access-denied"
+        />
+      ) : null}
+
+      {sortable ? (
+        // The Sorter's way in (spec/30-screens.md): a suggestion card, as Health's, while
+        // some of the logged time has no category.
+        <NoticeCard
+          icon="wand.and.stars"
+          title="Sort Activities"
+          body={`${Math.floor(sorted * 100)}% of your time has a category. Sort the rest in a few taps, and future events will follow.`}
+          primary={{
+            label: 'Sort Activities',
+            onPress: () => router.push('/sorter'),
+            testID: 'open-sorter',
+          }}
+          testID="sorter-card"
         />
       ) : null}
 

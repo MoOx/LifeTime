@@ -164,3 +164,59 @@ export const alsoMatches = (
   }
   return result
 }
+
+/**
+ * One rule for several titles (D26, spec/10-model.md, "A rule from a selection"), on
+ * normalised titles:
+ *
+ *   1. all identical: `exact`;
+ *   2. a common prefix of at least 3 characters ending on a word boundary: `startsWith`;
+ *   3. otherwise a common suffix under the same condition: `endsWith`;
+ *   4. otherwise a common run of at least one whole word: `contains`;
+ *   5. otherwise `undefined`: the caller writes one `exact` rule per title.
+ *
+ * The pattern is normalised (lower case), as `matches` compares normalised titles anyway.
+ */
+export const inferRule = (
+  titles: readonly string[],
+): { title: string; match: MatchMode } | undefined => {
+  const all = [...new Set(titles.map(normalizeTitle))].filter((t) => t.length > 0)
+  if (all.length === 0) return undefined
+  if (all.length === 1) return { title: all[0], match: 'exact' }
+
+  const minLength = Math.min(...all.map((t) => t.length))
+
+  // 2. Prefix: the longest common one, cut back to a word boundary in every title.
+  let prefix = 0
+  while (prefix < minLength && all.every((t) => t[prefix] === all[0][prefix])) prefix++
+  for (let end = prefix; end >= 3; end--) {
+    const candidate = all[0].slice(0, end)
+    if (candidate.endsWith(' ')) continue
+    if (all.every((t) => t.length === end || t[end] === ' ')) {
+      return { title: candidate, match: 'startsWith' }
+    }
+  }
+
+  // 3. Suffix, the mirror image.
+  let suffix = 0
+  const at = (t: string, i: number) => t[t.length - 1 - i]
+  while (suffix < minLength && all.every((t) => at(t, suffix) === at(all[0], suffix))) suffix++
+  for (let length = suffix; length >= 3; length--) {
+    const candidate = all[0].slice(all[0].length - length)
+    if (candidate.startsWith(' ')) continue
+    if (all.every((t) => t.length === length || t[t.length - length - 1] === ' ')) {
+      return { title: candidate, match: 'endsWith' }
+    }
+  }
+
+  // 4. The longest run of whole words found, as whole words, in every title.
+  const words = all[0].split(' ')
+  const hasWords = (t: string, run: string) => ` ${t} `.includes(` ${run} `)
+  for (let size = words.length; size >= 1; size--) {
+    for (let start = 0; start + size <= words.length; start++) {
+      const run = words.slice(start, start + size).join(' ')
+      if (all.every((t) => hasWords(t, run))) return { title: run, match: 'contains' }
+    }
+  }
+  return undefined
+}

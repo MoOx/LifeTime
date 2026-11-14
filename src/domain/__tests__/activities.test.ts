@@ -1,6 +1,7 @@
 import {
   Activity,
   alsoMatches,
+  inferRule,
   MatchMode,
   matches,
   normalizeTitle,
@@ -94,5 +95,44 @@ describe('alsoMatches', () => {
   })
   it('claims nothing else when exact', () => {
     expect(alsoMatches({ title: 'Lunch', match: 'exact' }, titles)).toEqual([])
+  })
+})
+
+describe('inferRule', () => {
+  it('is exact when every title is the same once normalised', () => {
+    expect(inferRule(['Gym', 'gym ', 'GYM'])).toEqual({ title: 'gym', match: 'exact' })
+  })
+
+  it('finds a common start on a word boundary', () => {
+    expect(inferRule(['Gym', 'Gym legs', 'Gym arms'])).toEqual({ title: 'gym', match: 'startsWith' })
+    expect(inferRule(['Team lunch', 'Team meeting'])).toEqual({ title: 'team', match: 'startsWith' })
+  })
+
+  it('never cuts a word: "Gymnastics" and "Gym" share no word', () => {
+    expect(inferRule(['Gymnastics', 'Gym'])).toBeUndefined()
+  })
+
+  it('falls back to a common end', () => {
+    expect(inferRule(['Morning run', 'Evening run'])).toEqual({ title: 'run', match: 'endsWith' })
+  })
+
+  it('then to a common run of whole words', () => {
+    expect(inferRule(['Lunch with Jane', 'Dinner with Jane and Bob'])).toEqual({
+      title: 'with jane',
+      match: 'contains',
+    })
+  })
+
+  it('needs at least three characters for a start or an end', () => {
+    expect(inferRule(['PT legs', 'PT arms'])).toEqual({ title: 'pt', match: 'contains' })
+  })
+
+  it('gives up when nothing is shared', () => {
+    expect(inferRule(['Sleep', 'Deep work'])).toBeUndefined()
+  })
+
+  it('yields a rule that also claims a new title of the same kind', () => {
+    const rule = inferRule(['Gym', 'Gym legs'])!
+    expect(matches(activity(rule.title, rule.match, 'exercise'), 'Gym arms')).toBe(true)
   })
 })

@@ -64,7 +64,7 @@ Both sides are put through `normalizeTitle` first: case-folded, whitespace colla
 trailing ` — someone` / ` w/ someone` attendee suffix removed. That last one collapses a
 lot of real calendar noise into one activity for free.
 
-The reach of a broad rule is shown before it is saved. `app/activity/[title].tsx` counts
+The reach of a broad rule is shown before it is saved. `app/(tabs)/summary/activity.tsx` counts
 how many *other* titles in the last six weeks the rule would also claim, and says so —
 issue #13 identified an invisible blast radius as the hard part of the UX, and it is.
 
@@ -91,7 +91,8 @@ consult it unless asked with `{ includeKeywords: true }`, which only the sorter 
 
 ## 3. The sorter
 
-`app/categorize.tsx`. The screen that replaces "repeat a few hundred times".
+`app/sorter.tsx` (slice 8, [slices/8/](./slices/8/README.md)). The screen that replaces "repeat a
+few hundred times". Opened from a card on the Summary while some logged time has no category.
 
 - Reads the last `categorisationWeeks` weeks (default 6, user-settable).
 - `suggestAll` groups every **uncategorised** title, sums its minutes, and sorts by
@@ -111,7 +112,8 @@ vanish under the user's thumb and the remaining count jump around.
 ### 3.1 A rule from a selection
 
 Select several rows or events; the app deduces one rule that also applies to future events
-(MoOx, 2026-11-09; algorithm in `docs/spec/10-model.md`). The user sees the pattern, can change
+(MoOx, 2026-11-09; algorithm in `docs/spec/10-model.md`, `inferRule` in
+`src/domain/activities.ts`). The user sees the pattern, can change
 its mode, and sees what else it would claim before applying it.
 
 ---

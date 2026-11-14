@@ -1,0 +1,139 @@
+# Slice 8: the Sorter and a rule from a selection. Needs an E2E build (EXPO_PUBLIC_E2E=1).
+# New screen, so no v1 capture: the evidence is the flow and its screenshots.
+appId: io.moox.LifeTime
+---
+- launchApp:
+    clearState: true
+    permissions:
+      calendar: unset
+- extendedWaitUntil:
+    visible: "Continue"
+    timeout: 30000
+- tapOn: "Continue"
+- tapOn:
+    id: "use-my-calendar"
+- tapOn:
+    id: "access-continue"
+- waitForAnimationToEnd
+- tapOn: "Allow Full Access"
+- openLink: "lifetime://e2e?scenario=week"
+- tapOn:
+    text: "Open"
+    optional: true
+
+# A fortnight with no rule: the Summary offers the Sorter.
+- extendedWaitUntil:
+    visible:
+      id: "sorter-card"
+    timeout: 20000
+- takeScreenshot: 40-sorter-card
+- tapOn:
+    id: "open-sorter"
+- extendedWaitUntil:
+    visible: "0%"
+    timeout: 10000
+- takeScreenshot: 41-sorter
+
+# Two titles, one rule: "Gym" and "Gym legs" give `Starts With "gym"`.
+- tapOn: "Select"
+- scrollUntilVisible:
+    element:
+      id: "sort-select-Gym"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "sort-select-Gym"
+- scrollUntilVisible:
+    element:
+      id: "sort-select-Gym legs"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "sort-select-Gym legs"
+- scrollUntilVisible:
+    element:
+      id: "make-rule"
+    direction: UP
+- tapOn:
+    id: "make-rule"
+- extendedWaitUntil:
+    visible: "“gym”"
+    timeout: 5000
+- assertVisible: ".*Starts With.*"
+- takeScreenshot: 42-rule-from-selection
+- scrollUntilVisible:
+    element:
+      id: "rule-category-exercise"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "rule-category-exercise"
+
+# Every remaining guess in one action.
+- scrollUntilVisible:
+    element:
+      id: "accept-all"
+    direction: UP
+- tapOn:
+    id: "accept-all"
+
+# CrossFit has no guess: a selection of one gives an exact rule.
+- tapOn: "Select"
+- scrollUntilVisible:
+    element:
+      id: "sort-select-CrossFit"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "sort-select-CrossFit"
+- scrollUntilVisible:
+    element:
+      id: "make-rule"
+    direction: UP
+- tapOn:
+    id: "make-rule"
+- extendedWaitUntil:
+    visible: "“crossfit”"
+    timeout: 5000
+- scrollUntilVisible:
+    element:
+      id: "rule-category-exercise"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    id: "rule-category-exercise"
+- scrollUntilVisible:
+    element:
+      id: "coverage"
+    direction: UP
+- assertVisible: "100%"
+- takeScreenshot: 43-all-sorted
+- tapOn: "Done"
+- extendedWaitUntil:
+    notVisible:
+      id: "sorter-card"
+    timeout: 10000
+- takeScreenshot: 44-summary-sorted
+
+# A new event of the same kind follows the rule with no action.
+- openLink: "lifetime://e2e?scenario=late-event&title=Gym%20arms"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "summary"
+    timeout: 15000
+- scrollUntilVisible:
+    element:
+      id: "activity-Gym arms"
+    direction: DOWN
+    centerElement: true
+    timeout: 30000
+- tapOn:
+    id: "activity-Gym arms"
+- extendedWaitUntil:
+    visible:
+      id: "category-exercise-selected"
+    timeout: 10000
+- takeScreenshot: 45-new-event-claimed

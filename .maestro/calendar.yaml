@@ -87,8 +87,10 @@ appId: io.moox.LifeTime
 - waitForAnimationToEnd
 - takeScreenshot: 17-filters
 - tapOn: "Done"
+# The week is in: with nothing sorted yet, the Sorter's card shows (slice 8).
 - extendedWaitUntil:
-    visible: "Deep work"
+    visible:
+      id: "sorter-card"
     timeout: 15000
 - assertNotVisible:
     id: "empty-only-skipped-calendars"
@@ -105,8 +107,10 @@ appId: io.moox.LifeTime
     timeout: 15000
 - takeScreenshot: 04d-empty-only-skipped-activities
 - tapOn: "Toggle Hidden Activities"
+# The week is in: with nothing sorted yet, the Sorter's card shows (slice 8).
 - extendedWaitUntil:
-    visible: "Deep work"
+    visible:
+      id: "sorter-card"
     timeout: 15000
 
 # A real fortnight, then one more event: it appears with no refresh action.
@@ -115,8 +119,10 @@ appId: io.moox.LifeTime
 - tapOn:
     text: "Open"
     optional: true
+# The week is in: with nothing sorted yet, the Sorter's card shows (slice 8).
 - extendedWaitUntil:
-    visible: "Deep work"
+    visible:
+      id: "sorter-card"
     timeout: 15000
 - takeScreenshot: 12-calendar-week
 - openLink: "lifetime://e2e?scenario=late-event"

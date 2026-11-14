@@ -53,6 +53,7 @@ export default function RootLayout() {
           {/* E2E builds only: seeds the simulator's calendar, then shows the Summary. */}
           <Stack.Screen name="e2e" options={{ headerShown: false }} />
           <Stack.Screen name="goal" options={{ presentation: 'modal', title: 'New Goal' }} />
+          <Stack.Screen name="sorter" options={{ presentation: 'modal', title: 'Sort Activities' }} />
         </Stack>
       </SettingsProvider>
     </ThemeProvider>

@@ -26,8 +26,10 @@ appId: io.moox.LifeTime
 - tapOn:
     text: "Open"
     optional: true
+# The week is in: with nothing sorted yet, the Sorter's card shows (slice 8).
 - extendedWaitUntil:
-    visible: "Deep work"
+    visible:
+      id: "sorter-card"
     timeout: 15000
 - takeScreenshot: 12-before-rule
 

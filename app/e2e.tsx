@@ -12,10 +12,12 @@ import { useSettings } from '@/data/settings'
  * (`src/data/e2e.ts`).
  */
 export default function E2E() {
-  const { scenario, skip, notify } = useLocalSearchParams<{
+  const { scenario, skip, notify, title } = useLocalSearchParams<{
     scenario?: Scenario
     skip?: string
     notify?: string
+    /** The late event's title (slice 8: a new "Gym arms" a rule should claim). */
+    title?: string
   }>()
   const { update } = useSettings()
   const [done, setDone] = useState(!E2E_ENABLED)
@@ -29,7 +31,7 @@ export default function E2E() {
         .finally(() => setDone(true))
       return
     }
-    seed(scenario ?? 'week')
+    seed(scenario ?? 'week', Date.now(), title)
       .then((calendarId) => {
         update((settings) => ({
           ...settings,
@@ -44,7 +46,7 @@ export default function E2E() {
         }))
       })
       .finally(() => setDone(true))
-  }, [scenario, skip, notify, update])
+  }, [scenario, skip, notify, title, update])
 
   return done ? <Redirect href="/summary" /> : null
 }

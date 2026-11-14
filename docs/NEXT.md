@@ -186,6 +186,8 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
   Slice 6 done 2026-11-13 (Goals), evidence in [slices/6/](./slices/6/README.md).
   Slice 7 done 2026-11-13 (Settings, Notifications, Reset; settings kept on the device),
   evidence in [slices/7/](./slices/7/README.md).
+  Slice 8 done 2026-11-14 (the Sorter and a rule from a selection), evidence in
+  [slices/8/](./slices/8/README.md).
 
 Follow `docs/spec/60-slices.md`, v2-alpha1 first. **Slice 0** is the fresh Expo SDK 58 scaffold (D12), with:
 - `src/domain` and its tests ported.

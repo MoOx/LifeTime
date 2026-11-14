@@ -77,7 +77,11 @@ const seedAllDay = async (calendarId: string, now: number) => {
 }
 
 /** Seeds the scenario and returns the E2E calendar's id, if one remains. */
-export const seed = async (scenario: Scenario, now = Date.now()): Promise<string | undefined> => {
+export const seed = async (
+  scenario: Scenario,
+  now = Date.now(),
+  title = 'Late addition',
+): Promise<string | undefined> => {
   if (!E2E_ENABLED) return undefined
   const { reset, create, event } = writes()
   isolated = true
@@ -85,7 +89,7 @@ export const seed = async (scenario: Scenario, now = Date.now()): Promise<string
     // One more event, ending five minutes ago, in the existing calendar.
     const calendar = (await LifeTimeCalendar.listCalendars()).find((c) => c.title === E2E_CALENDAR)
     if (calendar === undefined) return undefined
-    await event(calendar.id, 'Late addition', now - 60 * minuteMs, now - 5 * minuteMs, false)
+    await event(calendar.id, title, now - 60 * minuteMs, now - 5 * minuteMs, false)
     return calendar.id
   }
   await reset(E2E_CALENDAR)
