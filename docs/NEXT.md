@@ -191,7 +191,7 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
   Slice 9 done 2026-11-14 (the accessibility pass: every screen at the largest text size,
   VoiceOver labels, Reduce Motion), evidence in [slices/9/](./slices/9/README.md); one point
   to hear on a device with VoiceOver (README, "Open").
-- [x] **Milestone v2-alpha1 on TestFlight: uploaded 2026-11-15.** Build 2.0.0 (10) of
+- [ ] **Milestone v2-alpha1 on TestFlight: build 10 uploaded 2026-11-15, rejected by Apple.** Build 2.0.0 (10) of
   `0aded80`, run 43625292452 attempt 3: "Successfully uploaded the new binary to App Store
   Connect" (fastlane, 07:13 UTC). Earlier attempts, kept for the record:
   1. `0262389` failed at `setup-xcode`: `macos-latest` stops at Xcode 26.6. The workflow now
@@ -199,7 +199,12 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
   2. `0aded80` attempts 1 and 2 got through Xcode 27.2 and match signing, then App Store
      Connect refused `latest_testflight_build_number`: "A required agreement is missing or
      has expired." MoOx accepted the pending agreements; attempt 3 went through.
-  Next for MoOx: install build 10 from TestFlight once Apple has processed it, and listen
+  3. Apple then rejected build 10 during processing, ITMS-90683: no `NSCalendarsUsageDescription`.
+     The deployment target is iOS 16.4 and `modules/lifetime-calendar` falls back to
+     `requestAccess(to: .event)` before iOS 17, which needs that older key besides
+     `NSCalendarsFullAccessUsageDescription`. Added to `app.json` with the same wording
+     (`npx expo config --type introspect` lists both); build 11 sent with that commit.
+  Next for MoOx: install the build from TestFlight once Apple has processed it, and listen
   with VoiceOver to the point left open in [slices/9/](./slices/9/README.md) ("Open").
 
 Follow `docs/spec/60-slices.md`, v2-alpha1 first. **Slice 0** is the fresh Expo SDK 58 scaffold (D12), with:
