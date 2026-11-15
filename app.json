@@ -40,7 +40,8 @@
         }
       ],
       "expo-localization",
-      "expo-sqlite"
+      "expo-sqlite",
+      "./modules/lifetime-health/app.plugin.js"
     ],
     "experiments": {
       "typedRoutes": true,

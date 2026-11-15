@@ -1,0 +1,45 @@
+# Spike 5, the refusal (docs/spikes/05-healthkit.md). Run after spike-health.yaml, on a fresh
+# install: the week that flow seeded stays in the simulator's Health, written by LifeTime.
+appId: io.moox.LifeTime
+---
+- launchApp:
+    clearState: true
+- openLink: "lifetime://spike-health"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "health-status"
+    timeout: 15000
+- tapOn:
+    id: "health-request"
+- extendedWaitUntil:
+    visible: "Health Access"
+    timeout: 10000
+# With no topic selected the sheet ends with a disabled "Allow" and "Don't Allow". The tree
+# also lists hidden navigation items with the same names: take the button under the
+# disabled one.
+- scrollUntilVisible:
+    element:
+      text: "Allow"
+      enabled: false
+    direction: DOWN
+- tapOn:
+    text: "Don’t Allow"
+    below:
+      text: "Allow"
+      enabled: false
+# iOS then explains where to change one's mind.
+- extendedWaitUntil:
+    visible: "You can turn on health data categories later in the Health app."
+    timeout: 10000
+- takeScreenshot: h05a-denied-alert
+- tapOn: "OK"
+- extendedWaitUntil:
+    visible: "Request status: unnecessary"
+    timeout: 10000
+- tapOn:
+    id: "health-read"
+- waitForAnimationToEnd
+- takeScreenshot: h05-denied

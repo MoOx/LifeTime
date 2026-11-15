@@ -1,0 +1,55 @@
+# Spike 5, HealthKit (docs/spikes/05-healthkit.md). Needs an E2E build (EXPO_PUBLIC_E2E=1):
+# asks for Health, seeds a week into the simulator"s Health, reads it back, and checks the
+# change signal fired. The Health sheet is iOS"s own; simctl cannot grant Health, so the flow
+# taps it.
+appId: io.moox.LifeTime
+---
+- launchApp:
+    clearState: true
+- openLink: "lifetime://spike-health"
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "health-status"
+    timeout: 15000
+- takeScreenshot: h01-before
+- tapOn:
+    id: "health-request"
+- extendedWaitUntil:
+    visible: "Health Access"
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: h02-health-sheet
+# iOS 27's sheet: one button selects every topic, read and write, then "Allow".
+- tapOn: "Select All .* Topics"
+- takeScreenshot: h03-health-sheet-on
+# The sheet ends with "Continue" and "Don't Allow" under the list (iOS 27.2); the "Allow"
+# the accessibility tree also lists is a hidden navigation bar item.
+- scrollUntilVisible:
+    element:
+      text: "Continue"
+    direction: DOWN
+- takeScreenshot: h03b-health-sheet-end
+- tapOn:
+    text: "Continue"
+# iOS 27 then asks how much history to share. The flow picks the narrower choice, the one
+# LifeTime must cope with.
+- extendedWaitUntil:
+    visible: "Past 30 Days and Future Data"
+    timeout: 10000
+- takeScreenshot: h03c-health-history
+- tapOn: "Past 30 Days and Future Data"
+- tapOn: "Allow"
+- extendedWaitUntil:
+    visible: "Request status: unnecessary"
+    timeout: 10000
+- tapOn:
+    id: "health-seed"
+# The totals are one multi-line text: match it whole.
+- extendedWaitUntil:
+    visible: "(?s).*Workouts: 5, 285 min.*Mindful: 7, 70 min.*Older than 30 days: 1"
+    timeout: 60000
+- assertNotVisible: "Change signals: 0"
+- takeScreenshot: h04-read-back

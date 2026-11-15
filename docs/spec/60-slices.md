@@ -30,9 +30,9 @@ v1 are listed there, each with its reason.
 
 | # | Slice | Done when | Evidence beyond the common bar |
 |---|---|---|---|
-| 10 | **Spike HealthKit**, then detail this alpha from what alpha1 taught | Verdict in `docs/spikes/` | |
-| 11 | **Observations and overlap rules.** | Same thing seen twice counted once; different things in parallel counted in both; tested | Test output |
-| 12 | **HealthKit source and Sources screen.** | Seeded week appears, gym in the calendar and on the watch counted once; denied case honest | Seeded captures; a real week on MoOx's iPhone |
+| 10 | **Spike HealthKit**, then detail this alpha from what alpha1 taught | Verdict in `docs/spikes/` | Done: [spike 5](../spikes/05-healthkit.md). What alpha1 teaches on MoOx's calendars may still reshape 11 and 12 |
+| 11 | **Observations and overlap rules.** Health samples become observations (sleep from stages when present, in-bed otherwise; workouts by activity; mindful sessions) beside calendar events, with their writer kept | Same thing seen twice counted once (a gym event and a strength workout overlapping); different things in parallel counted in both; two writers of one workout counted once; tested | Test output |
+| 12 | **HealthKit source and Sources screen.** `modules/lifetime-health` out of E2E-only; HealthKit capability and profile (MoOx); the Sources screen says what Health shares, including iOS 27's 30-day choice, and how to change it; spike screen removed | Seeded week appears, gym in the calendar and on the watch counted once; refusal and "no data" read the same, honestly; weeks beyond Health's window keep their calendar data | Seeded captures; a real week on MoOx's iPhone |
 
 **Milestone: v2-alpha2 on TestFlight.** MoOx uses it for a few weeks.
 

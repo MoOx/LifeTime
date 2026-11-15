@@ -191,6 +191,10 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
   Slice 9 done 2026-11-14 (the accessibility pass: every screen at the largest text size,
   VoiceOver labels, Reduce Motion), evidence in [slices/9/](./slices/9/README.md); one point
   to hear on a device with VoiceOver (README, "Open").
+  Slice 10 done 2026-11-15 (spike HealthKit): [spikes/05-healthkit.md](./spikes/05-healthkit.md),
+  flows `.maestro/spike-health.yaml` and `spike-health-denied.yaml` pass in light and dark;
+  slices 11 and 12 detailed in `spec/60-slices.md`. Slice 12 will need MoOx for the HealthKit
+  capability and a regenerated App Store profile.
 - [x] **Milestone v2-alpha1 on TestFlight: build 11 available 2026-11-15** (MoOx confirmed it in TestFlight, no ITMS mail). Build 2.0.0 (10) of
   `0aded80`, run 43625292452 attempt 3: "Successfully uploaded the new binary to App Store
   Connect" (fastlane, 07:13 UTC). Earlier attempts, kept for the record:
