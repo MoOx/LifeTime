@@ -191,7 +191,7 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
   Slice 9 done 2026-11-14 (the accessibility pass: every screen at the largest text size,
   VoiceOver labels, Reduce Motion), evidence in [slices/9/](./slices/9/README.md); one point
   to hear on a device with VoiceOver (README, "Open").
-- [ ] **Milestone v2-alpha1 on TestFlight: build 11 uploaded 2026-11-15, Apple processing to confirm.** Build 2.0.0 (10) of
+- [x] **Milestone v2-alpha1 on TestFlight: build 11 available 2026-11-15** (MoOx confirmed it in TestFlight, no ITMS mail). Build 2.0.0 (10) of
   `0aded80`, run 43625292452 attempt 3: "Successfully uploaded the new binary to App Store
   Connect" (fastlane, 07:13 UTC). Earlier attempts, kept for the record:
   1. `0262389` failed at `setup-xcode`: `macos-latest` stops at Xcode 26.6. The workflow now
@@ -205,7 +205,6 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
      `NSCalendarsFullAccessUsageDescription`. Added to `app.json` with the same wording
      (`npx expo config --type introspect` lists both). Build 11 of `e2f49af`, run
      43689259927: "Successfully uploaded the new binary to App Store Connect" (07:35 UTC).
-     Not yet checked: that Apple's processing accepts it (an ITMS mail would say otherwise).
   Next for MoOx: install the build from TestFlight once Apple has processed it, and listen
   with VoiceOver to the point left open in [slices/9/](./slices/9/README.md) ("Open").
 
