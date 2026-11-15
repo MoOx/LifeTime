@@ -191,19 +191,16 @@ evidence, the verdict. A failed spike is a result. Update the spec if a verdict 
   Slice 9 done 2026-11-14 (the accessibility pass: every screen at the largest text size,
   VoiceOver labels, Reduce Motion), evidence in [slices/9/](./slices/9/README.md); one point
   to hear on a device with VoiceOver (README, "Open").
-- **Milestone v2-alpha1 on TestFlight: blocked on MoOx (2026-11-14).** Two runs:
+- [x] **Milestone v2-alpha1 on TestFlight: uploaded 2026-11-15.** Build 2.0.0 (10) of
+  `0aded80`, run 43625292452 attempt 3: "Successfully uploaded the new binary to App Store
+  Connect" (fastlane, 07:13 UTC). Earlier attempts, kept for the record:
   1. `0262389` failed at `setup-xcode`: `macos-latest` stops at Xcode 26.6. The workflow now
      runs on GitHub's Xcode 27 image (`runs-on: xcode-27`, public preview), `0aded80`.
-  2. `0aded80` got through Xcode 27.2 and match signing, then App Store Connect refused
-     `latest_testflight_build_number`: "A required agreement is missing or has expired. This
-     request requires an in-effect agreement that has not been signed or has expired."
-  MoOx: accept the pending agreement in App Store Connect (Business, or the banner on the
-  home page), then rerun the last failed run of "iOS to TestFlight", or push a commit
-  containing `[testflight]`.
-  3. MoOx accepted an agreement; the rerun of `0aded80` (attempt 2, 19:13) got the same
-     answer. Still missing: possibly the Apple Developer Program License Agreement on
-     developer.apple.com/account, which only the Account Holder can accept, or a delay before
-     an accepted agreement takes effect.
+  2. `0aded80` attempts 1 and 2 got through Xcode 27.2 and match signing, then App Store
+     Connect refused `latest_testflight_build_number`: "A required agreement is missing or
+     has expired." MoOx accepted the pending agreements; attempt 3 went through.
+  Next for MoOx: install build 10 from TestFlight once Apple has processed it, and listen
+  with VoiceOver to the point left open in [slices/9/](./slices/9/README.md) ("Open").
 
 Follow `docs/spec/60-slices.md`, v2-alpha1 first. **Slice 0** is the fresh Expo SDK 58 scaffold (D12), with:
 - `src/domain` and its tests ported.
